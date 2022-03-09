@@ -13,24 +13,24 @@ document.writeln(`
             </div>                                
             <div>
                 <b><u>Games</u></b><br>
-                Trivia<br>
-                The Wheel<br>
-                Clash<br>
+                <a href="">Trivia</a><br>
+                <a href="">The Wheel</a><br>
+                <a href="">Clash</a><br>
             </div>                                
             <div>
                 <b><u>Office</u></b><br>
-                Writer<br>
-                Sheets<br>
-                Presentation<br>
+                <a href="">Writer</a><br>
+                <a href="">Sheets</a><br>
+                <a href="">Presentation</a><br>
             </div>                                
             <div>
                 <b><u>Tools</u></b><br>
-                HTML Coder<br>
+                <a href="">HTML Coder</a><br>
             </div>                                
             <div>
                 <b><u>Media</u></b><br>
-                Video Player<br>
-                Interactive Book<br>
+                <a href="">Video Player</a><br>
+                <a href="">Interactive Book</a><br>
             </div>
         </div>
     </li>
