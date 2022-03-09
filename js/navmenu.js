@@ -30,6 +30,7 @@ document.writeln(`
             <div>
                 <b><u>Media</u></b><br>
                 <a href="">Video Player</a><br>
+                <a href="">OBS</a><br>
                 <a href="">Interactive Book</a><br>
             </div>
         </div>
