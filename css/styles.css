@@ -23,57 +23,195 @@ header {
   box-sizing: border-box;
 }
 
-header nav {
-  display: flex;
+input.hamburger {
+  display: none;
 }
+
 header span {
   display: flex;
   align-items: center;
   height: 100%;
 }
 
-header ul {
-  list-style-type: none;
-  padding: 0;
+@media screen and (max-width: 600px) {
+  header span:first-child {
+    padding-left: 48px;
+  }
+
+  nav {
+    position: fixed;
+    top: 57px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    overflow: scroll;
+  }
+
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  nav > ul li {
+    position: relative;
+    padding: 0 20px;
+    height: 48px;
+    line-height: 48px;
+    border-bottom: 1px solid lightgray;
+  }
+
+  input.hamburger:checked ~ label > i {
+    background-color: transparent;
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+
+  input.hamburger:checked ~ label > i:before {
+    -webkit-transform: translate(-50%, 0%) rotate(315deg);
+    transform: translate(-50%, 0%) rotate(315deg);
+  }
+
+  input.hamburger:checked ~ label > i:after {
+    -webkit-transform: translate(-50%, 0%) rotate(-315deg);
+    transform: translate(-50%, 0%) rotate(-315deg);
+  }
+
+  input.hamburger:checked ~ label > div::after {
+    width: 100%;
+  }
+
+  input.hamburger:checked ~ label > div::before {
+    width: 0;
+  }
+
+  /** hamburger */
+  input.hamburger:checked ~ nav {
+    //	height: 100vh;
+    width: 100vw;
+  }
+
+  input.hamburger:checked ~ label > i {
+    background-color: transparent;
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+
+  input.hamburger:checked ~ label > i:before {
+    -webkit-transform: translate(-50%, -50%) rotate(315deg);
+    transform: translate(-50%, -50%) rotate(315deg);
+  }
+
+  input.hamburger:checked ~ label > i:after {
+    -webkit-transform: translate(-50%, -50%) rotate(-315deg);
+    transform: translate(-50%, -50%) rotate(-315deg);
+  }
+
+  label.hamburger {
+    z-index: 9999;
+    position: relative;
+    display: block;
+    height: 24px;
+    width: 24px;
+  }
+
+  label.hamburger:hover {
+    cursor: pointer;
+  }
+
+  label.hamburger > i {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
+    pointer-events: auto;
+    transition-duration: 0.35s;
+    transition-delay: 0.35s;
+  }
+
+  label.hamburger > i:before,
+  label.hamburger > i:after {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 2px;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
+    content: "";
+    transition: -webkit-transform 0.35s;
+    transition: transform 0.35s;
+    transition: transform 0.35s, -webkit-transform 0.35s;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+  }
+
+  label.hamburger > i:before {
+    -webkit-transform: translate(-50%, -7px);
+    transform: translate(-50%, -7px);
+  }
+
+  label.hamburger > i:after {
+    -webkit-transform: translate(-50%, 7px);
+    transform: translate(-50%, 7px);
+  }
+
+  label.hamburger {
+    position: fixed;
+    top: 14px;
+    left: 17px;
+  }
 }
 
-header nav > ul li {
-  position: relative;
-  float: left;
-  padding: 0 10px;
-  height: 56px;
-  line-height: 56px;
-}
+@media screen and (min-width: 601px) {
+  header nav {
+    display: flex;
+  }
 
-header nav > ul li:hover {
-  color: blue;
-}
+  header ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
-header ul li > div {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.5rem);
-  background-color: white;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25);
-  opacity: 0;
-  transform: translateY(-25px);
-  transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
-  line-height: 1.8rem;
-  pointer-events: none;
+  header nav > ul li {
+    position: relative;
+    float: left;
+    padding: 0 10px;
+    height: 56px;
+    line-height: 56px;
+  }
 
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 2rem;
-}
+  header nav > ul li:hover {
+    color: blue;
+  }
 
-header ul li:hover > div,
-header ul li > div:hover {
-  transform: translateY(-10px);
-  opacity: 1;
-  pointer-events: auto;
-  color: black;
+  header ul li > div {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateY(-25px);
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    line-height: 1.8rem;
+    pointer-events: none;
+
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 2rem;
+  }
+
+  header ul li:hover > div,
+  header ul li > div:hover {
+    transform: translateY(-10px);
+    opacity: 1;
+    pointer-events: auto;
+    color: black;
+  }
 }
 
 .nav-webxr {
