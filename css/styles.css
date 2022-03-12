@@ -21,6 +21,8 @@ header {
   justify-content: space-between;
   display: flex;
   box-sizing: border-box;
+
+  align-items: center;
 }
 
 input.hamburger {
@@ -30,6 +32,8 @@ input.hamburger {
 header span {
   display: flex;
   align-items: center;
+  position: absolute;
+  left: 56px;
   height: 100%;
 }
 
@@ -60,7 +64,7 @@ header span {
     //	transition: height 246ms .5s ease;
     transition: width 246ms 0.5s ease;
     top: 61px;
-    right: 0px;
+    left: 0px;
     overflow-x: hidden;
     overflow-y: hidden;
     border-top: 1px solid rgba(255, 255, 255, 0.8);
@@ -108,7 +112,7 @@ header span {
 
   /** hamburger */
   input.hamburger:checked ~ nav {
-    //	height: 100vh;
+    height: 100vh;
     width: 100vw;
   }
 
