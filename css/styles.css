@@ -37,31 +37,74 @@ header span {
   height: 100%;
 }
 
+@media screen and (min-width: 601px) {
+  header nav {
+    display: flex;
+  }
+
+  header ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  header nav > ul li {
+    position: relative;
+    float: left;
+    padding: 0 10px;
+    height: 56px;
+    line-height: 56px;
+  }
+
+  header nav > ul li:hover {
+    color: blue;
+  }
+
+  header ul li > div {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateY(-25px);
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    line-height: 1.8rem;
+    pointer-events: none;
+
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 2rem;
+  }
+
+  header ul li:hover > div,
+  header ul li > div:hover {
+    transform: translateY(-10px);
+    opacity: 1;
+    pointer-events: auto;
+    color: black;
+  }
+}
+
+.nav-webxr {
+  grid-template-columns: repeat(3, max-content);
+}
+
 @media screen and (max-width: 600px) {
   header span:first-child {
     padding-left: 48px;
   }
 
   nav {
-    /*
-    position: fixed;
-    top: 57px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: white;
-    overflow: scroll;
-  */
     position: fixed;
     height: 100%;
-    //	width: 100vw;
     width: 0;
     font-size: 0.8em;
     text-transform: uppercase;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
-    //	transition: height 246ms .5s ease;
     transition: width 246ms 0.5s ease;
     top: 61px;
     left: 0px;
@@ -77,7 +120,7 @@ header span {
     padding: 0;
     margin: 0;
   }
-
+  /*
   nav > ul li {
     position: relative;
     padding: 0 20px;
@@ -85,7 +128,7 @@ header span {
     line-height: 48px;
     border-bottom: 1px solid lightgray;
   }
-
+*/
   input.hamburger:checked ~ label > i {
     background-color: transparent;
     -webkit-transform: rotate(90deg);
@@ -186,59 +229,58 @@ header span {
     top: 14px;
     left: 17px;
   }
-}
 
-@media screen and (min-width: 601px) {
-  header nav {
-    display: flex;
-  }
-
-  header ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  header nav > ul li {
+  header nav label,
+  header nav .singleItem {
     position: relative;
-    float: left;
-    padding: 0 10px;
-    height: 56px;
-    line-height: 56px;
+    display: block;
+    padding: 0.6em;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 2px 0 #fff;
+    font-size: 1.1em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+    color: #666;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.865, 0.14, 0.095, 0.87);
   }
-
-  header nav > ul li:hover {
-    color: blue;
-  }
-
-  header ul li > div {
+  header nav label:after {
+    content: "+";
     position: absolute;
-    right: 0;
-    top: calc(100% + 0.5rem);
-    background-color: white;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25);
-    opacity: 0;
-    transform: translateY(-25px);
-    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
-    line-height: 1.8rem;
-    pointer-events: none;
+    right: 1em;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+    border-radius: 50%;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
+  }
+  header nav input:checked + label {
+    color: #b044d6;
+  }
+  header nav input:checked + label:after {
+    content: "-";
+  }
+
+  header nav .accordion__content {
+    overflow: hidden;
+    height: auto;
+    max-height: 0px;
+    position: relative;
+    padding: 0 1.5em;
+    box-shadow: inset 10px 0 0 0 navy, inset 0 3px 6px rgba(0, 0, 0, 0.75);
+    background: #efefef;
+    transition: max-height 1s ease-in 0s;
 
     display: grid;
-    grid-template-columns: repeat(2, max-content);
-    gap: 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
-  header ul li:hover > div,
-  header ul li > div:hover {
-    transform: translateY(-10px);
-    opacity: 1;
-    pointer-events: auto;
-    color: black;
+  header nav input:checked ~ .accordion__content {
+    height: auto;
+    max-height: 9999px;
   }
 }
 
-.nav-webxr {
-  grid-template-columns: repeat(3, max-content);
+header nav input {
+  display: none;
 }
-
