@@ -1,12 +1,13 @@
 document.writeln(`
 <nav>
 <ul>
-    <li>Home</li>
-    <li>Hardware</li>
-    <li>Software</li>
+    <li class="singleItem">Home</li>
+    <li><input type="radio" name="panel" id="nav-hardware"><label for="nav-hardware">Hardware</label></li>
+    <li><input type="radio" name="panel" id="nav-software"><label for="nav-software">Software</label></li>
     <li>
-        HTML
-        <div>
+    <input type="radio" name="panel" id="nav-html">
+    <label for="nav-html">HTML</label>
+        <div class="accordion__content">
             <div>
                 <b><u>Web Apps</u></b><br>
                 None<br>
@@ -36,8 +37,9 @@ document.writeln(`
         </div>
     </li>
     <li>
-        WebXR
-        <div class="nav-webxr">
+    <input type="radio" name="panel" id="nav-webxr">
+    <label for="nav-webxr">WebXR</label>
+        <div class="accordion__content nav-webxr">
             <div style="grid-column: span 3;">About</div>
             <div style="grid-column: span 3;">Wiki</div>
             <div>1</div>
