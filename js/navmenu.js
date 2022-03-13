@@ -2,10 +2,18 @@ document.writeln(`
 <nav>
 <ul>
     <li class="singleItem">Home</li>
-    <li><input type="radio" name="panel" id="nav-hardware"><label for="nav-hardware">Hardware</label></li>
-    <li><input type="radio" name="panel" id="nav-software"><label for="nav-software">Software</label></li>
+    <input type="radio" name="panel" id="nav-hardware">
     <li>
+        <label for="nav-hardware">Hardware</label>
+        <div class="accordion__content">Hardware</div>
+    </li>
+    <input type="radio" name="panel" id="nav-software">
+    <li>
+        <label for="nav-software">Software</label>
+        <div class="accordion__content">Software</div>
+    </li>
     <input type="radio" name="panel" id="nav-html">
+    <li>
     <label for="nav-html">HTML</label>
         <div class="accordion__content">
             <div>
@@ -33,11 +41,11 @@ document.writeln(`
                 <a href="">Video Player</a><br>
                 <a href="">OBS</a><br>
                 <a href="">Interactive Book</a><br>
-            </div>
+                </div>
         </div>
     </li>
-    <li>
     <input type="radio" name="panel" id="nav-webxr">
+    <li>
     <label for="nav-webxr">WebXR</label>
         <div class="accordion__content nav-webxr">
             <div style="grid-column: span 3;">About</div>
