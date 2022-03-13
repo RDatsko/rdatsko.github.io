@@ -196,6 +196,5 @@ header input:checked + li > label:after {
   box-shadow: inset 10px 0 0 0 navy, inset 0 3px 6px rgba(0, 0, 0, 0.75);
   background: #efefef;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: block;
 }
