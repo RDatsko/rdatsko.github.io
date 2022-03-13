@@ -245,7 +245,7 @@ header span {
     transition: all 0.4s cubic-bezier(0.865, 0.14, 0.095, 0.87);
   }
   header nav label:after {
-    content: "+";
+    content: "＋";
     position: absolute;
     right: 1em;
     width: 1em;
@@ -258,7 +258,7 @@ header span {
     color: #b044d6;
   }
   header nav input:checked + label:after {
-    content: "-";
+    content: "ー";
   }
 
   header nav .accordion__content {
