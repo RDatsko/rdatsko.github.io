@@ -192,7 +192,7 @@ header input:checked + li > label:after {
   overflow: scroll;
   height: calc(100% - 44px);
   position: relative;
-  padding: 0 1.5em;
+  padding: 1.5em;
   box-shadow: inset 10px 0 0 0 navy, inset 0 3px 6px rgba(0, 0, 0, 0.75);
   background: #efefef;
 
