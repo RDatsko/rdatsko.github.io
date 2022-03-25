@@ -46,7 +46,7 @@ document.writeln(`
     </li>
     <input type="radio" name="panel" id="nav-webxr">
     <li>
-    <label for="nav-webxr">WebXR</label>
+    <label for="nav-webxr">WebXR3js</label>
         <div class="accordion__content nav-webxr">
             <div style="grid-column: span 3;">About</div>
             <div style="grid-column: span 3;">Wiki</div>
