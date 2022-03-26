@@ -48,11 +48,11 @@ document.writeln(`
     <li>
     <label for="nav-webxr">WebXR3js</label>
         <div class="accordion__content nav-webxr">
-            <a href="/webxr/"><div style="grid-column: span 3;">About</div></a>
+            <a href="/pages/webxr/"><div style="grid-column: span 3;">About</div></a>
             <div style="grid-column: span 3;">Wiki</div>
             <div>1</div>
             <div>1</div>
-            <div>1</div>
+            <div>1</div>s
         </div>
     </li>
 </ul>
