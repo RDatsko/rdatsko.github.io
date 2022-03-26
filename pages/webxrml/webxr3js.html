@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WebXR Three JS Wrapper</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#xrscene {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+
+<div id="xrscene"></div>
+
+<script src="../../js/webxr3.js" type="module"></script>
+<script type="module">
+import { App, camera, scene, Model } from '../../js/webxr3.js';
+
+/* Assets go here
+ * ================================================== */
+const asset = {
+    hall: { src: "hall.glb" }
+};
+
+
+
+
+
+/* Application goes here
+ * ================================================== */
+
+ async function main() {
+    const app = new App();
+    await app.init();
+    app.start();
+
+    const hall = new Model(asset.hall);
+    scene.add(hall);
+}
+
+main().catch((err) => {
+    console.error(err);
+})
+</script>
+</body>
+</html>
