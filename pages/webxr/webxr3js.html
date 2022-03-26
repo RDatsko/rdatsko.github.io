@@ -28,7 +28,83 @@ import { App, camera, scene, Model } from '../../js/webxr3.js';
 /* Assets go here
  * ================================================== */
 const asset = {
-    hall: { src: "hall.glb" }
+    // hall
+    //foxr_tex: { src: "./assets/foxr.png" },
+    //hall_model: { src: "./assets/hall.glb" },
+    hall_model: { src: "./assets/hall_variants/hall_empty.glb" },
+    //generic_controller_model: { src: "./assets/generic_controller.glb" },
+    //lightmap_tex: { src: "./assets/lightmap.jpg" },
+    //controller_tex: { src: "./assets/controller.basis" },
+    //doorfx_tex: { src: "./assets/doorfx.basis" },
+    //sky_tex: { src: "./assets/sky.png" },
+    //clouds_tex: { src: "./assets/clouds.basis" },
+    //teleport_model: { src: "./assets/teleport.glb" },
+    //beam_tex: { src: "./assets/beamfx.png" },
+    //glow_tex: { src: "./assets/glow.basis" },
+    //newsticker_tex: { src: "./assets/newsticker.jpg" },
+    //mozillamr_tex: { src: "./assets/mozillamr.basis" },
+    //zoomicon_tex: { src: "./assets/zoomicon.png" },
+
+    // panoramas
+    //panoballfx_tex: { src: "./assets/ballfx.basis" },
+
+    //stereopanoL: { src: "./assets/stereopanoL.basis" },
+    //stereopanoL: { src: "./assets/stereopanoL.basis" },
+    //stereopanoR: { src: "./assets/stereopanoR.basis" },
+    //pano1small: { src: "./assets/stereopano_small.basis" },
+
+    //pano2: { src: "./assets/tigerturtle.basis" },
+    //pano3: { src: "./assets/lakebyllesby.basis" },
+    //pano4: { src: "./assets/haldezollern.basis" },
+    //pano5: { src: "./assets/zapporthorn.basis" },
+    //pano6: { src: "./assets/thuringen.basis" },
+    //pano2small: { src: "./assets/tigerturtle_small.basis" },
+    //pano3small: { src: "./assets/lakebyllesby_small.basis" },
+    //pano4small: { src: "./assets/haldezollern_small.basis" },
+    //pano5small: { src: "./assets/zapporthorn_small.basis" },
+    //pano6small: { src: "./assets/thuringen_small.basis" },
+
+    // graffiti
+    //spray_model: { src: "./assets/spray.glb" },
+    //spray_tex: { src: "./assets/spray.basis" },
+
+    // vertigo
+    //vertigo_model: { src: "./assets/vertigo.glb" },
+    //vertigo_door_lm_tex: { src: "./assets/vertigo_door_lm.jpg" },
+    //vertigo_lm_tex: { src: "./assets/vertigo_lm.basis" },
+    //checkboard_tex: { src: "./assets/checkboard.basis" },
+
+    // sound
+    //sound_model: { src: "./assets/sound.glb" },
+    //sound_door_model: { src: "./assets/sound_door.glb" },
+    //sound_shadow_tex: { src: "./assets/sound_shadow.png" },
+    //sound_door_lm_tex: { src: "./assets/sound_door_lm.jpg" },
+    //grid_tex: { src: "./assets/grid.png" },
+
+    // photogrametry object
+    //pg_floor_tex: { src: "./assets/travertine2.basis" },
+    //pg_floor_lm_tex: { src: "./assets/pg_floor_lm.jpg" },
+    //pg_door_lm_tex: { src: "./assets/pg_door_lm.jpg" },
+    //pg_object_tex: { src: "./assets/angel.basis" },
+    //pg_object_model: { src: "./assets/angel.min.glb" },
+    //pg_bg_tex: { src: "./assets/pg_bg.jpg" },
+    //pg_flare_tex: { src: "./assets/flare.jpg" },
+    //pg_panel_tex: { src: "./assets/panel.basis" },
+
+    // paintings
+    //painting_seurat_tex: { src: "./assets/paintings/seurat.basis" },
+    //painting_sorolla_tex: { src: "./assets/paintings/sorolla.basis" },
+    //painting_bosch_tex: { src: "./assets/paintings/bosch.basis" },
+    //painting_degas_tex: { src: "./assets/paintings/degas.basis" },
+    //painting_rembrandt_tex: { src: "./assets/paintings/rembrandt.basis" },
+
+    // sounnds
+    //birds_snd: { src: "./assets/ogg/birds.ogg" },
+    //chopin_snd: { src: "./assets/ogg/chopin.ogg" },
+    //forest_snd: { src: "./assets/ogg/forest.ogg" },
+    //wind_snd: { src: "./assets/ogg/wind.ogg" },
+    //teleport_a_snd: { src: "./assets/ogg/teleport_a.ogg" },
+    //teleport_b_snd: { src: "./assets/ogg/teleport_b.ogg" },
 };
 
 
@@ -43,7 +119,7 @@ const asset = {
     await app.init();
     app.start();
 
-    const hall = new Model(asset.hall);
+    const hall = new Model(asset.hall_model);
     scene.add(hall);
 }
 
