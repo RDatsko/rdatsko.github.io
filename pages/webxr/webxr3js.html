@@ -21,10 +21,8 @@ body {
 
 <div id="xrscene"></div>
 
-<script src="../../js/webxr3.js" type="module"></script>
-<script type="module">
-import { App, camera, scene, Model } from '../../js/webxr3.js';
-
+<script src="../../js/webxr3.min.js"></script>
+<script>
 /* Assets go here
  * ================================================== */
 const asset = {
@@ -115,11 +113,13 @@ const asset = {
  * ================================================== */
 
  async function main() {
-    const app = new App();
+    const app = new W3.App();
+    let scene = W3.scene;
+
     await app.init();
     app.start();
 
-    const hall = new Model(asset.hall_model);
+    const hall = new W3.Model("hall_model");
     scene.add(hall);
 }
 
