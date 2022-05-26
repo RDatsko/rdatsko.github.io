@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="/css/sm.css">
+<link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="/css/lg.css">
+<title>Portfolio</title>
+</head>
+<body>
+<header>
+<input id="hamburger" class="hamburger" type="checkbox" />
+<label for="hamburger" class="hamburger"><i></i></label>
+<span>[ Logo ]</span>
+<script src="js/navmenu.js"></script>
+</header>
+<h1>Screen Recorder</h1>
+<video width="320" height="240" autoplay></video><br>
+<button id="shareScreen">Capture Screen</button>
+<button id="rec" disabled>Record</button>
+<button id="stop" disabled>Stop</button>
+<a id="downloadLink" download="mediarecorder.webm" name="mediarecorder.webm" href></a>
+<div id="error"></div>
+<script src="../../../js/screen_capture.js"></script>
+</body>
+</html>
