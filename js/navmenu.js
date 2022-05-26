@@ -41,6 +41,7 @@ document.writeln(`
                 <a href="">Video Player</a><br>
                 <a href="">OBS</a><br>
                 <a href="">Interactive Book</a><br>
+                <a href="/pages/javascript/screen_capture.html">Screen Capture</a><br>
                 </div>
         </div>
     </li>
