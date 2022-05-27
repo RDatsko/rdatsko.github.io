@@ -2,7 +2,7 @@
     "short_name": "WebXR3.js Sample",
   
   
-    "name": "WebXR3.js PWA applicatipn",
+    "name": "WebXR3.js PWA application",
     "icons": [{
         "src": "icons/icon-256.png",
         "sizes": "256x256",
@@ -18,4 +18,3 @@
   
     "display": "standalone"
   }
-  
