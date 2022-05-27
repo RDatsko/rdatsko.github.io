@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>WebXR Three JS Wrapper</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="./manifest.json">
 <style>
 body {
   margin: 0;
@@ -21,6 +22,16 @@ body {
 
 <div id="xrscene"></div>
 
+<script>
+  if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js',
+         {scope: "./"}
+        ).then(function(reg) { 
+            console.log('Service Worker Registered for scope : '+ reg.scope); 
+          });
+     }
+  
+  </script>
 <script src="../../js/webxr3.min.js"></script>
 <script>
 /* Assets go here
