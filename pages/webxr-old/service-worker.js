@@ -1,7 +1,7 @@
 const STATIC_DATA = [
     'webxr3js.html',
     'js/webxr3.min.js',
-    'assets/hall_variants/hall_empty.glb',
+    'assets/models/hall_empty.glb',
   ];
   
   const cacheName ='cache_v1';
