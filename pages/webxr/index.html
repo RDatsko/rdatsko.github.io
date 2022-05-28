@@ -13,7 +13,7 @@
 <script>
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js',
-    { scope: "/pages/webxr/" }
+    { scope: "./" }
     ).then(function(reg) { 
         console.log('Service Worker Registered for scope : '+ reg.scope); 
     });
