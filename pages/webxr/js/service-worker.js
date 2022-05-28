@@ -3,8 +3,9 @@ const STATIC_DATA = [
     'index.html',
     // JavaScipt
     'js/webxr.js',
-    'js/webxr.three.js'
+    'js/webxr.three.js',
     // Assets
+    'assets/models/hall_empty.glb',
 ];
 
 const cacheName ='cache_v1';
