@@ -83,13 +83,13 @@ class Controller {
         this.initInputListenerXR();
 
         this.group = new THREE.Group();
-
+/*
         this.marker = new THREE.Mesh(
             new THREE.CircleGeometry( 0.25, 32 ).rotateX( - Math.PI / 2 ),
             new THREE.MeshBasicMaterial( { color: 0xFF00FF } )
         );
         scene.add( this.marker );
-
+*/
         raycaster = new THREE.Raycaster();
     }
 
