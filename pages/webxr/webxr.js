@@ -25,7 +25,8 @@ var controller = {
 
 let gravity = 9.8;
 
-const direction = new THREE.Vector3();
+//const direction = new THREE.Vector3();
+let orientation_a, orientation_b, orientation_g;
 
 
 
@@ -340,41 +341,18 @@ class Loop {
     start() {
         renderer.setAnimationLoop(() => {
             this.tick();
-//            this.renderer.render(this.scene, this.camera);
-
-//            renderer.render(scene, camera);
-//            effect.render( scene, camera );
 
 
-if(fakeVR) {
+		if(fakeVR) {
 
-    /* Top-left */
+			camera.rotation.x = -THREE.MathUtils.degToRad(orientation_g + 90);
+			camera.rotation.y =  THREE.MathUtils.degToRad(orientation_a); // OK
+			camera.rotation.z = -THREE.MathUtils.degToRad(orientation_b);
 
-    camera.rotation.x = -1 * ((direction.z - 270) * Math.PI / 180);
-    camera.rotation.y =  1 * ((direction.x +   0) * Math.PI / 180);
-    camera.rotation.z = -1 * ((direction.y +   0) * Math.PI / 180);
-
-
-    /* Top-right = OK */
-/*
-    camera.rotation.x = (direction.z -  90) * Math.PI / 180;
-    camera.rotation.y = (direction.x +   0) * Math.PI / 180;
-    camera.rotation.z = (direction.y +   0) * Math.PI / 180;
-*/
-/*
-    if(camera.rotation.x < 0) { camera.rotation.x + 360; }
-    if(camera.rotation.y < 0) { camera.rotation.y + 360; }
-    if(camera.rotation.z < 0) { camera.rotation.z + 360; }
-
-    if(camera.rotation.x >= 0) { camera.rotation.x - 360; }
-    if(camera.rotation.y >= 0) { camera.rotation.y - 360; }
-    if(camera.rotation.z >= 0) { camera.rotation.z - 360; }
-*/
-
-    effect.render( scene, camera );
-} else {
-    renderer.render(scene, camera);
-}
+		    effect.render( scene, camera );
+		} else {
+		    renderer.render(scene, camera);
+		}
 
         });
     }
@@ -490,100 +468,6 @@ class App {
         scene.add(ambientLight, mainLight);
 
         const resizer = new Resizer(container, camera, renderer);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-        let container = document.querySelector('#VRScene');
-        let renderer = new THREE.WebGLRenderer({ antialias : true });
-        let canvas = renderer.domElement;
-        container.appendChild(canvas);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        
-        let scene = new THREE.Scene();
-        
-        let camera = new THREE.PerspectiveCamera(
-            45,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-        camera.position.setY(1.7);
-        scene.add(camera);
-        
-    
-        let sphereRadius = 1;
-        let sphereGeometry = new THREE.SphereBufferGeometry(
-            sphereRadius,
-            16,
-            16
-        );
-        let sphereMaterial = new THREE.MeshLambertMaterial({
-            color: 0xFF0000
-        });
-        let sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        let cubeGeometry = new THREE.BoxBufferGeometry(
-            1.5 * sphereRadius,
-            1.5 * sphereRadius,
-            1.5 * sphereRadius
-        );
-        let cubeMaterial = new THREE.MeshLambertMaterial({
-            color: 0x00FF00
-        });
-        let cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        
-    
-        let shapes = new THREE.Object3D();
-        shapes.add(sphereMesh);
-        shapes.add(cubeMesh);
-        shapes.position.setY(1.7);
-        shapes.position.setZ(-10);
-        scene.add(shapes);
-        
-    
-        let light = new THREE.PointLight();
-        light.position.setY(2);
-        scene.add(light);
-        
-    
-        let clock = new THREE.Clock(); //Need to keep track of time elapsed between frames
-        function update() {
-            let timeDelta = clock.getDelta();
-            let rotationAmount = 2 * Math.PI * timeDelta * 0.1; //0.1 rotations per second
-            shapes.rotation.x += rotationAmount;
-            shapes.rotation.y += rotationAmount;
-            renderer.render(scene, camera);
-        }
-        renderer.setAnimationLoop(update);
-        
-        function onResize () {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-        }
-        
-        window.addEventListener('resize', onResize);
-        window.addEventListener('wheel', function(event) {
-            event.preventDefault();
-        }, {passive: false, capture: true});
-*/
-
     }
 
     init() {
@@ -600,49 +484,16 @@ class App {
 
 
 `);
-//       <svg id="VROverlay" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none meet" width="100vw" height="100vh" viewBox="0, 0, 400, 200" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 9999; display: none;"><g id="svgg"><path id="path0" d="M0.000 100.000 L 0.000 200.000 200.000 200.000 L 400.000 200.000 400.000 100.000 L 400.000 0.000 200.000 0.000 L 0.000 0.000 0.000 100.000 M123.200 24.415 C 141.210 25.211,159.255 28.205,173.350 32.735 C 178.197 34.293,177.923 34.087,179.317 37.200 C 183.677 46.934,187.409 57.508,189.285 65.442 C 189.657 67.014,190.107 68.840,190.285 69.500 C 190.571 70.563,191.727 76.842,192.512 81.600 C 194.061 90.993,194.351 106.695,193.196 118.700 C 191.605 135.239,186.579 153.249,179.843 166.551 C 178.325 169.549,178.777 169.199,174.900 170.373 C 165.570 173.198,155.277 175.504,146.200 176.802 C 138.576 177.893,135.924 178.159,127.100 178.718 C 121.366 179.081,104.959 179.020,99.500 178.614 C 92.476 178.093,90.796 177.937,86.200 177.379 C 73.330 175.819,61.432 173.326,51.231 170.052 C 47.963 169.003,48.229 169.242,46.493 165.785 C 44.317 161.453,41.562 154.489,39.735 148.700 C 28.787 114.020,30.795 76.185,45.414 41.700 C 47.660 36.402,48.667 34.508,49.431 34.148 C 55.382 31.340,68.780 28.088,81.702 26.315 C 87.744 25.486,89.603 25.301,100.069 24.487 C 105.449 24.069,114.712 24.040,123.200 24.415 M297.000 24.406 C 303.768 24.714,311.757 25.470,318.900 26.480 C 322.602 27.002,329.369 28.158,329.613 28.308 C 329.696 28.359,330.515 28.541,331.432 28.712 C 339.134 30.147,350.569 33.748,350.913 34.848 C 350.991 35.097,351.319 35.840,351.642 36.500 C 351.965 37.160,352.548 38.463,352.938 39.395 C 353.328 40.328,353.854 41.543,354.106 42.095 C 355.917 46.060,359.362 55.962,360.822 61.400 C 361.161 62.665,361.697 64.645,362.012 65.800 C 366.195 81.129,367.669 102.395,365.719 119.300 C 364.828 127.020,363.092 137.034,362.182 139.700 C 362.069 140.030,361.622 141.666,361.189 143.336 C 360.755 145.006,360.301 146.626,360.178 146.936 C 360.056 147.246,359.569 148.715,359.097 150.200 C 358.170 153.113,356.692 157.181,356.040 158.612 C 355.818 159.100,355.350 160.220,355.001 161.100 C 354.119 163.322,351.436 168.707,351.033 169.063 C 350.850 169.225,350.070 169.537,349.300 169.758 C 348.530 169.978,346.505 170.566,344.800 171.064 C 339.510 172.609,333.122 174.129,327.500 175.179 C 322.294 176.151,321.363 176.294,312.400 177.495 C 295.515 179.758,267.720 179.354,251.659 176.614 C 243.264 175.182,239.486 174.396,232.700 172.670 C 228.973 171.723,225.791 170.801,223.029 169.867 L 220.759 169.100 219.794 167.200 C 218.233 164.129,216.400 160.240,216.400 160.001 C 216.400 159.880,216.250 159.492,216.066 159.140 C 214.778 156.672,211.040 144.896,209.512 138.491 C 201.756 105.983,205.129 70.519,218.908 39.700 C 221.031 34.954,221.311 34.479,222.220 34.106 C 225.587 32.723,232.214 30.678,235.568 29.987 C 236.595 29.775,237.990 29.455,238.668 29.276 C 243.076 28.109,256.321 26.032,263.900 25.320 C 276.979 24.090,285.130 23.865,297.000 24.406 " stroke="none" fill="#000000" fill-rule="evenodd"></path></g></svg>
-
         if ('xr' in navigator) {
 
-
-
-
-//            navigator.xr.isSessionSupported('immersive-vr').then(function(supported) {
-//                if(supported) {
-//                  if(navigator.xr.isSessionSupported('immersive-vr')) {
-
-
-
-/*
-                let supported = navigator.xr.isSessionSupported( 'immersive-vr' );
-                if(supported) {
-
-
-                    renderer.xr.enabled = true;
-                    new THREE.VRButton(this.renderer);
-                    document.body.appendChild( THREE.VRButton.createButton(renderer));
-                    document.getElementById('VRButton').style.visibility = 'visible';
-
-                }
-*/
-
-
-
-
-
-
-
-				navigator.xr.isSessionSupported('immersive-vr').then(function(supported) {
-					if(supported) {
+		navigator.xr.isSessionSupported('immersive-vr').then(function(supported) {
+			if(supported) {
                         renderer.xr.enabled = true;
                         new THREE.VRButton(renderer);
                         document.body.appendChild(THREE.VRButton.createButton(renderer));
                         document.getElementById('VRButton').style.display = 'block';
                         document.getElementById('VRIcon').style.display = 'none';
-//                        effect = renderer;
-//effect = new THREE.StereoEffect(renderer);
-//effect.setSize(window.innerWidth, window.innerHeight);
-}
+			}
                     else {
 //                        effect = new THREE.StereoEffect(renderer);
 //                        effect.setSize(window.innerWidth, window.innerHeight);
@@ -837,22 +688,10 @@ function handleMotion(event) {
 
 
 
-  function handleOrientation(event) {
-//    updateFieldIfNotNull('Orientation_a', event.alpha);
-//    updateFieldIfNotNull('Orientation_b', event.beta);
-//    updateFieldIfNotNull('Orientation_g', event.gamma);
-//    incrementEventCount();
-
-
-    direction.x = event.alpha;
-    direction.y = event.beta;
-    direction.z = event.gamma;
-
- 
-//    sphere.position.x = event.alpha;
-//    sphere.position.y = event.beta;
-//    sphere.position.z = event.gamma;
-
+function handleOrientation(event) {
+	orientation_a = event.alpha;
+	orientation_b = event.beta;
+	orientation_g = event.gamma;
 }
 
 
