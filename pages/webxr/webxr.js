@@ -470,6 +470,8 @@ class Scene extends THREE.Scene {
 class App {
     constructor() {
         camera = new Camera();
+	camera.position.set ( 0, 0, 0 );
+
         renderer = createRenderer();
         scene = new Scene();
         loop = new Loop(camera, scene, renderer);
