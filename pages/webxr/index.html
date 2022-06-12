@@ -7,20 +7,47 @@
 <style>
 body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden;}
 canvas { width: 100vw; height: 100vh; display: block; }
+#VRScene { position: absolute; width: 100vw; height: 100vh; display: block;}
+.VRbutton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  outline: none;
+  border: none;
+  background: none;
+  width: 60px;
+  z-index: 100;
+}
+.VRbutton svg {
+  width: 100%;
+  fill: white;
+  stroke: rgba(0,0,0,0.25);
+}
+
+#VRButton { display: block; }
+#VRIcon { display: block; }
 </style>
 </head>
 <body>
+<div id="VRScene"></div>
 <script src="webxr.three.js"></script>
 <script src="webxr.js"></script>
 <script>
 /* Assets & Controls go here
  * ================================================== */
 
- var assets = {
+var assets = {
 //    building: { src: './assets/models/studio.glb' },
 //    building: { src: './assets/models/college.glb' },
     building: { src: './assets/models/collision-world.glb' },
 };
+ 
+var controller = {
+    movement: 'slide', // slide, teleport
+    left: 'default', // hands (does handtracking), default (default controllers), none, or model name
+    right: 'default', // hands (does handtracking), default (default controllers), none, or model name
+};
+
 
 
 
