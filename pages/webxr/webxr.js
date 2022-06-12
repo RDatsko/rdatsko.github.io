@@ -25,6 +25,8 @@ var controller = {
 
 let gravity = 9.8;
 
+const direction = new THREE.Vector3();
+
 
 
 
@@ -344,7 +346,31 @@ class Loop {
 //            effect.render( scene, camera );
 
 
-if(VR) {
+if(fakeVR) {
+
+    /* Top-left */
+
+    camera.rotation.x = -1 * ((direction.z - 270) * Math.PI / 180);
+    camera.rotation.y =  1 * ((direction.x +   0) * Math.PI / 180);
+    camera.rotation.z = -1 * ((direction.y +   0) * Math.PI / 180);
+
+
+    /* Top-right = OK */
+/*
+    camera.rotation.x = (direction.z -  90) * Math.PI / 180;
+    camera.rotation.y = (direction.x +   0) * Math.PI / 180;
+    camera.rotation.z = (direction.y +   0) * Math.PI / 180;
+*/
+/*
+    if(camera.rotation.x < 0) { camera.rotation.x + 360; }
+    if(camera.rotation.y < 0) { camera.rotation.y + 360; }
+    if(camera.rotation.z < 0) { camera.rotation.z + 360; }
+
+    if(camera.rotation.x >= 0) { camera.rotation.x - 360; }
+    if(camera.rotation.y >= 0) { camera.rotation.y - 360; }
+    if(camera.rotation.z >= 0) { camera.rotation.z - 360; }
+*/
+
     effect.render( scene, camera );
 } else {
     renderer.render(scene, camera);
@@ -722,14 +748,18 @@ function createLights() {
 
 
 
-var VR = false;
+var fakeVR = false;
 function toggleVR() {
-  if (VR) {
-    VR = false;
+    if(DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+        DeviceMotionEvent.requestPermission();
+      }
+	
+  if (fakeVR) {
+    fakeVR = false;
 //    controls = new THREE.OrbitControls(camera, renderer.domElement);
     cancelFullScreen();
   } else {
-    VR = true;
+    fakeVR = true;
 //    controls = new THREE.DeviceOrientationControls(camera); // This function was removed!!!
     requestFullscreen(document.documentElement);
   }
@@ -737,6 +767,10 @@ function toggleVR() {
 }
 
 var requestFullscreen = function(ele) {
+    window.addEventListener("devicemotion", handleMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
     if (ele.requestFullscreen) {
       ele.requestFullscreen();
     } else if (ele.webkitRequestFullscreen) {
@@ -768,7 +802,70 @@ var requestFullscreen = function(ele) {
     }
     document.getElementById('VROverlay').style.display = 'none';
 
+    window.removeEventListener("devicemotion", handleMotion);
+    window.removeEventListener("deviceorientation", handleOrientation);
+    window.removeEventListener('orientationchange', handleOrientationChange);
+
     loop.stop();
     loop.start();
 };
 
+function updateFieldIfNotNull(fieldName, value, precision=10){
+    if (value != null)
+      document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+  }
+
+
+function handleMotion(event) {
+//    updateFieldIfNotNull('Accelerometer_gx', event.accelerationIncludingGravity.x);
+//    updateFieldIfNotNull('Accelerometer_gy', event.accelerationIncludingGravity.y);
+//    updateFieldIfNotNull('Accelerometer_gz', event.accelerationIncludingGravity.z);
+  
+//    updateFieldIfNotNull('Accelerometer_x', event.acceleration.x);
+//    updateFieldIfNotNull('Accelerometer_y', event.acceleration.y);
+//    updateFieldIfNotNull('Accelerometer_z', event.acceleration.z);
+  
+//    updateFieldIfNotNull('Accelerometer_i', event.interval, 2);
+  
+//    updateFieldIfNotNull('Gyroscope_z', event.rotationRate.alpha);
+//    updateFieldIfNotNull('Gyroscope_x', event.rotationRate.beta);
+//    updateFieldIfNotNull('Gyroscope_y', event.rotationRate.gamma);
+//    incrementEventCount();
+  }
+
+
+
+  function handleOrientation(event) {
+//    updateFieldIfNotNull('Orientation_a', event.alpha);
+//    updateFieldIfNotNull('Orientation_b', event.beta);
+//    updateFieldIfNotNull('Orientation_g', event.gamma);
+//    incrementEventCount();
+
+
+    direction.x = event.alpha;
+    direction.y = event.beta;
+    direction.z = event.gamma;
+
+ 
+//    sphere.position.x = event.alpha;
+//    sphere.position.y = event.beta;
+//    sphere.position.z = event.gamma;
+
+}
+
+
+/*
+  function onDeviceOrientationChangeEvent( { alpha, beta, gamma } ) {
+    if( scope.initialOffset === null ) {
+        scope.initialOffset = alpha;
+    }
+    alpha = alpha - scope.initialOffset;
+    if(alpha < 0) alpha += 360;
+    scope.deviceOrientation = { alpha, beta, gamma };
+};
+*/
+
+
+function handleOrientationChange(event) {
+
+}
