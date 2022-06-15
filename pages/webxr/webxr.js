@@ -623,7 +623,7 @@ var requestFullscreen = function(ele) {
     window.addEventListener("devicemotion", handleMotion);
     window.addEventListener("deviceorientation", handleOrientation);
     window.addEventListener('orientationchange', handleOrientationChange);
-
+/*
     if (ele.requestFullscreen) {
       ele.requestFullscreen();
     } else if (ele.webkitRequestFullscreen) {
@@ -636,12 +636,13 @@ var requestFullscreen = function(ele) {
       console.log("Fullscreen API is not supported.");
     }
     document.getElementById('VROverlay').style.display = 'block';
-
+*/
     loop.stop();
     loop.start();
   };
 
   var cancelFullScreen = function() {
+/*
     if (document.cancelFullScreen) {
         document.cancelFullScreen();
     } else if (document.webkitCancelFullScreen) {
@@ -654,7 +655,7 @@ var requestFullscreen = function(ele) {
       console.log("Fullscreen API is not supported.");
     }
     document.getElementById('VROverlay').style.display = 'none';
-
+*/
     window.removeEventListener("devicemotion", handleMotion);
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener('orientationchange', handleOrientationChange);
