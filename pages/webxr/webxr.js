@@ -491,8 +491,8 @@ class App {
                         renderer.xr.enabled = true;
                         new THREE.VRButton(renderer);
                         document.body.appendChild(THREE.VRButton.createButton(renderer));
-                        document.getElementById('VRButton').style.display = 'block';
-                        document.getElementById('VRIcon').style.display = 'none';
+//                        document.getElementById('VRButton').style.display = 'block';
+//                        document.getElementById('VRIcon').style.display = 'none';
 			}
                     else {
 //                        effect = new THREE.StereoEffect(renderer);
