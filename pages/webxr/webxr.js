@@ -345,9 +345,9 @@ class Loop {
 
 		if(fakeVR) {
 
-			camera.rotation.x = -THREE.MathUtils.degToRad(orientation_g + 90);
-			camera.rotation.y =  THREE.MathUtils.degToRad(orientation_a); // OK
-			camera.rotation.z = -THREE.MathUtils.degToRad(orientation_b);
+			camera.rotation.x = THREE.MathUtils.degToRad(orientation_g);
+			camera.rotation.y = THREE.MathUtils.degToRad(orientation_a);
+			camera.rotation.z = THREE.MathUtils.degToRad(orientation_b);
 
 		    effect.render( scene, camera );
 		} else {
@@ -690,9 +690,9 @@ function handleMotion(event) {
 
 
 function handleOrientation(event) {
-	orientation_a = event.alpha;
-	orientation_b = event.beta;
-	orientation_g = event.gamma;
+	orientation_a =  event.alpha;
+	orientation_b = -event.beta;
+	orientation_g = -event.gamma + 90;
 	
 	document.getElementById("Orientation_a1").innerHTML = orientation_a.toFixed(3);
 	document.getElementById("Orientation_b1").innerHTML = orientation_b.toFixed(3);
