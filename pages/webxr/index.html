@@ -26,10 +26,34 @@ canvas { width: 100vw; height: 100vh; display: block; }
 
 #VRButton { display: block; }
 #VRIcon { display: block; }
+
+li {
+  list-style-type: none;
+  overflow: hidden;
+}
 </style>
 </head>
 <body>
 <div id="VRScene"></div>
+
+
+<div style="display: block; position: fixed; top: 10%; left: 10%; right: 60%; background: rgba(255,255,255,.65);">
+  <ul>
+    <li>X-axis (&beta;): <span id="Orientation_b1">0</span><span>&deg;</span></li>
+    <li>Y-axis (&gamma;): <span id="Orientation_g1">0</span><span>&deg;</span></li>
+    <li>Z-axis (&alpha;): <span id="Orientation_a1">0</span><span>&deg;</span></li>
+  </ul>
+  </div>
+  
+  
+  <div style="display: block; position: fixed; top: 10%; left: 60%; right: 10%; background: rgba(255,255,255,.65);">
+    <ul>
+      <li>X-axis (&beta;): <span id="Orientation_b2">0</span><span>&deg;</span></li>
+      <li>Y-axis (&gamma;): <span id="Orientation_g2">0</span><span>&deg;</span></li>
+      <li>Z-axis (&alpha;): <span id="Orientation_a2">0</span><span>&deg;</span></li>
+    </ul>
+  </div>
+    
 <script src="webxr.three.js"></script>
 <script src="webxr.js"></script>
 <script>
