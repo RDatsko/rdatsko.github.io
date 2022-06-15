@@ -692,6 +692,14 @@ function handleOrientation(event) {
 	orientation_a = event.alpha;
 	orientation_b = event.beta;
 	orientation_g = event.gamma;
+	
+	document.getElementById("Orientation_a1").innerHTML = orientation_a.toFixed(3);
+	document.getElementById("Orientation_b1").innerHTML = orientation_b.toFixed(3);
+	document.getElementById("Orientation_g1").innerHTML = orientation_g.toFixed(3);
+
+	document.getElementById("Orientation_a2").innerHTML = orientation_a.toFixed(3);
+	document.getElementById("Orientation_b2").innerHTML = orientation_b.toFixed(3);
+	document.getElementById("Orientation_g2").innerHTML = orientation_g.toFixed(3);
 }
 
 
