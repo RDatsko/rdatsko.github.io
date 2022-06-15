@@ -633,8 +633,9 @@ var requestFullscreen = function(ele) {
     } else {
       console.log("Fullscreen API is not supported.");
     }
-    document.getElementById('VROverlay').style.display = 'block';
 */
+    document.getElementById('VROverlay').style.display = 'block';
+
     loop.stop();
     loop.start();
   };
@@ -652,8 +653,9 @@ var requestFullscreen = function(ele) {
     } else {
       console.log("Fullscreen API is not supported.");
     }
-    document.getElementById('VROverlay').style.display = 'none';
 */
+    document.getElementById('VROverlay').style.display = 'none';
+
     window.removeEventListener("devicemotion", handleMotion);
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener('orientationchange', handleOrientationChange);
