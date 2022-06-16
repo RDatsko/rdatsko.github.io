@@ -690,9 +690,19 @@ function handleMotion(event) {
 
 
 function handleOrientation(event) {
-	orientation_a =  event.alpha;
-	orientation_b = -event.beta;
-	orientation_g = -event.gamma + 90;
+	// Need to find way to rotate gama 90 without breaking it
+
+	/*
+	// Top Right
+	orientation_a =  event.beta;
+	orientation_b =  event.alpha + 180;  // landscape + / - flip
+	orientation_g = -event.gamma + 180; // Problem
+	*/
+
+	// Top Left
+	orientation_a =  event.beta + 180;
+	orientation_b =  event.alpha;  // landscape + / - flip
+	orientation_g =  event.gamma; // Problem
 	
 	document.getElementById("Orientation_a1").innerHTML = orientation_a.toFixed(3);
 	document.getElementById("Orientation_b1").innerHTML = orientation_b.toFixed(3);
