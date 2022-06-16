@@ -703,6 +703,10 @@ function handleOrientation(event) {
 	orientation_a =  event.beta + 180;
 	orientation_b =  event.alpha;  // landscape + / - flip
 	orientation_g =  event.gamma; // Problem
+
+	// O_a = Z-axis (&alpha;)
+	// O_b = X-axis (&beta;)
+	// O_g = Y-axis (&gamma;)
 	
 	document.getElementById("Orientation_a1").innerHTML = orientation_a.toFixed(3);
 	document.getElementById("Orientation_b1").innerHTML = orientation_b.toFixed(3);
