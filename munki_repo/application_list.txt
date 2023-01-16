@@ -3,7 +3,7 @@ Last Update : 20XX-##-##
 File URL    : https://
 
 Name        : BenQ InstaShare
-Last Update  : 20XX-##-##
+Last Update : 20XX-##-##
 File URL    : https://
 
 Name        : Google Chrome
