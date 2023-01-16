@@ -1,0 +1,11 @@
+Name    : Adobe Creative Cloud
+File URL: https://
+
+Name    : BenQ InstaShare
+File URL: https://
+
+Name    : Google Chrome
+File URL: https://
+
+Name    : Mozilla Firefox
+File URL: https://download-installer.cdn.mozilla.net/pub/firefox/releases/108.0.2/mac/en-US/Firefox%20108.0.2.dmg
