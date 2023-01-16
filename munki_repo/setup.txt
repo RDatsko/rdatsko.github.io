@@ -1,0 +1,76 @@
+# Repo access plugin (defaults to FileRepo):
+
+Setup
+=====
+
+cd /Users/Shared/
+mkdir munki_repo
+mkdir munki_repo/catalogs
+mkdir munki_repo/icons
+mkdir munki_repo/manifests
+mkdir munki_repo/pkgs
+mkdir munki_repo/pkgsinfo
+
+chmod -R a+rX munki_repo
+
+sudo ln -s /Users/Shared/munki_repo /Library/WebServer/Documents/
+
+Intall Munki:
+https://github.com/munki/munki/releases/latest
+
+munkiimport --configure
+Repo URL (example: afp://munki.example.com/repo):
+file:///Users/Shared/munki_repo
+
+pkginfo extension (Example: .plist): .pkginfo
+
+pkginfo editor (examples: /usr/bin/vi or TextMate.app;
+leave empty to not open an editor after import):
+BBEdit.app
+
+Default catalog to use (example: testing):
+[Enter]
+
+Repo access plugin (defaults to FileRepo):
+[Enter]
+
+
+
+
+
+Importing Items
+===============
+
+munkiimport Downloads/Firefox\ 64.0.2.dmg
+
+Item name: Firefox
+Display name: Mozilla Firefox
+Description: Firefox web browser
+Version: 64.0.2
+Category: Browsers
+Developer: Mozilla
+Unattended install: True
+Unattended uninstall: True
+Catalogs: testing
+
+Import this item? [y/n] y
+Upload item to subdirectory path []: [Enter]
+
+No existing product icon found.
+Attempt to create a product icon? [y/n] y
+Attempting to extract and upload icon...
+Imported icons/Firefox.png.
+
+Copying Firefox 64.0.2.dmg to repo...
+Copied Firefox 64.0.2.dmg to pkgs/Firefox 64.0.2.dmg.
+Edit pkginfo before upload? [y/n]: n
+
+Saved pkginfo to pkgsinfo/Firefox-64.0.2.
+Rebuild catalogs? [y/n] y
+Rebuilding catalogs at
+file:///Users/Shared/munki_repo...
+Created icons/_icon_hashes.plist...
+
+makecatalogs
+
+
