@@ -29,7 +29,7 @@ document.writeln(`
     </li>
 
 
-    <input type="radio" name="panel" id="nav-webxr">
+    <input type="radio" name="panel" id="nav-xrml">
     <li>
     <label for="nav-xrml">XRML</label>
         <div class="accordion__content nav-xrml">
