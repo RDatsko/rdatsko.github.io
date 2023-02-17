@@ -2,59 +2,43 @@ document.writeln(`
 <nav>
 <ul>
     <li class="singleItem">Home</li>
+
+
     <input type="radio" name="panel" id="nav-hardware">
     <li>
         <label for="nav-hardware">Hardware</label>
         <div class="accordion__content">Hardware</div>
     </li>
+
+
     <input type="radio" name="panel" id="nav-software">
     <li>
         <label for="nav-software">Software</label>
         <div class="accordion__content">Software</div>
     </li>
+
+
     <input type="radio" name="panel" id="nav-html">
     <li>
     <label for="nav-html">HTML</label>
         <div class="accordion__content">
-            <div>
-                <b><u>Web Apps</u></b><br>
-                None<br>
-            </div>                                
-            <div>
-                <b><u>Games</u></b><br>
-                <a href="">Trivia</a><br>
-                <a href="">The Wheel</a><br>
-                <a href="">Clash</a><br>
-            </div>                                
-            <div>
-                <b><u>Office</u></b><br>
-                <a href="">Writer</a><br>
-                <a href="">Sheets</a><br>
-                <a href="">Presentation</a><br>
-            </div>                                
-            <div>
-                <b><u>Tools</u></b><br>
-                <a href="">HTML Coder</a><br>
-            </div>                                
-            <div>
-                <b><u>Media</u></b><br>
-                <a href="">Video Player</a><br>
-                <a href="">OBS</a><br>
-                <a href="">Interactive Book</a><br>
-                <a href="/pages/javascript/screen_capture.html">Screen Capture</a><br>
-                </div>
+            <div>Applications</div>
+            <div>Games</div>
+            <div>Tools</div>
         </div>
     </li>
+
+
     <input type="radio" name="panel" id="nav-webxr">
     <li>
-    <label for="nav-webxr">WebXR3js</label>
-        <div class="accordion__content nav-webxr">
-            <a href="/pages/webxr/"><div style="grid-column: span 3;">About</div></a>
-            <div style="grid-column: span 3;">Wiki</div>
-            <div>1</div>
-            <div>1</div>
-            <div>1</div>s
+    <label for="nav-xrml">XRML</label>
+        <div class="accordion__content nav-xrml">
+            <div><a-a href="/xrml/about.html" a-title="About">About</a-a></div>
+            <div"><a-a href="/xrml/wiki.html" a-title="Wiki">Wiki</a-a></div>
         </div>
     </li>
+
+
 </ul>
-</nav>`);
+</nav>
+`);
