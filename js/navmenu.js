@@ -33,8 +33,10 @@ document.writeln(`
     <li>
     <label for="nav-xrml">XRML</label>
         <div class="accordion__content nav-xrml">
-            <div><a-a href="/pages/xrml/" a-title="About">About</a-a></div>
-            <div"><a-a href="/pages/xrml/wiki.html" a-title="Wiki">Wiki</a-a></div>
+            <div><a href="/pages/xrml/"">About</a-a></div>
+            <div"><a href="/pages/xrml/wiki/">Wiki</a-a></div>
+            <div"><a href="/pages/xrml/nehe/">NeHe based tutorials</a-a></div>
+            <div"><a href="/pages/xrml/test.html">Wiki</a-a></div>
         </div>
     </li>
 
