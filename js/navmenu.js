@@ -32,7 +32,7 @@ document.writeln(`
     <input type="radio" name="panel" id="nav-xrml">
     <li>
     <label for="nav-xrml">XRML</label>
-        <div class="accordion__content nav-xrml">
+        <div class="accordion__content">
             <div><a href="/pages/xrml/">About</a></div>
             <div><a href="/pages/xrml/wiki/">Wiki</a></div>
             <div><a href="/pages/xrml/nehe/">NeHe based tutorials</a></div>
