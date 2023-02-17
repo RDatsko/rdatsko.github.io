@@ -47,9 +47,9 @@ header ul li > div {
   line-height: 1.8rem;
   pointer-events: none;
 
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 2rem;
+  display: block;
+  width: max-content;
+  min-width: 100px;
 }
 
 header ul li:hover > div,
