@@ -102,7 +102,7 @@
 
 .window menu ul {
     min-width: 150px;
-    padding: 2px;
+/*    padding: 2px;*/
 }
 
 .window menu li:hover > ul {
@@ -150,10 +150,42 @@
     padding: 4px 10px 4px 32px;
 }
 
-.window menu ul li a:hover {
-    border: 1px solid #666;
+.window menu ul li {
+    padding: 2px;
+}
+
+
+
+
+
+
+.window menu ul li:hover {
     background-color: #333;
 }
+
+.window menu ul li:hover > a {
+    border: 1px solid transparent;
+    background-color: #333;
+}
+
+.window menu ul li a:hover {
+    border: 1px solid #444;
+    background-color: #333;
+}
+
+/*
+.window menu ul li:hover > a,
+.window menu ul li a:hover {
+    border: 1px solid #444;
+    background-color: #333;
+}
+*/
+
+
+
+
+
+
 
 .window menu ul {
     border: 1px solid #333;
@@ -187,4 +219,3 @@
     pointer-events: none;
     border: 0;
 }
-
