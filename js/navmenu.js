@@ -1,7 +1,7 @@
 document.writeln(`
 <nav>
 <ul>
-    <li class="singleItem"><a hef="/">Home</a></li>
+    <li class="singleItem"><a href="/">Home</a></li>
 
 
     <input type="radio" name="panel" id="nav-hardware">
