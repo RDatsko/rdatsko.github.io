@@ -17,7 +17,7 @@
     flex-direction: column;
 }
 
-.window > title-bar {
+.window > .titlebar {
     align-items: center;
     display: flex;
     justify-content: space-between;
@@ -29,20 +29,20 @@
     flex: 1 1 auto;
 }
 
-.window > title-bar > span {
+.window > .titlebar > span {
     display: flex;
     flex: 1 1 auto;
 }
 
-.window > title-bar > i[icon] {
+.window > .titlebar > i[icon] {
     padding-right: 10px;
     width: 16px;
     height: 16px;
 }
 
-.window > title-bar > i[min],
-.window > title-bar > i[max],
-.window > title-bar > i[close] {
+.window > .titlebar > i[min],
+.window > .titlebar > i[max],
+.window > .titlebar > i[close] {
     display: flex;
     width: 24px;
     height: 10px;
@@ -52,27 +52,27 @@
     left: 9px;
 }
 
-.window > title-bar > i[min] {
+.window > .titlebar > i[min] {
     content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='10px' height='1px' x='0px' y='0px' viewBox='0 0 10.2 1' fill='white'%3E%3Crect width='10.2' height='1'%3E%3C/rect%3E%3C/svg%3E");
     height: 1px;
     padding: 14.5px 9px;
 }
 
-.window > title-bar > i[max] {
+.window > .titlebar > i[max] {
     content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='10px' height='10px' x='0px' y='0px' viewBox='0 0 10.2 10.1' fill='white'%3E%3Cpath d='M0,0v10.1h10.2V0H0z M9.2,9.2H1.1V1h8.1V9.2z' /%3E%3C/svg%3E");
 /*    background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='10px' height='10px' x='0px' y='0px' viewBox='0 0 10.2 10.1' fill='rgb(255, 255, 255)'%3E%3Cpath d='M2.1,0v2H0v8.1h8.2v-2h2V0H2.1z M7.2,9.2H1.1V3h6.1V9.2z M9.2,7.1h-1V2H3.1V1h6.1V7.1z' /%3E%3C/svg%3E%0A");*/
 }
 
-.window > title-bar > i[close] {
+.window > .titlebar > i[close] {
     content: url("data:image/svg+xml,  %3Csvg xmlns='http://www.w3.org/2000/svg' width='10px' height='10px' x='0px' y='0px' viewBox='0 0 10.2 10.2' fill='white'%3E%3Cpolygon points='10.2,0.7 9.5,0 5.1,4.4 0.7,0 0,0.7 4.4,5.1 0,9.5 0.7,10.2 5.1,5.8 9.5,10.2 10.2,9.5 5.8,5.1' /%3E%3C/svg%3E");
 }
 
-.window > title-bar > i[min]:hover,
-.window > title-bar > i[max]:hover {
+.window > .titlebar > i[min]:hover,
+.window > .titlebar > i[max]:hover {
     background-color: var(--os-window-button);
 }
 
-.window > title-bar > i[close]:hover {
+.window > .titlebar > i[close]:hover {
     background-color: #c42b1c;
 }
 
