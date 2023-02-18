@@ -23,6 +23,7 @@
     display: flex;
     flex-direction: column;
     font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 12px;
 }
 
 .window > .titlebar {
@@ -82,5 +83,98 @@
 
 .window > .titlebar > i[close]:hover {
     background-color: #c42b1c;
+}
+
+
+/*
+ *
+ * Menus
+ *
+ */
+ 
+.window menu,
+.window menu ul {
+    cursor: default;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.window menu ul {
+    min-width: 150px;
+    padding: 2px;
+}
+
+.window menu li:hover > ul {
+    display: block;
+}
+
+.window menu ul li > ul {
+    display: none;
+/*    top: 100%;*/
+/*    left: 0;*/
+    position: absolute;
+    z-index: 99;
+
+    
+
+
+    left: 100%;
+    top: -1px;
+}
+
+.window menu ul li > ul {
+    display: none;
+    top: 100%;
+    left: 0;
+    position: absolute;
+    z-index: 99;
+}
+
+
+.window .menubar ul ul ul {
+    left: 100%;
+    top: -1px;
+}
+
+.window menu li > ul {
+    left: 100%;
+    top: -4px;
+}
+
+.window menu ul li a {
+    border: 1px solid transparent;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px 4px 32px;
+}
+
+.window menu ul li a:hover {
+    border: 1px solid #666;
+    background-color: #333;
+}
+
+.window menu ul {
+    border: 1px solid #333;
+    box-shadow: 4px 4px 3px -2px #333;
+    position: relative;
+}
+
+.window .menubar > ul {
+    display: flex;
+    position: relative;
+    padding: 0;
+    border: 1px solid transparent;
+    box-shadow: none;
+}
+
+.window .menubar > ul > li {
+    padding: 6px 10px;
+    position: relative;
+}
+
+.window .menubar > ul > li:hover {
+    background: #333;
 }
 
