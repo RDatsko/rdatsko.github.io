@@ -38,7 +38,7 @@ document.writeln(`
             <div><a href="/pages/xrml/">About</a></div>
             <div><a href="/pages/xrml/wiki/">Wiki</a></div>
             <div><a href="/pages/xrml/nehe/">NeHe based tutorials</a></div>
-            <div><a href="/pages/xrml/test.html">Wiki</a></div>
+            <div><a href="/pages/xrml/test.html">Test Area</a></div>
         </div>
     </li>
 
