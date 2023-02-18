@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="/css/common.css">
-<link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="/css/sm.css">
-<link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="/css/lg.css">
-<link rel="stylesheet" type="text/css" href="/css/windows.css">
+<link rel="stylesheet" type="text/css" href="../..//css/common.css">
+<link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="../..//css/sm.css">
+<link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="../..//css/lg.css">
+<link rel="stylesheet" type="text/css" href="../../css/windows.css">
 <title>Smart Watch Code Editor</title>
 <style>
 
@@ -164,10 +164,10 @@ body {
 <input id="hamburger" class="hamburger" type="checkbox">
 <label for="hamburger" class="hamburger"><i></i></label>
 <span>[ Logo ]</span>
-<script src="/js/navmenu.js"></script>
+<script src="../..//js/navmenu.js"></script>
 </header>
 
-<div class="window" style="position: absolute; top: 75px; right: 400px; bottom: 25px; left: 15px;">
+<div class="window" style="position: absolute; top: 75px; right: /*40*/0px; bottom: 25px; left: 15px;">
     <div class="titlebar">
         <i icon>
             <svg style="position: relative;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -182,23 +182,50 @@ body {
         <i max></i>
         <i close></i>
     </div>
-    <menu menubar>
+    <menu class="menubar">
         <ul>
             <li>File
                 <ul>
-                    <li>New</li>
-                    <li>Open</li>
-                    <li>Save</li>
+                    <li><a>Open</a></li>
+                    <li><a>Save</a></li>
+                    <li><a>Save As...</a></li>
+                    <hr>
+                    <li><a>Exit</a></li>
                 </ul>
             </li>
-            <li>Edit</li>
-            <li>View</li>
+            <li>Edit
+                <ul>
+                    <li><a>Undo</a></li>
+                    <li><a>Copy</a></li>
+                    <li><a>Cut</a></li>
+                    <li><a>Paste</a></li>
+                    <hr>
+                    <li><a>Delete</a></li>
+                    <li><a>Find...</a></li>
+                    <li><a>Replace</a></li>
+                    <li><a>Go to...</a></li>
+                </ul>
+            </li>
+            <li>View
+                <ul>
+                    <li><a>Zoom</a>
+                        <ul>
+                            <li><a>Zoom In</a>
+                                <ul>
+                                    <li><a>Super Zoom</a></li>
+                                </ul>
+                            <li><a>Zoom Out</a></li>
+                        </ul>
+                    </li>
+                    <li><a>Status Bar</a></li>
+                </ul>
+            </li>
             <li>Help</li>
         </ul>
     </menu>
 </div>
 
-<div class="watch">
+<div class="watch" style="display: none;">
     <div class="strap"></div>
     <div class="screen">
     </div>
