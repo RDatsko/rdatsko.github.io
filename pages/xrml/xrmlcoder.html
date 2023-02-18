@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html>
 <head>
@@ -7,6 +8,7 @@
 <link rel="stylesheet" type="text/css" href="../../css/common.css">
 <link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="../../css/sm.css">
 <link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="../../css/lg.css">
+<link rel="stylesheet" type="text/css" href="../../css/prism.css">
 <title>HTML Code Editor</title>
 </head>
 <style>
@@ -32,17 +34,25 @@
     flex-basis: 50%;
 }
 
-.container textarea {
+.container textarea,
+#code1, #code2, #code3 {
     width: 100%;
     height: calc((100% - 90px) / 3);
     background: #1f1f1f;
     color: #fff;
+    caret-color: white;
     border: 0;
     outline: 0;
     font-size: 18px;
     resize: none;
+    position: relative;
 }
-
+/*
+.container textarea {
+    color: transparent;
+    background-color: transparent;
+}
+*/
 .container iframe {
     width: 100%;
     height: calc(100% - 30px);
@@ -61,6 +71,122 @@
     background: #000;
     height: 30px;
 }
+
+
+
+
+
+
+
+#navi1, #navi2, #navi3
+#html-code {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#html-code {
+  z-index: 10;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Please see the article */
+
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3 {
+  /* Both elements need the same text and space styling so they are directly on top of each other */
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  height: 100%;
+}
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3,
+#highlighting1 *, #highlighting2 *, #highlighting3 * {
+  /* Also add text styles to highlighing tokens */
+  font-size: 12pt;
+  font-family: monospace;
+  line-height: 18pt;
+  tab-size: 4;
+}
+
+
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3 {
+  /* In the same place */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+/* Move the textarea in front of the result */
+
+#html-code, #css-code, #js-code {
+  z-index: 1;
+}
+#highlighting1, #highlighting2, #highlighting3 {
+  z-index: 0;
+}
+
+
+/* Make textarea almost completely transparent */
+
+#html-code, #css-code, #js-code {
+  color: transparent;
+  background: transparent;
+  caret-color: white; /* Or choose your favourite color */
+}
+
+/* Can be scrolled */
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3 {
+  overflow: auto;
+  white-space: nowrap; /* Allows textarea to scroll horizontally */
+}
+
+/* No resize on textarea */
+#html-code, #css-code, #js-code {
+  resize: none;
+}
+
+/* Paragraphs; First Image */
+* {
+  font-family: "Fira Code", monospace;
+}
+p code {
+  border-radius: 2px;
+  background-color: #eee;
+  color: #111;
+}
 </style>
 <body>
 <header>
@@ -68,6 +194,7 @@
 <label for="hamburger" class="hamburger"><i></i></label>
 <span>[ Logo ]</span>
 <script src="../../js/navmenu.js"></script>
+<script src="../../js/prism.js"></script>
 </header>
 
 <div class="container">
@@ -75,14 +202,29 @@
     <div class="left">
 
         <label>HTML</label>
-        <textarea id="html-code" onkeyup="run()"></textarea>
+        <div id="code1">
+            <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"></textarea>
+            <pre id="highlighting1" aria-hidden="true">
+              <code class="language-html" id="highlighting-content1"></code>
+            </pre>
+        </div>
 
         <label>CSS</label>
-        <textarea id="css-code" onkeyup="run()"></textarea>
+        <div id="code2">
+          <textarea id="css-code" spellcheck="false" oninput="update(this.value, 2); sync_scroll(this, 2);" onscroll="sync_scroll(this, 2);" onkeydown="check_tab(this, event, 2);" onkeyup="run()"></textarea>
+          <pre id="highlighting2" aria-hidden="true">
+            <code class="language-css" id="highlighting-content2"></code>
+          </pre>
+      </div>
 
         <label>JavaScript</label>
-        <textarea id="js-code" onkeyup="run()"></textarea>
-    </div>
+        <div id="code3">
+          <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()"></textarea>
+          <pre id="highlighting3" aria-hidden="true">
+            <code class="language-js" id="highlighting-content3"></code>
+          </pre>
+        </div>
+  </div>
 
     <div class="right">
         <label>Output</label>
@@ -132,7 +274,12 @@ setInterval(function() {
         `;
 }, 1000);
 
-setTimeout(function() { run(); }, 3000);
+setTimeout(function() {
+    update(document.querySelector('#html-code').value, 1);
+  update(document.querySelector('#css-code').value, 2);
+  update(document.querySelector('#js-code').value, 3);
+    run();
+}, 3000);
 
 function run() {
     let htmlCode = document.querySelector('#html-code').value;
@@ -146,5 +293,59 @@ function run() {
     output.contentWindow.eval(jsCode);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function update(text, num) {
+  let result_element = eval(`document.querySelector("#highlighting-content${num}")`);
+  // Handle final newlines (see article)
+  if(text[text.length-1] == "\n") {
+    text += " ";
+  }
+  // Update code
+  result_element.innerHTML = text.replace(new RegExp("&", "g"), "&amp;").replace(new RegExp("<", "g"), "&lt;"); /* Global RegExp */
+  // Syntax Highlight
+  Prism.highlightElement(result_element);
+}
+
+function sync_scroll(element, num) {
+  /* Scroll result to scroll coords of event - sync with textarea */
+  let result_element = eval(`document.querySelector("#highlighting${num}")`);;
+  // Get and set x and y
+  result_element.scrollTop = element.scrollTop;
+  result_element.scrollLeft = element.scrollLeft;
+}
+
+
+
+
+
+function check_tab(element, event, num) {
+  let code = element.value;
+  if(event.key == "Tab") {
+    /* Tab key pressed */
+    event.preventDefault(); // stop normal
+    let before_tab = code.slice(0, element.selectionStart); // text before tab
+    let after_tab = code.slice(element.selectionEnd, element.value.length); // text after tab
+    let cursor_pos = element.selectionStart + 1; // where cursor moves after tab - moving forward by 1 char to after tab
+    element.value = before_tab + "\t" + after_tab; // add tab char
+    // move cursor
+    element.selectionStart = cursor_pos;
+    element.selectionEnd = cursor_pos;
+    eval(`update(element.value, ${num})`); // Update text to include indent
+  }
+}
 </script>
 </html>
