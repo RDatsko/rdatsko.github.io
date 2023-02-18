@@ -7,7 +7,9 @@ document.writeln(`
     <input type="radio" name="panel" id="nav-hardware">
     <li>
         <label for="nav-hardware">Hardware</label>
-        <div class="accordion__content">Hardware</div>
+        <div class="accordion__content">
+            <div><a href="/pages/hardware/code,html">Code Editor</a></div>
+        </div>
     </li>
 
 
