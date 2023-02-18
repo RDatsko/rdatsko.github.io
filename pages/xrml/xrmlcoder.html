@@ -95,43 +95,6 @@
 
 var newScript = document.createElement("script");
 newScript.src = "../../js/xrml.min.js";
-/*
-document.querySelector('#html-code').value = `
-<xr-camera></xr-camera>
-<xr-scene></xr-scene>
-
-<xr-cube id="box"
-    position="1, 0, -5"
-    color="#ff00ff"
-    rotation="0, Math.PI * 45 / 180, 0">
-</xr-cube>
-
-<xr-sphere id="ball"
-    position="-1, 0, -5"
-></xr-sphere>
-
-<xr-plane id="plane"
-    position="1, 0, -5"
-    color="#ffffff"
-    rotation="Math.PI / 2 * -1, 0, 0">
-</xr-plane>
-
-<xr-light position="0, 300, 200"></xr-light>
-`;
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 run();
 
@@ -159,21 +122,11 @@ setTimeout(function() {
 <xr-light position="0, 300, 200"></xr-light>`;
 
     document.querySelector('#js-code').value = `
-    //        console.log("Global variable $XR is used");
-//        console.log($XR);
-
-/* OK  */    // document.querySelector('#ball').parentNode.removeChild(document.querySelector('#ball'));
-
-//        console.log($XR);
-
 var clock = new THREE.Clock();
 
 let i = 0;
 
 setInterval(function() {
-//    if(i-- < 0) { i = i + 360; }
-//    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
-    //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
     $XR.Scene.children[0].rotation.y -= clock.getDelta();
 },10);
         `;
@@ -187,22 +140,10 @@ function run() {
     let jsCode   = document.querySelector('#js-code').value;
     let output   = document.querySelector('#output');
 
-//    output.contentDocument.body.innerHTML = "<style>" + cssCode + "</style>" + htmlCode;
-
-
-let html = "<style>" + cssCode + "</style>" + htmlCode;
-output.contentDocument.body.appendChild(newScript);
-output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
-
-
-
-//    output.contentDocument.body.appendChild(newScript);
-//    output.contentDocument.body.insertBefore(gtm, s);(newScript);
+    let html = "<style>" + cssCode + "</style>" + htmlCode;
+    output.contentDocument.body.appendChild(newScript);
+    output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
     output.contentWindow.eval(jsCode);
-    
-    
-
-//    output.contentDocument.body.appendChild(newScript);
 }
 
 </script>
