@@ -8,7 +8,7 @@ document.writeln(`
     <li>
         <label for="nav-hardware">Hardware</label>
         <div class="accordion__content">
-            <div><a href="/pages/hardware/code,html">Code Editor</a></div>
+            <div><a href="/pages/hardware/code.html">Code Editor</a></div>
         </div>
     </li>
 
