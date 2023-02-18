@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="/css/windows.css">
+<title>Smart Watch Code Editor</title>
+<style>
+
+body {
+    background: #000046;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to left, #1CB5E0, #000046);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, #1CB5E0, #000046); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/*
+ *
+ * Smart Watch
+ *
+ */
+
+.watch {
+    filter: drop-shadow(0 10px 50px hsl(0deg, 0%, 0%));
+    width: 240px;
+    aspect-ratio: 2 / 1;
+    margin: auto;
+    position: absolute;
+    right: 80px;
+    top: 5%;
+}
+
+/* Wacth Straps */
+.strap {
+    position: relative;
+    box-shadow: inset 0 10vmax 2vmax -10vmax hsl(260deg 50% 0% / 15%);
+    background: linear-gradient(to bottom, rgba(32, 32, 32), hsl(260deg 60% 115% / 15%)), hsl(260deg 100% 8%);
+    height: 75%;
+    width: 70%;
+    margin: 0 auto;
+    z-index: -2;
+    border-radius: 50% 50% 0% 0% / 30% 30% 0 0 
+}
+
+.strap::before,
+.strap::after {
+    display: block;
+    content: '';
+    background: inherit;
+    background-size: 100% 200%;
+    background-position: 0 100%;
+    position: absolute;
+    top: 30%;
+    bottom: 0%;
+    width: 30%;
+    z-index: -1;
+    transform: translateY(5px);
+    -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+    -webkit-mask-position: 0 24px;
+            mask-position: 0 24px;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+}
+
+.strap::before {
+    right: 99.5%;
+    -webkit-mask-image: radial-gradient(ellipse farthest-corner at left top, transparent 70%, black 70.5%);
+            mask-image: radial-gradient(ellipse farthest-corner at left top, transparent 70%, black 70.5%);
+}
+
+.strap::after {
+    left: 99.5%;
+    -webkit-mask-image: radial-gradient(ellipse farthest-corner at right top, transparent 70%, black 70.5%);
+            mask-image: radial-gradient(ellipse farthest-corner at right top, transparent 70%, black 70.5%);
+}
+
+.strap[reflect="true"] {
+    transform: scaleY(-1);
+}
+
+/* Screen */
+.screen {
+    position: relative;
+    content: '';
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    aspect-ratio: 240 / 280;
+    border: 2px solid #000;
+    border-radius: 21% 21% 21% 21% / 20% 20% 20% 20%;
+    background-position: center center;
+    background-size: 200%;
+    box-shadow:
+        25px 0 10px -20px hsl(260deg 60% 115% / 60%),
+        -25px 0 10px -20px hsl(260deg 60% 115% / 60%),
+        0 20px 10px -20px hsl(260deg 60% 115% / 60%),
+        0 -20px 10px -20px hsl(260deg 60% 115% / 60%),
+        inset 0 125px 3px -125px white,
+        inset 0 -125px 3px -125px white,
+        inset 125px 0 3px -125px white,
+        inset -125px 0 3px -125px white,
+        inset 0 50px 5px -50px hsl(260deg 60% 115%),
+        inset 0 -50px 5px -50px hsl(260deg 60% 115%),
+        inset 50px 0 5px -50px hsl(260deg 60% 115%),
+        inset -50px 0 5px -50px hsl(260deg 60% 115%),
+        inset 0 50px 15px -50px hsl(260deg 60% 115%),
+        inset 0 -50px 15px -50px hsl(260deg 60% 115%),
+        inset 50px 0 15px -50px hsl(260deg 60% 115%),
+        inset -50px 0 15px -50px hsl(260deg 60% 115%);
+}
+
+.screen::before {
+    position: absolute;
+    content: '';
+/*
+    box-shadow:
+        inset 0 0.3vmax 0.7vmax -0.4vmax #000000,
+        inset 0 -0.3vmax 0.7vmax -0.4vmax #000000,
+        inset 0 0 0.7vmax 0.6vmax #bb99ff;
+*/
+    left: -5%;
+    right: -5%;
+    top: -4%;
+    bottom: -4%;
+    z-index: -1;
+    border-radius: 23% / 22%;
+    border: 10px solid black;
+}
+
+.screen::after {
+    position: absolute;
+    content: '';
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 20%;
+    z-index: 100;
+  }
+
+.screen > div {
+    position: absolute;
+    top: 0%;
+    bottom: 0%;
+    left: 0%;
+    right: 0%;
+    overflow: hidden;
+    border-radius: 20%;
+    z-index: -1000;
+}
+
+.screen .divA {
+    background-color: black;
+}
+</style>
+<div class="window" style="position: absolute; left: 10px; right: 400px; height: 95vh;">
+    <div>
+        <i icon>
+            <svg style="position: relative;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0.228341 8.36915C0.228341 8.36915 -0.356212 7.94324 0.345251 7.37453L1.97956 5.89736C1.97956 5.89736 2.44721 5.40004 2.94164 5.83334L18.0231 17.375V22.9094C18.0231 22.9094 18.0158 23.7785 16.9124 23.6825L0.228341 8.36915Z" fill="#007acc"/>
+                <path d="M4.11555 11.9367L0.228273 15.5089C0.228273 15.5089 -0.171172 15.8093 0.228273 16.346L2.03308 18.0053C2.03308 18.0053 2.46175 18.4706 3.09502 17.9413L7.21611 14.7827L4.11555 11.9367Z" fill="#0065a9"/>
+                <path d="M10.94 11.9661L18.0691 6.46362L18.0228 0.95865C18.0228 0.95865 17.7183 -0.242793 16.7027 0.382548L7.21589 9.11025L10.94 11.9661Z" fill="#0065a9"/>
+                <path d="M16.9121 23.69C17.3261 24.1183 17.8279 23.978 17.8279 23.978L23.3838 21.2108C24.0951 20.7208 23.9952 20.1127 23.9952 20.1127V3.58803C23.9952 2.86175 23.2596 2.61063 23.2596 2.61063L18.4441 0.264377C17.3919 -0.392968 16.7027 0.382548 16.7027 0.382548C16.7027 0.382548 17.5892 -0.262484 18.0228 0.95865L18.0228 22.8086C18.0228 22.9588 17.9911 23.1065 17.9278 23.2394C17.8011 23.4979 17.5259 23.7392 16.8658 23.6383L16.9121 23.69Z" fill="#1f9cf0"/>
+            </svg>
+        </i>
+        <span>SCode Editor</span>
+        <i min></i>
+        <i max></i>
+        <i close></i>
+    </div>
+    <menu menubar>
+        <ul>
+            <li>File
+                <ul>
+                    <li>New</li>
+                    <li>Open</li>
+                    <li>Save</li>
+                </ul>
+            </li>
+            <li>Edit</li>
+            <li>View</li>
+            <li>Help</li>
+        </ul>
+    </menu>
+</div>
+
+<div class="watch">
+    <div class="strap"></div>
+    <div class="screen">
+    </div>
+    <div class="strap" reflect="true"></div>
+</div>
