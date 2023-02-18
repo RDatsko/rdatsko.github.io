@@ -4,6 +4,13 @@
  *
  */
 
+:root {
+    --os-window-color: black;
+    --os-window-border: rgba(255, 255, 255, 0.2);
+    --os-window-button: #2f2d27;
+    --os-text-color: white;
+}
+
 .window {
     border: 1px solid var(--os-window-border);
     border-radius: 10px;
