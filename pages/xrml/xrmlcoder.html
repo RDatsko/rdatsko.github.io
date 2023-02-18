@@ -1,0 +1,209 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="../../css/common.css">
+<link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="../../css/sm.css">
+<link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="../../css/lg.css">
+<title>HTML Code Editor</title>
+</head>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    position: absolute;
+    top: 56px;
+    bottom: 0;
+    display: flex;
+    flex: 1;
+    background: #454545;
+    color: #fff;
+    overflow: hidden;
+}
+
+.container .left, .container .right {
+    flex-basis: 50%;
+}
+
+.container textarea {
+    width: 100%;
+    height: calc((100% - 90px) / 3);
+    background: #1f1f1f;
+    color: #fff;
+    border: 0;
+    outline: 0;
+    font-size: 18px;
+    resize: none;
+}
+
+.container iframe {
+    width: 100%;
+    height: calc(100% - 30px);
+    background: #fff;
+    border: 0;
+    outline: 0;
+}
+
+.container label i {
+    margin: 0 10px;
+}
+
+.container label {
+    display: flex;
+    align-items: center;
+    background: #000;
+    height: 30px;
+}
+</style>
+<body>
+<header>
+<input id="hamburger" class="hamburger" type="checkbox" />
+<label for="hamburger" class="hamburger"><i></i></label>
+<span>[ Logo ]</span>
+<script src="../../js/navmenu.js"></script>
+</header>
+
+<div class="container">
+
+    <div class="left">
+
+        <label>HTML</label>
+        <textarea id="html-code" onkeyup="run()"></textarea>
+
+        <label>CSS</label>
+        <textarea id="css-code" onkeyup="run()"></textarea>
+
+        <label>JavaScript</label>
+        <textarea id="js-code" onkeyup="run()"></textarea>
+    </div>
+
+    <div class="right">
+        <label>Output</label>
+        <iframe id="output"></iframe>
+    </div>
+</div>
+
+</body>
+<script>
+
+var newScript = document.createElement("script");
+newScript.src = "../../js/xrml.min.js";
+/*
+document.querySelector('#html-code').value = `
+<xr-camera></xr-camera>
+<xr-scene></xr-scene>
+
+<xr-cube id="box"
+    position="1, 0, -5"
+    color="#ff00ff"
+    rotation="0, Math.PI * 45 / 180, 0">
+</xr-cube>
+
+<xr-sphere id="ball"
+    position="-1, 0, -5"
+></xr-sphere>
+
+<xr-plane id="plane"
+    position="1, 0, -5"
+    color="#ffffff"
+    rotation="Math.PI / 2 * -1, 0, 0">
+</xr-plane>
+
+<xr-light position="0, 300, 200"></xr-light>
+`;
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+run();
+
+setTimeout(function() {
+    document.querySelector('#html-code').value = `
+<xr-camera></xr-camera>
+<xr-scene></xr-scene>
+
+<xr-cube id="box"
+    position="1, 0, -5"
+    color="#ff00ff"
+    rotation="0, Math.PI * 45 / 180, 0">
+</xr-cube>
+
+<xr-sphere id="ball"
+    position="-1, 0, -5"
+></xr-sphere>
+
+<xr-plane id="plane"
+    position="1, 0, -5"
+    color="#ffffff"
+    rotation="Math.PI / 2 * -1, 0, 0">
+</xr-plane>
+
+<xr-light position="0, 300, 200"></xr-light>`;
+
+    document.querySelector('#js-code').value = `
+    //        console.log("Global variable $XR is used");
+//        console.log($XR);
+
+/* OK  */    // document.querySelector('#ball').parentNode.removeChild(document.querySelector('#ball'));
+
+//        console.log($XR);
+
+var clock = new THREE.Clock();
+
+let i = 0;
+
+setInterval(function() {
+//    if(i-- < 0) { i = i + 360; }
+//    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
+    //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
+    $XR.Scene.children[0].rotation.y -= clock.getDelta();
+},10);
+        `;
+}, 1000);
+
+setTimeout(function() { run(); }, 3000);
+
+function run() {
+    let htmlCode = document.querySelector('#html-code').value;
+    let cssCode  = document.querySelector('#css-code').value;
+    let jsCode   = document.querySelector('#js-code').value;
+    let output   = document.querySelector('#output');
+
+//    output.contentDocument.body.innerHTML = "<style>" + cssCode + "</style>" + htmlCode;
+
+
+let html = "<style>" + cssCode + "</style>" + htmlCode;
+output.contentDocument.body.appendChild(newScript);
+output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
+
+
+
+//    output.contentDocument.body.appendChild(newScript);
+//    output.contentDocument.body.insertBefore(gtm, s);(newScript);
+    output.contentWindow.eval(jsCode);
+    
+    
+
+//    output.contentDocument.body.appendChild(newScript);
+}
+
+</script>
+</html>
