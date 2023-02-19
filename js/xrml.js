@@ -443,7 +443,7 @@ class Loop {
         $XR.Renderer.setAnimationLoop(() =>  {
             this.tick();
   
-            if($XR.Variables.stereo) {
+            if($XR.Variables.fakeVR) {
                 $XR.Effect.render($XR.Scene, $XR.Camera);
             } else {
                 $XR.Renderer.render($XR.Scene, $XR.Camera);
@@ -469,12 +469,50 @@ class Loop {
 
 /***/ }),
 
+/***/ 928:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Resizer": () => (/* binding */ Resizer)
+/* harmony export */ });
+/* ====================================================================================================
+ * Resizer
+ * ==================================================================================================== */
+
+class Resizer {
+    constructor(container, camera, renderer) {
+      this.setSize(container, camera, renderer);
+  
+      window.addEventListener("resize", () => {
+        this.setSize(container, camera, renderer);
+        this.onResize();
+      });
+    }
+  
+    onResize() {}
+  
+    setSize(container, camera, renderer) {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+  
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+    }
+  }
+  
+
+/***/ }),
+
 /***/ 751:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_loop_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(820);
+/* harmony import */ var _base_resizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(928);
+
 
 
 /* ====================================================================================================
@@ -493,6 +531,10 @@ class XRCamera extends HTMLElement {
         if($XR.Scene != null) {
             $XR.Loop = new _base_loop_js__WEBPACK_IMPORTED_MODULE_0__.Loop($XR.Camera, $XR.Scene, $XR.Renderer);
             $XR.Loop.start();
+        }
+
+        if($XR.rezier == null) {
+            $XR.Resizer = new _base_resizer_js__WEBPACK_IMPORTED_MODULE_1__.Resizer($XR.Container, $XR.Camera, $XR.Renderer)
         }
     }
   
@@ -636,12 +678,74 @@ class XRPlane extends HTMLElement {
 
 /***/ }),
 
-/***/ 492:
+/***/ 745:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _base_loop_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(820);
+
+// EXTERNAL MODULE: ./src/base/loop.js
+var loop = __webpack_require__(820);
+// EXTERNAL MODULE: ./node_modules/three/build/three.module.js
+var three_module = __webpack_require__(477);
+;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/effects/StereoEffect.js
+
+
+class StereoEffect {
+
+	constructor( renderer ) {
+
+		const _stereo = new three_module.StereoCamera();
+		_stereo.aspect = 0.5;
+		const size = new three_module.Vector2();
+
+		this.setEyeSeparation = function ( eyeSep ) {
+
+			_stereo.eyeSep = eyeSep;
+
+		};
+
+		this.setSize = function ( width, height ) {
+
+			renderer.setSize( width, height );
+
+		};
+
+		this.render = function ( scene, camera ) {
+
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+			_stereo.update( camera );
+
+			renderer.getSize( size );
+
+			if ( renderer.autoClear ) renderer.clear();
+			renderer.setScissorTest( true );
+
+			renderer.setScissor( 0, 0, size.width / 2, size.height );
+			renderer.setViewport( 0, 0, size.width / 2, size.height );
+			renderer.render( scene, _stereo.cameraL );
+
+			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+			renderer.render( scene, _stereo.cameraR );
+
+			renderer.setScissorTest( false );
+
+		};
+
+	}
+
+}
+
+
+
+;// CONCATENATED MODULE: ./src/elements/xr-scene.js
+
+
 
 
 /* ====================================================================================================
@@ -654,11 +758,14 @@ class XRScene extends HTMLElement {
   
         $XR.Scene = new THREE.Scene();
         $XR.Scene.background = new THREE.Color(0x000000);
+
+        $XR.Effect = new StereoEffect($XR.Renderer);
+        $XR.Effect.setSize(window.innerWidth, window.innerHeight);
     }
   
     connectedCallback() {
         if($XR.Camera != null) {
-            $XR.Loop = new _base_loop_js__WEBPACK_IMPORTED_MODULE_0__.Loop($XR.Camera, $XR.Scene, $XR.Renderer);
+            $XR.Loop = new loop.Loop($XR.Camera, $XR.Scene, $XR.Renderer);
             $XR.Loop.start();
         }
     }
@@ -710,549 +817,422 @@ class XRSphere extends HTMLElement {
   if (!customElements.get("xr-sphere")) { customElements.define("xr-sphere", XRSphere); }
   
 
-/***/ })
+/***/ }),
 
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/nonce */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nc = undefined;
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
+/***/ 477:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
 "use strict";
-
-// NAMESPACE OBJECT: ./node_modules/three/build/three.module.js
-var three_module_namespaceObject = {};
-__webpack_require__.r(three_module_namespaceObject);
-__webpack_require__.d(three_module_namespaceObject, {
-  "ACESFilmicToneMapping": () => (ACESFilmicToneMapping),
-  "AddEquation": () => (AddEquation),
-  "AddOperation": () => (AddOperation),
-  "AdditiveAnimationBlendMode": () => (AdditiveAnimationBlendMode),
-  "AdditiveBlending": () => (AdditiveBlending),
-  "AlphaFormat": () => (AlphaFormat),
-  "AlwaysDepth": () => (AlwaysDepth),
-  "AlwaysStencilFunc": () => (AlwaysStencilFunc),
-  "AmbientLight": () => (AmbientLight),
-  "AmbientLightProbe": () => (AmbientLightProbe),
-  "AnimationClip": () => (AnimationClip),
-  "AnimationLoader": () => (AnimationLoader),
-  "AnimationMixer": () => (AnimationMixer),
-  "AnimationObjectGroup": () => (AnimationObjectGroup),
-  "AnimationUtils": () => (AnimationUtils),
-  "ArcCurve": () => (ArcCurve),
-  "ArrayCamera": () => (ArrayCamera),
-  "ArrowHelper": () => (ArrowHelper),
-  "Audio": () => (Audio),
-  "AudioAnalyser": () => (AudioAnalyser),
-  "AudioContext": () => (AudioContext),
-  "AudioListener": () => (AudioListener),
-  "AudioLoader": () => (AudioLoader),
-  "AxesHelper": () => (AxesHelper),
-  "BackSide": () => (BackSide),
-  "BasicDepthPacking": () => (BasicDepthPacking),
-  "BasicShadowMap": () => (BasicShadowMap),
-  "Bone": () => (Bone),
-  "BooleanKeyframeTrack": () => (BooleanKeyframeTrack),
-  "Box2": () => (Box2),
-  "Box3": () => (Box3),
-  "Box3Helper": () => (Box3Helper),
-  "BoxBufferGeometry": () => (BoxBufferGeometry),
-  "BoxGeometry": () => (BoxGeometry),
-  "BoxHelper": () => (BoxHelper),
-  "BufferAttribute": () => (BufferAttribute),
-  "BufferGeometry": () => (BufferGeometry),
-  "BufferGeometryLoader": () => (BufferGeometryLoader),
-  "ByteType": () => (ByteType),
-  "Cache": () => (Cache),
-  "Camera": () => (Camera),
-  "CameraHelper": () => (CameraHelper),
-  "CanvasTexture": () => (CanvasTexture),
-  "CapsuleBufferGeometry": () => (CapsuleBufferGeometry),
-  "CapsuleGeometry": () => (CapsuleGeometry),
-  "CatmullRomCurve3": () => (CatmullRomCurve3),
-  "CineonToneMapping": () => (CineonToneMapping),
-  "CircleBufferGeometry": () => (CircleBufferGeometry),
-  "CircleGeometry": () => (CircleGeometry),
-  "ClampToEdgeWrapping": () => (ClampToEdgeWrapping),
-  "Clock": () => (Clock),
-  "Color": () => (Color),
-  "ColorKeyframeTrack": () => (ColorKeyframeTrack),
-  "ColorManagement": () => (ColorManagement),
-  "CompressedArrayTexture": () => (CompressedArrayTexture),
-  "CompressedTexture": () => (CompressedTexture),
-  "CompressedTextureLoader": () => (CompressedTextureLoader),
-  "ConeBufferGeometry": () => (ConeBufferGeometry),
-  "ConeGeometry": () => (ConeGeometry),
-  "CubeCamera": () => (CubeCamera),
-  "CubeReflectionMapping": () => (CubeReflectionMapping),
-  "CubeRefractionMapping": () => (CubeRefractionMapping),
-  "CubeTexture": () => (CubeTexture),
-  "CubeTextureLoader": () => (CubeTextureLoader),
-  "CubeUVReflectionMapping": () => (CubeUVReflectionMapping),
-  "CubicBezierCurve": () => (CubicBezierCurve),
-  "CubicBezierCurve3": () => (CubicBezierCurve3),
-  "CubicInterpolant": () => (CubicInterpolant),
-  "CullFaceBack": () => (CullFaceBack),
-  "CullFaceFront": () => (CullFaceFront),
-  "CullFaceFrontBack": () => (CullFaceFrontBack),
-  "CullFaceNone": () => (CullFaceNone),
-  "Curve": () => (Curve),
-  "CurvePath": () => (CurvePath),
-  "CustomBlending": () => (CustomBlending),
-  "CustomToneMapping": () => (CustomToneMapping),
-  "CylinderBufferGeometry": () => (CylinderBufferGeometry),
-  "CylinderGeometry": () => (CylinderGeometry),
-  "Cylindrical": () => (Cylindrical),
-  "Data3DTexture": () => (Data3DTexture),
-  "DataArrayTexture": () => (DataArrayTexture),
-  "DataTexture": () => (DataTexture),
-  "DataTextureLoader": () => (DataTextureLoader),
-  "DataUtils": () => (DataUtils),
-  "DecrementStencilOp": () => (DecrementStencilOp),
-  "DecrementWrapStencilOp": () => (DecrementWrapStencilOp),
-  "DefaultLoadingManager": () => (DefaultLoadingManager),
-  "DepthFormat": () => (DepthFormat),
-  "DepthStencilFormat": () => (DepthStencilFormat),
-  "DepthTexture": () => (DepthTexture),
-  "DirectionalLight": () => (DirectionalLight),
-  "DirectionalLightHelper": () => (DirectionalLightHelper),
-  "DiscreteInterpolant": () => (DiscreteInterpolant),
-  "DodecahedronBufferGeometry": () => (DodecahedronBufferGeometry),
-  "DodecahedronGeometry": () => (DodecahedronGeometry),
-  "DoubleSide": () => (DoubleSide),
-  "DstAlphaFactor": () => (DstAlphaFactor),
-  "DstColorFactor": () => (DstColorFactor),
-  "DynamicCopyUsage": () => (DynamicCopyUsage),
-  "DynamicDrawUsage": () => (DynamicDrawUsage),
-  "DynamicReadUsage": () => (DynamicReadUsage),
-  "EdgesGeometry": () => (EdgesGeometry),
-  "EllipseCurve": () => (EllipseCurve),
-  "EqualDepth": () => (EqualDepth),
-  "EqualStencilFunc": () => (EqualStencilFunc),
-  "EquirectangularReflectionMapping": () => (EquirectangularReflectionMapping),
-  "EquirectangularRefractionMapping": () => (EquirectangularRefractionMapping),
-  "Euler": () => (Euler),
-  "EventDispatcher": () => (EventDispatcher),
-  "ExtrudeBufferGeometry": () => (ExtrudeBufferGeometry),
-  "ExtrudeGeometry": () => (ExtrudeGeometry),
-  "FileLoader": () => (FileLoader),
-  "Float16BufferAttribute": () => (Float16BufferAttribute),
-  "Float32BufferAttribute": () => (Float32BufferAttribute),
-  "Float64BufferAttribute": () => (Float64BufferAttribute),
-  "FloatType": () => (FloatType),
-  "Fog": () => (Fog),
-  "FogExp2": () => (FogExp2),
-  "FramebufferTexture": () => (FramebufferTexture),
-  "FrontSide": () => (FrontSide),
-  "Frustum": () => (Frustum),
-  "GLBufferAttribute": () => (GLBufferAttribute),
-  "GLSL1": () => (GLSL1),
-  "GLSL3": () => (GLSL3),
-  "GreaterDepth": () => (GreaterDepth),
-  "GreaterEqualDepth": () => (GreaterEqualDepth),
-  "GreaterEqualStencilFunc": () => (GreaterEqualStencilFunc),
-  "GreaterStencilFunc": () => (GreaterStencilFunc),
-  "GridHelper": () => (GridHelper),
-  "Group": () => (Group),
-  "HalfFloatType": () => (HalfFloatType),
-  "HemisphereLight": () => (HemisphereLight),
-  "HemisphereLightHelper": () => (HemisphereLightHelper),
-  "HemisphereLightProbe": () => (HemisphereLightProbe),
-  "IcosahedronBufferGeometry": () => (IcosahedronBufferGeometry),
-  "IcosahedronGeometry": () => (IcosahedronGeometry),
-  "ImageBitmapLoader": () => (ImageBitmapLoader),
-  "ImageLoader": () => (ImageLoader),
-  "ImageUtils": () => (ImageUtils),
-  "IncrementStencilOp": () => (IncrementStencilOp),
-  "IncrementWrapStencilOp": () => (IncrementWrapStencilOp),
-  "InstancedBufferAttribute": () => (InstancedBufferAttribute),
-  "InstancedBufferGeometry": () => (InstancedBufferGeometry),
-  "InstancedInterleavedBuffer": () => (InstancedInterleavedBuffer),
-  "InstancedMesh": () => (InstancedMesh),
-  "Int16BufferAttribute": () => (Int16BufferAttribute),
-  "Int32BufferAttribute": () => (Int32BufferAttribute),
-  "Int8BufferAttribute": () => (Int8BufferAttribute),
-  "IntType": () => (IntType),
-  "InterleavedBuffer": () => (InterleavedBuffer),
-  "InterleavedBufferAttribute": () => (InterleavedBufferAttribute),
-  "Interpolant": () => (Interpolant),
-  "InterpolateDiscrete": () => (InterpolateDiscrete),
-  "InterpolateLinear": () => (InterpolateLinear),
-  "InterpolateSmooth": () => (InterpolateSmooth),
-  "InvertStencilOp": () => (InvertStencilOp),
-  "KeepStencilOp": () => (KeepStencilOp),
-  "KeyframeTrack": () => (KeyframeTrack),
-  "LOD": () => (LOD),
-  "LatheBufferGeometry": () => (LatheBufferGeometry),
-  "LatheGeometry": () => (LatheGeometry),
-  "Layers": () => (Layers),
-  "LessDepth": () => (LessDepth),
-  "LessEqualDepth": () => (LessEqualDepth),
-  "LessEqualStencilFunc": () => (LessEqualStencilFunc),
-  "LessStencilFunc": () => (LessStencilFunc),
-  "Light": () => (Light),
-  "LightProbe": () => (LightProbe),
-  "Line": () => (Line),
-  "Line3": () => (Line3),
-  "LineBasicMaterial": () => (LineBasicMaterial),
-  "LineCurve": () => (LineCurve),
-  "LineCurve3": () => (LineCurve3),
-  "LineDashedMaterial": () => (LineDashedMaterial),
-  "LineLoop": () => (LineLoop),
-  "LineSegments": () => (LineSegments),
-  "LinearEncoding": () => (LinearEncoding),
-  "LinearFilter": () => (LinearFilter),
-  "LinearInterpolant": () => (LinearInterpolant),
-  "LinearMipMapLinearFilter": () => (LinearMipMapLinearFilter),
-  "LinearMipMapNearestFilter": () => (LinearMipMapNearestFilter),
-  "LinearMipmapLinearFilter": () => (LinearMipmapLinearFilter),
-  "LinearMipmapNearestFilter": () => (LinearMipmapNearestFilter),
-  "LinearSRGBColorSpace": () => (LinearSRGBColorSpace),
-  "LinearToneMapping": () => (LinearToneMapping),
-  "Loader": () => (Loader),
-  "LoaderUtils": () => (LoaderUtils),
-  "LoadingManager": () => (LoadingManager),
-  "LoopOnce": () => (LoopOnce),
-  "LoopPingPong": () => (LoopPingPong),
-  "LoopRepeat": () => (LoopRepeat),
-  "LuminanceAlphaFormat": () => (LuminanceAlphaFormat),
-  "LuminanceFormat": () => (LuminanceFormat),
-  "MOUSE": () => (MOUSE),
-  "Material": () => (Material),
-  "MaterialLoader": () => (MaterialLoader),
-  "MathUtils": () => (MathUtils),
-  "Matrix3": () => (Matrix3),
-  "Matrix4": () => (Matrix4),
-  "MaxEquation": () => (MaxEquation),
-  "Mesh": () => (Mesh),
-  "MeshBasicMaterial": () => (MeshBasicMaterial),
-  "MeshDepthMaterial": () => (MeshDepthMaterial),
-  "MeshDistanceMaterial": () => (MeshDistanceMaterial),
-  "MeshLambertMaterial": () => (MeshLambertMaterial),
-  "MeshMatcapMaterial": () => (MeshMatcapMaterial),
-  "MeshNormalMaterial": () => (MeshNormalMaterial),
-  "MeshPhongMaterial": () => (MeshPhongMaterial),
-  "MeshPhysicalMaterial": () => (MeshPhysicalMaterial),
-  "MeshStandardMaterial": () => (MeshStandardMaterial),
-  "MeshToonMaterial": () => (MeshToonMaterial),
-  "MinEquation": () => (MinEquation),
-  "MirroredRepeatWrapping": () => (MirroredRepeatWrapping),
-  "MixOperation": () => (MixOperation),
-  "MultiplyBlending": () => (MultiplyBlending),
-  "MultiplyOperation": () => (MultiplyOperation),
-  "NearestFilter": () => (NearestFilter),
-  "NearestMipMapLinearFilter": () => (NearestMipMapLinearFilter),
-  "NearestMipMapNearestFilter": () => (NearestMipMapNearestFilter),
-  "NearestMipmapLinearFilter": () => (NearestMipmapLinearFilter),
-  "NearestMipmapNearestFilter": () => (NearestMipmapNearestFilter),
-  "NeverDepth": () => (NeverDepth),
-  "NeverStencilFunc": () => (NeverStencilFunc),
-  "NoBlending": () => (NoBlending),
-  "NoColorSpace": () => (NoColorSpace),
-  "NoToneMapping": () => (NoToneMapping),
-  "NormalAnimationBlendMode": () => (NormalAnimationBlendMode),
-  "NormalBlending": () => (NormalBlending),
-  "NotEqualDepth": () => (NotEqualDepth),
-  "NotEqualStencilFunc": () => (NotEqualStencilFunc),
-  "NumberKeyframeTrack": () => (NumberKeyframeTrack),
-  "Object3D": () => (Object3D),
-  "ObjectLoader": () => (ObjectLoader),
-  "ObjectSpaceNormalMap": () => (ObjectSpaceNormalMap),
-  "OctahedronBufferGeometry": () => (OctahedronBufferGeometry),
-  "OctahedronGeometry": () => (OctahedronGeometry),
-  "OneFactor": () => (OneFactor),
-  "OneMinusDstAlphaFactor": () => (OneMinusDstAlphaFactor),
-  "OneMinusDstColorFactor": () => (OneMinusDstColorFactor),
-  "OneMinusSrcAlphaFactor": () => (OneMinusSrcAlphaFactor),
-  "OneMinusSrcColorFactor": () => (OneMinusSrcColorFactor),
-  "OrthographicCamera": () => (OrthographicCamera),
-  "PCFShadowMap": () => (PCFShadowMap),
-  "PCFSoftShadowMap": () => (PCFSoftShadowMap),
-  "PMREMGenerator": () => (PMREMGenerator),
-  "Path": () => (Path),
-  "PerspectiveCamera": () => (PerspectiveCamera),
-  "Plane": () => (Plane),
-  "PlaneBufferGeometry": () => (PlaneBufferGeometry),
-  "PlaneGeometry": () => (PlaneGeometry),
-  "PlaneHelper": () => (PlaneHelper),
-  "PointLight": () => (PointLight),
-  "PointLightHelper": () => (PointLightHelper),
-  "Points": () => (Points),
-  "PointsMaterial": () => (PointsMaterial),
-  "PolarGridHelper": () => (PolarGridHelper),
-  "PolyhedronBufferGeometry": () => (PolyhedronBufferGeometry),
-  "PolyhedronGeometry": () => (PolyhedronGeometry),
-  "PositionalAudio": () => (PositionalAudio),
-  "PropertyBinding": () => (PropertyBinding),
-  "PropertyMixer": () => (PropertyMixer),
-  "QuadraticBezierCurve": () => (QuadraticBezierCurve),
-  "QuadraticBezierCurve3": () => (QuadraticBezierCurve3),
-  "Quaternion": () => (Quaternion),
-  "QuaternionKeyframeTrack": () => (QuaternionKeyframeTrack),
-  "QuaternionLinearInterpolant": () => (QuaternionLinearInterpolant),
-  "RED_GREEN_RGTC2_Format": () => (RED_GREEN_RGTC2_Format),
-  "RED_RGTC1_Format": () => (RED_RGTC1_Format),
-  "REVISION": () => (REVISION),
-  "RGBADepthPacking": () => (RGBADepthPacking),
-  "RGBAFormat": () => (RGBAFormat),
-  "RGBAIntegerFormat": () => (RGBAIntegerFormat),
-  "RGBA_ASTC_10x10_Format": () => (RGBA_ASTC_10x10_Format),
-  "RGBA_ASTC_10x5_Format": () => (RGBA_ASTC_10x5_Format),
-  "RGBA_ASTC_10x6_Format": () => (RGBA_ASTC_10x6_Format),
-  "RGBA_ASTC_10x8_Format": () => (RGBA_ASTC_10x8_Format),
-  "RGBA_ASTC_12x10_Format": () => (RGBA_ASTC_12x10_Format),
-  "RGBA_ASTC_12x12_Format": () => (RGBA_ASTC_12x12_Format),
-  "RGBA_ASTC_4x4_Format": () => (RGBA_ASTC_4x4_Format),
-  "RGBA_ASTC_5x4_Format": () => (RGBA_ASTC_5x4_Format),
-  "RGBA_ASTC_5x5_Format": () => (RGBA_ASTC_5x5_Format),
-  "RGBA_ASTC_6x5_Format": () => (RGBA_ASTC_6x5_Format),
-  "RGBA_ASTC_6x6_Format": () => (RGBA_ASTC_6x6_Format),
-  "RGBA_ASTC_8x5_Format": () => (RGBA_ASTC_8x5_Format),
-  "RGBA_ASTC_8x6_Format": () => (RGBA_ASTC_8x6_Format),
-  "RGBA_ASTC_8x8_Format": () => (RGBA_ASTC_8x8_Format),
-  "RGBA_BPTC_Format": () => (RGBA_BPTC_Format),
-  "RGBA_ETC2_EAC_Format": () => (RGBA_ETC2_EAC_Format),
-  "RGBA_PVRTC_2BPPV1_Format": () => (RGBA_PVRTC_2BPPV1_Format),
-  "RGBA_PVRTC_4BPPV1_Format": () => (RGBA_PVRTC_4BPPV1_Format),
-  "RGBA_S3TC_DXT1_Format": () => (RGBA_S3TC_DXT1_Format),
-  "RGBA_S3TC_DXT3_Format": () => (RGBA_S3TC_DXT3_Format),
-  "RGBA_S3TC_DXT5_Format": () => (RGBA_S3TC_DXT5_Format),
-  "RGB_ETC1_Format": () => (RGB_ETC1_Format),
-  "RGB_ETC2_Format": () => (RGB_ETC2_Format),
-  "RGB_PVRTC_2BPPV1_Format": () => (RGB_PVRTC_2BPPV1_Format),
-  "RGB_PVRTC_4BPPV1_Format": () => (RGB_PVRTC_4BPPV1_Format),
-  "RGB_S3TC_DXT1_Format": () => (RGB_S3TC_DXT1_Format),
-  "RGFormat": () => (RGFormat),
-  "RGIntegerFormat": () => (RGIntegerFormat),
-  "RawShaderMaterial": () => (RawShaderMaterial),
-  "Ray": () => (Ray),
-  "Raycaster": () => (Raycaster),
-  "RectAreaLight": () => (RectAreaLight),
-  "RedFormat": () => (RedFormat),
-  "RedIntegerFormat": () => (RedIntegerFormat),
-  "ReinhardToneMapping": () => (ReinhardToneMapping),
-  "RepeatWrapping": () => (RepeatWrapping),
-  "ReplaceStencilOp": () => (ReplaceStencilOp),
-  "ReverseSubtractEquation": () => (ReverseSubtractEquation),
-  "RingBufferGeometry": () => (RingBufferGeometry),
-  "RingGeometry": () => (RingGeometry),
-  "SIGNED_RED_GREEN_RGTC2_Format": () => (SIGNED_RED_GREEN_RGTC2_Format),
-  "SIGNED_RED_RGTC1_Format": () => (SIGNED_RED_RGTC1_Format),
-  "SRGBColorSpace": () => (SRGBColorSpace),
-  "Scene": () => (Scene),
-  "ShaderChunk": () => (ShaderChunk),
-  "ShaderLib": () => (ShaderLib),
-  "ShaderMaterial": () => (ShaderMaterial),
-  "ShadowMaterial": () => (ShadowMaterial),
-  "Shape": () => (Shape),
-  "ShapeBufferGeometry": () => (ShapeBufferGeometry),
-  "ShapeGeometry": () => (ShapeGeometry),
-  "ShapePath": () => (ShapePath),
-  "ShapeUtils": () => (ShapeUtils),
-  "ShortType": () => (ShortType),
-  "Skeleton": () => (Skeleton),
-  "SkeletonHelper": () => (SkeletonHelper),
-  "SkinnedMesh": () => (SkinnedMesh),
-  "Source": () => (Source),
-  "Sphere": () => (Sphere),
-  "SphereBufferGeometry": () => (SphereBufferGeometry),
-  "SphereGeometry": () => (SphereGeometry),
-  "Spherical": () => (Spherical),
-  "SphericalHarmonics3": () => (SphericalHarmonics3),
-  "SplineCurve": () => (SplineCurve),
-  "SpotLight": () => (SpotLight),
-  "SpotLightHelper": () => (SpotLightHelper),
-  "Sprite": () => (Sprite),
-  "SpriteMaterial": () => (SpriteMaterial),
-  "SrcAlphaFactor": () => (SrcAlphaFactor),
-  "SrcAlphaSaturateFactor": () => (SrcAlphaSaturateFactor),
-  "SrcColorFactor": () => (SrcColorFactor),
-  "StaticCopyUsage": () => (StaticCopyUsage),
-  "StaticDrawUsage": () => (StaticDrawUsage),
-  "StaticReadUsage": () => (StaticReadUsage),
-  "StereoCamera": () => (StereoCamera),
-  "StreamCopyUsage": () => (StreamCopyUsage),
-  "StreamDrawUsage": () => (StreamDrawUsage),
-  "StreamReadUsage": () => (StreamReadUsage),
-  "StringKeyframeTrack": () => (StringKeyframeTrack),
-  "SubtractEquation": () => (SubtractEquation),
-  "SubtractiveBlending": () => (SubtractiveBlending),
-  "TOUCH": () => (TOUCH),
-  "TangentSpaceNormalMap": () => (TangentSpaceNormalMap),
-  "TetrahedronBufferGeometry": () => (TetrahedronBufferGeometry),
-  "TetrahedronGeometry": () => (TetrahedronGeometry),
-  "Texture": () => (Texture),
-  "TextureLoader": () => (TextureLoader),
-  "TorusBufferGeometry": () => (TorusBufferGeometry),
-  "TorusGeometry": () => (TorusGeometry),
-  "TorusKnotBufferGeometry": () => (TorusKnotBufferGeometry),
-  "TorusKnotGeometry": () => (TorusKnotGeometry),
-  "Triangle": () => (Triangle),
-  "TriangleFanDrawMode": () => (TriangleFanDrawMode),
-  "TriangleStripDrawMode": () => (TriangleStripDrawMode),
-  "TrianglesDrawMode": () => (TrianglesDrawMode),
-  "TubeBufferGeometry": () => (TubeBufferGeometry),
-  "TubeGeometry": () => (TubeGeometry),
-  "TwoPassDoubleSide": () => (TwoPassDoubleSide),
-  "UVMapping": () => (UVMapping),
-  "Uint16BufferAttribute": () => (Uint16BufferAttribute),
-  "Uint32BufferAttribute": () => (Uint32BufferAttribute),
-  "Uint8BufferAttribute": () => (Uint8BufferAttribute),
-  "Uint8ClampedBufferAttribute": () => (Uint8ClampedBufferAttribute),
-  "Uniform": () => (Uniform),
-  "UniformsGroup": () => (UniformsGroup),
-  "UniformsLib": () => (UniformsLib),
-  "UniformsUtils": () => (UniformsUtils),
-  "UnsignedByteType": () => (UnsignedByteType),
-  "UnsignedInt248Type": () => (UnsignedInt248Type),
-  "UnsignedIntType": () => (UnsignedIntType),
-  "UnsignedShort4444Type": () => (UnsignedShort4444Type),
-  "UnsignedShort5551Type": () => (UnsignedShort5551Type),
-  "UnsignedShortType": () => (UnsignedShortType),
-  "VSMShadowMap": () => (VSMShadowMap),
-  "Vector2": () => (Vector2),
-  "Vector3": () => (Vector3),
-  "Vector4": () => (Vector4),
-  "VectorKeyframeTrack": () => (VectorKeyframeTrack),
-  "VideoTexture": () => (VideoTexture),
-  "WebGL1Renderer": () => (WebGL1Renderer),
-  "WebGL3DRenderTarget": () => (WebGL3DRenderTarget),
-  "WebGLArrayRenderTarget": () => (WebGLArrayRenderTarget),
-  "WebGLCubeRenderTarget": () => (WebGLCubeRenderTarget),
-  "WebGLMultipleRenderTargets": () => (WebGLMultipleRenderTargets),
-  "WebGLRenderTarget": () => (WebGLRenderTarget),
-  "WebGLRenderer": () => (WebGLRenderer),
-  "WebGLUtils": () => (WebGLUtils),
-  "WireframeGeometry": () => (WireframeGeometry),
-  "WrapAroundEnding": () => (WrapAroundEnding),
-  "ZeroCurvatureEnding": () => (ZeroCurvatureEnding),
-  "ZeroFactor": () => (ZeroFactor),
-  "ZeroSlopeEnding": () => (ZeroSlopeEnding),
-  "ZeroStencilOp": () => (ZeroStencilOp),
-  "_SRGBAFormat": () => (_SRGBAFormat),
-  "sRGBEncoding": () => (sRGBEncoding)
-});
-
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(379);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(795);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(569);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(565);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(216);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(589);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style/styles.css
-var styles = __webpack_require__(222);
-;// CONCATENATED MODULE: ./src/style/styles.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(styles["default"], options);
-
-
-
-
-       /* harmony default export */ const style_styles = (styles["default"] && styles["default"].locals ? styles["default"].locals : undefined);
-
-;// CONCATENATED MODULE: ./node_modules/three/build/three.module.js
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ACESFilmicToneMapping": () => (/* binding */ ACESFilmicToneMapping),
+/* harmony export */   "AddEquation": () => (/* binding */ AddEquation),
+/* harmony export */   "AddOperation": () => (/* binding */ AddOperation),
+/* harmony export */   "AdditiveAnimationBlendMode": () => (/* binding */ AdditiveAnimationBlendMode),
+/* harmony export */   "AdditiveBlending": () => (/* binding */ AdditiveBlending),
+/* harmony export */   "AlphaFormat": () => (/* binding */ AlphaFormat),
+/* harmony export */   "AlwaysDepth": () => (/* binding */ AlwaysDepth),
+/* harmony export */   "AlwaysStencilFunc": () => (/* binding */ AlwaysStencilFunc),
+/* harmony export */   "AmbientLight": () => (/* binding */ AmbientLight),
+/* harmony export */   "AmbientLightProbe": () => (/* binding */ AmbientLightProbe),
+/* harmony export */   "AnimationClip": () => (/* binding */ AnimationClip),
+/* harmony export */   "AnimationLoader": () => (/* binding */ AnimationLoader),
+/* harmony export */   "AnimationMixer": () => (/* binding */ AnimationMixer),
+/* harmony export */   "AnimationObjectGroup": () => (/* binding */ AnimationObjectGroup),
+/* harmony export */   "AnimationUtils": () => (/* binding */ AnimationUtils),
+/* harmony export */   "ArcCurve": () => (/* binding */ ArcCurve),
+/* harmony export */   "ArrayCamera": () => (/* binding */ ArrayCamera),
+/* harmony export */   "ArrowHelper": () => (/* binding */ ArrowHelper),
+/* harmony export */   "Audio": () => (/* binding */ Audio),
+/* harmony export */   "AudioAnalyser": () => (/* binding */ AudioAnalyser),
+/* harmony export */   "AudioContext": () => (/* binding */ AudioContext),
+/* harmony export */   "AudioListener": () => (/* binding */ AudioListener),
+/* harmony export */   "AudioLoader": () => (/* binding */ AudioLoader),
+/* harmony export */   "AxesHelper": () => (/* binding */ AxesHelper),
+/* harmony export */   "BackSide": () => (/* binding */ BackSide),
+/* harmony export */   "BasicDepthPacking": () => (/* binding */ BasicDepthPacking),
+/* harmony export */   "BasicShadowMap": () => (/* binding */ BasicShadowMap),
+/* harmony export */   "Bone": () => (/* binding */ Bone),
+/* harmony export */   "BooleanKeyframeTrack": () => (/* binding */ BooleanKeyframeTrack),
+/* harmony export */   "Box2": () => (/* binding */ Box2),
+/* harmony export */   "Box3": () => (/* binding */ Box3),
+/* harmony export */   "Box3Helper": () => (/* binding */ Box3Helper),
+/* harmony export */   "BoxBufferGeometry": () => (/* binding */ BoxBufferGeometry),
+/* harmony export */   "BoxGeometry": () => (/* binding */ BoxGeometry),
+/* harmony export */   "BoxHelper": () => (/* binding */ BoxHelper),
+/* harmony export */   "BufferAttribute": () => (/* binding */ BufferAttribute),
+/* harmony export */   "BufferGeometry": () => (/* binding */ BufferGeometry),
+/* harmony export */   "BufferGeometryLoader": () => (/* binding */ BufferGeometryLoader),
+/* harmony export */   "ByteType": () => (/* binding */ ByteType),
+/* harmony export */   "Cache": () => (/* binding */ Cache),
+/* harmony export */   "Camera": () => (/* binding */ Camera),
+/* harmony export */   "CameraHelper": () => (/* binding */ CameraHelper),
+/* harmony export */   "CanvasTexture": () => (/* binding */ CanvasTexture),
+/* harmony export */   "CapsuleBufferGeometry": () => (/* binding */ CapsuleBufferGeometry),
+/* harmony export */   "CapsuleGeometry": () => (/* binding */ CapsuleGeometry),
+/* harmony export */   "CatmullRomCurve3": () => (/* binding */ CatmullRomCurve3),
+/* harmony export */   "CineonToneMapping": () => (/* binding */ CineonToneMapping),
+/* harmony export */   "CircleBufferGeometry": () => (/* binding */ CircleBufferGeometry),
+/* harmony export */   "CircleGeometry": () => (/* binding */ CircleGeometry),
+/* harmony export */   "ClampToEdgeWrapping": () => (/* binding */ ClampToEdgeWrapping),
+/* harmony export */   "Clock": () => (/* binding */ Clock),
+/* harmony export */   "Color": () => (/* binding */ Color),
+/* harmony export */   "ColorKeyframeTrack": () => (/* binding */ ColorKeyframeTrack),
+/* harmony export */   "ColorManagement": () => (/* binding */ ColorManagement),
+/* harmony export */   "CompressedArrayTexture": () => (/* binding */ CompressedArrayTexture),
+/* harmony export */   "CompressedTexture": () => (/* binding */ CompressedTexture),
+/* harmony export */   "CompressedTextureLoader": () => (/* binding */ CompressedTextureLoader),
+/* harmony export */   "ConeBufferGeometry": () => (/* binding */ ConeBufferGeometry),
+/* harmony export */   "ConeGeometry": () => (/* binding */ ConeGeometry),
+/* harmony export */   "CubeCamera": () => (/* binding */ CubeCamera),
+/* harmony export */   "CubeReflectionMapping": () => (/* binding */ CubeReflectionMapping),
+/* harmony export */   "CubeRefractionMapping": () => (/* binding */ CubeRefractionMapping),
+/* harmony export */   "CubeTexture": () => (/* binding */ CubeTexture),
+/* harmony export */   "CubeTextureLoader": () => (/* binding */ CubeTextureLoader),
+/* harmony export */   "CubeUVReflectionMapping": () => (/* binding */ CubeUVReflectionMapping),
+/* harmony export */   "CubicBezierCurve": () => (/* binding */ CubicBezierCurve),
+/* harmony export */   "CubicBezierCurve3": () => (/* binding */ CubicBezierCurve3),
+/* harmony export */   "CubicInterpolant": () => (/* binding */ CubicInterpolant),
+/* harmony export */   "CullFaceBack": () => (/* binding */ CullFaceBack),
+/* harmony export */   "CullFaceFront": () => (/* binding */ CullFaceFront),
+/* harmony export */   "CullFaceFrontBack": () => (/* binding */ CullFaceFrontBack),
+/* harmony export */   "CullFaceNone": () => (/* binding */ CullFaceNone),
+/* harmony export */   "Curve": () => (/* binding */ Curve),
+/* harmony export */   "CurvePath": () => (/* binding */ CurvePath),
+/* harmony export */   "CustomBlending": () => (/* binding */ CustomBlending),
+/* harmony export */   "CustomToneMapping": () => (/* binding */ CustomToneMapping),
+/* harmony export */   "CylinderBufferGeometry": () => (/* binding */ CylinderBufferGeometry),
+/* harmony export */   "CylinderGeometry": () => (/* binding */ CylinderGeometry),
+/* harmony export */   "Cylindrical": () => (/* binding */ Cylindrical),
+/* harmony export */   "Data3DTexture": () => (/* binding */ Data3DTexture),
+/* harmony export */   "DataArrayTexture": () => (/* binding */ DataArrayTexture),
+/* harmony export */   "DataTexture": () => (/* binding */ DataTexture),
+/* harmony export */   "DataTextureLoader": () => (/* binding */ DataTextureLoader),
+/* harmony export */   "DataUtils": () => (/* binding */ DataUtils),
+/* harmony export */   "DecrementStencilOp": () => (/* binding */ DecrementStencilOp),
+/* harmony export */   "DecrementWrapStencilOp": () => (/* binding */ DecrementWrapStencilOp),
+/* harmony export */   "DefaultLoadingManager": () => (/* binding */ DefaultLoadingManager),
+/* harmony export */   "DepthFormat": () => (/* binding */ DepthFormat),
+/* harmony export */   "DepthStencilFormat": () => (/* binding */ DepthStencilFormat),
+/* harmony export */   "DepthTexture": () => (/* binding */ DepthTexture),
+/* harmony export */   "DirectionalLight": () => (/* binding */ DirectionalLight),
+/* harmony export */   "DirectionalLightHelper": () => (/* binding */ DirectionalLightHelper),
+/* harmony export */   "DiscreteInterpolant": () => (/* binding */ DiscreteInterpolant),
+/* harmony export */   "DodecahedronBufferGeometry": () => (/* binding */ DodecahedronBufferGeometry),
+/* harmony export */   "DodecahedronGeometry": () => (/* binding */ DodecahedronGeometry),
+/* harmony export */   "DoubleSide": () => (/* binding */ DoubleSide),
+/* harmony export */   "DstAlphaFactor": () => (/* binding */ DstAlphaFactor),
+/* harmony export */   "DstColorFactor": () => (/* binding */ DstColorFactor),
+/* harmony export */   "DynamicCopyUsage": () => (/* binding */ DynamicCopyUsage),
+/* harmony export */   "DynamicDrawUsage": () => (/* binding */ DynamicDrawUsage),
+/* harmony export */   "DynamicReadUsage": () => (/* binding */ DynamicReadUsage),
+/* harmony export */   "EdgesGeometry": () => (/* binding */ EdgesGeometry),
+/* harmony export */   "EllipseCurve": () => (/* binding */ EllipseCurve),
+/* harmony export */   "EqualDepth": () => (/* binding */ EqualDepth),
+/* harmony export */   "EqualStencilFunc": () => (/* binding */ EqualStencilFunc),
+/* harmony export */   "EquirectangularReflectionMapping": () => (/* binding */ EquirectangularReflectionMapping),
+/* harmony export */   "EquirectangularRefractionMapping": () => (/* binding */ EquirectangularRefractionMapping),
+/* harmony export */   "Euler": () => (/* binding */ Euler),
+/* harmony export */   "EventDispatcher": () => (/* binding */ EventDispatcher),
+/* harmony export */   "ExtrudeBufferGeometry": () => (/* binding */ ExtrudeBufferGeometry),
+/* harmony export */   "ExtrudeGeometry": () => (/* binding */ ExtrudeGeometry),
+/* harmony export */   "FileLoader": () => (/* binding */ FileLoader),
+/* harmony export */   "Float16BufferAttribute": () => (/* binding */ Float16BufferAttribute),
+/* harmony export */   "Float32BufferAttribute": () => (/* binding */ Float32BufferAttribute),
+/* harmony export */   "Float64BufferAttribute": () => (/* binding */ Float64BufferAttribute),
+/* harmony export */   "FloatType": () => (/* binding */ FloatType),
+/* harmony export */   "Fog": () => (/* binding */ Fog),
+/* harmony export */   "FogExp2": () => (/* binding */ FogExp2),
+/* harmony export */   "FramebufferTexture": () => (/* binding */ FramebufferTexture),
+/* harmony export */   "FrontSide": () => (/* binding */ FrontSide),
+/* harmony export */   "Frustum": () => (/* binding */ Frustum),
+/* harmony export */   "GLBufferAttribute": () => (/* binding */ GLBufferAttribute),
+/* harmony export */   "GLSL1": () => (/* binding */ GLSL1),
+/* harmony export */   "GLSL3": () => (/* binding */ GLSL3),
+/* harmony export */   "GreaterDepth": () => (/* binding */ GreaterDepth),
+/* harmony export */   "GreaterEqualDepth": () => (/* binding */ GreaterEqualDepth),
+/* harmony export */   "GreaterEqualStencilFunc": () => (/* binding */ GreaterEqualStencilFunc),
+/* harmony export */   "GreaterStencilFunc": () => (/* binding */ GreaterStencilFunc),
+/* harmony export */   "GridHelper": () => (/* binding */ GridHelper),
+/* harmony export */   "Group": () => (/* binding */ Group),
+/* harmony export */   "HalfFloatType": () => (/* binding */ HalfFloatType),
+/* harmony export */   "HemisphereLight": () => (/* binding */ HemisphereLight),
+/* harmony export */   "HemisphereLightHelper": () => (/* binding */ HemisphereLightHelper),
+/* harmony export */   "HemisphereLightProbe": () => (/* binding */ HemisphereLightProbe),
+/* harmony export */   "IcosahedronBufferGeometry": () => (/* binding */ IcosahedronBufferGeometry),
+/* harmony export */   "IcosahedronGeometry": () => (/* binding */ IcosahedronGeometry),
+/* harmony export */   "ImageBitmapLoader": () => (/* binding */ ImageBitmapLoader),
+/* harmony export */   "ImageLoader": () => (/* binding */ ImageLoader),
+/* harmony export */   "ImageUtils": () => (/* binding */ ImageUtils),
+/* harmony export */   "IncrementStencilOp": () => (/* binding */ IncrementStencilOp),
+/* harmony export */   "IncrementWrapStencilOp": () => (/* binding */ IncrementWrapStencilOp),
+/* harmony export */   "InstancedBufferAttribute": () => (/* binding */ InstancedBufferAttribute),
+/* harmony export */   "InstancedBufferGeometry": () => (/* binding */ InstancedBufferGeometry),
+/* harmony export */   "InstancedInterleavedBuffer": () => (/* binding */ InstancedInterleavedBuffer),
+/* harmony export */   "InstancedMesh": () => (/* binding */ InstancedMesh),
+/* harmony export */   "Int16BufferAttribute": () => (/* binding */ Int16BufferAttribute),
+/* harmony export */   "Int32BufferAttribute": () => (/* binding */ Int32BufferAttribute),
+/* harmony export */   "Int8BufferAttribute": () => (/* binding */ Int8BufferAttribute),
+/* harmony export */   "IntType": () => (/* binding */ IntType),
+/* harmony export */   "InterleavedBuffer": () => (/* binding */ InterleavedBuffer),
+/* harmony export */   "InterleavedBufferAttribute": () => (/* binding */ InterleavedBufferAttribute),
+/* harmony export */   "Interpolant": () => (/* binding */ Interpolant),
+/* harmony export */   "InterpolateDiscrete": () => (/* binding */ InterpolateDiscrete),
+/* harmony export */   "InterpolateLinear": () => (/* binding */ InterpolateLinear),
+/* harmony export */   "InterpolateSmooth": () => (/* binding */ InterpolateSmooth),
+/* harmony export */   "InvertStencilOp": () => (/* binding */ InvertStencilOp),
+/* harmony export */   "KeepStencilOp": () => (/* binding */ KeepStencilOp),
+/* harmony export */   "KeyframeTrack": () => (/* binding */ KeyframeTrack),
+/* harmony export */   "LOD": () => (/* binding */ LOD),
+/* harmony export */   "LatheBufferGeometry": () => (/* binding */ LatheBufferGeometry),
+/* harmony export */   "LatheGeometry": () => (/* binding */ LatheGeometry),
+/* harmony export */   "Layers": () => (/* binding */ Layers),
+/* harmony export */   "LessDepth": () => (/* binding */ LessDepth),
+/* harmony export */   "LessEqualDepth": () => (/* binding */ LessEqualDepth),
+/* harmony export */   "LessEqualStencilFunc": () => (/* binding */ LessEqualStencilFunc),
+/* harmony export */   "LessStencilFunc": () => (/* binding */ LessStencilFunc),
+/* harmony export */   "Light": () => (/* binding */ Light),
+/* harmony export */   "LightProbe": () => (/* binding */ LightProbe),
+/* harmony export */   "Line": () => (/* binding */ Line),
+/* harmony export */   "Line3": () => (/* binding */ Line3),
+/* harmony export */   "LineBasicMaterial": () => (/* binding */ LineBasicMaterial),
+/* harmony export */   "LineCurve": () => (/* binding */ LineCurve),
+/* harmony export */   "LineCurve3": () => (/* binding */ LineCurve3),
+/* harmony export */   "LineDashedMaterial": () => (/* binding */ LineDashedMaterial),
+/* harmony export */   "LineLoop": () => (/* binding */ LineLoop),
+/* harmony export */   "LineSegments": () => (/* binding */ LineSegments),
+/* harmony export */   "LinearEncoding": () => (/* binding */ LinearEncoding),
+/* harmony export */   "LinearFilter": () => (/* binding */ LinearFilter),
+/* harmony export */   "LinearInterpolant": () => (/* binding */ LinearInterpolant),
+/* harmony export */   "LinearMipMapLinearFilter": () => (/* binding */ LinearMipMapLinearFilter),
+/* harmony export */   "LinearMipMapNearestFilter": () => (/* binding */ LinearMipMapNearestFilter),
+/* harmony export */   "LinearMipmapLinearFilter": () => (/* binding */ LinearMipmapLinearFilter),
+/* harmony export */   "LinearMipmapNearestFilter": () => (/* binding */ LinearMipmapNearestFilter),
+/* harmony export */   "LinearSRGBColorSpace": () => (/* binding */ LinearSRGBColorSpace),
+/* harmony export */   "LinearToneMapping": () => (/* binding */ LinearToneMapping),
+/* harmony export */   "Loader": () => (/* binding */ Loader),
+/* harmony export */   "LoaderUtils": () => (/* binding */ LoaderUtils),
+/* harmony export */   "LoadingManager": () => (/* binding */ LoadingManager),
+/* harmony export */   "LoopOnce": () => (/* binding */ LoopOnce),
+/* harmony export */   "LoopPingPong": () => (/* binding */ LoopPingPong),
+/* harmony export */   "LoopRepeat": () => (/* binding */ LoopRepeat),
+/* harmony export */   "LuminanceAlphaFormat": () => (/* binding */ LuminanceAlphaFormat),
+/* harmony export */   "LuminanceFormat": () => (/* binding */ LuminanceFormat),
+/* harmony export */   "MOUSE": () => (/* binding */ MOUSE),
+/* harmony export */   "Material": () => (/* binding */ Material),
+/* harmony export */   "MaterialLoader": () => (/* binding */ MaterialLoader),
+/* harmony export */   "MathUtils": () => (/* binding */ MathUtils),
+/* harmony export */   "Matrix3": () => (/* binding */ Matrix3),
+/* harmony export */   "Matrix4": () => (/* binding */ Matrix4),
+/* harmony export */   "MaxEquation": () => (/* binding */ MaxEquation),
+/* harmony export */   "Mesh": () => (/* binding */ Mesh),
+/* harmony export */   "MeshBasicMaterial": () => (/* binding */ MeshBasicMaterial),
+/* harmony export */   "MeshDepthMaterial": () => (/* binding */ MeshDepthMaterial),
+/* harmony export */   "MeshDistanceMaterial": () => (/* binding */ MeshDistanceMaterial),
+/* harmony export */   "MeshLambertMaterial": () => (/* binding */ MeshLambertMaterial),
+/* harmony export */   "MeshMatcapMaterial": () => (/* binding */ MeshMatcapMaterial),
+/* harmony export */   "MeshNormalMaterial": () => (/* binding */ MeshNormalMaterial),
+/* harmony export */   "MeshPhongMaterial": () => (/* binding */ MeshPhongMaterial),
+/* harmony export */   "MeshPhysicalMaterial": () => (/* binding */ MeshPhysicalMaterial),
+/* harmony export */   "MeshStandardMaterial": () => (/* binding */ MeshStandardMaterial),
+/* harmony export */   "MeshToonMaterial": () => (/* binding */ MeshToonMaterial),
+/* harmony export */   "MinEquation": () => (/* binding */ MinEquation),
+/* harmony export */   "MirroredRepeatWrapping": () => (/* binding */ MirroredRepeatWrapping),
+/* harmony export */   "MixOperation": () => (/* binding */ MixOperation),
+/* harmony export */   "MultiplyBlending": () => (/* binding */ MultiplyBlending),
+/* harmony export */   "MultiplyOperation": () => (/* binding */ MultiplyOperation),
+/* harmony export */   "NearestFilter": () => (/* binding */ NearestFilter),
+/* harmony export */   "NearestMipMapLinearFilter": () => (/* binding */ NearestMipMapLinearFilter),
+/* harmony export */   "NearestMipMapNearestFilter": () => (/* binding */ NearestMipMapNearestFilter),
+/* harmony export */   "NearestMipmapLinearFilter": () => (/* binding */ NearestMipmapLinearFilter),
+/* harmony export */   "NearestMipmapNearestFilter": () => (/* binding */ NearestMipmapNearestFilter),
+/* harmony export */   "NeverDepth": () => (/* binding */ NeverDepth),
+/* harmony export */   "NeverStencilFunc": () => (/* binding */ NeverStencilFunc),
+/* harmony export */   "NoBlending": () => (/* binding */ NoBlending),
+/* harmony export */   "NoColorSpace": () => (/* binding */ NoColorSpace),
+/* harmony export */   "NoToneMapping": () => (/* binding */ NoToneMapping),
+/* harmony export */   "NormalAnimationBlendMode": () => (/* binding */ NormalAnimationBlendMode),
+/* harmony export */   "NormalBlending": () => (/* binding */ NormalBlending),
+/* harmony export */   "NotEqualDepth": () => (/* binding */ NotEqualDepth),
+/* harmony export */   "NotEqualStencilFunc": () => (/* binding */ NotEqualStencilFunc),
+/* harmony export */   "NumberKeyframeTrack": () => (/* binding */ NumberKeyframeTrack),
+/* harmony export */   "Object3D": () => (/* binding */ Object3D),
+/* harmony export */   "ObjectLoader": () => (/* binding */ ObjectLoader),
+/* harmony export */   "ObjectSpaceNormalMap": () => (/* binding */ ObjectSpaceNormalMap),
+/* harmony export */   "OctahedronBufferGeometry": () => (/* binding */ OctahedronBufferGeometry),
+/* harmony export */   "OctahedronGeometry": () => (/* binding */ OctahedronGeometry),
+/* harmony export */   "OneFactor": () => (/* binding */ OneFactor),
+/* harmony export */   "OneMinusDstAlphaFactor": () => (/* binding */ OneMinusDstAlphaFactor),
+/* harmony export */   "OneMinusDstColorFactor": () => (/* binding */ OneMinusDstColorFactor),
+/* harmony export */   "OneMinusSrcAlphaFactor": () => (/* binding */ OneMinusSrcAlphaFactor),
+/* harmony export */   "OneMinusSrcColorFactor": () => (/* binding */ OneMinusSrcColorFactor),
+/* harmony export */   "OrthographicCamera": () => (/* binding */ OrthographicCamera),
+/* harmony export */   "PCFShadowMap": () => (/* binding */ PCFShadowMap),
+/* harmony export */   "PCFSoftShadowMap": () => (/* binding */ PCFSoftShadowMap),
+/* harmony export */   "PMREMGenerator": () => (/* binding */ PMREMGenerator),
+/* harmony export */   "Path": () => (/* binding */ Path),
+/* harmony export */   "PerspectiveCamera": () => (/* binding */ PerspectiveCamera),
+/* harmony export */   "Plane": () => (/* binding */ Plane),
+/* harmony export */   "PlaneBufferGeometry": () => (/* binding */ PlaneBufferGeometry),
+/* harmony export */   "PlaneGeometry": () => (/* binding */ PlaneGeometry),
+/* harmony export */   "PlaneHelper": () => (/* binding */ PlaneHelper),
+/* harmony export */   "PointLight": () => (/* binding */ PointLight),
+/* harmony export */   "PointLightHelper": () => (/* binding */ PointLightHelper),
+/* harmony export */   "Points": () => (/* binding */ Points),
+/* harmony export */   "PointsMaterial": () => (/* binding */ PointsMaterial),
+/* harmony export */   "PolarGridHelper": () => (/* binding */ PolarGridHelper),
+/* harmony export */   "PolyhedronBufferGeometry": () => (/* binding */ PolyhedronBufferGeometry),
+/* harmony export */   "PolyhedronGeometry": () => (/* binding */ PolyhedronGeometry),
+/* harmony export */   "PositionalAudio": () => (/* binding */ PositionalAudio),
+/* harmony export */   "PropertyBinding": () => (/* binding */ PropertyBinding),
+/* harmony export */   "PropertyMixer": () => (/* binding */ PropertyMixer),
+/* harmony export */   "QuadraticBezierCurve": () => (/* binding */ QuadraticBezierCurve),
+/* harmony export */   "QuadraticBezierCurve3": () => (/* binding */ QuadraticBezierCurve3),
+/* harmony export */   "Quaternion": () => (/* binding */ Quaternion),
+/* harmony export */   "QuaternionKeyframeTrack": () => (/* binding */ QuaternionKeyframeTrack),
+/* harmony export */   "QuaternionLinearInterpolant": () => (/* binding */ QuaternionLinearInterpolant),
+/* harmony export */   "RED_GREEN_RGTC2_Format": () => (/* binding */ RED_GREEN_RGTC2_Format),
+/* harmony export */   "RED_RGTC1_Format": () => (/* binding */ RED_RGTC1_Format),
+/* harmony export */   "REVISION": () => (/* binding */ REVISION),
+/* harmony export */   "RGBADepthPacking": () => (/* binding */ RGBADepthPacking),
+/* harmony export */   "RGBAFormat": () => (/* binding */ RGBAFormat),
+/* harmony export */   "RGBAIntegerFormat": () => (/* binding */ RGBAIntegerFormat),
+/* harmony export */   "RGBA_ASTC_10x10_Format": () => (/* binding */ RGBA_ASTC_10x10_Format),
+/* harmony export */   "RGBA_ASTC_10x5_Format": () => (/* binding */ RGBA_ASTC_10x5_Format),
+/* harmony export */   "RGBA_ASTC_10x6_Format": () => (/* binding */ RGBA_ASTC_10x6_Format),
+/* harmony export */   "RGBA_ASTC_10x8_Format": () => (/* binding */ RGBA_ASTC_10x8_Format),
+/* harmony export */   "RGBA_ASTC_12x10_Format": () => (/* binding */ RGBA_ASTC_12x10_Format),
+/* harmony export */   "RGBA_ASTC_12x12_Format": () => (/* binding */ RGBA_ASTC_12x12_Format),
+/* harmony export */   "RGBA_ASTC_4x4_Format": () => (/* binding */ RGBA_ASTC_4x4_Format),
+/* harmony export */   "RGBA_ASTC_5x4_Format": () => (/* binding */ RGBA_ASTC_5x4_Format),
+/* harmony export */   "RGBA_ASTC_5x5_Format": () => (/* binding */ RGBA_ASTC_5x5_Format),
+/* harmony export */   "RGBA_ASTC_6x5_Format": () => (/* binding */ RGBA_ASTC_6x5_Format),
+/* harmony export */   "RGBA_ASTC_6x6_Format": () => (/* binding */ RGBA_ASTC_6x6_Format),
+/* harmony export */   "RGBA_ASTC_8x5_Format": () => (/* binding */ RGBA_ASTC_8x5_Format),
+/* harmony export */   "RGBA_ASTC_8x6_Format": () => (/* binding */ RGBA_ASTC_8x6_Format),
+/* harmony export */   "RGBA_ASTC_8x8_Format": () => (/* binding */ RGBA_ASTC_8x8_Format),
+/* harmony export */   "RGBA_BPTC_Format": () => (/* binding */ RGBA_BPTC_Format),
+/* harmony export */   "RGBA_ETC2_EAC_Format": () => (/* binding */ RGBA_ETC2_EAC_Format),
+/* harmony export */   "RGBA_PVRTC_2BPPV1_Format": () => (/* binding */ RGBA_PVRTC_2BPPV1_Format),
+/* harmony export */   "RGBA_PVRTC_4BPPV1_Format": () => (/* binding */ RGBA_PVRTC_4BPPV1_Format),
+/* harmony export */   "RGBA_S3TC_DXT1_Format": () => (/* binding */ RGBA_S3TC_DXT1_Format),
+/* harmony export */   "RGBA_S3TC_DXT3_Format": () => (/* binding */ RGBA_S3TC_DXT3_Format),
+/* harmony export */   "RGBA_S3TC_DXT5_Format": () => (/* binding */ RGBA_S3TC_DXT5_Format),
+/* harmony export */   "RGB_ETC1_Format": () => (/* binding */ RGB_ETC1_Format),
+/* harmony export */   "RGB_ETC2_Format": () => (/* binding */ RGB_ETC2_Format),
+/* harmony export */   "RGB_PVRTC_2BPPV1_Format": () => (/* binding */ RGB_PVRTC_2BPPV1_Format),
+/* harmony export */   "RGB_PVRTC_4BPPV1_Format": () => (/* binding */ RGB_PVRTC_4BPPV1_Format),
+/* harmony export */   "RGB_S3TC_DXT1_Format": () => (/* binding */ RGB_S3TC_DXT1_Format),
+/* harmony export */   "RGFormat": () => (/* binding */ RGFormat),
+/* harmony export */   "RGIntegerFormat": () => (/* binding */ RGIntegerFormat),
+/* harmony export */   "RawShaderMaterial": () => (/* binding */ RawShaderMaterial),
+/* harmony export */   "Ray": () => (/* binding */ Ray),
+/* harmony export */   "Raycaster": () => (/* binding */ Raycaster),
+/* harmony export */   "RectAreaLight": () => (/* binding */ RectAreaLight),
+/* harmony export */   "RedFormat": () => (/* binding */ RedFormat),
+/* harmony export */   "RedIntegerFormat": () => (/* binding */ RedIntegerFormat),
+/* harmony export */   "ReinhardToneMapping": () => (/* binding */ ReinhardToneMapping),
+/* harmony export */   "RepeatWrapping": () => (/* binding */ RepeatWrapping),
+/* harmony export */   "ReplaceStencilOp": () => (/* binding */ ReplaceStencilOp),
+/* harmony export */   "ReverseSubtractEquation": () => (/* binding */ ReverseSubtractEquation),
+/* harmony export */   "RingBufferGeometry": () => (/* binding */ RingBufferGeometry),
+/* harmony export */   "RingGeometry": () => (/* binding */ RingGeometry),
+/* harmony export */   "SIGNED_RED_GREEN_RGTC2_Format": () => (/* binding */ SIGNED_RED_GREEN_RGTC2_Format),
+/* harmony export */   "SIGNED_RED_RGTC1_Format": () => (/* binding */ SIGNED_RED_RGTC1_Format),
+/* harmony export */   "SRGBColorSpace": () => (/* binding */ SRGBColorSpace),
+/* harmony export */   "Scene": () => (/* binding */ Scene),
+/* harmony export */   "ShaderChunk": () => (/* binding */ ShaderChunk),
+/* harmony export */   "ShaderLib": () => (/* binding */ ShaderLib),
+/* harmony export */   "ShaderMaterial": () => (/* binding */ ShaderMaterial),
+/* harmony export */   "ShadowMaterial": () => (/* binding */ ShadowMaterial),
+/* harmony export */   "Shape": () => (/* binding */ Shape),
+/* harmony export */   "ShapeBufferGeometry": () => (/* binding */ ShapeBufferGeometry),
+/* harmony export */   "ShapeGeometry": () => (/* binding */ ShapeGeometry),
+/* harmony export */   "ShapePath": () => (/* binding */ ShapePath),
+/* harmony export */   "ShapeUtils": () => (/* binding */ ShapeUtils),
+/* harmony export */   "ShortType": () => (/* binding */ ShortType),
+/* harmony export */   "Skeleton": () => (/* binding */ Skeleton),
+/* harmony export */   "SkeletonHelper": () => (/* binding */ SkeletonHelper),
+/* harmony export */   "SkinnedMesh": () => (/* binding */ SkinnedMesh),
+/* harmony export */   "Source": () => (/* binding */ Source),
+/* harmony export */   "Sphere": () => (/* binding */ Sphere),
+/* harmony export */   "SphereBufferGeometry": () => (/* binding */ SphereBufferGeometry),
+/* harmony export */   "SphereGeometry": () => (/* binding */ SphereGeometry),
+/* harmony export */   "Spherical": () => (/* binding */ Spherical),
+/* harmony export */   "SphericalHarmonics3": () => (/* binding */ SphericalHarmonics3),
+/* harmony export */   "SplineCurve": () => (/* binding */ SplineCurve),
+/* harmony export */   "SpotLight": () => (/* binding */ SpotLight),
+/* harmony export */   "SpotLightHelper": () => (/* binding */ SpotLightHelper),
+/* harmony export */   "Sprite": () => (/* binding */ Sprite),
+/* harmony export */   "SpriteMaterial": () => (/* binding */ SpriteMaterial),
+/* harmony export */   "SrcAlphaFactor": () => (/* binding */ SrcAlphaFactor),
+/* harmony export */   "SrcAlphaSaturateFactor": () => (/* binding */ SrcAlphaSaturateFactor),
+/* harmony export */   "SrcColorFactor": () => (/* binding */ SrcColorFactor),
+/* harmony export */   "StaticCopyUsage": () => (/* binding */ StaticCopyUsage),
+/* harmony export */   "StaticDrawUsage": () => (/* binding */ StaticDrawUsage),
+/* harmony export */   "StaticReadUsage": () => (/* binding */ StaticReadUsage),
+/* harmony export */   "StereoCamera": () => (/* binding */ StereoCamera),
+/* harmony export */   "StreamCopyUsage": () => (/* binding */ StreamCopyUsage),
+/* harmony export */   "StreamDrawUsage": () => (/* binding */ StreamDrawUsage),
+/* harmony export */   "StreamReadUsage": () => (/* binding */ StreamReadUsage),
+/* harmony export */   "StringKeyframeTrack": () => (/* binding */ StringKeyframeTrack),
+/* harmony export */   "SubtractEquation": () => (/* binding */ SubtractEquation),
+/* harmony export */   "SubtractiveBlending": () => (/* binding */ SubtractiveBlending),
+/* harmony export */   "TOUCH": () => (/* binding */ TOUCH),
+/* harmony export */   "TangentSpaceNormalMap": () => (/* binding */ TangentSpaceNormalMap),
+/* harmony export */   "TetrahedronBufferGeometry": () => (/* binding */ TetrahedronBufferGeometry),
+/* harmony export */   "TetrahedronGeometry": () => (/* binding */ TetrahedronGeometry),
+/* harmony export */   "Texture": () => (/* binding */ Texture),
+/* harmony export */   "TextureLoader": () => (/* binding */ TextureLoader),
+/* harmony export */   "TorusBufferGeometry": () => (/* binding */ TorusBufferGeometry),
+/* harmony export */   "TorusGeometry": () => (/* binding */ TorusGeometry),
+/* harmony export */   "TorusKnotBufferGeometry": () => (/* binding */ TorusKnotBufferGeometry),
+/* harmony export */   "TorusKnotGeometry": () => (/* binding */ TorusKnotGeometry),
+/* harmony export */   "Triangle": () => (/* binding */ Triangle),
+/* harmony export */   "TriangleFanDrawMode": () => (/* binding */ TriangleFanDrawMode),
+/* harmony export */   "TriangleStripDrawMode": () => (/* binding */ TriangleStripDrawMode),
+/* harmony export */   "TrianglesDrawMode": () => (/* binding */ TrianglesDrawMode),
+/* harmony export */   "TubeBufferGeometry": () => (/* binding */ TubeBufferGeometry),
+/* harmony export */   "TubeGeometry": () => (/* binding */ TubeGeometry),
+/* harmony export */   "TwoPassDoubleSide": () => (/* binding */ TwoPassDoubleSide),
+/* harmony export */   "UVMapping": () => (/* binding */ UVMapping),
+/* harmony export */   "Uint16BufferAttribute": () => (/* binding */ Uint16BufferAttribute),
+/* harmony export */   "Uint32BufferAttribute": () => (/* binding */ Uint32BufferAttribute),
+/* harmony export */   "Uint8BufferAttribute": () => (/* binding */ Uint8BufferAttribute),
+/* harmony export */   "Uint8ClampedBufferAttribute": () => (/* binding */ Uint8ClampedBufferAttribute),
+/* harmony export */   "Uniform": () => (/* binding */ Uniform),
+/* harmony export */   "UniformsGroup": () => (/* binding */ UniformsGroup),
+/* harmony export */   "UniformsLib": () => (/* binding */ UniformsLib),
+/* harmony export */   "UniformsUtils": () => (/* binding */ UniformsUtils),
+/* harmony export */   "UnsignedByteType": () => (/* binding */ UnsignedByteType),
+/* harmony export */   "UnsignedInt248Type": () => (/* binding */ UnsignedInt248Type),
+/* harmony export */   "UnsignedIntType": () => (/* binding */ UnsignedIntType),
+/* harmony export */   "UnsignedShort4444Type": () => (/* binding */ UnsignedShort4444Type),
+/* harmony export */   "UnsignedShort5551Type": () => (/* binding */ UnsignedShort5551Type),
+/* harmony export */   "UnsignedShortType": () => (/* binding */ UnsignedShortType),
+/* harmony export */   "VSMShadowMap": () => (/* binding */ VSMShadowMap),
+/* harmony export */   "Vector2": () => (/* binding */ Vector2),
+/* harmony export */   "Vector3": () => (/* binding */ Vector3),
+/* harmony export */   "Vector4": () => (/* binding */ Vector4),
+/* harmony export */   "VectorKeyframeTrack": () => (/* binding */ VectorKeyframeTrack),
+/* harmony export */   "VideoTexture": () => (/* binding */ VideoTexture),
+/* harmony export */   "WebGL1Renderer": () => (/* binding */ WebGL1Renderer),
+/* harmony export */   "WebGL3DRenderTarget": () => (/* binding */ WebGL3DRenderTarget),
+/* harmony export */   "WebGLArrayRenderTarget": () => (/* binding */ WebGLArrayRenderTarget),
+/* harmony export */   "WebGLCubeRenderTarget": () => (/* binding */ WebGLCubeRenderTarget),
+/* harmony export */   "WebGLMultipleRenderTargets": () => (/* binding */ WebGLMultipleRenderTargets),
+/* harmony export */   "WebGLRenderTarget": () => (/* binding */ WebGLRenderTarget),
+/* harmony export */   "WebGLRenderer": () => (/* binding */ WebGLRenderer),
+/* harmony export */   "WebGLUtils": () => (/* binding */ WebGLUtils),
+/* harmony export */   "WireframeGeometry": () => (/* binding */ WireframeGeometry),
+/* harmony export */   "WrapAroundEnding": () => (/* binding */ WrapAroundEnding),
+/* harmony export */   "ZeroCurvatureEnding": () => (/* binding */ ZeroCurvatureEnding),
+/* harmony export */   "ZeroFactor": () => (/* binding */ ZeroFactor),
+/* harmony export */   "ZeroSlopeEnding": () => (/* binding */ ZeroSlopeEnding),
+/* harmony export */   "ZeroStencilOp": () => (/* binding */ ZeroStencilOp),
+/* harmony export */   "_SRGBAFormat": () => (/* binding */ _SRGBAFormat),
+/* harmony export */   "sRGBEncoding": () => (/* binding */ sRGBEncoding)
+/* harmony export */ });
 /**
  * @license
  * Copyright 2010-2023 Three.js Authors
@@ -35902,7 +35882,7 @@ function filterPoints( start, end ) {
 
 		again = false;
 
-		if ( ! p.steiner && ( equals( p, p.next ) || three_module_area( p.prev, p, p.next ) === 0 ) ) {
+		if ( ! p.steiner && ( equals( p, p.next ) || area( p.prev, p, p.next ) === 0 ) ) {
 
 			removeNode( p );
 			p = end = p.prev;
@@ -35995,7 +35975,7 @@ function isEar( ear ) {
 		b = ear,
 		c = ear.next;
 
-	if ( three_module_area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
+	if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
 
 	// now make sure we don't have other points inside the potential ear
 	const ax = a.x, bx = b.x, cx = c.x, ay = a.y, by = b.y, cy = c.y;
@@ -36011,7 +35991,7 @@ function isEar( ear ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 &&
 			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) &&
-			three_module_area( p.prev, p, p.next ) >= 0 ) return false;
+			area( p.prev, p, p.next ) >= 0 ) return false;
 		p = p.next;
 
 	}
@@ -36026,7 +36006,7 @@ function isEarHashed( ear, minX, minY, invSize ) {
 		b = ear,
 		c = ear.next;
 
-	if ( three_module_area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
+	if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
 
 	const ax = a.x, bx = b.x, cx = c.x, ay = a.y, by = b.y, cy = c.y;
 
@@ -36047,11 +36027,11 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( p && p.z >= minZ && n && n.z <= maxZ ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && three_module_area( p.prev, p, p.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && area( p.prev, p, p.next ) >= 0 ) return false;
 		p = p.prevZ;
 
 		if ( n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && three_module_area( n.prev, n, n.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && area( n.prev, n, n.next ) >= 0 ) return false;
 		n = n.nextZ;
 
 	}
@@ -36060,7 +36040,7 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( p && p.z >= minZ ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && three_module_area( p.prev, p, p.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && area( p.prev, p, p.next ) >= 0 ) return false;
 		p = p.prevZ;
 
 	}
@@ -36069,7 +36049,7 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( n && n.z <= maxZ ) {
 
 		if ( n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && three_module_area( n.prev, n, n.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && area( n.prev, n, n.next ) >= 0 ) return false;
 		n = n.nextZ;
 
 	}
@@ -36268,7 +36248,7 @@ function findHoleBridge( hole, outerNode ) {
 // whether sector in vertex m contains sector in vertex p in the same coordinates
 function sectorContainsSector( m, p ) {
 
-	return three_module_area( m.prev, m, p.prev ) < 0 && three_module_area( p.next, m, m.next ) < 0;
+	return area( m.prev, m, p.prev ) < 0 && area( p.next, m, m.next ) < 0;
 
 }
 
@@ -36409,13 +36389,13 @@ function isValidDiagonal( a, b ) {
 
 	return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) && // dones't intersect other edges
            ( locallyInside( a, b ) && locallyInside( b, a ) && middleInside( a, b ) && // locally visible
-            ( three_module_area( a.prev, a, b.prev ) || three_module_area( a, b.prev, b ) ) || // does not create opposite-facing sectors
-            equals( a, b ) && three_module_area( a.prev, a, a.next ) > 0 && three_module_area( b.prev, b, b.next ) > 0 ); // special zero-length case
+            ( area( a.prev, a, b.prev ) || area( a, b.prev, b ) ) || // does not create opposite-facing sectors
+            equals( a, b ) && area( a.prev, a, a.next ) > 0 && area( b.prev, b, b.next ) > 0 ); // special zero-length case
 
 }
 
 // signed area of a triangle
-function three_module_area( p, q, r ) {
+function area( p, q, r ) {
 
 	return ( q.y - p.y ) * ( r.x - q.x ) - ( q.x - p.x ) * ( r.y - q.y );
 
@@ -36431,10 +36411,10 @@ function equals( p1, p2 ) {
 // check if two segments intersect
 function intersects( p1, q1, p2, q2 ) {
 
-	const o1 = sign( three_module_area( p1, q1, p2 ) );
-	const o2 = sign( three_module_area( p1, q1, q2 ) );
-	const o3 = sign( three_module_area( p2, q2, p1 ) );
-	const o4 = sign( three_module_area( p2, q2, q1 ) );
+	const o1 = sign( area( p1, q1, p2 ) );
+	const o2 = sign( area( p1, q1, q2 ) );
+	const o3 = sign( area( p2, q2, p1 ) );
+	const o4 = sign( area( p2, q2, q1 ) );
 
 	if ( o1 !== o2 && o3 !== o4 ) return true; // general case
 
@@ -36479,9 +36459,9 @@ function intersectsPolygon( a, b ) {
 // check if a polygon diagonal is locally inside the polygon
 function locallyInside( a, b ) {
 
-	return three_module_area( a.prev, a, a.next ) < 0 ?
-		three_module_area( a, b, a.next ) >= 0 && three_module_area( a, a.prev, b ) >= 0 :
-		three_module_area( a, b, a.prev ) < 0 || three_module_area( a, a.next, b ) < 0;
+	return area( a.prev, a, a.next ) < 0 ?
+		area( a, b, a.next ) >= 0 && area( a, a.prev, b ) >= 0 :
+		area( a, b, a.prev ) < 0 || area( a, a.next, b ) < 0;
 
 }
 
@@ -51438,6 +51418,138 @@ if ( typeof window !== 'undefined' ) {
 
 
 
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			id: moduleId,
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(379);
+var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(795);
+var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(569);
+var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(565);
+var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(216);
+var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(589);
+var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style/styles.css
+var styles = __webpack_require__(222);
+;// CONCATENATED MODULE: ./src/style/styles.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (styleTagTransform_default());
+options.setAttributes = (setAttributesWithoutAttributes_default());
+
+      options.insert = insertBySelector_default().bind(null, "head");
+    
+options.domAPI = (styleDomAPI_default());
+options.insertStyleElement = (insertStyleElement_default());
+
+var update = injectStylesIntoStyleTag_default()(styles["default"], options);
+
+
+
+
+       /* harmony default export */ const style_styles = (styles["default"] && styles["default"].locals ? styles["default"].locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/three/build/three.module.js
+var three_module = __webpack_require__(477);
 ;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/webxr/VRButton.js
 class VRButton {
 
@@ -51640,68 +51752,15 @@ VRButton.registerSessionGrantedListener();
 
 
 
-;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/effects/StereoEffect.js
-
-
-class StereoEffect {
-
-	constructor( renderer ) {
-
-		const _stereo = new StereoCamera();
-		_stereo.aspect = 0.5;
-		const size = new Vector2();
-
-		this.setEyeSeparation = function ( eyeSep ) {
-
-			_stereo.eyeSep = eyeSep;
-
-		};
-
-		this.setSize = function ( width, height ) {
-
-			renderer.setSize( width, height );
-
-		};
-
-		this.render = function ( scene, camera ) {
-
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-			_stereo.update( camera );
-
-			renderer.getSize( size );
-
-			if ( renderer.autoClear ) renderer.clear();
-			renderer.setScissorTest( true );
-
-			renderer.setScissor( 0, 0, size.width / 2, size.height );
-			renderer.setViewport( 0, 0, size.width / 2, size.height );
-			renderer.render( scene, _stereo.cameraL );
-
-			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
-			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
-			renderer.render( scene, _stereo.cameraR );
-
-			renderer.setScissorTest( false );
-
-		};
-
-	}
-
-}
-
-
-
 ;// CONCATENATED MODULE: ./src/index.js
 
 
 
-window.THREE = three_module_namespaceObject;
+window.THREE = three_module;
 
 
-
+//import { StereoEffect } from '../node_modules/three/examples/jsm/effects/StereoEffect.js';
+//import { LineLoop } from "three";
 
 /*
  * XR_
@@ -51722,6 +51781,7 @@ if (!customElements.get("xr-_")) { customElements.define("xr-_", XR_); }
 */
 
 __webpack_require__(820);
+__webpack_require__(928);
 
 __webpack_require__(106);
 __webpack_require__(434);
@@ -51729,7 +51789,7 @@ __webpack_require__(955);
 __webpack_require__(781);
 
 __webpack_require__(751);
-__webpack_require__(492);
+__webpack_require__(745);
 
 
 
@@ -51739,75 +51799,174 @@ __webpack_require__(492);
  * ==================================================================================================== */
 
 class XRAPP {
-  constructor() {
-      this.Effect;
-      this.Camera;
-      this.Scene;
-      this.Renderer;
-      this.Loop;
+    constructor() {
+        this.Effect;
+        this.Camera;
+        this.Scene;
+        this.Renderer;
+        this.Loop;
 
-      this.Variables = {
-          curVar: null,
-          stereo: false,
-          xrSession: null,
+        this.Variables = {
+            curVar: null,
+            stereo: false,
+            xrSession: null,
+            fakeVR: false,
 
-          // Phone motion
-          orientation_a: 0,
-          orientation_b: 0,
-          orientation_g: 0,
-          alphaOffset: 25,
-          screenOrientation: 0
-      };
+            // Phone motion
+            orientation_a: 0,
+            orientation_b: 0,
+            orientation_g: 0,
+            alphaOffset: 25,
+            screenOrientation: 0
+        };
 
-      this.Resources = new Array();
+        this.Resources = new Array();
 
-      this.init();
-      this.setupXR();
-  }
+        this.init();
+        this.setupXR();
+    }
 
-  init() {
-      // Setup Renderer
-      this.Renderer = new WebGLRenderer({ antialias: true });
-      this.Renderer.setPixelRatio(window.devicePixelRatio);
-      this.Renderer.setSize(window.innerWidth, window.innerHeight);
-//        this.Renderer.physicallyCorrectLights = true;
+    init() {
+        // Setup Renderer
+        this.Renderer = new three_module.WebGLRenderer({ antialias: true });
+        this.Renderer.setPixelRatio(window.devicePixelRatio);
+        this.Renderer.setSize(window.innerWidth, window.innerHeight);
+        //        this.Renderer.physicallyCorrectLights = true;
 
-      this.Renderer.shadowMap.enabled = true;
-      this.Renderer.shadowMap.type = VSMShadowMap;
-      this.Renderer.outputEncoding = sRGBEncoding;
-      this.Renderer.toneMapping = ACESFilmicToneMapping;
+        this.Renderer.shadowMap.enabled = true;
+        this.Renderer.shadowMap.type = three_module.VSMShadowMap;
+        this.Renderer.outputEncoding = three_module.sRGBEncoding;
+        this.Renderer.toneMapping = three_module.ACESFilmicToneMapping;
 
-      this.Effect = new StereoEffect(this.Renderer);
-      this.Effect.setSize(window.innerWidth, window.innerHeight);
+        // Create VR scene <div>
+        const VRdiv = document.createElement("div");
+        VRdiv.id = "VRScene";
+        VRdiv.style.cssText = "position: absolute; top: 0; width: 100vw; height: 100vh; display: block;";
+        document.body.insertAdjacentElement("afterbegin", VRdiv);
+        document.querySelector("#VRScene").append(this.Renderer.domElement);
 
-      // Create VR scene <div>
-      const VRdiv = document.createElement("div");
-      VRdiv.id = "VRScene";
-      VRdiv.style.cssText = "position: absolute; top: 0; width: 100vw; height: 100vh; display: block;";
-      document.body.insertAdjacentElement("afterbegin", VRdiv);
-      document.querySelector("#VRScene").append(this.Renderer.domElement);
+        document.body.appendChild( VRButton.createButton( this.Renderer ) );
+        this.Renderer.xr.enabled = true;
 
-      document.body.appendChild( VRButton.createButton( this.Renderer ) );
-      this.Renderer.xr.enabled = true;
+        // Attach VR Canvas to div element
+        this.Container = document.querySelector("#VRScene");
+        this.Container.append(this.Renderer.domElement);
+    }
 
-      // Attach VR Canvas to div element
-      this.Container = document.querySelector("#VRScene");
-      this.Container.append(this.Renderer.domElement);
-  }
+    setupXR() {
+        this.Renderer.xr.addEventListener("sessionstart", () => {
+            this.Variables.xrSession = this.Renderer.xr.getSession();
+        })
 
-  setupXR() {
-  }
+        this.Renderer.xr.addEventListener("sessionend", () => {
+        this.Variables.xrSession = null;
+        })
 
-  start() {
-      this.Loop.start();
-  }
+        document.write(`
+            <button id='VRIcon' class='toggleVR' style="position: fixed; bottom: 10px; left: 10px; outline: none; border: none; background: none; width: 60px; z-index: 10000;" onclick='$XR.toggleVR()' title='Toggle VR Mode for Mobile Devices Only'>
+                <svg style="width: 100%; fill: white; stroke: rgba(0,0,0,0.25);" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 62.7 52.375" enable-background="new 0 0 62.7 41.9" xml:space="preserve"><path d="M53.4,5.5h-44c-2.1,0-3.7,1.7-3.7,3.7v22.6c0,2.1,1.7,3.7,3.7,3.7h13.4c1.1,0,2.1-0.6,2.5-1.6l3-7.5c1.2-2.6,4.9-2.5,6,0.1  l2.6,7.3c0.4,1,1.4,1.7,2.5,1.7h13.9c2.1,0,3.7-1.7,3.7-3.7V9.3C57.2,7.2,55.5,5.5,53.4,5.5z M20.4,27c-3.2,0-5.7-2.6-5.7-5.7  s2.6-5.7,5.7-5.7s5.7,2.6,5.7,5.7S23.6,27,20.4,27z M42.4,27c-3.2,0-5.7-2.6-5.7-5.7s2.6-5.7,5.7-5.7s5.7,2.6,5.7,5.7  S45.6,27,42.4,27z"/></svg>
+            </button>
 
-  stop() {
-      this.Loop.stop();
-  }
+            <svg id="VROverlay" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none meet" width="100vw" height="100vh" viewBox="0, 0, 2000, 1000" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 9999; display: none;"><g id="svgg"><path id="path0" d="M 0 0 L 0 1000 L 1000000 1000 L 1000000 0 L 0 0 z M 500.04492 15 C 636.69612 15.006191 768.82704 43.380704 892.76562 99.34375 C 896.20268 100.89576 898.95249 103.64562 900.50391 107.08398 C 1013.1637 356.78574 1013.1657 643.21219 900.50781 892.91602 C 898.9564 896.35438 896.20466 899.10424 892.76758 900.65625 C 768.82901 956.61724 636.69909 984.9898 499.95508 985 C 363.30182 984.99379 231.171 956.61724 107.23242 900.65625 C 103.79536 899.10424 101.04557 896.35438 99.494141 892.91602 C -13.163603 643.21219 -13.163603 356.78574 99.494141 107.08398 C 101.04557 103.64562 103.79536 100.89576 107.23242 99.34375 C 231.171 43.380704 363.3009 15.0062 500.04492 15 z M 1500.0449 15 C 1636.6961 15.006191 1768.827 43.380704 1892.7656 99.34375 C 1896.2026 100.89576 1898.9525 103.64562 1900.5039 107.08398 L 1900.5078 107.08398 C 2013.1656 356.78574 2013.1656 643.21219 1900.5078 892.91602 C 1898.9564 896.35438 1896.2047 899.10424 1892.7676 900.65625 C 1768.8291 956.61724 1636.6991 984.9898 1499.9551 985 C 1363.3019 984.99379 1231.1709 956.61724 1107.2324 900.65625 C 1103.7953 899.10424 1101.0455 896.35438 1099.4941 892.91602 C 986.8364 643.21219 986.8364 356.78574 1099.4941 107.08398 C 1101.0455 103.64562 1103.7953 100.89576 1107.2324 99.34375 C 1231.1709 43.380704 1363.3009 15.0062 1500.0449 15 z " stroke="none" fill="#000000" fill-rule="evenodd"></path></g></svg>
+        `);
+    }
 
-  toggleVR() {
-  }
+    start() {
+        this.Loop.start();
+    }
+
+    stop() {
+        this.Loop.stop();
+    }
+
+    toggleVR() {
+        if (
+            DeviceMotionEvent &&
+            typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+            DeviceMotionEvent.requestPermission();
+        }
+
+        if (this.Variables.fakeVR) {
+            this.Variables.fakeVR = false;
+
+            document.getElementById("VROverlay").style.display = "none";
+
+            window.removeEventListener("devicemotion", this.handleMotion);
+            window.removeEventListener("deviceorientation", this.handleOrientation);
+            window.removeEventListener(
+                "orientationchange",
+                this.handleOrientationChange
+            );
+        } else {
+            this.Variables.fakeVR = true;
+
+            window.addEventListener("devicemotion", this.handleMotion);
+            window.addEventListener("deviceorientation", this.handleOrientation);
+            window.addEventListener(
+                "orientationchange",
+                this.handleOrientationChange
+            );
+
+            document.getElementById("VROverlay").style.display = "block";
+        }
+
+        $XR.Loop.stop();
+        $XR.Loop.start();
+    }
+
+    handleMotion(event) {
+        //alert('alpha: ' + event.rotationRate.alpha);
+        //alert('beta: ' + event.rotationRate.beta);
+        //alert('gamma: ' + event.rotationRate.gamma);
+    }
+
+    handleOrientation(event) {
+        if (window.screen.orientation) {
+            $XR.Variables.screenOrientation = window.screen.orientation.angle;
+        } else if (typeof window.orientation === "number") {
+            $XR.Variables.screenOrientation = window.orientation;
+        } else if (window.screen.mozOrientationn) {
+            $XR.Variables.screenOrientation = {
+                "portrait-primary": 0,
+                "portrait-secondary": 180,
+                "landscape-primary": 90,
+                "landscape-secondary": 270
+            }[window.screen.mozOrientation];
+        }
+        $XR.Variables.orientation_a = event.alpha;
+        $XR.Variables.orientation_b = event.beta;
+        $XR.Variables.orientation_g = event.gamma;
+
+        var rotType = $XR.Variables.screenOrientation === 0 || $XR.Variables.screenOrientation === 180 ? "YXZ" : "YZX";
+
+        if (rotType == "YZX") {
+            if ($XR.Variables.orientation_g >= 0) {
+                $XR.Variables.orientation_b = $XR.Variables.orientation_b + $XR.Variables.alphaOffset;
+            } else {
+                $XR.Variables.orientation_b = $XR.Variables.orientation_b - $XR.Variables.alphaOffset;
+            }
+        }
+
+        var d2r = Math.PI / 180;
+
+        const zee = new three_module.Vector3(0, 0, 1);
+        const euler = new three_module.Euler();
+        const q0 = new three_module.Quaternion();
+        const q1 = new three_module.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // - PI/2 around the x-axis
+
+        euler.set(
+            $XR.Variables.orientation_b * d2r,
+            $XR.Variables.orientation_a * d2r,
+            -$XR.Variables.orientation_g * d2r,
+            "YXZ"
+        );
+        $XR.Camera.quaternion.setFromEuler(euler);
+        $XR.Camera.quaternion.multiply(q1);
+        $XR.Camera.quaternion.multiply(q0.setFromAxisAngle(zee, -$XR.Variables.screenOrientation));
+    }
+
+    handleOrientationChange(event) {}
 }
 
 
