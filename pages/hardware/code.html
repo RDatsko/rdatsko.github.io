@@ -95,7 +95,6 @@ body {
     border-radius: 21% 21% 21% 21% / 20% 20% 20% 20%;
     background-position: center center;
     background-size: 200%;
-    background-color: black;
     box-shadow:
         25px 0 10px -20px hsl(260deg 60% 115% / 60%),
         -25px 0 10px -20px hsl(260deg 60% 115% / 60%),
@@ -312,6 +311,9 @@ body {
 <div class="watch">
     <div class="strap"></div>
     <div class="screen">
+        <div id="framebuffer" style="z-index: -1;">
+            <canvas id="canvas" style="width: 240px; height:  320px; position:  absolute; top: -20px; background: black;"></canvas>
+        </div>
     </div>
     <div class="strap" reflect="true"></div>
 </div>
