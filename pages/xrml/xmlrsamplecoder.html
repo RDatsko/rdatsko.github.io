@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -22,6 +23,7 @@
     top: 56px;
     bottom: 0;
     display: flex;
+    flex-direction: row;
     flex: 1;
     background: #454545;
     color: #fff;
@@ -35,7 +37,7 @@
 .container textarea,
 #code1, #code2, #code3 {
     width: 100%;
-    height: calc((100% - 90px) / 3);
+    height: calc(100% - 35px);
     background: #1f1f1f;
     color: #fff;
     caret-color: white;
@@ -95,7 +97,60 @@
 
 
 
+.hide-radio {
+    display: none;
+}
 
+.left {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: relative;
+    background-color: #444;
+    height: 100%;
+}
+
+.left > label {
+    background-color: #444;
+    z-index: 4;
+    color: white;
+    padding: 0.5em 30px;
+    border: 0 none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+
+    display: flex;
+    position: relative;
+    align-items: end;
+    flex: 0 1 auto;
+    height: 35px;    
+}
+
+.left > input + label + .tab-content {
+    display: none;
+}
+
+.left > input:checked + label {
+    border-bottom: 3px solid cyan;
+    color: cyan;
+}
+
+.left > input:checked + label + .tab-content {
+    display: block;
+}
+
+.tab-content {
+    display: block;
+    flex-basis: 100%;
+    width: 100%;
+    height: calc(100% - 35px); /* label height */
+    order: 999; /* makes this as the last elements inside this div*/
+    position: relative;
+    top: 0;
+    left: 0;
+    background-color: black;
+    color: white;
+}
 
 
 
@@ -182,6 +237,10 @@ p code {
   background-color: #eee;
   color: #111;
 }
+
+
+
+
 </style>
 <body>
 <header>
@@ -196,28 +255,31 @@ p code {
 
     <div class="left">
 
-        <label>HTML</label>
-        <div id="code1">
+        <input id="A" name="tabs" class="hide-radio" type="radio" checked>
+        <label for="A">HTML</label>
+        <div id="code1" class="tab-content">
             <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"></textarea>
             <pre id="highlighting1" aria-hidden="true">
-              <code class="language-html" id="highlighting-content1"></code>
+                <code class="language-html" id="highlighting-content1"></code>
             </pre>
         </div>
 
-        <label>CSS</label>
-        <div id="code2">
-          <textarea id="css-code" spellcheck="false" oninput="update(this.value, 2); sync_scroll(this, 2);" onscroll="sync_scroll(this, 2);" onkeydown="check_tab(this, event, 2);" onkeyup="run()"></textarea>
-          <pre id="highlighting2" aria-hidden="true">
-            <code class="language-css" id="highlighting-content2"></code>
-          </pre>
-      </div>
+        <input id="B" name="tabs" class="hide-radio" type="radio">
+        <label for="B">CSS</label>
+        <div id="code2" class="tab-content">
+            <textarea id="css-code" spellcheck="false" oninput="update(this.value, 2); sync_scroll(this, 2);" onscroll="sync_scroll(this, 2);" onkeydown="check_tab(this, event, 2);" onkeyup="run()"></textarea>
+            <pre id="highlighting2" aria-hidden="true">
+                <code class="language-css" id="highlighting-content2"></code>
+            </pre>
+        </div>
 
-        <label>JavaScript</label>
-        <div id="code3">
-          <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()"></textarea>
-          <pre id="highlighting3" aria-hidden="true">
-            <code class="language-js" id="highlighting-content3"></code>
-          </pre>
+        <input id="C" name="tabs" class="hide-radio" type="radio">  
+        <label for="C">JavaScript</label>
+        <div id="code3" class="tab-content">
+            <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()"></textarea>
+            <pre id="highlighting3" aria-hidden="true">
+                <code class="language-js" id="highlighting-content3"></code>
+            </pre>
         </div>
   </div>
 
@@ -233,8 +295,10 @@ p code {
 var newScript = document.createElement("script");
 newScript.src = "../../js/xrml.min.js";
 
-run();
+document.querySelector('#output').contentDocument.head.appendChild(newScript);
+setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforeend', "<div id='zzz'></div>") }, 3000);
 
+    
 setTimeout(function() {
     document.querySelector('#html-code').value = `<xr-camera></xr-camera>
 <xr-scene></xr-scene>
@@ -276,17 +340,36 @@ setTimeout(function() {
   update(document.querySelector('#js-code').value, 3);
     run();
 }, 3000);
+    
+    
+run();
 
 function run() {
+    let xrmlCode = `<div id="VRScene" style="position: absolute; top: 0px; width: 100vw; height: 100vh; display: block;"><canvas data-engine="three.js r149" width="479" height="400" style="display: block; width: 479px; height: 400px;"></canvas></div><style></style><button id="VRButton" style="position: absolute; bottom: 20px; padding: 12px 6px; border: 1px solid rgb(255, 255, 255); border-radius: 4px; background: rgba(0, 0, 0, 0.1); color: rgb(255, 255, 255); font: 13px sans-serif; text-align: center; opacity: 0.5; outline: none; z-index: 999; cursor: auto; left: calc(50% - 75px); width: 150px;">VR NOT SUPPORTED</button>`;
     let htmlCode = document.querySelector('#html-code').value;
     let cssCode  = document.querySelector('#css-code').value;
     let jsCode   = document.querySelector('#js-code').value;
     let output   = document.querySelector('#output');
 
+
+// HTML
+/*
+    let html = "<style>" + cssCode + "</style>" + htmlCode;
+    output.contentWindow.eval(jsCode);
+*/
+// XRML
+/*
     let html = "<style>" + cssCode + "</style>" + htmlCode;
     output.contentDocument.body.appendChild(newScript);
     output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
     output.contentWindow.eval(jsCode);
+*/
+
+// Test
+    let html = "<style>" + cssCode + "</style>" + htmlCode;
+    output.contentDocument.body.querySelector('#zzz').innerHTML = html;
+    output.contentWindow.eval(jsCode);
+
 }
 
 
