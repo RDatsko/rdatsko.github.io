@@ -292,7 +292,9 @@ p code {
 </body>
 <script>
 
-window.$iXR = document.querySelector('#output').contentWindow.$XR;    
+setTimeout(function() {
+    window.$iXR = document.querySelector('#output').contentWindow.$XR;    
+}, 5000);
 
 var newScript = document.createElement("script");
 newScript.src = "../../js/xrml.min.js";
