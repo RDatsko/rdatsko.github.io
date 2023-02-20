@@ -325,7 +325,15 @@ setTimeout(function() {
     rotation="Math.PI / 2 * -1, 0, 0">
 </xr-plane>
 
-<xr-light position="0, 300, 200"></xr-light>`;
+<xr-light position="0, 300, 200"></xr-light>
+
+<xr-controller></xr-controller>  <!-- VR Controllers -->
+<xr-gamepad></xr-gamepad>        <!-- XBox like gamepads -->
+<xr-hands></xr-hands>            <!-- hand tracking -->
+<xr-keyboard></xr-keyboard>      <!-- keyboard -->
+<xr-mouse></xr-mouse>            <!-- mouse -->
+<xr-touchscreen></xrtouchscreen> <!-- onscreen gamepad -->
+`;
 
     document.querySelector('#js-code').value = `
 var clock = new THREE.Clock();
@@ -335,7 +343,7 @@ let i = 0;
 setInterval(function() {
     $XR.Scene.children[0].rotation.y -= clock.getDelta();
 },10);
-        `;
+`;
 }, 1000);
 
 setTimeout(function() {
