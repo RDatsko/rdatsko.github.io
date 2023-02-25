@@ -79,12 +79,14 @@ var clock = new THREE.Clock();
 
 let i = 0;
 
-setInterval(function() {
-//    if(i-- < 0) { i = i + 360; }
-//    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
-    //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
-    $XR.Scene.children[2].rotation.y -= clock.getDelta();
-},10);
+setTimeout(function() {
+    setInterval(function() {
+    //    if(i-- < 0) { i = i + 360; }
+    //    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
+        //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
+        $XR.Scene.children[2].rotation.y -= clock.getDelta();
+    },10);
+}, 5000);
 
 
 </script>
