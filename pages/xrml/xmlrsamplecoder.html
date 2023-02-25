@@ -304,35 +304,63 @@ setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforee
 
     
 setTimeout(function() {
-    document.querySelector('#html-code').value = `<xr-camera></xr-camera>
-<xr-scene></xr-scene>
+    document.querySelector('#html-code').value = `<!-- Setup XR Scene -->
 
-<xr-model src="../../assets/models/world.glb"></xr-model>
+<xr-camera></xr-camera>
+<xr-scene color="#87ceeb"></xr-scene>
+
+
+<!-- Setup Controls -->
+
+<xr-controller></xr-controller>   <!-- VR Controllers -->
+<xr-gamepad></xr-gamepad>         <!-- XBox like gamepads -->
+<xr-hands></xr-hands>             <!-- hand tracking -->
+<xr-keyboard></xr-keyboard>       <!-- keyboard -->
+<xr-mouse></xr-mouse>             <!-- mouse -->
+<xr-touchscreen></xr-touchscreen> <!-- onscreen gamepad -->
+
+
+<!-- Objects -->
+
+<xr-light id="worldlight"
+    type="hemisphere"
+    position="2, 1, 1"
+    color="#4488bb"
+    ground="#002244"
+    power="0.1"
+    intensity="0.3"
+></xr-light>
+
+<xr-light id="sunlight"
+    type="directional"
+    color="#ffffff"
+    intensity="0.6"
+    position="-5, 25, -1"
+    shadow
+></xr-light>
+
+<xr-model id="world" 
+    src="./assets/models/world.glb"
+></xr-model>
 
 <xr-cube id="box"
     position="1, 2.5, -14"
     color="#ff00ff"
-    rotation="0, Math.PI * 45 / 180, 0">
-</xr-cube>
+    rotation="0, Math.PI * 45 / 180, 0"
+    shadow
+></xr-cube>
 
 <xr-sphere id="ball"
     position="-1, 1.5, -8"
+    shadow
 ></xr-sphere>
 
 <xr-plane id="plane"
     position="-2.25, .78, -10"
     color="#ffffff"
-    rotation="Math.PI / 2 * -1, 0, 0">
-</xr-plane>
-
-<xr-light position="0, 300, 200"></xr-light>
-
-<xr-controller></xr-controller>  <!-- VR Controllers -->
-<xr-gamepad></xr-gamepad>        <!-- XBox like gamepads -->
-<xr-hands></xr-hands>            <!-- hand tracking -->
-<xr-keyboard></xr-keyboard>      <!-- keyboard -->
-<xr-mouse></xr-mouse>            <!-- mouse -->
-<xr-touchscreen></xr-touchscreen> <!-- onscreen gamepad -->
+    rotation="Math.PI / 2 * -1, 0, 0"
+    shadow
+></xr-plane>
 `;
 
     document.querySelector('#js-code').value = `
@@ -341,7 +369,7 @@ var clock = new THREE.Clock();
 let i = 0;
 
 setInterval(function() {
-    $XR.Scene.children[0].rotation.y -= clock.getDelta();
+    $XR.Scene.children[2].rotation.y -= clock.getDelta();
 },10);
 `;
 }, 1000);
