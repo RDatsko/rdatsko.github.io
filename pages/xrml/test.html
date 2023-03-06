@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="Access-Control-Allow-Methods">
 <title>WebXR Application</title>
 <style>
 *,
@@ -111,6 +112,20 @@ body.en #mode::before { content: "Mode"; }
 .hamburger-menu:has(input:checked) + .sidebar {
     translate: 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     .sidebarMenuInner {
@@ -257,10 +272,8 @@ body.en #mode::before { content: "Mode"; }
         opacity: 0.5;
       }
 </style>
-
 </head>
 <body class="en">
-<script src="/js/xrml.min.js">console.clear();</script>
 
 <label class="hamburger-menu">
     <input type="checkbox" />
@@ -341,6 +354,8 @@ body.en #mode::before { content: "Mode"; }
           </ul>
     </nav>
 </aside>
+
+<script src="/js/xrml.min.js">console.clear();</script>
 
 
 <!-- Setup XR Scene -->
