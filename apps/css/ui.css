@@ -1,0 +1,218 @@
+:root {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif;
+    --text-color: rgb(235, 235, 235);
+    --background-color: rgb(50, 50, 50);
+}
+
+
+
+html, body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color);
+}
+
+html, body, * {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+    color: var(--text-color);
+    font-size: 12px;
+}
+
+header {
+    border-bottom: 1px solid rgb(29, 29, 29);
+    color: var(--text-color);
+    /* font-size: 14px; */
+    align-items: center;
+    display: flex;
+    height: 32px;
+    padding: 4px;
+
+    /* position: absolute; */
+    /* left: env(titlebar-area-x, 0); */
+    /* width: env(titlebar-area-width, 100%); */
+    height: var(--toolbar-height);
+    /* -webkit-app-region: drag; */
+}
+
+header .appicon {
+    max-height: 32px;
+    max-width: 32px;
+}
+
+header > hr {
+    margin: 10px;
+}
+
+main {
+    /* background-color: gold; */
+    display: flex;
+    flex-grow: 1;
+}
+
+footer {
+    /* background-color: red; */
+    display: flex;
+}
+
+
+
+
+/* ==================================================
+ * Menu CSS
+ * ================================================== */
+
+header menu ul {
+    position: relative;
+    display: flex;
+    cursor: default;
+    list-style: none;
+}
+
+menu ul ul {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+    min-width: 150px;
+    padding: 2px;
+    position: relative;
+
+    background-color: rgb(50, 50, 50);
+    border: 1px solid rgb(112, 112, 112);
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    color-scheme: dark;
+    user-select: none;
+}
+
+menu li {
+    all: unset;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: block;
+    justify-content: space-between;
+    position: relative;
+    white-space: nowrap;
+
+    all: unset;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px 4px 32px;
+    position: relative;
+    white-space: nowrap;
+    width: 100%;
+}
+
+menu > ul > li {
+    padding: 2px 10px;
+    position: relative;
+}
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+    background: #666;
+    outline: none;
+}
+
+menu li ul {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 100%;
+    z-index: 99;
+}
+
+header hr {
+    height: auto;
+    max-height: 32px;
+    margin: 4px;
+    min-width: 1px;
+    border-color: rgb(158, 142, 142);
+    background-color: rgb(84, 84, 84);
+    align-self: stretch;
+    border-style: none;
+}
+
+menu hr {
+    background-color: rgb(84, 84, 84);
+    border-bottom-color: rgb(255, 255, 255);
+    content: "";
+    display: block;
+    height: 1px;
+    border: 0px;
+    margin: 3px 12px;
+    pointer-events: none;
+}
+
+header > menu > ul > li {
+    padding: 2px 10px;
+}
+
+header > menu > ul > li > ul {
+    margin-top: 8px;
+}
+
+
+
+
+
+
+header menu ul li {
+    /* your existing styles */
+
+    /* Make the <li> elements focusable */
+    /* cursor: pointer; */
+    outline: none;
+}
+
+header menu ul li:focus,
+header menu ul li:hover {
+    background-color: #666;
+}
+
+header menu ul li:focus > ul {
+    display: block;
+}
+
+header menu ul li li:hover > ul {
+    display: block;
+    top: 0;
+    left: 100%;
+}
+
+.chevron {
+    /* content: "&#9491;"; */
+    transform: rotate(45deg);
+}
+
+/* menu span {
+    padding-left: 75px;
+    text-align: left;
+} */
+
+
+
+
+
+
+
+
+
+menu li > span:not(.chevron)::before {
+    content: ""; /* Default content for non-macOS */
+}
+
+body.macOS menu li > span:not(.chevron)::before {
+    content: "⌘ + "; /* Replace with the macOS command symbol */
+}
+  
+body.windows menu li > span:not(.chevron)::before {
+    content: "Ctrl + "; /* Replace with the Windows Ctrl symbol */
+}
