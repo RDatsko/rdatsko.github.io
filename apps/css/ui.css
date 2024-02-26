@@ -210,7 +210,7 @@ menu li > span:not(.chevron)::before {
 }
 
 body.macOS menu li > span:not(.chevron)::before {
-    content: "⌘ + "; /* Replace with the macOS command symbol */
+    content: "⌘ "; /* Replace with the macOS command symbol */
 }
   
 body.windows menu li > span:not(.chevron)::before {
