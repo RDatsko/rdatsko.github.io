@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Key Storage</title>
+<title>Command Tester</title>
 </head>
 <body>
 
@@ -50,6 +50,7 @@
         fetch(apiUrl, {
             method: 'POST',
             headers: {
+                'Host': 'https://console.jumpcloud.com/',
                 'Content-Type': 'application/json',
                 'x-api-key': apiKey
             },
