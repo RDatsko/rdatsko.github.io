@@ -13,10 +13,10 @@
 <input type="text" id="apiKeyInput">
 <button onclick="saveApiKey()">Save</button>
 
-<div>
+<!-- <div>
     <h2>Current API Key:</h2>
     <span id="apiKey"></span>
-</div>
+</div> -->
 
 <label for="triggerNameInput">Trigger Name:</label>
 <input type="text" id="triggerNameInput">
@@ -36,10 +36,10 @@
     }
 
     // Function to display API key from local storage
-    function displayApiKey() {
-        var storedApiKey = localStorage.getItem('APIKey');
-        document.getElementById('apiKey').textContent = storedApiKey || 'No API Key stored.';
-    }
+    // function displayApiKey() {
+    //     var storedApiKey = localStorage.getItem('APIKey');
+    //     document.getElementById('apiKey').textContent = storedApiKey || 'No API Key stored.';
+    // }
 
     // Function to execute the command
     function executeCommand() {
