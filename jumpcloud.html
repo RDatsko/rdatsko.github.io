@@ -3,51 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JumpCloud</title>
+<title>API Key Storage</title>
 </head>
 <body>
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Key Storage</title>
-    </head>
-    <body>
-    
-        <h1>API Key Storage</h1>
-    
-        <label for="apiKeyInput">API Key:</label>
-        <input type="text" id="apiKeyInput">
-        <button onclick="saveApiKey()">Save</button>
-    
-        <div>
-            <h2>Current API Key:</h2>
-            <span id="apiKey"></span>
-        </div>
-    
-        <script>
-            // Function to save API key to local storage
-            function saveApiKey() {
-                var apiKey = document.getElementById('apiKeyInput').value;
-                localStorage.setItem('APIKey', apiKey);
-                displayApiKey();
-            }
-    
-            // Function to display API key from local storage
-            function displayApiKey() {
-                var storedApiKey = localStorage.getItem('APIKey');
-                document.getElementById('apiKey').textContent = storedApiKey || 'No API Key stored.';
-            }
-    
-            // Display API key on page load
-            displayApiKey();
-        </script>
-    
-    </body>
-    </html>
-    
+<h1>API Key Storage</h1>
+
+<label for="apiKeyInput">API Key:</label>
+<input type="text" id="apiKeyInput">
+<button onclick="saveApiKey()">Save</button>
+
+<div>
+    <h2>Current API Key:</h2>
+    <span id="apiKey"></span>
+</div>
+
+<label for="triggerNameInput">Trigger Name:</label>
+<input type="text" id="triggerNameInput">
+<button onclick="executeCommand()">Execute Command</button>
+
+<div>
+    <h2>Result:</h2>
+    <span id="result"></span>
+</div>
+
+<script>
+    // Function to save API key to local storage
+    function saveApiKey() {
+        var apiKey = document.getElementById('apiKeyInput').value;
+        localStorage.setItem('APIKey', apiKey);
+        displayApiKey();
+    }
+
+    // Function to display API key from local storage
+    function displayApiKey() {
+        var storedApiKey = localStorage.getItem('APIKey');
+        document.getElementById('apiKey').textContent = storedApiKey || 'No API Key stored.';
+    }
+
+    // Function to execute the command
+    function executeCommand() {
+        var apiKey = localStorage.getItem('APIKey');
+        var triggerName = document.getElementById('triggerNameInput').value;
+        var apiUrl = "https://console.jumpcloud.com/api/command/trigger/" + triggerName;
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').textContent = JSON.stringify(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('result').textContent = 'Error occurred.';
+        });
+    }
+
+    // Display API key on page load
+    displayApiKey();
+</script>
 
 </body>
 </html>
