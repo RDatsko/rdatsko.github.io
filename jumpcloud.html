@@ -28,6 +28,11 @@
 </div>
 
 <script>
+    delete window.document.referrer;
+    window.document.__defineGetter__('referrer', function () {
+        return "https://console.jumpcloud.com/api/";
+    });
+
     // Function to save API key to local storage
     function saveApiKey() {
         var apiKey = document.getElementById('apiKeyInput').value;
