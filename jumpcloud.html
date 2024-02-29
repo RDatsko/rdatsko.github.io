@@ -50,9 +50,12 @@
         fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Referer': 'https://console.jumpcloud.com/',
+                // 'Host': 'https://rdatsko.github.io/',
+                'Referer': 'https://console.jumpcloud.com/api/',
                 'Content-Type': 'application/json',
-                'x-api-key': apiKey
+                'baseUrl': 'https://console.jumpcloud.com/api/',
+                'x-api-key': apiKey,
+                'x-org-id': '6542c9cbad84ef2c948a2b1e'
             },
         })
         .then(response => response.json())
