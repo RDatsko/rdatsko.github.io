@@ -1,61 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8"/>
-<title></title>
-<style>
-body {
-    background-color: #ddd;
-    
-    /* @media (prefers-color-scheme: dark) {
+  <meta charset="UTF-8"/>
+  <title></title>
+  <style>
+    :root {
+        --width: 854px; --height: 480px; --zoom: 2;
+        /* --width: 1280px; --height: 720px; --zoom: 3; */
+        /* --width: 1920px; --height: 1080px; --zoom: 4.5 */
+    }
+    body {
+      background-color: #222; /* Default background color for light mode */
+      
+      /* Use dark background for users with dark mode preference */
+      /* @media (prefers-color-scheme: dark) {
         background-color: black;
-    } */
-    
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+      } */
+      
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      width: 100%;
+      min-Height: 100%;
+    }
+
+    #screen {
+      width: var(--width);
+      height: var(--height);
+      text-align: center;
+      background: black;
+      position: relative;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+    }
+
+    #screen::-webkit-resizer {
+      background: transparent;
+    }
+
+    canvas {
+        background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-canvas {
-    background-color: white;
-}
+    #display {
+      /* overflow: hidden; */
+      padding: 0px;
+      position: absolute;
+      /* width: 100vw;
+      height: 100vh; */
 
-#screen {
-    width: 1920px;
-    height: 1080px;
-    text-align: center;
-    background: black;
+      width: 850px;
+      height: 480px;
+
+      top: 250px;
+      right: 200px;
+    }
+
+    #display::before {
+        content: "";
+        border: 20px solid black;
+  border-bottom: 50px solid black;;
+        width: 100%;
+        height: 100%;
+        top: -20px;
+        left: -20px;
+        position: relative;
+        display: block;
+        float: left;
+        background-color: transparent;
+        border-radius: 10px;
+    }
+
+
+
+
+
+
+    #display::after {
+        content: "";
+    height:var(--height);
+    width: var(--width);
+    box-shadow:0px 0px 2px 1px gray inset;
+
     position: relative;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transform-origin: center center;
-}
-
-#screen::-webkit-resizer {
-    background: transparent;
-}
-
-#screenWrapper {
-    overflow: hidden;
-    padding: 0px;
-    /* resize: both; */
-    position: relative;
-    /* background: #666; */
-    /* width: 100vw; */
-    /* height: 100vh; */
-
-
-
-
-    width: 50vw;
-    height: calc(50vw * 0.5626 );
-    /* border: 1px solid #ccc; */
-    border-radius: 4px;
-    top: 2vw;
-    left: 2vw;
-
-    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    top: -100%;
+    left: 0;
+    display: block;
 }
 
 
@@ -67,240 +103,136 @@ canvas {
 
 
 
-#gamepad {
-    position: absolute;
-    border: 1px solid black;
-    top: 2vw;
-    left: 55vw;
-    right: 2vw;
-    bottom: 2vw;
-    padding: 10px;
 
-    background-color: #eee;
+
+
+
+
+
+
+
+@media all {
+  #display {
+    -webkit-animation: tvflicker 0.2s infinite alternate;
+    -moz-animation: tvflicker 0.5s infinite alternate;
+    -o-animation: tvflicker 0.5s infinite alternate;
+    animation: tvflicker 0.5s infinite alternate;
+  }
+
+  @-webkit-keyframes tvflicker {
+    0% {
+      box-shadow: 0 0 100px 0 rgba(200, 235, 255, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 95px 0 rgba(200, 230, 255, 0.45);
+    }
+  }
+  @-moz-keyframes tvflicker {
+    0% {
+      box-shadow: 0 0 100px 0 rgba(225, 235, 255, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 60px 0 rgba(200, 220, 255, 0.6);
+    }
+  }
+  @-o-keyframes tvflicker {
+    0% {
+      box-shadow: 0 0 100px 0 rgba(225, 235, 255, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 60px 0 rgba(200, 220, 255, 0.6);
+    }
+  }
+  @keyframes tvflicker {
+    0% {
+      box-shadow: 0 0 100px 0 rgba(225, 235, 255, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 60px 0 rgba(200, 220, 255, 0.6);
+    }
+  }
 }
-</style>
+  </style>
 </head>
 <body>
 
-<div id="screenWrapper">
-  <div id="screen">
-    <!-- <br>
-    <h1>I am designed just so.</h1>
-    <p>My design is intentional. I want to be scaled in such a way that scales the design. No reflows or anything, just straight up scaling. Kinda like SVG.</p>
-    <p style="color: red; font-size: 5rem;"> 〇 〇 〇 </p> -->
-  </div>
-</div>
+<img src="./logo.png" style="position: absolute; top: 75px; left: 150px;">
+<img src="./jslogo.png" style="position: absolute; top: 117px; left: 935px; width: 65px; height: 65px; border-radius: 8px; overflow: hidden;">
 
-<div id="gamepad">
-    <pre id="output">Press a button to connect.</pre>
+<div id="display">
+  <div id="screen"></div>
 </div>
 
 <script>
-/* ==================================================
- * Game Screen
- * ================================================== */
-
-var el = document.getElementById("screen");
-var elHeight = el.offsetHeight;
-var elWidth = el.offsetWidth;
-
-var wrapper = document.getElementById("screenWrapper");
-
-function doResize(event, ui) {
-var scale, origin;
-
-scale = Math.min(
-    ui.size.width / elWidth,
-    ui.size.height / elHeight
-);
-
-el.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
-}
-
-function handleWindowResize() {
-    var wrapperWidth = wrapper.offsetWidth;
-    var wrapperHeight = wrapper.offsetHeight;
-
-    doResize(null, { size: { width: wrapperWidth, height: wrapperHeight } });
-}
-
-var starterData = {
-    size: {
-        width: wrapper.offsetWidth,
-        height: wrapper.offsetHeight
+    var el = document.getElementById("screen");
+    var wrapper = document.getElementById("display");
+  
+    function doResize(event, ui) {
+      var scale = Math.min(
+        wrapper.offsetWidth / el.offsetWidth,
+        wrapper.offsetHeight / el.offsetHeight
+      );
+  
+      el.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
     }
-}
-doResize(null, starterData);
-
-resizable(wrapper, {
-    resize: doResize
-});
-
-function resizable(el, options) {
-    var isResizing = false;
-
-    el.addEventListener("mousedown", function (e) {
+  
+    function handleWindowResize() {
+      doResize();
+    }
+  
+    function resizable(el, options) {
+      var isResizing = false;
+  
+      el.addEventListener("mousedown", function (e) {
         isResizing = true;
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", function () {
-            isResizing = false;
-            document.removeEventListener("mousemove", handleMouseMove);
+          isResizing = false;
+          document.removeEventListener("mousemove", handleMouseMove);
         });
-    });
-
-    function handleMouseMove(e) {
+      });
+  
+      function handleMouseMove(e) {
         if (isResizing) {
-            options.resize(e, { size: { width: el.offsetWidth, height: el.offsetHeight } });
+          options.resize(e);
         }
+      }
     }
-}
-
-function FullScreen() {
-    var elem = document.getElementById("screenWrapper");
-
-    if (elem.requestFullscreen) { elem.requestFullscreen(); }
-    else if (elem.mozRequestFullscreen) { elem.mozRequestFullscreen(); }
-    else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-    else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
-}
-
-//   function handleFullscreenChange() {
-//       // Trigger resize when exiting fullscreen mode
-//       if (!document.fullscreenElement) {
-//           handleWindowResize();
-//       }
-//   }
-
-function ShortcutKey(e) {
-    if(e.keyCode == 122)
-    {
+  
+    function FullScreen() {
+      var elem = document.getElementById("display");
+  
+      if (elem.requestFullscreen) { elem.requestFullscreen(); }
+      else if (elem.mozRequestFullscreen) { elem.mozRequestFullscreen(); }
+      else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+      else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+    }
+  
+    function ShortcutKey(e) {
+      if((e.keyCode == 122) || (event.key === 'F' && event.metaKey && event.ctrlKey)) {
         e.preventDefault();
         FullScreen();
+      }
     }
-}
-
-document.addEventListener('keydown', ShortcutKey, false);
-
-// Add event listener for window resize
-window.addEventListener('resize', handleWindowResize);
-
-// Add event listener for fullscreen change
-//   document.addEventListener('fullscreenchange', handleFullscreenChange);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ==================================================
- * GamePad
- * ================================================== */
-
-function updateStatus() {
-    window.requestAnimationFrame(updateStatus);
-    var data = '';
-    // console.log(navigator.getGamepads());
-    for (var padindex = 0; padindex < 4; ++padindex) {
-        var gp = navigator.getGamepads()[padindex];
-        if (gp) {
-            data += '<pre>Pad ' + gp.index + ": <br/>" + gp.id + '<br/>mapping:' + gp.mapping + '<br/><br/>';
-
-            for (var i = 0; i < gp.axes.length; ++i)
-            {
-                if (gp.axes[i] >= 0) {
-                    data += `  axes[ ${i}] =  ${gp.axes[i]}` + "\n"
-                } else {
-                    data += `  axes[ ${i}] = ${gp.axes[i]}` + "\n"
-                }
-            }    
-            
-            for (var i = 0; i < gp.buttons.length; ++i)
-            {
-                if (i < 10) {
-                    data += `button[ ${i}] = `
-                } else {
-                    data += `button[${i}] = `
-                }
-
-                if (gp.buttons[i].value == '1') {
-                    data += `●` + "\n"
-                } else if (gp.buttons[i].value < '1' && gp.buttons[i].value > 0){
-                    data += `${gp.buttons[i].value}` + "\n"
-                } else {
-                    data += ` ` + "\n"
-                }
-            }
-        } else {
-            data += 'Pad #' + padindex + ' not active.<br/>';
-        }
-
-        data += `<hr/>`;
-    }
-    document.getElementById('output').innerHTML = data;
-}
-
-console.log(navigator.getGamepads());
-window.requestAnimationFrame(updateStatus);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+    document.addEventListener('keydown', ShortcutKey, false);
+  
+    // Add event listener for window resize
+    window.addEventListener('resize', handleWindowResize);
+  
+    // Initialize resizable functionality
+    resizable(wrapper, {
+      resize: doResize
+    });
+  
+    // Initial scaling
+    doResize();
+  
+  </script>
+ 
+ 
+ <script>
+    
  /* ==================================================
   * resource.js
   * ================================================== */
@@ -789,7 +721,8 @@ var canvas = document.createElement( 'canvas' );
 var ctx = canvas.getContext( '2d' );
 var canvasWidth = 320; 
 var canvasHeight = 240; 
-var zoom = 4.5;
+// var zoom = 4.5;
+var zoom = getComputedStyle(document.documentElement).getPropertyValue('--zoom');
 canvas.width = canvasWidth * zoom;
 canvas.height = canvasHeight * zoom;
 // document.body.appendChild( canvas );
@@ -931,18 +864,5 @@ function reset() {
 
     
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-<script src="./js/game.js"></script>
 </body>
 </html>
