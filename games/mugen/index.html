@@ -233,11 +233,15 @@
     function FullScreen() {
       var elem = document.getElementById("display");
   
-      if (elem.requestFullscreen || !document.fullscreenElement) { elem.requestFullscreen(); }
+      if (elem.requestFullscreen) { elem.requestFullscreen(); }
       else if (elem.mozRequestFullscreen) { elem.mozRequestFullscreen(); }
       else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
       else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
-      else { document.exitFullscreen(); }
+      else if (!document.fullscreenElement) {
+            fullscreen?.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
     }
   
     function ShortcutKey(e) {
