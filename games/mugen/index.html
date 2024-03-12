@@ -238,7 +238,7 @@
       else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
       else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
       else if (!document.fullscreenElement) {
-            fullscreen?.requestFullscreen();
+            elem?.requestFullscreen();
         } else {
             document.exitFullscreen();
         }
