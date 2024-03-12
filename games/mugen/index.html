@@ -233,7 +233,7 @@
     function FullScreen() {
       var elem = document.getElementById("display");
   
-      if (elem.requestFullscreen || !elem.fullscreenElement) { elem.requestFullscreen(); }
+      if (elem.requestFullscreen || !document.fullscreenElement) { elem.requestFullscreen(); }
       else if (elem.mozRequestFullscreen) { elem.mozRequestFullscreen(); }
       else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
       else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
