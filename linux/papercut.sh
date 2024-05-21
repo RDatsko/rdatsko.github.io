@@ -40,7 +40,8 @@
 #sudo apt install perl -y
 
 #useradd -m -d /home/papercut papercut
-#usermod -a -G wheel papercut
+#sudo ufw allow 9191
+#sudo ufw allow 9192
 
 #echo "papercut - nofile 65535" | sudo tee -a /etc/security/limits.conf
 
