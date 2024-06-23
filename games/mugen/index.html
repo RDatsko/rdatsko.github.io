@@ -240,10 +240,14 @@
     }
   
     function ShortcutKey(e) {
-      if((e.keyCode == 122) || (event.key === 'F' && event.metaKey && event.ctrlKey)) {
-        e.preventDefault();
-        FullScreen();
-      }
+        var key = e.key.toUpperCase();
+        var isCtrlKey = (e.ctrlKey || e.metaKey); // Check for Ctrl or Cmd key
+
+        // Check if Ctrl + F is pressed regardless of platform
+        if (isCtrlKey && key === 'F') {
+            e.preventDefault(); // Prevent the default behavior (like searching)
+            FullScreen(); // Call your FullScreen function
+        }
     }
   
     document.addEventListener('keydown', ShortcutKey, false);
