@@ -285,6 +285,8 @@ setInterval(syncIframes, 1000);
     const desktopFrame = document.getElementById('desktop');
     const url = document.getElementById('url');
 
+    url.value = desktopFrame.src;
+
     // Store the current URLs of each iframe
     let lastPhoneUrl = phoneFrame.src;
     let lastDesktopUrl = desktopFrame.src;
