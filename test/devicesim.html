@@ -280,41 +280,66 @@ setInterval(syncIframes, 1000);
 
 
 
-    // Select the iframes
-    const phoneFrame = document.getElementById('phone');
-    const desktopFrame = document.getElementById('desktop');
-    const url = document.getElementById('url');
+// Select the iframes
+const phoneFrame = document.getElementById('phone');
+const desktopFrame = document.getElementById('desktop');
+const url = document.getElementById('url');
 
-    url.value = desktopFrame.src;
+url.value = desktopFrame.src;
 
-    // Store the current URLs of each iframe
-    let lastPhoneUrl = phoneFrame.src;
-    let lastDesktopUrl = desktopFrame.src;
+// Store the current URLs of each iframe
+let lastPhoneUrl = phoneFrame.src;
+let lastDesktopUrl = desktopFrame.src;
 
-    // Function to sync iframes when an iframe's URL changes
-    function syncIframe(iframeChanged, newUrl) {
-        if (iframeChanged === phoneFrame) {
-            if (lastPhoneUrl !== newUrl) {
-                lastPhoneUrl = newUrl;
-                desktopFrame.src = newUrl; // Sync desktop iframe to phone iframe
-                lastDesktopUrl = newUrl;    // Update stored URL for desktop
+// Function to sync scroll position
+function syncScroll(sourceFrame, targetFrame) {
+    try {
+        const sourceDoc = sourceFrame.contentDocument || sourceFrame.contentWindow.document;
+        const targetDoc = targetFrame.contentDocument || targetFrame.contentWindow.document;
 
-                setTimeout(() => { url.value = phoneFrame.src; }, "100");
-            }
-        } else if (iframeChanged === desktopFrame) {
-            if (lastDesktopUrl !== newUrl) {
-                lastDesktopUrl = newUrl;
-                phoneFrame.src = newUrl;   // Sync phone iframe to desktop iframe
-                lastPhoneUrl = newUrl;     // Update stored URL for phone
+        // Calculate the scroll position as a percentage
+        const scrollTopPercentage = sourceDoc.documentElement.scrollTop / 
+                                    (sourceDoc.documentElement.scrollHeight - sourceDoc.documentElement.clientHeight);
 
-                setTimeout(() => { url.value = phoneFrame.src; }, "100");
-            }
+        // Apply the scroll position to the target iframe
+        targetDoc.documentElement.scrollTop = scrollTopPercentage * 
+                                                (targetDoc.documentElement.scrollHeight - targetDoc.documentElement.clientHeight);
+    } catch (e) {
+        console.error("Cannot access iframe content due to cross-origin policy:", e);
+    }
+}
+
+// Function to sync iframes when an iframe's URL changes
+function syncIframe(iframeChanged, newUrl) {
+    if (iframeChanged === phoneFrame) {
+        if (lastPhoneUrl !== newUrl) {
+            lastPhoneUrl = newUrl;
+            desktopFrame.src = newUrl; // Sync desktop iframe to phone iframe
+            lastDesktopUrl = newUrl;    // Update stored URL for desktop
+
+            setTimeout(() => { url.value = phoneFrame.src; }, "100");
+        }
+    } else if (iframeChanged === desktopFrame) {
+        if (lastDesktopUrl !== newUrl) {
+            lastDesktopUrl = newUrl;
+            phoneFrame.src = newUrl;   // Sync phone iframe to desktop iframe
+            lastPhoneUrl = newUrl;     // Update stored URL for phone
+
+            setTimeout(() => { url.value = phoneFrame.src; }, "100");
         }
     }
+}
 
-    // Add onload event listeners to detect URL changes
-    phoneFrame.onload = () => syncIframe(phoneFrame, phoneFrame.contentWindow.location.href);
-    desktopFrame.onload = () => syncIframe(desktopFrame, desktopFrame.contentWindow.location.href);
+// Add onload event listeners to detect URL changes
+phoneFrame.onload = () => {
+    syncIframe(phoneFrame, phoneFrame.contentWindow.location.href);
+    phoneFrame.contentWindow.addEventListener('scroll', () => syncScroll(phoneFrame, desktopFrame));
+}
+
+desktopFrame.onload = () => {
+    syncIframe(desktopFrame, desktopFrame.contentWindow.location.href);
+    desktopFrame.contentWindow.addEventListener('scroll', () => syncScroll(desktopFrame, phoneFrame));
+}
 
 </script>
 </body>
