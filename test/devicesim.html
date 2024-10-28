@@ -317,7 +317,7 @@ function syncIframe(iframeChanged, newUrl) {
             desktopFrame.src = newUrl; // Sync desktop iframe to phone iframe
             lastDesktopUrl = newUrl;    // Update stored URL for desktop
 
-            setTimeout(() => { url.value = phoneFrame.src; }, "100");
+            setTimeout(() => { url.value = desktopFrame.src; }, "100");
         }
     } else if (iframeChanged === desktopFrame) {
         if (lastDesktopUrl !== newUrl) {
