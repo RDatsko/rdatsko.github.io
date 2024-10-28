@@ -333,12 +333,12 @@ function syncIframe(iframeChanged, newUrl) {
 // Add onload event listeners to detect URL changes
 phoneFrame.onload = () => {
     syncIframe(phoneFrame, phoneFrame.contentWindow.location.href);
-    phoneFrame.contentWindow.addEventListener('scroll', () => syncScroll(phoneFrame, desktopFrame));
+    // phoneFrame.contentWindow.addEventListener('scroll', () => syncScroll(phoneFrame, desktopFrame));
 }
 
 desktopFrame.onload = () => {
     syncIframe(desktopFrame, desktopFrame.contentWindow.location.href);
-    desktopFrame.contentWindow.addEventListener('scroll', () => syncScroll(desktopFrame, phoneFrame));
+    // desktopFrame.contentWindow.addEventListener('scroll', () => syncScroll(desktopFrame, phoneFrame));
 }
 
 </script>
