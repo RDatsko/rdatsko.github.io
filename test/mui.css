@@ -575,9 +575,9 @@
 
 /*  Layouts */
 
-/* Layout1 */
+/* template1 */
 
-#layout1 > header {
+#template1 > header {
     position: fixed;
     display: flex;
     height: 64px;
@@ -593,7 +593,7 @@ html, body {
     width: 100vw;
 }
 
-#layout1 > header > input {
+#template1 > header > input {
     position: fixed;
     display: block;
     top: 20px;
@@ -610,8 +610,8 @@ html, body {
     border: 1px solid black;
 }
 
-#layout1 > header > input:before,
-#layout1 > header > input:after {
+#template1 > header > input:before,
+#template1 > header > input:after {
   position: absolute;
   display: block;
   width: 100%;
@@ -626,43 +626,43 @@ html, body {
   transform-origin: 50% 50%;
 }
 
-#layout1 > header > input:before {
+#template1 > header > input:before {
   -webkit-transform: translate(-50%, -7px);
   transform: translate(-50%, -7px);
 }
 
-#layout1 > header > input:after {
+#template1 > header > input:after {
   -webkit-transform: translate(-50%, 7px);
   transform: translate(-50%, 7px);
 }
 
-#layout1 > header > input:checked:before {
+#template1 > header > input:checked:before {
     -webkit-transform: translate(-50%, -50%) rotate(315deg);
     transform: translate(-50%, -50%) rotate(315deg);
 }
   
-#layout1 > header > input:checked:after {
+#template1 > header > input:checked:after {
     -webkit-transform: translate(-50%, -50%) rotate(-315deg);
     transform: translate(-50%, -50%) rotate(-315deg);
 }
 
 @media screen and (max-width: 600px) {
-    #layout1 > header > input {
+    #template1 > header > input {
         display: block;
     }
 
-    #layout1 > header > span {
+    #template1 > header > span {
         margin-left: 54px;
     }
 }
 
 @media screen and (min-width: 601px) {
-    #layout1 > header > input {
+    #template1 > header > input {
         display: none;
     }
 }
 
-#layout1 > main {
+#template1 > main {
     position: absolute;
     margin-top: 65px;
 }
