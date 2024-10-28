@@ -295,17 +295,19 @@ setInterval(syncIframes, 1000);
     function syncIframe(iframeChanged, newUrl) {
         if (iframeChanged === phoneFrame) {
             if (lastPhoneUrl !== newUrl) {
-                url.value = phoneFrame.src;
                 lastPhoneUrl = newUrl;
                 desktopFrame.src = newUrl; // Sync desktop iframe to phone iframe
                 lastDesktopUrl = newUrl;    // Update stored URL for desktop
+
+                setTimeout(() => { url.value = phoneFrame.src; }, "100");
             }
         } else if (iframeChanged === desktopFrame) {
             if (lastDesktopUrl !== newUrl) {
-                url.value = desktopFrame.src;
                 lastDesktopUrl = newUrl;
                 phoneFrame.src = newUrl;   // Sync phone iframe to desktop iframe
                 lastPhoneUrl = newUrl;     // Update stored URL for phone
+
+                setTimeout(() => { url.value = phoneFrame.src; }, "100");
             }
         }
     }
