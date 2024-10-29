@@ -582,7 +582,7 @@ html {
 }
 
 body {
-    overflow-x: hidden;;
+    overflow-x: hidden;
 }
 
 /* Templates */
@@ -685,11 +685,16 @@ body {
     position: absolute;
     padding-top: 65px;
     width: 100%;
+    overflow: visible;
 }
 
 #template1 > main > header {
     background-color: lightgray;
+    /* width: calc(100% + ((100% - var(--max-width)) * 2) * 1px); */
     width: 100%;
+    /* width: calc(100% + var(--max-width)); */
+    /* width: var(--max-width) / 2; */
     padding: 0 calc(100% - var(--max-width));
     height: calc(100vh - 64px);
+    overflow: visible;
 }
