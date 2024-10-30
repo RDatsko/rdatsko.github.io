@@ -528,6 +528,11 @@
     box-sizing: border-box;
 }
 
+html, body {
+    font-size: var(--size);
+    font-family: var(--font);
+}
+
 /* Grids */
 
 .s1  { grid-column: span 1; }
