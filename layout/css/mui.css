@@ -816,7 +816,7 @@ body {
     max-width: 350px;
     height: 64px;
     line-height: 64px;
-    background-color: lightgray;
+    background-color: white;
     position: fixed;
     z-index: 1001;
 }
@@ -827,7 +827,7 @@ body {
 
 @media screen and (max-width: 600px) {
     .top-nav > #menu-btn ~ nav {
-        background-color: lightgray;
+        background-color: white;
         position: fixed;
         top: 0;
         bottom: 0;
