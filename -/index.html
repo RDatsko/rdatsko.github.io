@@ -52,6 +52,35 @@
         「創聖のアクエリオン」「艦隊これくしょん」「スティッチ！」など多数のアニソンを歌唱するコーラスダンスグループ"bless4"が経営する唯一無二のエンターテイメント企業。
         「あなたの夢を現実にする場所」をテーマに歌やダンス、アートなどを始めとするエンターテイメントや様々なイベント、アーティストのプロデュースを行い様々なイベントの企画を行っている芸能事務所です。
     </main>
-    
+
+    <button onclick="addToHomeScreen()">Add to Home Screen</button> 
+
+<script>
+function addToHomeScreen() { 
+  if (window.navigator.standalone === true) { 
+    return false; 
+  } else if (window.matchMedia('(display-mode: standalone)').matches) { 
+    return false; 
+  } 
+ 
+  const prompt = window.deferredPrompt; 
+ 
+  if (prompt) { 
+    prompt.prompt(); 
+ 
+    prompt.userChoice.then(function(choiceResult) { 
+      if (choiceResult.outcome === 'accepted') { 
+        console.log('User accepted the A2HS prompt'); 
+      } else { 
+        console.log('User dismissed the A2HS prompt'); 
+      } 
+ 
+      window.deferredPrompt = null; 
+    }); 
+  } 
+ 
+  return true; 
+} 
+</script>
 </body>
 </html>
