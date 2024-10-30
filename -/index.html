@@ -81,6 +81,16 @@ function addToHomeScreen() {
  
   return true; 
 } 
+
+window.addEventListener('beforeinstallprompt', function(event) { 
+  console.log('beforeinstallprompt fired'); 
+ 
+  event.preventDefault(); 
+ 
+  window.deferredPrompt = event; 
+ 
+  return false; 
+}); 
 </script>
 </body>
 </html>
