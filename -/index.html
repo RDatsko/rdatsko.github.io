@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="white">
+<meta name="apple-mobile-web-app-title" content="KAT">
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="apple-touch-icon" href="/layout/image/site_icon.png" sizes="256x256">
 <link rel="manifest" href="../layout/manifest.webmanifest" />
 <link rel="stylesheet" type="text/css" href="../layout/css/mui.css">
 <title>KAT: Home Page</title>
@@ -53,44 +57,44 @@
         「あなたの夢を現実にする場所」をテーマに歌やダンス、アートなどを始めとするエンターテイメントや様々なイベント、アーティストのプロデュースを行い様々なイベントの企画を行っている芸能事務所です。
     </main>
 
-    <button onclick="addToHomeScreen()">Add to Home Screen</button> 
+    <button id="installButton" style="display: none;">Add to Home Screen</button>
 
-<script>
-function addToHomeScreen() { 
-  if (window.navigator.standalone === true) { 
-    return false; 
-  } else if (window.matchMedia('(display-mode: standalone)').matches) { 
-    return false; 
-  } 
- 
-  const prompt = window.deferredPrompt; 
- 
-  if (prompt) { 
-    prompt.prompt(); 
- 
-    prompt.userChoice.then(function(choiceResult) { 
-      if (choiceResult.outcome === 'accepted') { 
-        console.log('User accepted the A2HS prompt'); 
-      } else { 
-        console.log('User dismissed the A2HS prompt'); 
-      } 
- 
-      window.deferredPrompt = null; 
-    }); 
-  } 
- 
-  return true; 
-} 
+    <script>
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/layout/js/service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(error => console.log('Service Worker registration failed:', error));
+        }
 
-window.addEventListener('beforeinstallprompt', function(event) { 
-  console.log('beforeinstallprompt fired'); 
- 
-  event.preventDefault(); 
- 
-  window.deferredPrompt = event; 
- 
-  return false; 
-}); 
-</script>
+        let deferredPrompt;
+
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the default mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Show the install button
+            document.getElementById('installButton').style.display = 'block';
+
+            // Add click event listener on the install button
+            document.getElementById('installButton').addEventListener('click', () => {
+                // Hide the install button
+                document.getElementById('installButton').style.display = 'none';
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user's response
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
