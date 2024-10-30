@@ -5,6 +5,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="../layout/css/mui.css">
 <title>MUI References</title>
+<style>
+
+:root {
+    --max-width: 100vw;
+}
+
+main {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+main > div:first-child {
+    width: 300px;
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    overflow: auto;
+}
+
+main > div:nth-child(2) {
+    /* width: calc(100vw - 300px);
+    height: 100vh;
+    right: 0; */
+    flex: 1;
+
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    overflow: auto;
+}
+
+@media screen and (max-width: 600px) {
+    main > div:first-child {
+        display: none;
+    }
+}
+
+[name="css"], [name="css"] + label {
+    display: none;
+}
+
+[name="css"] + label + div {
+    display: none;
+}
+
+[name="css"] + label + div {
+    width: 100%;
+    /* height: 100%;
+    overflow: scroll; */
+    padding: 10px 25px;
+}
+
+[name="css"]:checked + label + div {
+    display: block;
+}
+
+#sidebar a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+</style>
+<script>
+    function jump(id) {
+        document.getElementById(id).checked = true;
+    }
+    
+    // Wait until the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the hash from the URL (e.g., #radio1)
+        var hash = window.location.hash;
+    
+        // If there's a hash value, proceed
+        if (hash) {
+            // Remove the '#' from the hash to get the ID
+            var elementId = hash.substring(1);
+    
+            // Get the radio button element with that ID
+            var radioButton = document.getElementById(elementId);
+    
+            // If the element exists and is a radio button, click it
+            if (radioButton && radioButton.type === 'radio') {
+                radioButton.click();
+            }
+        }
+    });
+    
+    document.querySelectorAll('input[type="radio"].code').forEach(radio => {
+        radio.addEventListener('click', function () {
+            if (this.checked) {
+                this.checked = false;
+            }
+        });
+    });
+    
+    </script>
 </head>
 <body id="template1">
 
@@ -13,15 +109,226 @@
     <label for="hamburger" class="hamburger"><i></i></label> -->
     <input id="menu-btn" type="checkbox" />
     <span>Some Text</span>
-    <nav></nav>
+    <nav>
+        <a></a>
+        <a href="#mui" onclick="jump('mui')">MUI (My UI)</a>
+        <a href="#mainlayouts" onclick="jump('mainlayouts')">Main Layouts</a>
+        <a href="#appbars" onclick="jump('appbars')">App bars</a>
+        <!-- Top app bars -->
+        <!-- Bottom app bars -->
+        <a href="#badges" onclick="jump('badges')">Badges</a>
+        <!-- Common badges -->
+        <!-- Inline badges -->
+        <a href="#buttons" onclick="jump('buttons')">Buttons</a>
+        <!-- Common buttons -->
+        <!-- Responsive buttons -->
+        <a href="#fabs" onclick="jump('fabs')">FABs</a>
+        <a href="#extendedfabs" onclick="jump('extendedfabs')">Extended FABs</a>
+        <a href="#iconbuttons" onclick="jump('iconbuttons')">Icon buttons</a>
+        <a href="#segmentedbuttons" onclick="jump('segmentedbuttons')">Segmented buttons</a>
+        <a href="#cards" onclick="jump('cards')">Cards</a>
+        <a href="#checkboxes" onclick="jump('checkboxes')">Checkboxes</a>
+        <!-- Default checkbox -->
+        <!-- Checkbox with icons -->
+        <!-- Checkbox in field elements -->
+        <a href="#chips" onclick="jump('chips')">Chips</a>
+        <a href="#colors" onclick="jump('colors')">Colors</a>
+        <a href="#containers" onclick="jump('containers')">Containers</a>
+        <!-- Side content -->
+        <a href="#dialogs" onclick="jump('dialogs')">Dialogs</a>
+        <a href="#directions" onclick="jump('directions')">Directions</a>
+        <a href="#dividers" onclick="jump('dividers')">Dividers</a>
+        <a href="#expansions" onclick="jump('expansions')">Expansions</a>
+        <a href="#fieldsets" onclick="jump('fieldsets')">Fieldsets</a>
+        <a href="#grids" onclick="jump('grids')">Grids</a>
+        <a href="#icons" onclick="jump('icons')">Icons</a>
+        <!-- Default icons -->
+        <!-- SVG icons -->
+        <!-- Image icons -->
+        <!-- Other libs -->
+        <!-- Font Awesome -->
+        <!-- Pictogrammers -->
+        <a href="#inputs" onclick="jump('inputs')">Inputs</a>
+        <!-- Custom inputs -->
+        <a href="#layouts" onclick="jump('layouts')">Layouts</a>
+        <!-- Positions -->
+        <!-- Alignments -->
+        <!-- Headers and footers -->
+        <!-- Empty states -->
+        <!-- Blurred elements -->
+        <!-- Shadowed elements -->
+        <a href="#lists" onclick="jump('lists')">Lists</a>
+        <!-- Headline and spporting text -->
+        <!-- Wave effect -->
+        <!-- Icons -->
+        <!-- Leading media or avatar -->
+        <!-- List dividers -->
+        <!-- List expansions -->
+        <a href="#media" onclick="jump('media')">Media</a>
+        <a href="#menus" onclick="jump('menus')">Menus</a>
+        <a href="#navigation" onclick="jump('navigation')">Navigations</a>
+        <!-- Rowss -->
+        <!-- Navigations -->
+        <!-- Navigation rail/bar -->
+        <!-- Navigation drawer -->
+        <!-- Navigationtabbed -->
+        <a href="#pages" onclick="jump('pages')">Pages</a>
+        <a href="#progress" onclick="jump('progress')">Progress</a>
+        <!-- Linear (default) -->
+        <!-- Circular -->
+        <!-- Custom progressbar -->
+        <a href="#radios" onclick="jump('radios')">Radios</a>
+        <!-- Default radio -->
+        <!-- Radio with icons -->
+        <!-- Radio in field elements -->
+        <a href="#responsive" onclick="jump('responsive')">Responsive</a>
+        <a href="#scrolls" onclick="jump('scrolls')">Scrolls</a>
+        <!-- Chips -->
+        <!-- Images -->
+        <!-- Cards -->
+        <a href="#search" onclick="jump('search')">Search</a>
+        <!-- Docked -->
+        <!-- Fullscreen -->
+        <a href="#selects" onclick="jump('selects')">Selects</a>
+        <a href="#sliders" onclick="jump('sliders')">Sliders</a>
+        <!-- Default slider -->
+        <!-- Slider with tooltip -->
+        <!-- Slider withicon -->
+        <!-- Slider in field elements -->
+        <!-- Custom slider -->
+        <a href="#snackbars" onclick="jump('snackbars')">Snackbars</a>
+        <a href="#spaces" onclick="jump('spaces')">Spaces</a>
+        <a href="#steppers" onclick="jump('steppers')">Steppers</a>
+        <a href="#switches" onclick="jump('switches')">Switches</a>
+        <!-- Default switch -->
+        <!-- Switch with icons -->
+        <!-- Switch in field elements -->
+        <a href="#tables" onclick="jump('tables')">Tables</a>
+        <!-- Default -->
+        <!-- Stripes -->
+        <!-- Border -->
+        <a href="#tabs" onclick="jump('tabs')">Tabs</a>
+        <a href="#textareas" onclick="jump('textareas')">Textareas</a>
+        <a href="#tooltips" onclick="jump('tooltips')">Tooltips</a>
+        <a href="#typography" onclick="jump('typography')">Typography</a>
+        <!-- Display and headline -->
+        <!-- Formatting -->
+        <!-- Line spacing -->
+        <a href="#blockquote" onclick="jump('blockquote')">Blockquote, pre, and code</a>
+    </nav>
 </header>
 
 
-<header class="splash">Banner</header>
 <main>
-    <br>
-    <a href="link.html">Test Link</a>
-    <br><br>
+    <div>
+        <ul id="sidebar">
+            <a href="#mui" onclick="jump('mui')">MUI (My UI)</a></li>
+            <li><a href="#mainlayouts" onclick="jump('mainlayouts')">Main Layouts</a></li>
+            <li><a href="#appbars" onclick="jump('appbars')">App bars</a></li>
+            <!-- <li>Top app bars</li> -->
+            <!-- <li>Bottom app bars</li> -->
+            <li><a href="#badges" onclick="jump('badges')">Badges</a></li>
+            <!-- <li>Common badges</li> -->
+            <!-- <li>Inline badges</li> -->
+            <li><a href="#buttons" onclick="jump('buttons')">Buttons</a></li>
+            <!-- <li>Common buttons</li> -->
+            <!-- <li>Responsive buttons</li> -->
+            <li><a href="#fabs" onclick="jump('fabs')">FABs</a></li>
+            <li><a href="#extendedfabs" onclick="jump('extendedfabs')">Extended FABs</a></li>
+            <li><a href="#iconbuttons" onclick="jump('iconbuttons')">Icon buttons</a></li>
+            <li><a href="#segmentedbuttons" onclick="jump('segmentedbuttons')">Segmented buttons</a></li>
+            <li><a href="#cards" onclick="jump('cards')">Cards</a></li>
+            <li><a href="#checkboxes" onclick="jump('checkboxes')">Checkboxes</a></li>
+            <!-- <li>Default checkbox</li> -->
+            <!-- <li>Checkbox with icons</li> -->
+            <!-- <li>Checkbox in field elements</li> -->
+            <li><a href="#chips" onclick="jump('chips')">Chips</a></li>
+            <li><a href="#colors" onclick="jump('colors')">Colors</a></li>
+            <li><a href="#containers" onclick="jump('containers')">Containers</a></li>
+            <!-- <li>Side content</li> -->
+            <li><a href="#dialogs" onclick="jump('dialogs')">Dialogs</a></li>
+            <li><a href="#directions" onclick="jump('directions')">Directions</a></li>
+            <li><a href="#dividers" onclick="jump('dividers')">Dividers</a></li>
+            <li><a href="#expansions" onclick="jump('expansions')">Expansions</a></li>
+            <li><a href="#fieldsets" onclick="jump('fieldsets')">Fieldsets</a></li>
+            <li><a href="#grids" onclick="jump('grids')">Grids</a></li>
+            <li><a href="#icons" onclick="jump('icons')">Icons</a></li>
+            <!-- <li>Default icons</li> -->
+            <!-- <li>SVG icons</li> -->
+            <!-- <li>Image icons</li> -->
+            <!-- <li>Other libs</li> -->
+            <!-- <li>Font Awesome</li> -->
+            <!-- <li>Pictogrammers</li> -->
+            <li><a href="#inputs" onclick="jump('inputs')">Inputs</a></li>
+            <!-- <li>Custom inputs</li> -->
+            <li><a href="#layouts" onclick="jump('layouts')">Layouts</a></li>
+            <!-- <li>Positions</li> -->
+            <!-- <li>Alignments</li> -->
+            <!-- <li>Headers and footers</li> -->
+            <!-- <li>Empty states</li> -->
+            <!-- <li>Blurred elements</li> -->
+            <!-- <li>Shadowed elements</li> -->
+            <li><a href="#lists" onclick="jump('lists')">Lists</a></li>
+            <!-- <li>Headline and spporting text</li> -->
+            <!-- <li>Wave effect</li> -->
+            <!-- <li>Icons</li> -->
+            <!-- <li>Leading media or avatar</li> -->
+            <!-- <li>List dividers</li> -->
+            <!-- <li>List expansions</li> -->
+            <li><a href="#media" onclick="jump('media')">Media</a></li>
+            <li><a href="#menus" onclick="jump('menus')">Menus</a></li>
+            <li><a href="#navigation" onclick="jump('navigation')">Navigations</a></li>
+            <!-- <li>Rowss</li> -->
+            <!-- <li>Navigations</li> -->
+            <!-- <li>Navigation rail/bar</li> -->
+            <!-- <li>Navigation drawer</li> -->
+            <!-- <li>Navigationtabbed</li> -->
+            <li><a href="#pages" onclick="jump('pages')">Pages</a></li>
+            <li><a href="#progress" onclick="jump('progress')">Progress</a></li>
+            <!-- <li>Linear (default)</li> -->
+            <!-- <li>Circular</li> -->
+            <!-- <li>Custom progressbar</li> -->
+            <li><a href="#radios" onclick="jump('radios')">Radios</a></li>
+            <!-- <li>Default radio</li> -->
+            <!-- <li>Radio with icons</li> -->
+            <!-- <li>Radio in field elements</li> -->
+            <li><a href="#responsive" onclick="jump('responsive')">Responsive</a></li>
+            <li><a href="#scrolls" onclick="jump('scrolls')">Scrolls</a></li>
+            <!-- <li>Chips</li> -->
+            <!-- <li>Images</li> -->
+            <!-- <li>Cards</li> -->
+            <li><a href="#search" onclick="jump('search')">Search</a></li>
+            <!-- <li>Docked</li> -->
+            <!-- <li>Fullscreen</li> -->
+            <li><a href="#selects" onclick="jump('selects')">Selects</a></li>
+            <li><a href="#sliders" onclick="jump('sliders')">Sliders</a></li>
+            <!-- <li>Default slider</li> -->
+            <!-- <li>Slider with tooltip</li> -->
+            <!-- <li>Slider withicon</li> -->
+            <!-- <li>Slider in field elements</li> -->
+            <!-- <li>Custom slider</li> -->
+            <li><a href="#snackbars" onclick="jump('snackbars')">Snackbars</a></li>
+            <li><a href="#spaces" onclick="jump('spaces')">Spaces</a></li>
+            <li><a href="#steppers" onclick="jump('steppers')">Steppers</a></li>
+            <li><a href="#switches" onclick="jump('switches')">Switches</a></li>
+            <!-- <li>Default switch</li> -->
+            <!-- <li>Switch with icons</li> -->
+            <!-- <li>Switch in field elements</li> -->
+            <li><a href="#tables" onclick="jump('tables')">Tables</a></li>
+            <!-- <li>Default</li> -->
+            <!-- <li>Stripes</li> -->
+            <!-- <li>Border</li> -->
+            <li><a href="#tabs" onclick="jump('tabs')">Tabs</a></li>
+            <li><a href="#textareas" onclick="jump('textareas')">Textareas</a></li>
+            <li><a href="#tooltips" onclick="jump('tooltips')">Tooltips</a></li>
+            <li><a href="#typography" onclick="jump('typography')">Typography</a></li>
+            <!-- <li>Display and headline</li> -->
+            <!-- <li>Formatting</li> -->
+            <!-- <li>Line spacing</li> -->
+            <li><a href="#blockquote" onclick="jump('blockquote')">Blockquote, pre, and code</a></li>
+        </ul>
+    </div>
+    <div>
 
         
 
@@ -2123,7 +2430,8 @@
     
     
     
-     </main>
+    </div>
+</main>
 
 <footer></footer>
 
