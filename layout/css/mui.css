@@ -775,7 +775,7 @@ body {
 
 #template1 > main {
     position: absolute;
-    padding: 0 min(calc((100% - var(--max-width)) / 2), 15px);
+    padding: 0 max(calc((100% - var(--max-width)) / 2), 15px);
     width: 100%;
     overflow: visible;
 }
