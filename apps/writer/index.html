@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Painter%22,%22short_name%22:%22Painter%22}">
+<link rel="stylesheet" type="text/css" href="../_/css/app.css">
+<title>Web Application</title>
+</head>
+<body>
+
+<nav>
+    <!-- <img src="ps-appicon.svg" class="appicon" style="width: 24px; height: 24px;"> -->
+    <svg role="img" fill="currentColor" viewBox="0 0 18 18" id="SShowMenu18N-icon" width="18" height="18" aria-hidden="true" aria-label="" focusable="false"><rect fill-rule="evenodd" x="2" y="8" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="3" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="13" width="14" height="2" rx="0.5"></rect></svg>
+    <hr>
+    <span id="tabs">
+        <menu class="menubar">
+            <ul class="can-hover">
+                <li tabindex="0" aria-haspopup="true">File
+                    <ul>
+                        <li><a href="" onclick="">New...</a></li>
+                        <li><a href="" onclick="">Open...</a></li>
+                        <li><a href="" onclick="">Close</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Save</a></li>
+                        <li><a href="" onclick="">Save As...</a></li>
+                        <li><a href="" onclick="">Save As Web Page...</a></li>
+                        <li><a href="" onclick="">Search...</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Versions...</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Web Page Preview</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Page Setup...</a></li>
+                        <li><a href="" onclick="">Print Preview</a></li>
+                        <li><a href="" onclick="">Print...</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Send To
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Properties</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Recent Files
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <hr>
+                        <li><a href="" onclick="">Exit</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Edit
+                    <ul>
+                        <li><a href="" onclick="">Undo</a></li>
+                        <li><a href="" onclick="">Redo</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Cut</a></li>
+                        <li><a href="" onclick="">Copy</a></li>
+                        <li><a href="" onclick="">Office Clipboard</a></li>
+                        <li><a href="" onclick="">Paste</a></li>
+                        <li><a href="" onclick="">Paste Special</a></li>
+                        <li><a href="" onclick="">Paste as Hyperlink</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Clear
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Select All</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Find...</a></li>
+                        <li><a href="" onclick="">Replace...</a></li>
+                        <li><a href="" onclick="">Go To...</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Links</a></li>
+                        <li><a href="" onclick="">Object</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">View
+                    <ul>
+                        <li><a href="" onclick="">Normal</a></li>
+                        <li><a href="" onclick="">Web Layout</a></li>
+                        <li><a href="" onclick="">Print Layout</a></li>
+                        <li><a href="" onclick="">Outline</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Task Pane</a></li>
+                        <li tabindex="0" aria-haspopup="true">Toolbars
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Ruler</a></li>
+                        <li><a href="" onclick="">Document Map</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Header and Footer</a></li>
+                        <li><a href="" onclick="">Footnotes</a></li>
+                        <li><a href="" onclick="">Markup</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Full Screen</a></li>
+                        <li><a href="" onclick="">Zoom...</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Insert
+                    <ul>
+                        <li><a href="" onclick="">Break...</a></li>
+                        <li><a href="" onclick="">Page Numbers...</a></li>
+                        <li><a href="" onclick="">Date and Time...</a></li>
+                        <li tabindex="0" aria-haspopup="true">AutoText
+                            <ul>
+                                <li><a href="" onclick="">AutoText...</a></li>
+                                <li><a href="" onclick="">New...</a></li>
+                                <hr>
+                                <li tabindex="0" aria-haspopup="true">Attention Line
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Closing
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Header/Footer
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Mailing Instructions
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Reference Initials
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Reference Line
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Salutation
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Signature
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Signature Company
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                                <li tabindex="0" aria-haspopup="true">Subject Line
+                                    <ul>
+                                        <li><a href="" onclick="">Text</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Field...</a></li>
+                        <li><a href="" onclick="">Symbol...</a></li>
+                        <li><a href="" onclick="">Comment</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Reference
+                            <ul>
+                                <li><a href="" onclick="">Footnote...</a></li>
+                                <li><a href="" onclick="">Caption...</a></li>
+                                <li><a href="" onclick="">Cross-reference</a></li>
+                                <li><a href="" onclick="">Index and Tables...</a></li>
+                            </ul>
+                        </li>
+                        <hr>
+                        <li><a href="" onclick="">Picture</a></li>
+                        <li><a href="" onclick="">Diagram...</a></li>
+                        <li><a href="" onclick="">Text Box</a></li>
+                        <li><a href="" onclick="">File...</a></li>
+                        <li><a href="" onclick="">Object...</a></li>
+                        <li><a href="" onclick="">Bookmark...</a></li>
+                        <li><a href="" onclick="">Hyperlink...</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Format
+                    <ul>
+                        <li><a href="" onclick="">Font...</a></li>
+                        <li><a href="" onclick="">Paragraph...</a></li>
+                        <li><a href="" onclick="">Bullets and Numbering...</a></li>
+                        <li><a href="" onclick="">Borders and Shading...</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Columns...</a></li>
+                        <li><a href="" onclick="">Tabs...</a></li>
+                        <li><a href="" onclick="">Drop Cap...</a></li>
+                        <li><a href="" onclick="">Text Direction...</a></li>
+                        <li><a href="" onclick="">Change Case...</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Background
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Theme</a></li>
+                        <li tabindex="0" aria-haspopup="true">Frames
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">AutoFormat...</a></li>
+                        <li><a href="" onclick="">Styles and Formatting...</a></li>
+                        <li><a href="" onclick="">Reveal Formatting...</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Object...</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Tools
+                    <ul>
+                        <li><a href="" onclick="">Spelling and Grammar</a></li>
+                        <li tabindex="0" aria-haspopup="true">Language
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Word Count...</a></li>
+                        <li><a href="" onclick="">AutoSummarize...</a></li>
+                        <li><a href="" onclick="">Speech</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Track Changes</a></li>
+                        <li><a href="" onclick="">Copare and Merge Documents...</a></li>
+                        <li><a href="" onclick="">Protect Document...</a></li>
+                        <li tabindex="0" aria-haspopup="true">Online Collaboration
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Letters and Mailings
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Macro
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Templates and Add-ins...</a></li>
+                        <li><a href="" onclick="">AutoCorrect Options...</a></li>
+                        <li><a href="" onclick="">Customize...</a></li>
+                        <li><a href="" onclick="">Options...</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Table
+                    <ul>
+                        <li><a href="" onclick="">Draw Table</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Insert
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li tabindex="0" aria-haspopup="true">Delete
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li tabindex="0" aria-haspopup="true">Select
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Merge Cells</a></li>
+                        <li><a href="" onclick="">Split Cells...</a></li>
+                        <li><a href="" onclick="">Split Table</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Table AutoFormat...</a></li>
+                        <li tabindex="0" aria-haspopup="true">AutoFit
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Heading Rows Repeat</a></li>
+                        <hr>
+                        <li tabindex="0" aria-haspopup="true">Convert
+                            <ul>
+                                <li><a href="" onclick="">Text</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="" onclick="">Sort...</a></li>
+                        <li><a href="" onclick="">Formula...</a></li>
+                        <li><a href="" onclick="">Hide Gridlines</a></li>
+                        <hr>
+                        <li><a href="" onclick="">Table Properties...</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Window
+                    <ul>
+                        <li><a href="" onclick="">Text</a></li>
+                    </ul>
+                </li>
+                <li tabindex="0" aria-haspopup="true">Help
+                    <ul>
+                        <li><a href="" onclick="">About</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </menu>
+    </span>
+    <span>[ - ]</span>
+</nav>
+<main>
+    <span id="toolbar"></span>
+    <span id="main">
+        <!-- <menu>
+            <ul>
+                <li>New...</li>
+                <li>Open...</li>
+                <li>Save</li>
+                <li>Save as...</li>
+                <hr>
+                <li class="chevron">Edit</li>
+                <li class="chevron">Image</li>
+                <li class="chevron">Layer</li>
+                <li class="chevron">Select</li>
+                <li class="chevron">View</li>
+                <li class="chevron">Filter</li>
+                <hr>
+                <li>Export as...</li>
+                <hr>
+                <li>Import...</li>
+                <hr>
+                <li>Settings</li>
+            </ul>
+        </menu> -->
+    </span>
+    <span id="resizer"></span> <!-- Resizer handle -->
+    <span id="panel"></span>
+</main>
+
+<script lang="JavaScript" src="../_/js/app.js"></script>
+
+</body>
+</html>
