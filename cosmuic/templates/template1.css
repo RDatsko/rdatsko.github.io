@@ -719,11 +719,15 @@
 .chip.affiliate {
     block-size: 3.5rem;
     min-inline-size: 3.5rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
 }
 
 .chip.affiliate > .responsive {
     inline-size: 6.2rem;
     block-size: 3.5rem;
     margin-left: -0.5rem;
+}
+
+.chip.affiliate > img {
+    margin-top: 0;
 }
