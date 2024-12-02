@@ -1,0 +1,802 @@
+/* COSMUIC
+ * ===============
+ * A CSS template designed to make Material UI style elements with minimal use
+ * of classes and JavaScript when possible to create easy and professional
+ * looking websites. 
+ */
+
+ 
+/* Define variables for use in the CSS */
+
+:root {
+    /* stick to 60-30-(10 * 2) color rule */
+
+    /* color-scheme (choose one): only light, only dark, light dark */
+    /* color-scheme: only light; */
+    /* color-scheme: only dark; */
+    color-scheme:    light dark;
+
+    /* colors */
+    --primary:            light-dark(#ffffff,   #000000  );
+    --secondary:          light-dark(#c2c2c2,   #2c2c2c  );
+    --action-color:       light-dark(#0091ea,   #0091ea  );
+    --action-color-alpha: light-dark(#0091ea46, #0091ea46);
+    --action-text:        light-dark(#ffffff,   #ffffff  );
+    --font-color1:        light-dark(#000000,   #ffffff  );
+    --font-color2:        light-dark(#585858,   #858585  );
+    --elevate:            light-dark(#0000002c, #ffffff2c);
+
+    --font: "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system;
+
+    &:has(input[id="color-scheme"][value="light dark"]:checked) {
+      color-scheme: light dark;
+    }
+    &:has(input[id="color-scheme"][value="light"]:checked),
+    &:has(input[id="color-scheme"][type="checkbox"]) {
+      color-scheme: light;
+    }
+    &:has(input[id="color-scheme"][value="dark"]:checked),
+    &:has(input[id="color-scheme"][type="checkbox"]:checked) {
+      color-scheme: dark;
+    }
+}
+
+
+
+
+
+/* Navigation CSS Animations for when going to another page */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Move In-Out Animation */
+
+@keyframes page-move-out {
+    from {
+        transform: translateY(0%);
+    }
+ 
+    to {
+        transform: translateY(-100%);
+    }
+ }
+ 
+ @keyframes page-move-in {
+    from {
+        transform: translateY(100%);
+    }
+ 
+    to {
+        transform: translateY(0%);
+    }
+ }
+ 
+ html.move-out::view-transition-old(root) {
+    animation: 0.8s cubic-bezier(0.87, 0, 0.13, 1) both page-move-out;
+ }
+ 
+ html.move-in::view-transition-new(root) {
+    animation: 0.8s cubic-bezier(0.87, 0, 0.13, 1) both page-move-in;
+ }
+ 
+ /* Move In-Out Animation  End */
+ 
+ /* Filter Blur Zoom Animation */
+ 
+ @keyframes page-blur-out {
+     from {
+         filter: blur(0px);
+         transform: scale(1);
+         opacity: 1;
+     }
+  
+     to {
+         filter: blur(20px);
+         transform: scale(1.2);
+         opacity: 0;
+     }
+  }
+  
+  @keyframes page-blur-in {
+     from {
+         filter: blur(20px);
+         transform: scale(1.2);
+         opacity: 0;
+     }
+  
+     to {
+         filter: blur(0px);
+         transform: scale(1);
+         opacity: 1;
+     }
+ }
+ 
+ html.blur-out::view-transition-old(root) {
+     animation: 0.4s ease-out both page-blur-out;
+ }
+ 
+ html.blur-in::view-transition-new(root) {
+     animation: 0.4s ease-in both page-blur-in;
+ }
+ 
+ 
+ /* Filter Blur Zoom Animation End */
+ 
+ /* Yank Animation */
+ 
+ @keyframes page-yank-out {
+    from {
+        transform: translate(0,0);
+    }
+ 
+    to {
+        transform: translate(100%, -100%);
+    }
+ }
+ 
+ @keyframes page-yank-in {
+    from {
+        transform: translate(-100%, 100%);
+    }
+ 
+    to {
+        transform: translate(0,0);
+    }
+ }
+ 
+ html.yank-out::view-transition-old(root) {
+    animation: 1s cubic-bezier(0.68, -0.6, 0.32, 1.6) both page-yank-out;
+ }
+ 
+ html.yank-in::view-transition-new(root) {
+    animation: 1s cubic-bezier(0.68, -0.6, 0.32, 1.6) both page-yank-in;
+ }
+ 
+ /* Yank Animation End */
+ 
+ /* Pop Drop Animation */
+ 
+ @keyframes page-fall-back {
+    from {
+        scale: 1;
+    }
+ 
+    to {
+        scale: 0.8;
+    }
+ }
+ 
+ @keyframes page-drop-out {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+ 
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+ }
+ 
+ @keyframes page-pop-in {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+ 
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+ }
+ 
+ @keyframes page-come-in {
+    from {
+        scale: 0.8;
+    }
+ 
+    to {
+        scale: 1;
+    }
+ }
+ 
+ html.popdrop-out::view-transition-old(root) {
+    animation: 1s cubic-bezier(0.87, 0, 0.13, 1) both page-drop-out,
+    0.4s cubic-bezier(0.87, 0, 0.13, 1) both page-fall-back;
+ }
+ 
+ html.popdrop-in::view-transition-new(root) {
+    animation: 1s cubic-bezier(0.87, 0, 0.13, 1) both page-pop-in,
+    1.4s cubic-bezier(0.87, 0, 0.13, 1) both page-come-in;
+    animation-delay: 0.4s;
+ }
+ 
+ /* Pop Drop Animation End */
+ 
+ /* Side Swipe  Animation */
+ 
+ @keyframes page-fade-back {
+    from {
+        opacity: 1;
+        scale: 1;
+    }
+ 
+    to {
+        opacity: 0.5;
+        scale: 0.8;
+    }
+ }
+ 
+ @keyframes page-slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0.5;
+    }
+ 
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+ }
+ 
+ html.sideswipe-out::view-transition-old(root) {
+    animation: 1s cubic-bezier(0.87, 0, 0.13, 1) both page-fade-back;
+ }
+ 
+ html.sideswipe-in::view-transition-new(root) {
+    animation: 1s cubic-bezier(0.87, 0, 0.13, 1) both page-slide-in;
+ }
+ 
+ /* Side Swipe Animation End */
+
+
+
+
+
+
+/* element CSS designs */
+
+* {
+    font-family: var(--font);
+    color: var(--font-color1);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: var(--action-color);
+}
+
+a:after {
+    margin-top: 5px;
+    content: "";
+    display: block;
+    width: 0;
+    height: 2px;
+    -webkit-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    text-align: center;
+}
+
+a:hover::after {
+    width: 100%;
+    background: var(--action-color);
+}
+
+
+button, button.action1,
+a.button, a.button.action1 {
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 4px;
+    padding: 0 1rem;
+    margin: 0 .35rem;
+    min-width: 4rem;
+    height: 2.25rem;
+    vertical-align: middle;
+    text-align: center;
+    text-overflow: ellipsis;
+    color: var(--action-text);
+    background-color: var(--action-color);
+    box-shadow: 0 3px 1px -2px var(--elevate), 0 2px 2px 0 var(--elevate), 0 1px 5px 0 var(--elevate);
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow 0.2s;
+}
+
+button:hover,
+button:focus,
+a.button:hover,
+a.button:focus {
+    box-shadow: 0 2px 4px -1px var(--elevate), 0 4px 5px 0 var(--elevate), 0 1px 10px 0 var(--elevate);
+}
+
+/* Highlight, Ripple */
+button::before,
+button::after,
+a.button::before,
+a.button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    opacity: 0;
+}
+
+button::before {
+    /* background-color: rgb(var(--matter-helper-ontheme)); */
+    transition: opacity 0.2s;
+}
+
+button::after {
+    background: radial-gradient(circle at center, currentColor 1%, transparent 1%) center/10000% 10000% no-repeat;
+    transition: opacity 1s, background-size 0.5s;
+}
+
+/* Hover, Focus */
+button:hover,
+button:focus {
+    box-shadow: 0 2px 4px -1px var(--elevate), 0 4px 5px 0 var(--elevate), 0 1px 10px 0 var(--elevate);
+}
+
+button:hover::before {
+    opacity: 0.08;
+}
+
+button:focus::before {
+    opacity: 0.24;
+}
+
+button:hover:focus::before {
+    opacity: 0.32;
+}
+
+button.text {
+    
+}
+
+button.text {
+    color: var(--action-color);
+    background-color: transparent !important;
+}
+
+/* Highlight, Ripple */
+button.text::before,
+button.text::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    opacity: 0;
+}
+button.text::before {
+    /* background-color: rgb(var(--matter-helper-theme)); */
+    transition: opacity 0.2s;
+}
+button.text::after {
+    background: radial-gradient(circle at center, currentColor 1%, transparent 1%) center/10000% 10000% no-repeat;
+    transition: opacity 1s, background-size 0.5s;
+}
+/* Hover, Focus */
+button.text:hover::before {
+    opacity: 0.04;
+}
+button.text:focus::before {
+    opacity: 0.12;
+}
+button.text:hover:focus::before {
+    opacity: 0.16;
+}
+/* Active */
+button.text:active::after {
+    opacity: 0.16;
+    background-size: 100% 100%;
+    transition: background-size 0s;
+}
+/* Disabled */
+button.text:disabled {
+    color: var(--disabled-color);
+    background-color: transparent;
+    cursor: initial;
+}
+button.text:disabled::before,
+button.text:disabled::after {
+    opacity: 0;
+}
+
+button.unelevated,
+button.text {
+    box-shadow: none;
+}
+
+/* Highlight, Ripple */
+button.unelevated::before,
+button.unelevated::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    opacity: 0;
+}
+button.unelevated::before {
+    /* background-color: rgb(var(--matter-helper-ontheme)); */
+    transition: opacity 0.2s;
+}
+button.unelevated::after {
+    background: radial-gradient(circle at center, currentColor 1%, transparent 1%) center/10000% 10000% no-repeat;
+    transition: opacity 1s, background-size 0.5s;
+}
+
+/* Hover, Focus */
+button.unelevated:hover::before {
+    opacity: 0.08;
+}
+
+button.unelevated:focus::before {
+    opacity: 0.24;
+}
+
+button.unelevated:hover:focus::before {
+    opacity: 0.32;
+}
+
+/* Active */
+button.unelevated:active::after {
+    opacity: 0.32;
+    background-size: 100% 100%;
+    transition: background-size 0s;
+}
+
+button.outlined {
+    color: var(--action-color);
+    border: 1px solid var(--action-color);
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+/* Hover, Focus */
+button.outlined::before,
+button.outlined::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 3px;
+    opacity: 0;
+}
+button.outlined::before {
+    /* background-color: rgb(var(--matter-helper-theme)); */
+    transition: opacity 0.2s;
+}
+button.outlined::after {
+    background: radial-gradient(circle at center, currentColor 1%, transparent 1%) center/10000% 10000% no-repeat;
+    transition: opacity 1s, background-size 0.5s;
+}
+
+button.outlined:hover::before {
+    opacity: 0.04;
+}
+button.outlined:focus::before {
+    opacity: 0.12;
+}
+button.outlined:hover:focus::before {
+    opacity: 0.16;
+}
+
+/* Active */
+button.outlined:active::after {
+    opacity: 0.16;
+    background-size: 100% 100%;
+    transition: background-size 0s;
+}
+
+/* button.outlined:disabled {
+    color: var(--disabled-color);
+    border-color: var(--disabled-color);
+    background-color: var(--disabled-bgcolor);
+    cursor: initial;
+}
+
+button.outlined:disabled::before,
+button.outlined:disabled::after {
+    opacity: 0
+} */
+
+footer {
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 6rem;
+}
+
+h2 {
+    font-size: 3.75rem;
+}
+
+h3 {
+    font-size: 3rem;
+}
+
+h4 {
+    font-size: 2.125rem;
+}
+
+h5 {
+    font-size: 1.5rem;
+}
+
+h6 {
+    font-size: 1.25rem;
+}
+
+header {
+    width: 100%;
+    height: 64px;
+    background-color: var(--secondary);
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    justify-content: space-between;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+input[name="color-scheme"] {
+}
+
+input[name="color-scheme"]:checked {
+}
+
+/* Progress Circular */
+progress.circular {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 50%;
+    padding: 0.25em;
+    width: 3em;
+    height: 3em;
+    color: var(--action-color);
+    background-color: transparent;
+    font-size: 16px;
+    overflow: hidden;
+}
+progress.circular::-webkit-progress-bar {
+    background-color: transparent;
+}
+/* Indeterminate */
+progress.circular:indeterminate {
+    animation: progress-circular 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
+}
+:-ms-lang(x), progress.circular:indeterminate {
+    animation: none;
+}
+progress.circular:indeterminate::before,
+progress.circular:indeterminate::-webkit-progress-value {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 0.25em;
+    border: solid 0.25em currentColor;
+    border-radius: 50%;
+    width: 100% !important;
+    height: 100%;
+    background-color: transparent;
+    -webkit-clip-path: polygon(50% 50%, 37% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+    clip-path: polygon(50% 50%, 37% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+    animation: progress-circular-pseudo 0.75s infinite linear alternate;
+    animation-play-state: inherit;
+    animation-delay: inherit;
+}
+progress.circular:indeterminate::-moz-progress-bar {
+    box-sizing: border-box;
+    border: solid 0.25em currentColor;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    clip-path: polygon(50% 50%, 37% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+    animation: progress-circular-pseudo 0.75s infinite linear alternate;
+    animation-play-state: inherit;
+    animation-delay: inherit;
+}
+progress.circular:indeterminate::-ms-fill {
+    animation-name: -ms-ring;
+}
+@keyframes progress-circular {
+    0% {
+        transform: rotate(0deg);
+    }
+    12.5% {
+        transform: rotate(180deg);
+        animation-timing-function: linear;
+    }
+    25% {
+        transform: rotate(630deg);
+    }
+    37.5% {
+        transform: rotate(810deg);
+        animation-timing-function: linear;
+    }
+    50% {
+        transform: rotate(1260deg);
+    }
+    62.5% {
+        transform: rotate(1440deg);
+        animation-timing-function: linear;
+    }
+    75% {
+        transform: rotate(1890deg);
+    }
+    87.5% {
+        transform: rotate(2070deg);
+        animation-timing-function: linear;
+    }
+    100% {
+        transform: rotate(2520deg);
+    }
+}
+@keyframes progress-circular-pseudo {
+    0% {
+        -webkit-clip-path: polygon(50% 50%, 37% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+        clip-path: polygon(50% 50%, 37% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+    }
+    18% {
+        -webkit-clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 0, 100% 0, 100% 0);
+        clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 0, 100% 0, 100% 0);
+    }
+    53% {
+        -webkit-clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+        clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+    }
+    88% {
+        -webkit-clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+        clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+    }
+    100% {
+        -webkit-clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 0 100%, 0 63%);
+        clip-path: polygon(50% 50%, 37% 0, 100% 0, 100% 100%, 0 100%, 0 63%);
+    }
+}
+/* Progress Linear */
+progress.linear {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    width: 160px;
+    height: 4px;
+    vertical-align: middle;
+    color: var(--action-color);
+    background-color: var(--action-color-alpha);
+}
+progress.linear::-webkit-progress-bar {
+    background-color: transparent;
+}
+/* Determinate */
+progress.linear::-webkit-progress-value {
+    background-color: currentColor;
+    transition: all 0.2s;
+}
+progress.linear::-moz-progress-bar {
+    background-color: currentColor;
+    transition: all 0.2s;
+}
+progress.linear::-ms-fill {
+    border: none;
+    background-color: currentColor;
+    transition: all 0.2s;
+}
+/* Indeterminate */
+progress.linear:indeterminate {
+    background-size: 200% 100%;
+    background-image:
+        linear-gradient(to right, currentColor 16%, transparent 16%),
+        linear-gradient(to right, currentColor 16%, transparent 16%),
+        linear-gradient(to right, currentColor 25%, transparent 25%);
+    animation: progress-linear 1.8s infinite linear;
+}
+progress.linear:indeterminate::-webkit-progress-value {
+    background-color: transparent;
+}
+progress.linear:indeterminate::-moz-progress-bar {
+    background-color: transparent;
+}
+progress.linear:indeterminate::-ms-fill {
+    animation-name: none;
+}
+@keyframes progress-linear {
+    0% {
+        background-position: 32% 0, 32% 0, 50% 0;
+    }
+    2% {
+        background-position: 32% 0, 32% 0, 50% 0;
+    }
+    21% {
+        background-position: 32% 0, -18% 0, 0 0;
+    }
+    42% {
+        background-position: 32% 0, -68% 0, -27% 0;
+    }
+    50% {
+        background-position: 32% 0, -93% 0, -46% 0;
+    }
+    56% {
+        background-position: 32% 0, -118% 0, -68% 0;
+    }
+    66% {
+        background-position: -11% 0, -200% 0, -100% 0;
+    }
+    71% {
+        background-position: -32% 0, -200% 0, -100% 0;
+    }
+    79% {
+        background-position: -54% 0, -242% 0, -100% 0;
+    }
+    86% {
+        background-position: -68% 0, -268% 0, -100% 0;
+    }
+    100% {
+        background-position: -100% 0, -300% 0, -100% 0;
+    }
+}
+
+
+/* Combined elements */
+
+body > header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+body > header > span:first-child {
+    display: flex;
+}
+
+body > header > span:last-child {
+    display: flex;
+}
+
+body > header a {
+    padding: 0 .75rem;
+}
+
+body > header + main {
+    margin-top: 64px;
+}
+
+/* Custom designs and adjustments using CSS classes */
+
