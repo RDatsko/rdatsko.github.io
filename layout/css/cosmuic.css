@@ -12,9 +12,9 @@
     /* stick to 60-30-(10 * 2) color rule */
 
     /* color-scheme (choose one): only light, only dark, light dark */
-    /* color-scheme: only light; */
+    color-scheme: only light;
     /* color-scheme: only dark; */
-    color-scheme:    light dark;
+    /* color-scheme:    light dark; */
 
     /* colors */
     --primary:            light-dark(#ffffff,   #000000  );
