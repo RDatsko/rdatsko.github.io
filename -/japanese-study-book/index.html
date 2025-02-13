@@ -7,6 +7,7 @@
 <link rel="stylesheet" type="text/css" href="/layout/css/common.css">
 <link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="/layout/css/sm.css">
 <link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="/layout/css/lg.css">
+<link href='https://fonts.googleapis.com/css?family=Klee One' rel='stylesheet'>
 <script src="/layout/js/include.js"></script>
 <title>Document</title>
 <style>
@@ -149,6 +150,10 @@ div.sheet:nth-child(even) header img {
     }
 }
 
+body {
+    font-family: 'Klee One';
+}
+`
 </style>
 <style>@page { size: A5; }</style>
 </head>
@@ -173,8 +178,8 @@ div.sheet:nth-child(even) header img {
         flex-direction: column;
         justify-content: center;
         align-items: center;">
-        <h1>日本語</h1>
-        学  習  書
+        <h1 style="border-bottom: 3px solid black;">日本語</h1>
+        <h4>学  習  書</h4>
     </div>
     <div style="position: absolute; top: 175mm; left: 65mm; width: 75mm; height: 20mm; line-height: 8mm;">
         <sup style="display: inline-block; width: 15mm;">Name:</sup><span contenteditable="true">First Last</span><br>
