@@ -27,6 +27,12 @@ header nav > ul li {
   line-height: 56px;
   display: flex;
   flex: none;
+  align-items: center;
+}
+
+header nav > ul li label {
+    line-height: 1rem;
+    margin-bottom: 5px;
 }
 
 header nav > ul li:hover {
