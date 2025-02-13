@@ -61,15 +61,15 @@ body.legal.landscape  .sheet { width: 357mm; height: 215mm; }
     body.legal.landscape       { width: 357mm; }
 }
 
-body > .sheet:nth-child(odd) {
+body > .sheet:nth-child(even) {
     padding-left: 20mm;
 }
 
-body > .sheet:nth-child(even) {
+body > .sheet:nth-child(odd) {
     padding-right: 20mm;    
 }
 
-div.sheet:nth-child(odd) {
+div.sheet:nth-child(even) {
   position: relative;
   background:
     repeating-linear-gradient(
@@ -87,7 +87,7 @@ div.sheet:nth-child(odd) {
     linear-gradient(#616161, #020202) 15% calc(2% + 5px) / 60% 100% no-repeat;
 }
 
-div.sheet:nth-child(even) {
+div.sheet:nth-child(odd) {
   position: relative;
   background:
     repeating-linear-gradient(
