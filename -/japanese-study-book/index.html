@@ -254,8 +254,7 @@ div.sheet:nth-child(even) header img {
         overflow: unset;  
     }
 
-    body > header,
-    .ribbon {
+    .no-print {
         display: none !important;
     }
 }
@@ -265,7 +264,7 @@ div.sheet:nth-child(even) header img {
 </head>
 <body class="A5">
 
-<header>
+<header class="no-print">
     <input id="hamburger" class="hamburger" type="checkbox" />
     <label for="hamburger" class="hamburger"><i></i></label>
     <span>
@@ -275,7 +274,7 @@ div.sheet:nth-child(even) header img {
 </header>
 
 <div class="sheet padding-5mm" style="overflow: visible;">
-    <div class="ribbon down" style="--color: #2b92d6;">
+    <div class="ribbon down no-print" style="--color: #2b92d6;">
         <div class="content">
             Designed<br>for<br>page size<br><h3>A5</h3><br>
         </div>
