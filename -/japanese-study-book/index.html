@@ -162,11 +162,20 @@ div.sheet > header * {
     font-size: 13pt;
 }
 
+
 ruby {
-    ruby-align: center;
+    /* ruby-align: center; */
     display: inline-flex;
     align-items: center;
-    flex-direction: column-reverse
+    flex-direction: column-reverse;
+    white-space: nowrap;
+    position: relative;
+}
+
+@media print {
+    ruby {
+        top: -2.5pt;
+    }
 }
 
 div.sheet > header rt {
@@ -174,6 +183,11 @@ div.sheet > header rt {
     display: inline-flex;
     position: absolute;
     top: -4pt;
+}
+
+ruby, rt {
+    letter-spacing: 0;
+    word-spacing: 0;
 }
 
 div.sheet p {
