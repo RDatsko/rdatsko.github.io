@@ -129,12 +129,18 @@ div.sheet header img {
 
 div.sheet header > span {
     position: absolute;
-    top: 5mm;
+    top: 8mm;
     width: 55mm;
     height: 10mm;
     z-index: 100;
     display: flex;
     justify-content: space-between;
+}
+
+@media print {
+    div.sheet header > span {
+        top: 10mm;
+    }
 }
 
 div.sheet header > span > span {
