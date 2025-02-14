@@ -11,6 +11,7 @@
 <script src="/layout/js/include.js"></script>
 <title>Document</title>
 <style>
+
 @page { margin: 0; }
 body  { margin: 0; }
 .sheet {
@@ -52,7 +53,7 @@ body.legal.landscape  .sheet { width: 357mm; height: 215mm; }
 
 /** Fix for Chrome issue #273306 **/
 @media print {
-                body.A3.landscape { width: 420mm; }
+             body.A3.landscape { width: 420mm; }
     body.A3, body.A4.landscape { width: 297mm; }
     body.A4, body.A5.landscape { width: 210mm; }
     body.A5                    { width: 148mm; }
@@ -72,16 +73,16 @@ body > .sheet:nth-child(odd) {
 }
 
 div.sheet:nth-child(even) {
-    position: relative;
-    background:
+  position: relative;
+  background:
     repeating-linear-gradient(
-        #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-        transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-        #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
+      #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
+      transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
+      #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
     ) left calc(4% + 5px) / 5.5% 100% no-repeat, /* Shifted down by 10px */
 
     repeating-linear-gradient(
-        #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
+      #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
     ) 5% calc(6% + 5px) / 2% 100% no-repeat, /* Shifted down by 10px */
 
     linear-gradient(#ffffff, #ffffff) left 0% / 100% 100% no-repeat,
@@ -90,16 +91,16 @@ div.sheet:nth-child(even) {
 }
 
 div.sheet:nth-child(odd) {
-    position: relative;
-    background:
+  position: relative;
+  background:
     repeating-linear-gradient(
-        #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-        transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-        #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
+      #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
+      transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
+      #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
     ) right calc(4% + 5px) / 5.5% 100% no-repeat,
 
     repeating-linear-gradient(
-        #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
+      #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
     ) 95% calc(6% + 5px) / 2% 100% no-repeat,
 
     linear-gradient(#ffffff, #ffffff) right 0% / 100% 100% no-repeat,
@@ -161,7 +162,6 @@ div.sheet * {
 div.sheet > header * {
     font-size: 13pt;
 }
-
 
 ruby {
     /* ruby-align: center; */
@@ -302,15 +302,15 @@ div.sheet:nth-child(odd) header img {
 }
 
 .toc-list, .toc-list ol {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .toc-list {
-    padding: 0;
+  padding: 0;
 }
 
 .toc-list ol {
-    padding-inline-start: 2ch;
+  padding-inline-start: 2ch;
 }
 
 .toc-list > li {
@@ -318,8 +318,8 @@ div.sheet:nth-child(odd) header img {
 }
 
 .toc-list > li > a {
-    font-weight: bold;
-    /* margin-block-start: 1em; */
+  font-weight: bold;
+  /* margin-block-start: 1em; */
 }
 
 .toc-list li > a {
@@ -372,7 +372,7 @@ div.sheet:nth-child(odd) header img {
 @media print {
     body {
         padding-top: 0;     
-        overflow: unset;  
+        overflow: unset;
     }
 
     .no-print {
@@ -524,7 +524,9 @@ div.sheet:nth-child(odd) header img {
         <img>
         <span>
             <span>Numbers</span>
-            <span><ruby>数<rt>すう</rt></ruby><ruby>字<rt>じ</rt></ruby></span>
+            <span>
+                <ruby>数<rt>すう</rt></ruby><ruby>字<rt>じ</rt></ruby>
+            </span>
         </span>
     </header>
     Some Text.
@@ -547,11 +549,7 @@ div.sheet:nth-child(odd) header img {
         <span>
             <span>Date &amp; Time</span>
             <span>
-                <ruby>日<rt>ひ</rt></ruby>
-                <ruby>付<rt>づけ</rt></ruby>
-                と
-                <ruby>時<rt>じ</rt></ruby>
-                <ruby>間<rt>かん</rt></ruby>
+                <ruby>日<rt>ひ</rt></ruby><ruby>付<rt>づけ</rt></ruby>と<ruby>時<rt>じ</rt></ruby><ruby>間<rt>かん</rt></ruby>
             </span>
         </span>
     </header>
