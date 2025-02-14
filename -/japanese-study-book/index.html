@@ -12,6 +12,7 @@
 <title>Document</title>
 <style>
 
+
 @page { margin: 0; }
 body  { margin: 0; }
 .sheet {
@@ -72,40 +73,42 @@ body > .sheet:nth-child(odd) {
     padding-top: 20mm;
 }
 
-div.sheet:nth-child(even) {
-  position: relative;
-  background:
-    repeating-linear-gradient(
-      #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-      transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-      #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
-    ) left calc(4% + 5px) / 5.5% 100% no-repeat, /* Shifted down by 10px */
+@media screen {
+    div.sheet:nth-child(even) {
+        position: relative;
+        background:
+            repeating-linear-gradient(
+            #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
+            transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
+            #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
+            ) left calc(4% + 5px) / 5.5% 100% no-repeat, /* Shifted down by 10px */
 
-    repeating-linear-gradient(
-      #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
-    ) 5% calc(6% + 5px) / 2% 100% no-repeat, /* Shifted down by 10px */
+            repeating-linear-gradient(
+            #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
+            ) 5% calc(6% + 5px) / 2% 100% no-repeat, /* Shifted down by 10px */
 
-    linear-gradient(#ffffff, #ffffff) left 0% / 100% 100% no-repeat,
+            linear-gradient(#ffffff, #ffffff) left 0% / 100% 100% no-repeat,
 
-    linear-gradient(#616161, #020202) 15% calc(2% + 5px) / 60% 100% no-repeat;
-}
+            linear-gradient(#616161, #020202) 15% calc(2% + 5px) / 60% 100% no-repeat;
+    }
 
-div.sheet:nth-child(odd) {
-  position: relative;
-  background:
-    repeating-linear-gradient(
-      #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-      transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-      #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
-    ) right calc(4% + 5px) / 5.5% 100% no-repeat,
+    div.sheet:nth-child(odd) {
+        position: relative;
+        background:
+            repeating-linear-gradient(
+            #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
+            transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
+            #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
+            ) right calc(4% + 5px) / 5.5% 100% no-repeat,
 
-    repeating-linear-gradient(
-      #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
-    ) 95% calc(6% + 5px) / 2% 100% no-repeat,
+            repeating-linear-gradient(
+            #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
+            ) 95% calc(6% + 5px) / 2% 100% no-repeat,
 
-    linear-gradient(#ffffff, #ffffff) right 0% / 100% 100% no-repeat,
+            linear-gradient(#ffffff, #ffffff) right 0% / 100% 100% no-repeat,
 
-    linear-gradient(#616161, #020202) 85% calc(2% + 10px) / 60% 100% no-repeat;
+            linear-gradient(#616161, #020202) 85% calc(2% + 10px) / 60% 100% no-repeat;
+    }
 }
 
 img.full {
@@ -159,10 +162,16 @@ div.sheet:nth-child(even) header > span {
     background: black !important;
 }
 
-div.sheet *,
 div.sheet * {
-    font-family: 'Klee One';
+    font-family: 'Klee One', serif;
+    font-weight: 400;
+    font-style: normal;
     font-size: 10pt;
+}
+
+div.sheet b,
+div.sheet .kanachart * {
+  font-weight: 600;
 }
 
 div.sheet > header * {
@@ -316,6 +325,81 @@ div.sheet:nth-child(odd) header img {
     text-shadow: -0.15pt 0, 0 0.15pt, 0.15pt 0, 0 -0.15pt, -0.15pt -0.15pt, 0.15pt 0.15pt, -0.15pt 0.15pt, 0.15pt -0.15pt;
 }
 
+div.sheet .kanachart {
+    margin-top: 2mm;
+    /* border-collapse: collapse; */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+div.sheet .kanachart td {
+    text-align: center;
+    font-size: 13pt;
+}
+
+div.sheet .kanachart .n {
+    width: 6mm;
+}
+
+div.sheet .kanachart .w {
+    width: 11mm;
+}
+
+div.sheet .kanachart .k,
+div.sheet .kanachart .r {
+    background-color: white;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+div.sheet .kanachart .k {
+    height: 7mm;
+    border-top: 1px solid black;
+    line-height: .8;
+}
+
+div.sheet .kanachart .r {
+    border-top: 1px dotted black;
+    border-bottom: 1px solid black;
+    font-size: 8pt;
+    line-height: 2mm;
+    height: 4mm;
+}
+
+div.sheet .kanachart .b {
+    background-color: #2b92d6;
+    color: white;
+}
+
+div.sheet .kanachart .c {
+    color: #CC0000;
+}
+
+div.sheet .kanachart .s {
+    width: 2mm;
+    height: 2mm;
+}
+
+div.sheet .kanachart .y {
+    border-right: 2px solid yellow;
+}
+
+div.sheet .kanachart .t {
+    color: white;
+    line-height: 1rem;
+}
+
+div.sheet .kanachart .t span {
+    color: white;
+    font-size: 8pt;
+}
+
+div.sheet .kanachart .va {
+    transform: scale(.65, 1);
+    color: #CC0000;
+}
+
+
 
 
 
@@ -328,6 +412,11 @@ div.sheet:nth-child(odd) header img {
 
     .no-print {
         display: none !important;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important; /*Chrome, Safari */
+        color-adjust: exact !important;  /*Firefox*/
     }
 }
 
@@ -405,7 +494,746 @@ div.sheet:nth-child(odd) header img {
             <span>カナ</span>
         </span>
     </header>
-    Some Text.
+    <table class="kanachart">
+        <tr>
+            <td class="k n">あ</td>
+            <td class="k n">い</td>
+            <td class="k n">う</td>
+            <td class="k n">え</td>
+            <td class="k n">お</td>
+            <td class="s"></td>
+            <td class="t" colspan="3" rowspan="2">Hiragana<br><span>(ひらがな)</span></td>
+            <td class="s y"></td>
+            <td class="s"></td>
+            <td class="k n">ア</td>
+            <td class="k n">イ</td>
+            <td class="k n">ウ</td>
+            <td class="k n">エ</td>
+            <td class="k n">オ</td>
+            <td class="s"></td>
+            <td class="t" colspan="3" rowspan="2">Katakana<br><span>(カタカナ)</span></td>
+        </tr>
+        <tr>
+            <td class="r">a</td>
+            <td class="r">i</td>
+            <td class="r">u</td>
+            <td class="r">e</td>
+            <td class="r">o</td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">a</td>
+            <td class="r">i</td>
+            <td class="r">u</td>
+            <td class="r">e</td>
+            <td class="r">o</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="k">か</td>
+            <td class="k">き</td>
+            <td class="k">く</td>
+            <td class="k">け</td>
+            <td class="k">こ</td>
+            <td></td>
+            <td class="k w">きゃ</td>
+            <td class="k w">きゅ</td>
+            <td class="k w">きょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">カ</td>
+            <td class="k">キ</td>
+            <td class="k">ク</td>
+            <td class="k">ケ</td>
+            <td class="k">コ</td>
+            <td></td>
+            <td class="k w">キャ</td>
+            <td class="k w">キュ</td>
+            <td class="k w">キョ</td>
+        </tr>
+        <tr>
+            <td class="r">ka</td>
+            <td class="r">ki</td>
+            <td class="r">ku</td>
+            <td class="r">ke</td>
+            <td class="r">ko</td>
+            <td></td>
+            <td class="r">kya</td>
+            <td class="r">kyu</td>
+            <td class="r">kyo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ka</td>
+            <td class="r">ki</td>
+            <td class="r">ku</td>
+            <td class="r">ke</td>
+            <td class="r">ko</td>
+            <td></td>
+            <td class="r">ya</td>
+            <td class="r">yu</td>
+            <td class="r">yo</td>
+        </tr>
+        <tr>
+            <td class="k">さ</td>
+            <td class="k">し</td>
+            <td class="k">す</td>
+            <td class="k">せ</td>
+            <td class="k">そ</td>
+            <td></td>
+            <td class="k">しゃ</td>
+            <td class="k">しゅ</td>
+            <td class="k">しょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">サ</td>
+            <td class="k">シ</td>
+            <td class="k">ス</td>
+            <td class="k">セ</td>
+            <td class="k">ソ</td>
+            <td></td>
+            <td class="k">シャ</td>
+            <td class="k">シュ</td>
+            <td class="k">ショ</td>
+        </tr>
+        <tr>
+            <td class="r">sa</td>
+            <td class="r b">shi</td>
+            <td class="r">su</td>
+            <td class="r">se</td>
+            <td class="r">so</td>
+            <td></td>
+            <td class="r b">sha</td>
+            <td class="r b">shu</td>
+            <td class="r b">sho</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">sa</td>
+            <td class="r b">shi</td>
+            <td class="r">su</td>
+            <td class="r">se</td>
+            <td class="r">so</td>
+            <td></td>
+            <td class="r b">sha</td>
+            <td class="r b">shi</td>
+            <td class="r b">sho</td>
+        </tr>
+        <tr>
+            <td class="k">た</td>
+            <td class="k">ち</td>
+            <td class="k">つ</td>
+            <td class="k">て</td>
+            <td class="k">と</td>
+            <td></td>
+            <td class="k">ちゃ</td>
+            <td class="k">ちゅ</td>
+            <td class="k">ちょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">タ</td>
+            <td class="k">チ</td>
+            <td class="k">ツ</td>
+            <td class="k">テ</td>
+            <td class="k">ト</td>
+            <td></td>
+            <td class="k">ャ</td>
+            <td class="k">ュ</td>
+            <td class="k">ョ</td>
+        </tr>
+        <tr>
+            <td class="r">ta</td>
+            <td class="r b">chi</td>
+            <td class="r b">tsu</td>
+            <td class="r">te</td>
+            <td class="r">to</td>
+            <td></td>
+            <td class="r b">cha</td>
+            <td class="r b">chu</td>
+            <td class="r b">cho</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ta</td>
+            <td class="r b">chi</td>
+            <td class="r b">tsu</td>
+            <td class="r">te</td>
+            <td class="r">to</td>
+            <td></td>
+            <td class="r b">cha</td>
+            <td class="r b">chu</td>
+            <td class="r b">cho</td>
+        </tr>
+        <tr>
+            <td class="k">な</td>
+            <td class="k">に</td>
+            <td class="k">ぬ</td>
+            <td class="k">ね</td>
+            <td class="k">の</td>
+            <td></td>
+            <td class="k">にゃ</td>
+            <td class="k">にゅ</td>
+            <td class="k">にょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ナ</td>
+            <td class="k">ニ</td>
+            <td class="k">ヌ</td>
+            <td class="k">ネ</td>
+            <td class="k">ノ</td>
+            <td></td>
+            <td class="k">ニャ</td>
+            <td class="k">ニュ</td>
+            <td class="k">ニョ</td>
+        </tr>
+        <tr>
+            <td class="r">na</td>
+            <td class="r">ni</td>
+            <td class="r">nu</td>
+            <td class="r">ne</td>
+            <td class="r">no</td>
+            <td></td>
+            <td class="r">nya</td>
+            <td class="r">nyu</td>
+            <td class="r">nyo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">na</td>
+            <td class="r">ni</td>
+            <td class="r">nu</td>
+            <td class="r">ne</td>
+            <td class="r">no</td>
+            <td></td>
+            <td class="r">nya</td>
+            <td class="r">nyu</td>
+            <td class="r">nyo</td>
+        </tr>
+        <tr>
+            <td class="k">は</td>
+            <td class="k">ひ</td>
+            <td class="k">ふ</td>
+            <td class="k">へ</td>
+            <td class="k">ほ</td>
+            <td></td>
+            <td class="k">ひゃ</td>
+            <td class="k">ひゅ</td>
+            <td class="k">ひょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ハ</td>
+            <td class="k">ヒ</td>
+            <td class="k">フ</td>
+            <td class="k">ヘ</td>
+            <td class="k">ホ</td>
+            <td></td>
+            <td class="k">ヒャ</td>
+            <td class="k">ヒュ</td>
+            <td class="k">ヒョ</td>
+        </tr>
+        <tr>
+            <td class="r">ha</td>
+            <td class="r">hi</td>
+            <td class="r b">fu</td>
+            <td class="r">he</td>
+            <td class="r">ho</td>
+            <td></td>
+            <td class="r">hya</td>
+            <td class="r">hyu</td>
+            <td class="r">hyo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ha</td>
+            <td class="r">hi</td>
+            <td class="r b">fu</td>
+            <td class="r">he</td>
+            <td class="r">ho</td>
+            <td></td>
+            <td class="r">hya</td>
+            <td class="r">hyu</td>
+            <td class="r">hyo</td>
+        </tr>
+        <tr>
+            <td class="k">ま</td>
+            <td class="k">み</td>
+            <td class="k">む</td>
+            <td class="k">め</td>
+            <td class="k">も</td>
+            <td></td>
+            <td class="k">みゃ</td>
+            <td class="k">みゅ</td>
+            <td class="k">みょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">マ</td>
+            <td class="k">ミ</td>
+            <td class="k">ム</td>
+            <td class="k">メ</td>
+            <td class="k">モ</td>
+            <td></td>
+            <td class="k">ミャ</td>
+            <td class="k">ミュ</td>
+            <td class="k">ミョ</td>
+        </tr>
+        <tr>
+            <td class="r">ma</td>
+            <td class="r">mi</td>
+            <td class="r">mu</td>
+            <td class="r">me</td>
+            <td class="r">mo</td>
+            <td></td>
+            <td class="r">mya</td>
+            <td class="r">myu</td>
+            <td class="r">myo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ma</td>
+            <td class="r">mi</td>
+            <td class="r">mu</td>
+            <td class="r">me</td>
+            <td class="r">mo</td>
+            <td></td>
+            <td class="r">mya</td>
+            <td class="r">myu</td>
+            <td class="r">myo</td>
+        </tr>
+        <tr>
+            <td class="k">や</td>
+            <td></td>
+            <td class="k">ゆ</td>
+            <td></td>
+            <td class="k">よ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ヤ</td>
+            <td></td>
+            <td class="k">ユ</td>
+            <td></td>
+            <td class="k">ヨ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="r">ya</td>
+            <td></td>
+            <td class="r">yu</td>
+            <td></td>
+            <td class="r">yo</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ya</td>
+            <td></td>
+            <td class="r">yu</td>
+            <td></td>
+            <td class="r">yo</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="k">ら</td>
+            <td class="k">り</td>
+            <td class="k">る</td>
+            <td class="k">れ</td>
+            <td class="k">ろ</td>
+            <td></td>
+            <td class="k">りゃ</td>
+            <td class="k">りゅ</td>
+            <td class="k">りょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ラ</td>
+            <td class="k">リ</td>
+            <td class="k">ル</td>
+            <td class="k">レ</td>
+            <td class="k">ロ</td>
+            <td></td>
+            <td class="k">リャ</td>
+            <td class="k">リュ</td>
+            <td class="k">リョ</td>
+        </tr>
+        <tr>
+            <td class="r">ra</td>
+            <td class="r">ri</td>
+            <td class="r">ru</td>
+            <td class="r">re</td>
+            <td class="r">ro</td>
+            <td></td>
+            <td class="r">rya</td>
+            <td class="r">ryu</td>
+            <td class="r">ryo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ra</td>
+            <td class="r">ri</td>
+            <td class="r">ru</td>
+            <td class="r">re</td>
+            <td class="r">ro</td>
+            <td></td>
+            <td class="r">rya</td>
+            <td class="r">ryu</td>
+            <td class="r">ryo</td>
+        </tr>
+        <tr>
+            <td class="k">わ</td>
+            <td></td>
+            <td class="k">ん</td>
+            <td class="k c">ゑ</td>
+            <td class="k">を</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ワ</td>
+            <td class="k c">ヰ</td>
+            <td class="k">ン</td>
+            <td class="k c">ヱ</td>
+            <td class="k">ヲ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="r">wa</td>
+            <td></td>
+            <td class="r">n</td>
+            <td class="r c">we</td>
+            <td class="r">wo</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">wa</td>
+            <td class="r c">wi</td>
+            <td class="r">n</td>
+            <td class="r c">we</td>
+            <td class="r">wo</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="s"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k c"><span class="va">ｳﾞｧ</span></td>
+            <td class="k c">ヸ</td>
+            <td class="k c">ヴ</td>
+            <td class="k c">ヹ</td>
+            <td class="k c">ヹ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r c">va</td>
+            <td class="r c">vi</td>
+            <td class="r c">vu</td>
+            <td class="r c">ve</td>
+            <td class="r c">vo</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="s"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="k">が</td>
+            <td class="k">ぎ</td>
+            <td class="k">ぐ</td>
+            <td class="k">げ</td>
+            <td class="k">ご</td>
+            <td></td>
+            <td class="k">ぎゃ</td>
+            <td class="k">ぎゅ</td>
+            <td class="k">ぎょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ガ</td>
+            <td class="k">ギ</td>
+            <td class="k">グ</td>
+            <td class="k">ゲ</td>
+            <td class="k">ゴ</td>
+            <td></td>
+            <td class="k">ギャ</td>
+            <td class="k">ギュ</td>
+            <td class="k">ギョ</td>
+        </tr>
+        <tr>
+            <td class="r">ga</td>
+            <td class="r">gi</td>
+            <td class="r">gu</td>
+            <td class="r">ge</td>
+            <td class="r">go</td>
+            <td></td>
+            <td class="r">gya</td>
+            <td class="r">gyu</td>
+            <td class="r">gyo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ga</td>
+            <td class="r">gi</td>
+            <td class="r">gu</td>
+            <td class="r">ge</td>
+            <td class="r">go</td>
+            <td></td>
+            <td class="r">gya</td>
+            <td class="r">gyu</td>
+            <td class="r">gyo</td>
+        </tr>
+        <tr>
+            <td class="k">ざ</td>
+            <td class="k">じ</td>
+            <td class="k">ず</td>
+            <td class="k">ぜ</td>
+            <td class="k">ぞ</td>
+            <td></td>
+            <td class="k">じゃ</td>
+            <td class="k">じゅ</td>
+            <td class="k">じょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ザ</td>
+            <td class="k">ジ</td>
+            <td class="k">ズ</td>
+            <td class="k">ゼ</td>
+            <td class="k">ゾ</td>
+            <td></td>
+            <td class="k">ジャ</td>
+            <td class="k">ジュ</td>
+            <td class="k">ジョ</td>
+        </tr>
+        <tr>
+            <td class="r">za</td>
+            <td class="r b">ji</td>
+            <td class="r">zu</td>
+            <td class="r">ze</td>
+            <td class="r">zo</td>
+            <td></td>
+            <td class="r b">ja</td>
+            <td class="r b">ju</td>
+            <td class="r b">jo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">za</td>
+            <td class="r b">ji</td>
+            <td class="r">zu</td>
+            <td class="r">ze</td>
+            <td class="r">zo</td>
+            <td></td>
+            <td class="r b">ja</td>
+            <td class="r b">ju</td>
+            <td class="r b">jo</td>
+        </tr>
+        <tr>
+            <td class="k">だ</td>
+            <td class="k">ぢ</td>
+            <td class="k">づ</td>
+            <td class="k">で</td>
+            <td class="k">ど</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">ダ</td>
+            <td class="k">ヂ</td>
+            <td class="k">ヅ</td>
+            <td class="k">デ</td>
+            <td class="k">ド</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="r">da</td>
+            <td class="r b">ji</td>
+            <td class="r b">zu</td>
+            <td class="r">de</td>
+            <td class="r">do</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">da</td>
+            <td class="r b">ji</td>
+            <td class="r b">zu</td>
+            <td class="r">de</td>
+            <td class="r">do</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="s"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="y"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="k">ば</td>
+            <td class="k">び</td>
+            <td class="k">ぶ</td>
+            <td class="k">べ</td>
+            <td class="k">ぼ</td>
+            <td></td>
+            <td class="k">びゃ</td>
+            <td class="k">びゅ</td>
+            <td class="k">びょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">バ</td>
+            <td class="k">ビ</td>
+            <td class="k">ブ</td>
+            <td class="k">ベ</td>
+            <td class="k">ボ</td>
+            <td></td>
+            <td class="k">ビャ</td>
+            <td class="k">ビュ</td>
+            <td class="k">ビョ</td>
+        </tr>
+        <tr>
+            <td class="r">ba</td>
+            <td class="r">bi</td>
+            <td class="r">bu</td>
+            <td class="r">be</td>
+            <td class="r">bo</td>
+            <td></td>
+            <td class="r">bya</td>
+            <td class="r">byu</td>
+            <td class="r">byo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">ba</td>
+            <td class="r">bi</td>
+            <td class="r">bu</td>
+            <td class="r">be</td>
+            <td class="r">bo</td>
+            <td></td>
+            <td class="r">bya</td>
+            <td class="r">byu</td>
+            <td class="r">byo</td>
+        </tr>
+        <tr>
+            <td class="k">ぱ</td>
+            <td class="k">ぴ</td>
+            <td class="k">ぷ</td>
+            <td class="k">ぺ</td>
+            <td class="k">ぽ</td>
+            <td></td>
+            <td class="k">ぴゃ</td>
+            <td class="k">ぴゅ</td>
+            <td class="k">ぴょ</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="k">パ</td>
+            <td class="k">ピ</td>
+            <td class="k">プ</td>
+            <td class="k">ペ</td>
+            <td class="k">ポ</td>
+            <td></td>
+            <td class="k">ピャ</td>
+            <td class="k">ピュ</td>
+            <td class="k">ピョ</td>
+        </tr>
+        <tr>
+            <td class="r">pa</td>
+            <td class="r">pi</td>
+            <td class="r">pu</td>
+            <td class="r">pe</td>
+            <td class="r">po</td>
+            <td></td>
+            <td class="r">pya</td>
+            <td class="r">pyu</td>
+            <td class="r">pyo</td>
+            <td class="y"></td>
+            <td></td>
+            <td class="r">pa</td>
+            <td class="r">pi</td>
+            <td class="r">pu</td>
+            <td class="r">pe</td>
+            <td class="r">po</td>
+            <td></td>
+            <td class="r">pya</td>
+            <td class="r">pyu</td>
+            <td class="r">pyo</td>
+        </tr>
+    </table>
 </div>
 
 
