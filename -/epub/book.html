@@ -23,6 +23,9 @@ div.sheet > header { box-shadow: none; }
 @media screen {
     #epub-viewer {
         margin-top: 75px;
+        width: auto;
+        display: flex;
+        flex-direction: column;
     }
 }
 
@@ -43,7 +46,7 @@ div.sheet > header { box-shadow: none; }
             box-shadow: none;
     }
 
-    .no-print {
+    .no-print, .page-mkr {
         display: none !important;
     }
 
@@ -51,6 +54,32 @@ div.sheet > header { box-shadow: none; }
         -webkit-print-color-adjust: exact !important; /*Chrome, Safari */
         color-adjust: exact !important;  /*Firefox*/
     }
+}
+
+.page-mkr {
+    width: 25px;
+    height: 25px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px 10px 10px 10px;
+    margin: 15px;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+}
+
+.page-mkr::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #333 transparent transparent;
 }
 
 .debug {
@@ -118,6 +147,7 @@ div.sheet > header { box-shadow: none; }
 <script>
 // Get the query parameters from the current URL
 const params = new URLSearchParams(window.location.search);
+let pageCounter = 1;
 
 // Get the book path from the query string (e.g., ?book=/book.epub)
 const bookPath = params.get('book');
@@ -183,8 +213,8 @@ async function processEPUB(zipContents) {
     for (const cssFile of stylesheets) {
         const cssPath = opfBasePath + cssFile;
         if (zipContents.files[cssPath]) {
-        const cssContent = await zipContents.file(cssPath).async("text");
-        styles += cssContent + "\n";
+            const cssContent = await zipContents.file(cssPath).async("text");
+            styles += cssContent + "\n";
         }
     }
 
@@ -198,25 +228,25 @@ async function processEPUB(zipContents) {
     for (const imagePath of images) {
         const fullImagePath = opfBasePath + imagePath;
         if (zipContents.files[fullImagePath]) {
-        const imageData = await zipContents.file(fullImagePath).async("base64");
+            const imageData = await zipContents.file(fullImagePath).async("base64");
 
-        // Get the file extension and MIME type
-        const ext = fullImagePath.split('.').pop().toLowerCase();
-        const mimeType = ext === "png" ? "image/png" :
-                            ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-                            ext === "gif" ? "image/gif" :
-                            ext === "svg" ? "image/svg+xml" : "application/octet-stream";
+            // Get the file extension and MIME type
+            const ext = fullImagePath.split('.').pop().toLowerCase();
+            const mimeType = ext === "png" ? "image/png" :
+                                ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
+                                ext === "gif" ? "image/gif" :
+                                ext === "svg" ? "image/svg+xml" : "application/octet-stream";
 
-        const dataURI = `data:${mimeType};base64,${imageData}`;
+            const dataURI = `data:${mimeType};base64,${imageData}`;
 
-        // Generate CSS class name from the image path
-        const cssClass = "img-" + fullImagePath.replace(/\//g, "_").replace(/\./g, "-");
+            // Generate CSS class name from the image path
+            const cssClass = "img-" + fullImagePath.replace(/\//g, "_").replace(/\./g, "-");
 
-        // Add CSS rule
-        styles += `.${cssClass} { content: url(${dataURI}); }\n`;
+            // Add CSS rule
+            styles += `.${cssClass} { content: url(${dataURI}); }\n`;
 
-        // Store mapping for replacing img tags
-        imageMap[fullImagePath] = cssClass;
+            // Store mapping for replacing img tags
+            imageMap[fullImagePath] = cssClass;
         }
     }
 
@@ -279,7 +309,8 @@ async function processEPUB(zipContents) {
 
             // Extract body content
             const bodyContent = xhtmlDoc.querySelector("body")?.innerHTML || "Content not found";
-            document.getElementById('epub-viewer').innerHTML += `<div>${bodyContent}</div>`;
+            document.getElementById('epub-viewer').innerHTML += `<div>${bodyContent}<span class="page-mkr">${pageCounter}</span></div>`;
+            pageCounter++;
         }
     }
 }
