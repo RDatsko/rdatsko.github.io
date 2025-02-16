@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" media="screen and (max-width: 600px)" href="/layout/css/sm.css">
 <link rel="stylesheet" type="text/css" media="screen and (min-width: 601px)" href="/layout/css/lg.css">
 <title>EPUB File Viewer</title>
+<script src="/layout/js/include.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 html, body, * {
@@ -238,5 +239,6 @@ async function processEPUB(zipContents) {
     }
 }
 </script>
+<script>includeHTML();</script>
 </body>
 </html>
