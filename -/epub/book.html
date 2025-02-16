@@ -273,6 +273,7 @@ async function processEPUB(zipContents) {
 
                     // Add class and remove src attribute
                     img.classList.add(cssClass);
+                    img.removeAttribute("src"); // Remove the src attribute
                 }
             });
 
