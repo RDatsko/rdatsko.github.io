@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" translate="no">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="/layout/css/cosmuic.css">
 <link rel="stylesheet" type="text/css" href="/layout/css/common.css">
@@ -12,28 +11,132 @@
 <script src="/layout/js/include.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-html, body, * {
-    margin: 0;
-    padding: 0;
-    box-sizing: content-box;
+
+:root {
+    --pageW: 148mm;
+    --pageH: 210mm;
 }
 
-div.sheet > header { box-shadow: none; }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 @media screen {
+    html, body {
+        background-color: #ddd;
+    }
+
     #epub-viewer {
-        margin-top: 75px;
-        width: auto;
-        display: flex;
-        flex-direction: column;
+        width: 296mm;
+        height: 210mm;
+        margin: 75px auto;
+    }
+
+    .epub-book {
+        width: calc(var(--pageW) * 2);
+        max-width: calc(var(--pageW) * 2);
+        height: var(--pageH);
+        max-height: var(--pageH);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        perspective: 1500px;
+        user-select: none;
+    }
+
+    .epub-page {
+        /* width: 49%; */
+        /* height: 100%; */
+        /* padding: 20px; */
+        position: absolute;
+        /* top: 1%; */
+        left: 50%;
+        /* font-size: 16px; */
+        /* line-height: 18px; */
+        color: black;
+        background-color: white;
+        /* background-image: linear-gradient(to right, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 10%); */
+        transition: transform 0.5s;
+        /* transform: rotateY(-180deg); */
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        transform-origin: left center;
+        z-index: 4;
+    }
+
+    .epub-page:nth-of-type(2n) {
+        left: 1px;
+        /* background-image: linear-gradient(to left, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0) 10%); */
+        transform-origin: right center;
+        transform: rotateY(0);
+        visibility: hidden;
+    }
+        
+    .flipped {
+        visibility: visible;
+    }
+
+    .flipped:nth-child(odd) {
+        pointer-events: none;
+        transform: rotateY(-180deg);
+    }
+
+    .flipped:nth-child(odd):hover {
+        /* transform: rotateY(-15deg); */
+    }
+
+    .flipped:nth-child(odd):before {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .flipped:nth-child(even) {
+        pointer-events: all;
+        transform: rotateY(0deg);
+        visibility: visible;
+    }
+
+    .flipped:nth-child(even):hover {
+        /* transform: rotateY(15deg); */
+    }
+
+    .flipped:nth-child(even):hover:before {
+        background: rgba(0, 0, 0, 0.03);
+    }
+
+    .flipped:nth-child(even):before {
+        background: rgba(0, 0, 0, 0);
     }
 }
 
-#epub-viewer > div > article {
-    background: white;
-    box-shadow: 0 .5mm 2mm rgba(0, 0, 0, .3);
-    margin: 5mm auto;
+@media screen {
+    .sheet.odd {
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 10%);
+    }
+
+    .sheet.even {
+        background-image: linear-gradient(to left, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 10%);
+        transform-origin: right center;
+    }
 }
+
+
+
+
+
+
+
+
+
+
 
 @media print {
     body {
@@ -56,84 +159,19 @@ div.sheet > header { box-shadow: none; }
     }
 }
 
-.page-mkr {
-    width: 25px;
-    height: 25px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 10px 10px 10px 10px;
-    margin: 15px;
-    position: absolute;
-    z-index: 1;
-    bottom: 0;
-    right: 0;
-}
-
-.page-mkr::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #333 transparent transparent;
-}
-
-.debug {
-    background-color: magenta;
-}
-
-@media screen {
-    .sheet.odd {
-        position: relative;
-        background:
-            repeating-linear-gradient(
-            #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-            transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-            #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
-            ) left calc(4% + 5px) / 5.5% 100% no-repeat, /* Shifted down by 10px */
-
-            repeating-linear-gradient(
-            #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
-            ) 5% calc(6% + 5px) / 2% 100% no-repeat, /* Shifted down by 10px */
-
-            /* linear-gradient(#ffffff, #ffffff) left 0% / 100% 100% no-repeat, */
-
-            /* linear-gradient(#616161, #020202) 15% calc(2% + 5px) / 60% 100% no-repeat; */
-
-            linear-gradient(white, white) 0 100% no-repeat;
-    }
-
-    .sheet.even {
-        position: relative;
-        background:
-            repeating-linear-gradient(
-            #f7f7f7 0%, #d9d9d9 0.25%, #616161 0.75%, 
-            transparent 0.75%, transparent 1.25%, #f7f7f7 1.25%, 
-            #d9d9d9 1.5%, #616161 2%, transparent 2%, transparent 4%
-            ) right calc(4% + 5px) / 5.5% 100% no-repeat,
-
-            repeating-linear-gradient(
-            #7b7b7b 0%, #484848 2%, transparent 2%, transparent 4%
-            ) 95% calc(6% + 5px) / 2% 100% no-repeat,
-
-            /* linear-gradient(#ffffff, #ffffff) right 0% / 100% 100% no-repeat, */
-
-            /* linear-gradient(#616161, #020202) 85% calc(2% + 10px) / 60% 100% no-repeat; */
-
-            linear-gradient(white, white) 0 100% no-repeat;
-    }
-}
 </style>
 <style id="epub-styles"></style>
-
+<style>
+div.sheet,
+div.sheet header {
+    box-shadow: none;
+    margin: 0;
+}
+</style>
 </head>
 <body>
 
-    <header class="no-print">
+<header class="no-print">
     <input id="hamburger" class="hamburger" type="checkbox" />
     <label for="hamburger" class="hamburger"><i></i></label>
     <span>
@@ -142,9 +180,11 @@ div.sheet > header { box-shadow: none; }
     <span html-include="/layout/html/links.html" style="position: relative;"></span>
 </header>
 
-<div id="epub-viewer" style="width: auto;"></div>
+<div id="epub-viewer" class="book">
+</div>
 
 <script>
+
 // Get the query parameters from the current URL
 const params = new URLSearchParams(window.location.search);
 let pageCounter = 1;
@@ -161,160 +201,217 @@ if (bookPath) {
         .then(response => response.arrayBuffer())
         .then(data => {
             const zip = new JSZip();
-            zip.loadAsync(data).then(function(zipContents) {
-                // Your existing code to handle the EPUB contents (images, XHTML, etc.)
-                processEPUB(zipContents);
-            }).catch(function(error) {
-                console.error('Error reading EPUB:', error);
-            });
+            return zip.loadAsync(data);
         })
-        .catch(error => {
-            console.error('Error fetching the EPUB file:', error);
-        });
+        .then(zipContents => processEPUB(zipContents)) // Ensure processEPUB() completes first
+        .then(() => pageit())  // Now pageit() will run after processEPUB() is done
+        .catch(error => console.error('Error fetching the EPUB file:', error));
 } else {
     alert('No book query parameter found.');
 }
 
 async function processEPUB(zipContents) {
-    const fileList = Object.keys(zipContents.files);
-    // document.getElementById('file-list').textContent = fileList.join('\n');
+    return new Promise(async (resolve, reject) => {
+        try {
+            const fileList = Object.keys(zipContents.files);
+            // document.getElementById('file-list').textContent = fileList.join('\n');
 
-    const parser = new DOMParser();
+            const parser = new DOMParser();
 
-    // Find the OPF file
-    const containerXML = await zipContents.file("META-INF/container.xml").async("text");
-    const containerDoc = parser.parseFromString(containerXML, "application/xml");
-    const opfPath = containerDoc.querySelector("rootfile").getAttribute("full-path");
+            // Find the OPF file
+            const containerXML = await zipContents.file("META-INF/container.xml").async("text");
+            const containerDoc = parser.parseFromString(containerXML, "application/xml");
+            const opfPath = containerDoc.querySelector("rootfile").getAttribute("full-path");
 
-    // Read the OPF file
-    const opfXML = await zipContents.file(opfPath).async("text");
-    const opfDoc = parser.parseFromString(opfXML, "application/xml");
+            // Read the OPF file
+            const opfXML = await zipContents.file(opfPath).async("text");
+            const opfDoc = parser.parseFromString(opfXML, "application/xml");
 
-    // Extract manifest items
-    const itemMap = {};
-    opfDoc.querySelectorAll("manifest item").forEach(item => {
-        itemMap[item.getAttribute("id")] = item.getAttribute("href");
-    });
-
-    // Get spine order
-    const spineItems = [...opfDoc.querySelectorAll("spine itemref")].map(item => 
-        itemMap[item.getAttribute("idref")]
-    );
-
-    // Resolve OPF base path
-    const opfBasePath = opfPath.substring(0, opfPath.lastIndexOf("/") + 1);
-
-    // Extract and apply stylesheets
-    const stylesheets = [...opfDoc.querySelectorAll("manifest item[media-type='text/css']")].map(item => 
-        item.getAttribute("href")
-    );
-
-    let styles = "";
-    for (const cssFile of stylesheets) {
-        const cssPath = opfBasePath + cssFile;
-        if (zipContents.files[cssPath]) {
-            const cssContent = await zipContents.file(cssPath).async("text");
-            styles += cssContent + "\n";
-        }
-    }
-
-    // Extract images and create data URIs
-    const images = [...opfDoc.querySelectorAll("manifest item[media-type^='image/']")].map(item => 
-        item.getAttribute("href")
-    );
-
-    const imageMap = {}; // Store class references for later XHTML updates
-
-    for (const imagePath of images) {
-        const fullImagePath = opfBasePath + imagePath;
-        if (zipContents.files[fullImagePath]) {
-            const imageData = await zipContents.file(fullImagePath).async("base64");
-
-            // Get the file extension and MIME type
-            const ext = fullImagePath.split('.').pop().toLowerCase();
-            const mimeType = ext === "png" ? "image/png" :
-                                ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-                                ext === "gif" ? "image/gif" :
-                                ext === "svg" ? "image/svg+xml" : "application/octet-stream";
-
-            const dataURI = `data:${mimeType};base64,${imageData}`;
-
-            // Generate CSS class name from the image path
-            const cssClass = "img-" + fullImagePath.replace(/\//g, "_").replace(/\./g, "-");
-
-            // Add CSS rule
-            styles += `.${cssClass} { content: url(${dataURI}); }\n`;
-
-            // Store mapping for replacing img tags
-            imageMap[fullImagePath] = cssClass;
-        }
-    }
-
-    // Extract fonts and create data URIs
-    const fonts = [...opfDoc.querySelectorAll("manifest item[media-type^='font/']")].map(item => 
-        item.getAttribute("href")
-    );
-
-    for (const fontPath of fonts) {
-        const fullFontPath = opfBasePath + fontPath;
-        if (zipContents.files[fullFontPath]) {
-            const fontData = await zipContents.file(fullFontPath).async("base64");
-
-            // Get the file extension and MIME type
-            const ext = fullFontPath.split('.').pop().toLowerCase();
-            const mimeType = ext === "ttf" ? "font/ttf" :
-                                ext === "otf" ? "font/otf" :
-                                ext === "woff" ? "font/woff" :
-                                ext === "woff2" ? "font/woff2" : "application/octet-stream";
-
-            const dataURI = `data:${mimeType};base64,${fontData}`;
-
-            // Generate a font-family name based on the filename
-            const fontName = "font-" + fullFontPath.replace(/\//g, "_").replace(/\./g, "-");
-
-            // Add @font-face rule
-            styles += `@font-face { font-family: '${fontName}'; src: url(${dataURI}); }\n`;
-        }
-    }
-
-    document.getElementById("epub-styles").textContent = styles;
-
-    // Load and display XHTML files with adjusted <img> tags
-    for (const spineItem of spineItems) {
-        if (spineItem.endsWith(".xhtml") || spineItem.endsWith(".html")) {
-            const xhtmlPath = opfBasePath + spineItem;
-            const xhtmlContent = await zipContents.file(xhtmlPath).async("text");
-            const xhtmlDoc = parser.parseFromString(xhtmlContent, "application/xml");
-
-            // Modify XHTML content by adding a class to img tags
-            xhtmlDoc.querySelectorAll("img").forEach(img => {
-                const src = img.getAttribute("src");
-                if (src) {
-                    // Convert relative paths to full paths
-                    let fullPath = src;
-                    if (!src.startsWith("/")) {
-                        fullPath = opfBasePath + src;
-                    }
-
-                    // Generate class name using full path and fix any directory traversal ('../')
-                    const cssClass = "img-" + fullPath.replace(/\.\.\//g, "")  // Remove any '../' parts
-                                                        .replace(/\//g, "_")  // Replace directories with underscores
-                                                        .replace(/\./g, "-"); // Replace dots with dashes
-
-                    // Add class and remove src attribute
-                    img.classList.add(cssClass);
-                    img.removeAttribute("src"); // Remove the src attribute
-                }
+            // Extract manifest items
+            const itemMap = {};
+            opfDoc.querySelectorAll("manifest item").forEach(item => {
+                itemMap[item.getAttribute("id")] = item.getAttribute("href");
             });
 
-            // Extract body content
-            const bodyContent = xhtmlDoc.querySelector("body")?.innerHTML || "Content not found";
-            document.getElementById('epub-viewer').innerHTML += `<div>${bodyContent}<span class="page-mkr">${pageCounter}</span></div>`;
-            pageCounter++;
+            // Get spine order
+            const spineItems = [...opfDoc.querySelectorAll("spine itemref")].map(item => 
+                itemMap[item.getAttribute("idref")]
+            );
+
+            // Resolve OPF base path
+            const opfBasePath = opfPath.substring(0, opfPath.lastIndexOf("/") + 1);
+
+            // Extract and apply stylesheets
+            const stylesheets = [...opfDoc.querySelectorAll("manifest item[media-type='text/css']")].map(item => 
+                item.getAttribute("href")
+            );
+
+            let styles = "";
+            for (const cssFile of stylesheets) {
+                const cssPath = opfBasePath + cssFile;
+                if (zipContents.files[cssPath]) {
+                    const cssContent = await zipContents.file(cssPath).async("text");
+                    styles += cssContent + "\n";
+                }
+            }
+
+            // Extract images and create data URIs
+            const images = [...opfDoc.querySelectorAll("manifest item[media-type^='image/']")].map(item => 
+                item.getAttribute("href")
+            );
+
+            const imageMap = {}; // Store class references for later XHTML updates
+
+            for (const imagePath of images) {
+                const fullImagePath = opfBasePath + imagePath;
+                if (zipContents.files[fullImagePath]) {
+                    const imageData = await zipContents.file(fullImagePath).async("base64");
+
+                    // Get the file extension and MIME type
+                    const ext = fullImagePath.split('.').pop().toLowerCase();
+                    const mimeType = ext === "png" ? "image/png" :
+                                        ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
+                                        ext === "gif" ? "image/gif" :
+                                        ext === "svg" ? "image/svg+xml" : "application/octet-stream";
+
+                    const dataURI = `data:${mimeType};base64,${imageData}`;
+
+                    // Generate CSS class name from the image path
+                    const cssClass = "img-" + fullImagePath.replace(/\//g, "_").replace(/\./g, "-");
+
+                    // Add CSS rule
+                    styles += `.${cssClass} { content: url(${dataURI}); }\n`;
+
+                    // Store mapping for replacing img tags
+                    imageMap[fullImagePath] = cssClass;
+                }
+            }
+
+            // Extract fonts and create data URIs
+            const fonts = [...opfDoc.querySelectorAll("manifest item[media-type^='font/']")].map(item => 
+                item.getAttribute("href")
+            );
+
+            for (const fontPath of fonts) {
+                const fullFontPath = opfBasePath + fontPath;
+                if (zipContents.files[fullFontPath]) {
+                    const fontData = await zipContents.file(fullFontPath).async("base64");
+
+                    // Get the file extension and MIME type
+                    const ext = fullFontPath.split('.').pop().toLowerCase();
+                    const mimeType = ext === "ttf" ? "font/ttf" :
+                                        ext === "otf" ? "font/otf" :
+                                        ext === "woff" ? "font/woff" :
+                                        ext === "woff2" ? "font/woff2" : "application/octet-stream";
+
+                    const dataURI = `data:${mimeType};base64,${fontData}`;
+
+                    // Generate a font-family name based on the filename
+                    const fontName = "font-" + fullFontPath.replace(/\//g, "_").replace(/\./g, "-");
+
+                    // Add @font-face rule
+                    styles += `@font-face { font-family: '${fontName}'; src: url(${dataURI}); }\n`;
+                }
+            }
+
+            document.getElementById("epub-styles").textContent = styles;
+
+            // Load and display XHTML files with adjusted <img> tags
+            for (const spineItem of spineItems) {
+                if (spineItem.endsWith(".xhtml") || spineItem.endsWith(".html")) {
+                    const xhtmlPath = opfBasePath + spineItem;
+                    const xhtmlContent = await zipContents.file(xhtmlPath).async("text");
+                    const xhtmlDoc = parser.parseFromString(xhtmlContent, "application/xml");
+
+                    // Modify XHTML content by adding a class to img tags
+                    xhtmlDoc.querySelectorAll("img").forEach(img => {
+                        const src = img.getAttribute("src");
+                        if (src) {
+                            // Convert relative paths to full paths
+                            let fullPath = src;
+                            if (!src.startsWith("/")) {
+                                fullPath = opfBasePath + src;
+                            }
+
+                            // Generate class name using full path and fix any directory traversal ('../')
+                            const cssClass = "img-" + fullPath.replace(/\.\.\//g, "")  // Remove any '../' parts
+                                                                .replace(/\//g, "_")  // Replace directories with underscores
+                                                                .replace(/\./g, "-"); // Replace dots with dashes
+
+                            // Add class and remove src attribute
+                            img.classList.add(cssClass);
+                            img.removeAttribute("src"); // Remove the src attribute
+                        }
+                    });
+
+                    // Extract body content
+                    const bodyContent = xhtmlDoc.querySelector("body")?.innerHTML || "Content not found";
+                    // document.querySelector('#epub-viewer').innerHTML += `<div class="book-page">${bodyContent}</div>`;
+                    document.querySelector('#epub-viewer').innerHTML += `<div class="epub-page"/>${bodyContent}</div>`;
+                    pageCounter++;
+                }
+            }
+            resolve(); // Notify that processEPUB() has finished
+        } catch (error) {
+            reject(error); // Handle any errors
+        }
+    });
+}
+
+</script>
+
+<script>
+
+function pageit() {
+    var pages  = document.getElementsByClassName('epub-page');
+
+    for(var i = 0; i < pages.length; i++) {
+        var page = pages[i];
+        if (i % 2 === 0) {
+            page.style.zIndex = (pages.length - i);
+            console.log(`Page ${i + 1} zIndex set to:`, pages.length - i); // Debugging
+        }
+    }
+
+    for(var i = 0; i < pages.length; i++) {
+        //Or var page = pages[i];
+        pages[i].pageNum = i + 1;
+        pages[i].onclick=function() {
+            if (this.pageNum % 2 === 0) {
+                this.classList.remove('flipped');
+                this.previousElementSibling.classList.remove('flipped');
+            } else {
+                this.classList.add('flipped');
+                this.nextElementSibling.classList.add('flipped');
+            }
         }
     }
 }
+
+
+// setTimeout(pageit, 1000);
+
+
 </script>
 <script>includeHTML();</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
