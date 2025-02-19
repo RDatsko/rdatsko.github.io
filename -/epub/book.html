@@ -12,11 +12,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 
-:root {
-    --pageW: 148mm;
-    --pageH: 210mm;
-}
-
 html, body {
   margin: 0;
   padding: 0;
@@ -38,19 +33,6 @@ html, body {
         width: 296mm;
         height: 210mm;
         margin: 75px auto;
-    }
-
-    .epub-book {
-        width: calc(var(--pageW) * 2);
-        max-width: calc(var(--pageW) * 2);
-        height: var(--pageH);
-        max-height: var(--pageH);
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        perspective: 1500px;
-        user-select: none;
     }
 
     .epub-page {
@@ -100,16 +82,6 @@ html, body {
         transform-origin: right center;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 @media print {
     body {
