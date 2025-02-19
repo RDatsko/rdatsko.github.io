@@ -54,44 +54,25 @@ html, body {
     }
 
     .epub-page {
-        /* width: 49%; */
-        /* height: 100%; */
-        /* padding: 20px; */
         position: absolute;
-        /* top: 1%; */
         left: 50%;
-        /* font-size: 16px; */
-        /* line-height: 18px; */
         color: black;
         background-color: white;
-        /* background-image: linear-gradient(to right, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 10%); */
         transition: transform 0.5s;
-        /* transform: rotateY(-180deg); */
         backface-visibility: hidden;
         transform-style: preserve-3d;
         transform-origin: left center;
-        z-index: 4;
     }
 
     .epub-page:nth-of-type(2n) {
         left: 1px;
-        /* background-image: linear-gradient(to left, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0) 10%); */
         transform-origin: right center;
-        transform: rotateY(0);
-        visibility: hidden;
+        transform: rotateY(180deg);
     }
         
-    .flipped {
-        visibility: visible;
-    }
-
     .flipped:nth-child(odd) {
         pointer-events: none;
         transform: rotateY(-180deg);
-    }
-
-    .flipped:nth-child(odd):hover {
-        /* transform: rotateY(-15deg); */
     }
 
     .flipped:nth-child(odd):before {
@@ -102,14 +83,6 @@ html, body {
         pointer-events: all;
         transform: rotateY(0deg);
         visibility: visible;
-    }
-
-    .flipped:nth-child(even):hover {
-        /* transform: rotateY(15deg); */
-    }
-
-    .flipped:nth-child(even):hover:before {
-        background: rgba(0, 0, 0, 0.03);
     }
 
     .flipped:nth-child(even):before {
@@ -396,22 +369,3 @@ function pageit() {
 <script>includeHTML();</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
