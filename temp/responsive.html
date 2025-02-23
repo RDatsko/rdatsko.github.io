@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<title>Document</title>
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html, body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+}
+
+body > header {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    background-color: #0054bc;
+    /* padding: 20px 50px; */
+    height: 56px;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    z-index: 12000;
+}
+
+body > header + main {
+    margin-top: 56px;
+}
+
+body > header ol {
+    display: flex;
+    margin: auto 0;
+    list-style: none;
+}
+
+body > header ol li {
+    margin: 0 10px;
+}
+
+body > header ol li a {
+    font-size: 20px;
+    color: white;
+    text-transform: capitalize;
+    text-decoration: none;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+}
+
+body > header ol li:hover a {
+    background: white;
+    color: black;
+    border-radius: 5px;
+}
+
+body > header > label {
+    /* background-color: magenta; */
+    position: relative;
+    margin: 16px;
+    display: none;
+}
+
+body > header > label > i {
+    /* display: none; */
+}
+
+body > header > label + nav {
+    display: block;
+}
+
+body > header > input[type="checkbox"] {
+    --webkit-appearance: none;
+    display: none;
+}
+
+
+
+
+
+
+
+
+@media screen and (max-width: 850px) {
+    body > header {
+        /* display: block; */
+        padding: 0;
+    }
+
+    body > header .icon {
+        display: inline-block;
+        /* margin: 20px 50px; */
+    }
+
+    body > header ol {
+        display: block;
+        background-color: #182334;
+    }
+
+    body > header ol li {
+        text-align: center;
+        margin: 0;
+        display: none;
+        padding: 10px;
+    }
+
+    body > header ol li a {
+        padding: 30px;
+        font-size: 28px;
+        display: block;
+    }
+
+    body > header ol li:hover a {
+        background-color: #e34856;
+        border-radius: 0;
+        color: white;
+    }
+
+    body > header > label {
+        display: block;
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        /* top: 17px;
+        right: 17px; */
+        cursor: pointer;
+    }
+
+    body > header > input:checked ~ label > i {
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        top: 50%;
+        background-color: rgba(0, 0, 0, 0.8);
+        pointer-events: auto;
+        transition-duration: 0.35s;
+        transition-delay: 0.35s;
+    }
+
+    body > header > input:checked ~ label > i:before,
+    body > header > input:checked ~ label > i:after {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        left: 50%;
+        /* left: 0; */
+        background-color: rgba(0, 0, 0, 0.8);
+        content: "";
+        transition: -webkit-transform 0.35s;
+        transition: transform 0.35s;
+        transition: transform 0.35s, -webkit-transform 0.35s;
+        -webkit-transform-origin: 50% 50%;
+        transform-origin: 50% 50%;
+    }
+
+    body > header > input:checked ~  label > i:before {
+        -webkit-transform: translate(-50%, -7px);
+        transform: translate(-50%, -7px);
+    }
+
+    body > header > input:checked ~ label > i:after {
+        -webkit-transform: translate(-50%, 7px);
+        transform: translate(-50%, 7px);
+    }
+
+    #hamburger + label:not(.right),
+    #hamburger + label.left {
+        left: 0;
+    }
+
+    body > header > #hamburger + label:not(.right) + div,
+    body > header > #hamburger + label.left + div {
+        margin-left: 56px;
+    }
+
+    #hamburger + label.right {
+        right: 0;
+    }
+
+    body > header > #hamburger + label.right + div {
+        padding-left: 10px;
+    }
+
+
+
+
+
+
+    label {
+        z-index: 9999;
+        position: relative;
+        display: block;
+        height: 24px;
+        width: 24px;
+    }
+
+    label:hover {
+        cursor: pointer;
+    }
+
+    label > i {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        top: 50%;
+        background-color: rgba(0, 0, 0, 0.8);
+        pointer-events: auto;
+        transition-duration: 0.35s;
+        transition-delay: 0.35s;
+    }
+
+    label > i:before,
+    label > i:after {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 2px;
+        left: 50%;
+        background-color: rgba(0, 0, 0, 0.8);
+        content: "";
+        transition: -webkit-transform 0.35s;
+        transition: transform 0.35s;
+        transition: transform 0.35s, -webkit-transform 0.35s;
+        -webkit-transform-origin: 50% 50%;
+        transform-origin: 50% 50%;
+    }
+
+    label > i:before {
+        -webkit-transform: translate(-50%, -7px);
+        transform: translate(-50%, -7px);
+    }
+
+    label > i:after {
+        -webkit-transform: translate(-50%, 7px);
+        transform: translate(-50%, 7px);
+    }
+
+    body > header > input:checked ~ label > i {
+        background-color: transparent;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    body > header > input:checked ~ label > i:before {
+        -webkit-transform: translate(-50%, 0%) rotate(315deg);
+        transform: translate(-50%, 0%) rotate(315deg);
+    }
+
+    body > header > input:checked ~ label > i:after {
+        -webkit-transform: translate(-50%, 0%) rotate(-315deg);
+        transform: translate(-50%, 0%) rotate(-315deg);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+footer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #090d17;
+    color: white;
+}
+
+.row1 {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 15px 20px;
+}
+
+.row1 .cols {
+    max-width: 16%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    text-transform: capitalize;
+}
+
+.row1 .cols h2 {
+    color: red;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.row1 .cols p {
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.row1 .cols1 {
+    max-width: 25%;
+    width: 100%;
+    margin-left: 15px;
+}
+
+.row1 .cols1 h1 {
+    position: relative;
+    display: block;
+    width: 100%;
+    font-size: 4.5vw;
+    font-weight: 800;
+}
+
+.row1 .cols1 h3 {
+    margin: 2px 0;
+    font-size: 1.8vw;
+}
+
+.row1 .cols .mail {
+    width: 100%;
+    display: flex;
+    margin: 20px 0;
+}
+
+.cols .mail span {
+    color: red;
+    margin-right: 10px;
+    margin-top: 12px;
+}
+
+.cols .mail span p {
+    font-weight: lighter;
+    text-transform: lowercase;
+}
+
+.row1 .cols2 p:hover,
+.row1 .cols3 p:hover,
+.row1 .cols4 p:hover,
+.row1 .cols5 p:hover {
+    transition: 0.2s;
+    color: #8c8c8c;
+}
+
+.row1 .cols5 {
+    max-width: 13%;
+}
+
+.row1 .cols5 {
+    max-width: 20%;
+}
+
+.row1 .cols6 p {
+    cursor: default;
+    word-spacing: 05px;
+    text-transform: none;
+}
+
+.row2 {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    border-top: 1px solid rgba(255,255,255,0.7);
+}
+
+.row2 .cols span {
+    height: 35px;
+    width: 35px;
+    border: 2px solid white;
+    border-radius: 50%;
+    line-height: 32px;
+    text-align: center;
+    font-size: 20px;
+    margin: 0 5px;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.row2 .cols span:hover {
+    color: white;
+    background-color: red;
+}
+
+@media screen and (max-width: 1085px) {
+    footer {
+        /* overflow: hidden; */
+        width: 100%;
+    }
+
+    .row1 .cols {
+        display: block;
+        max-width: 100%;
+    }
+
+    .row1 .cols h1 {
+        font-size: 6vw;
+    }
+
+    .row2 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row2 .cols {
+        margin: 4px auto;
+    }
+
+    .row2 #a {
+        order: 3;
+    }
+
+    .row2 #b {
+        order: 2;
+    }
+
+    .row2 #c {
+        order: 1;
+    }
+}
+
+
+
+
+
+
+
+
+
+section#hero {
+    width: 100%;
+    height: 100%;
+    background-color: magenta;
+    overflow: hidden;
+}
+
+section#hero.header {
+    margin-top: 56px;
+    height: calc(100vh - 56px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
+</head>
+<body>
+
+<header>
+    <input id="hamburger" type="checkbox" />
+    <label for="hamburger" class="right"><i></i></label>
+    <div>Header</div>
+    <nav>
+        <ol>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Feedback</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Login</a></li>
+        </ol>
+    </nav>
+</header>
+
+<section id="hero" class="header">
+    Hero Section
+</section>
+
+<main>
+    Line 00 <br>
+    Line 01 <br>
+    Line 02 <br>
+    Line 03 <br>
+    Line 04 <br>
+    Line 05 <br>
+    Line 06 <br>
+    Line 07 <br>
+    Line 08 <br>
+    Line 09 <br>
+    Line 10 <br>
+    Line 11 <br>
+    Line 12 <br>
+    Line 13 <br>
+    Line 14 <br>
+    Line 15 <br>
+    Line 16 <br>
+    Line 17 <br>
+    Line 18 <br>
+    Line 19 <br>
+    Line 20 <br>
+    Line 21 <br>
+    Line 22 <br>
+    Line 23 <br>
+    Line 24 <br>
+    Line 25 <br>
+    Line 26 <br>
+    Line 27 <br>
+    Line 28 <br>
+    Line 29 <br>
+    Line 30 <br>
+    Line 31 <br>
+    Line 32 <br>
+    Line 33 <br>
+    Line 34 <br>
+    Line 35 <br>
+    Line 36 <br>
+    Line 37 <br>
+    Line 38 <br>
+    Line 39 <br>
+    Line 40 <br>
+    Line 41 <br>
+    Line 42 <br>
+    Line 43 <br>
+    Line 44 <br>
+    Line 45 <br>
+    Line 46 <br>
+    Line 47 <br>
+    Line 48 <br>
+    Line 49 <br>
+    Line 50 <br>
+</main>
+
+<footer>
+    <div class="row1">
+        <div class="cols cols1">
+            <h1>Delivery</h!>
+            <h3>Small World</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique, ut.</p>
+            <div class="mail">
+                <span class="fa fa-envelope"></span>
+                <p>customer.support@gmail.com</p>
+
+            </div>
+        </div>
+        <div class="cols cols2">
+            <h2>Company</h2>
+            <p>About Us</p>
+            <p>Services</p>
+            <p>Partner</p>
+            <p>News</p>
+            <p>Blog</p>
+        </div>
+        <div class="cols cols3">
+            <h2>Get in Touch</h2>
+            <p>Support</p>
+            <p>Career</p>
+            <p>Start Shipping</p>
+        </div>
+        <div class="cols cols4">
+            <h2>More from Us</h2>
+            <p>International Parcel Services</p>
+            <p>Domenstic Courier Services</p>
+            <p>Import/Export Courier Services</p>
+        </div>
+        <div class="cols cols5">
+            <h2>Quick Links</h2>
+            <p>Full Truckload Services</p>
+            <p>Partial Truckload Services</p>
+            <p>Supply Chain Logistics</p>
+            <p>Ecommerce Logistic Services</p>
+        </div>
+        <div class="cols cols6">
+            <h2>Information Security Policy</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis urna purus. Phasellus sit amet volutpat massa. Fusce at lobortis lorem. Etiam tempor orci faucibus quam pharetra pretium.</p>
+        </div>
+    </div>
+    <div class="row2">
+        <div class="cols" id="a">Company Pvt Ltd.</div>
+        <div class="cols" id="b">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis urna purus.</div>
+        <div class="cols" id="c">
+            <span class="fab fa-facebook"></span>
+            <span class="fab fa-linkedin"></span>
+            <span class="fab fa-instagram"></span>
+            <span class="fab fa-x-twitter"></span>
+            <span class="fab fa-youtube"></span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
