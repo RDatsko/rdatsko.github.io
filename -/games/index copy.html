@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: light;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="/layout/css/cosmuic.css">
+<link rel="stylesheet" type="text/css" href="/layout/css/template.css">
+<script src="/layout/js/include.js"></script>
+<title>Document</title>
+<style>
+
+.align {
+    clear: both;
+    margin: 90px auto 20px;
+    width: 100%;
+    max-width: 1170px;
+}
+
+.game {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.game > div {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.game > div > img {
+    max-width: 100%;
+    height: auto;
+}
+
+.game h2 {
+    font-size: 2.8em;
+    line-height: 1.1;
+    margin-top: 0;
+}
+
+.game button {
+    color: white;
+    background-image: linear-gradient(#2ECC40, #3D9970);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 1em 2em;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0 0 0 / 50%);
+    display: inline-flex;
+    align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.container {
+  /* display: inline-flex;
+  flex-flow: row;
+  min-height: 50px; */
+
+  position: relative;
+    width: 160px;
+    height: 220px;
+}
+
+.container > div {
+    padding: 1rem;
+}
+
+.container > div > img {
+    width: 140px;
+}
+
+.top {    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+padding-bottom: 1rem;}
+.left {
+}
+.main {
+  display: flex;
+  flex-direction: column;
+
+  padding-left: 40px;
+    text-align: left;
+    position: absolute;
+    top: 0%;
+    left: 165px;
+    width: 310px;
+    height: 100%;
+}
+.col {
+  margin: 2px;
+}
+.middle {
+
+  flex: 1 1 auto;
+  }
+.right {
+  flex:2;
+}
+
+.container button {
+}
+
+.container > div {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.align li {
+    position: relative;
+    width: 500px;
+    display: inline-block;
+    background-color: #ddd;;
+    margin: 35px;
+}
+</style>
+</head>
+<body>
+
+<header class="no-print">
+    <span>
+        <img src="/layout/image/logo.png">
+    </span>
+    <span html-include="/layout/html/links.html" style="position: relative;"></span>
+</header>
+
+<main>
+    <h3 style="text-align: center; font-weight: 600; padding-top: 35px;">HTML Games</h3>
+    <p>
+        These are some HTML based games that I have created.
+        They are optimized for full screen game play at a resolution of 16 x 9.
+    </p>
+    <p>
+        <i><b>Note:</b> These games are just in the beginiing phase and may not function properly at thsi time.</i>
+    </p>
+
+    <ul class="align">
+        <li>
+            <div class="container">
+                <div><img src="/assets/image/jeopardy.jpg"></div>
+                <div class="main">
+                    <h2 class="top">Jeopardy</h2>
+                    <div class="middle">A version of the game Jeopardy</div>
+                    <button class="bottom">Go to Game Page</button>
+                </div>
+            </div>
+        </li>
+
+
+        <li>
+            <div class="container">
+                <div><img src="/assets/image/jeopardy.jpg"></div>
+                <div class="main">
+                    <h2 class="top">Wheel of Fortune</h2>
+                    <div class="middle">A version of the game Wheel of Fortune</div>
+                    <button class="bottom">Go to Game Page</button>
+                </div>
+            </div>
+        </li>
+
+        <li>
+            <div class="container">
+                <div><img src="/assets/image/jeopardy.jpg"></div>
+                <div class="main">
+                    <h2 class="top">Family Fued</h2>
+                    <div class="middle">A version of the game Family Fued</div>
+                    <button class="bottom">Go to Game Page</button>
+                </div>
+            </div>
+        </li>
+
+
+</main>
+
+<script>includeHTML();</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi Device Simulator</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+    background-color: #e3e3e3;
+    display: flex;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    background-color: black;
+}
+
+.overlay-image {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+#fix {
+    width: auto;
+    height: auto;
+    position: relative;
+    margin: auto;
+}
+
+#game {
+    background-color: magenta;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.container {
+    width: 100%; /* Or set a specific width */
+    max-width: 800px; /* Adjust as needed */
+    border: 2px solid black;
+    padding: 10px;
+}
+
+.aspect-box {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: lightgray; /* Just for visibility */
+}
+</style>
+</head>
+<body>
+<!-- 
+<div class="container">
+    <div id="fix">
+        <div><img class="overlay-image" src="puzzle.jpg"></div>
+        <div>
+            <span style="background-color: magenta; position: absolute; top: 0; left: 0;">Some Text</span>
+        </div>
+    </div>
+</div> -->
+
+
+
+
+<div class="container">
+    <div class="aspect-box">
+        <!-- Content goes here -->
+    </div>
+</div>
+
+
+<script>
+
+
+</script>
+</body>
+</html>
