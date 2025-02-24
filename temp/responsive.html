@@ -538,6 +538,126 @@ section#hero.header {
 
 
 
+/* Dialogs
+ * ======================================== */
+
+dialog,
+#hamburger ~ nav {
+    display: block;
+    opacity: 0;
+    border: none;
+    position: fixed;
+    padding: 1.5rem;
+    z-index: -1;
+    inset: 10% auto auto 50%;
+    min-inline-size: 20rem;
+    max-inline-size: 100%;
+    max-block-size: 80%;
+    overflow-x: visible;
+    overflow-y: auto;
+    border-radius: 1.75rem;
+    outline: none;
+    background-color: var(--dialog-bg);
+    color: var(--dialog-text);
+    transform: translate(-50%,50%);
+    transition: all 0.3s, 0s background-color ease-in-out;
+}
+
+dialog:is([open]) {
+    opacity: 1;
+    visibility: visible;
+    z-index: 10001;
+    box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
+}
+
+dialog.left,
+dialog.right,
+dialog.top,
+dialog.bottom,
+#hamburger.left ~ nav,
+#hamburger.right ~ nav {
+    opacity: 1;
+    padding: 1rem;
+    transform: translate(-100%);
+}
+
+dialog.left,
+dialog.right,
+#hamburger.left ~ nav,
+#hamburger.right ~ nav {
+    inline-size: auto;
+    block-size: 100%;
+    max-block-size: 100%;
+}
+
+dialog.top, dialog.bottom {
+    block-size: auto;
+    inline-size: 100%;
+    min-inline-size: auto;
+    max-block-size: 100%;
+}
+
+dialog.right,
+#hamburger.right ~ nav {
+    opacity: 1;
+    padding: 1rem;
+    block-size: 100%;
+    max-block-size: 100%;
+    transform: translate(100%)
+}
+
+dialog.left,
+#hamburger.left ~ nav {
+    inset: 0 auto auto 0;
+    border-radius: 0 1rem 1rem 0;
+}
+
+dialog.right,
+#hamburger.right ~ nav {
+    inset: 0 0 auto auto;
+    inset-inline-end: 0;
+    border-radius: 1rem 0 0 1rem;
+}
+
+dialog.top {
+    inset: 0 auto auto 0;
+    border-radius: 0 0 1rem 1rem;
+    transform: translateY(-100%);
+}
+
+dialog.bottom {
+    inset: auto auto 0 0;
+    border-radius: 1rem 1rem 0 0;
+    transform: translateY(100%);
+}
+
+dialog.full {
+    inset: 0 auto auto 0;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: 100%;
+    max-block-size: 100%;
+    border-radius: 0;
+    transform: translateY(0);
+}
+
+dialog.left:is([open]),
+dialog.right:is([open]),
+dialog.top:is([open]),
+dialog.bottom:is([open]),
+#hamburger:checked ~ nav {
+    transform: translate(0);
+}
+
+#hamburger:checked ~ nav {
+    box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
+}
+
+dialog.blur:is([open])::backdrop {
+    -webkit-backdrop-filter: blur(1rem);
+    backdrop-filter: blur(1rem);
+}
+
 </style>
 </head>
 <body>
