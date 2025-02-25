@@ -7,6 +7,13 @@
 <title>Document</title>
 <style>
 
+:root {
+    --dialog-bg:          light-dark( #ece7eb, #2b292d );
+    --dialog-text:        light-dark( #1c1b1e, #e6e1e6 );
+}
+
+
+
 * {
     margin: 0;
     padding: 0;
@@ -78,20 +85,11 @@ body > header ol li:hover a {
     border-radius: 5px;
 }
 
-body > header > label {
-    /* background-color: magenta; */
-    position: relative;
-    margin: 16px;
-    display: none;
-}
-
-body > header > label > i {
-    /* display: none; */
-}
-
-body > header > label + nav {
+body > header > nav {
     display: block;
 }
+
+
 
 body > header > input[type="checkbox"] {
     --webkit-appearance: none;
@@ -105,7 +103,7 @@ body > header > input[type="checkbox"] {
 
 
 
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 650px) {
     body > header {
         /* display: block; */
         padding: 0;
@@ -118,14 +116,15 @@ body > header > input[type="checkbox"] {
 
     body > header ol {
         display: block;
-        background-color: #182334;
+        /* background-color: #182334; */
+        height: 100%;
     }
 
     body > header ol li {
         text-align: center;
         margin: 0;
-        display: none;
-        padding: 10px;
+        /* display: none; */
+        padding: 5px;
     }
 
     body > header ol li a {
@@ -138,142 +137,6 @@ body > header > input[type="checkbox"] {
         background-color: #e34856;
         border-radius: 0;
         color: white;
-    }
-
-    body > header > label {
-        display: block;
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        /* top: 17px;
-        right: 17px; */
-        cursor: pointer;
-    }
-
-    body > header > input:checked ~ label > i {
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 2px;
-        top: 50%;
-        background-color: rgba(0, 0, 0, 0.8);
-        pointer-events: auto;
-        transition-duration: 0.35s;
-        transition-delay: 0.35s;
-    }
-
-    body > header > input:checked ~ label > i:before,
-    body > header > input:checked ~ label > i:after {
-        position: absolute;
-        width: 100%;
-        height: 2px;
-        left: 50%;
-        /* left: 0; */
-        background-color: rgba(0, 0, 0, 0.8);
-        content: "";
-        transition: -webkit-transform 0.35s;
-        transition: transform 0.35s;
-        transition: transform 0.35s, -webkit-transform 0.35s;
-        -webkit-transform-origin: 50% 50%;
-        transform-origin: 50% 50%;
-    }
-
-    body > header > input:checked ~  label > i:before {
-        -webkit-transform: translate(-50%, -7px);
-        transform: translate(-50%, -7px);
-    }
-
-    body > header > input:checked ~ label > i:after {
-        -webkit-transform: translate(-50%, 7px);
-        transform: translate(-50%, 7px);
-    }
-
-    #hamburger + label:not(.right),
-    #hamburger + label.left {
-        left: 0;
-    }
-
-    body > header > #hamburger + label:not(.right) + div,
-    body > header > #hamburger + label.left + div {
-        margin-left: 56px;
-    }
-
-    #hamburger + label.right {
-        right: 0;
-    }
-
-    body > header > #hamburger + label.right + div {
-        padding-left: 10px;
-    }
-
-
-
-
-
-
-    label {
-        z-index: 9999;
-        position: relative;
-        display: block;
-        height: 24px;
-        width: 24px;
-    }
-
-    label:hover {
-        cursor: pointer;
-    }
-
-    label > i {
-        position: absolute;
-        width: 100%;
-        height: 2px;
-        top: 50%;
-        background-color: rgba(0, 0, 0, 0.8);
-        pointer-events: auto;
-        transition-duration: 0.35s;
-        transition-delay: 0.35s;
-    }
-
-    label > i:before,
-    label > i:after {
-        position: absolute;
-        display: block;
-        width: 100%;
-        height: 2px;
-        left: 50%;
-        background-color: rgba(0, 0, 0, 0.8);
-        content: "";
-        transition: -webkit-transform 0.35s;
-        transition: transform 0.35s;
-        transition: transform 0.35s, -webkit-transform 0.35s;
-        -webkit-transform-origin: 50% 50%;
-        transform-origin: 50% 50%;
-    }
-
-    label > i:before {
-        -webkit-transform: translate(-50%, -7px);
-        transform: translate(-50%, -7px);
-    }
-
-    label > i:after {
-        -webkit-transform: translate(-50%, 7px);
-        transform: translate(-50%, 7px);
-    }
-
-    body > header > input:checked ~ label > i {
-        background-color: transparent;
-        -webkit-transform: rotate(90deg);
-        transform: rotate(90deg);
-    }
-
-    body > header > input:checked ~ label > i:before {
-        -webkit-transform: translate(-50%, 0%) rotate(315deg);
-        transform: translate(-50%, 0%) rotate(315deg);
-    }
-
-    body > header > input:checked ~ label > i:after {
-        -webkit-transform: translate(-50%, 0%) rotate(-315deg);
-        transform: translate(-50%, 0%) rotate(-315deg);
     }
 }
 
@@ -535,20 +398,18 @@ section#hero.header {
 
 
 
-
-
-
 /* Dialogs
  * ======================================== */
 
 dialog,
-#hamburger ~ nav {
+#navmenu ~ nav {
     display: block;
     opacity: 0;
     border: none;
     position: fixed;
     padding: 1.5rem;
-    z-index: -1;
+    /* z-index: -1; */
+    z-index: 12500;
     inset: 10% auto auto 50%;
     min-inline-size: 20rem;
     max-inline-size: 100%;
@@ -563,10 +424,15 @@ dialog,
     transition: all 0.3s, 0s background-color ease-in-out;
 }
 
-dialog:is([open]) {
+#navmenu ~ nav {
+    background-color: transparent;
+}
+
+dialog:is([open]),
+#navmenu:checked ~ nav {
     opacity: 1;
     visibility: visible;
-    z-index: 10001;
+    /* z-index: 12501; */
     box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
@@ -574,17 +440,14 @@ dialog.left,
 dialog.right,
 dialog.top,
 dialog.bottom,
-#hamburger.left ~ nav,
-#hamburger.right ~ nav {
+#navmenu ~ nav {
     opacity: 1;
     padding: 1rem;
     transform: translate(-100%);
 }
 
 dialog.left,
-dialog.right,
-#hamburger.left ~ nav,
-#hamburger.right ~ nav {
+dialog.right {
     inline-size: auto;
     block-size: 100%;
     max-block-size: 100%;
@@ -598,22 +461,30 @@ dialog.top, dialog.bottom {
 }
 
 dialog.right,
-#hamburger.right ~ nav {
+#navmenu.right ~ nav {
     opacity: 1;
     padding: 1rem;
     block-size: 100%;
     max-block-size: 100%;
-    transform: translate(100%)
+    transform: translate(100%);
 }
 
+/*  Regular  */
+/* #navmenu ~ nav {
+    transform: translate(0%);
+    position: fixed;
+    top: 0;
+    right: 0;
+} */
+
 dialog.left,
-#hamburger.left ~ nav {
+#navmenu.left ~ nav {
     inset: 0 auto auto 0;
     border-radius: 0 1rem 1rem 0;
 }
 
 dialog.right,
-#hamburger.right ~ nav {
+#navmenu.right ~ nav {
     inset: 0 0 auto auto;
     inset-inline-end: 0;
     border-radius: 1rem 0 0 1rem;
@@ -645,12 +516,8 @@ dialog.left:is([open]),
 dialog.right:is([open]),
 dialog.top:is([open]),
 dialog.bottom:is([open]),
-#hamburger:checked ~ nav {
+#navmenu:checked ~ nav {
     transform: translate(0);
-}
-
-#hamburger:checked ~ nav {
-    box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
 dialog.blur:is([open])::backdrop {
@@ -658,13 +525,117 @@ dialog.blur:is([open])::backdrop {
     backdrop-filter: blur(1rem);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 650px) {
+    #navmenu {
+        appearance: none;
+        width: 40px;
+        height: 40px;
+        position: fixed;
+        cursor: pointer;
+        background: none;
+        border: none;
+        display: block !important;
+        z-index: 12550;
+    }
+
+    #navmenu::before,
+    #navmenu::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 2px;
+        background: black;
+        transition: transform 0.3s, top 0.3s;
+    }
+
+    #navmenu.left,
+    #navmenu.left::before,
+    #navmenu.left::after {
+        left: 8px;
+    }
+
+    #navmenu.left ~ div:first-of-type {
+        margin-left: 56px;
+    }
+
+    #navmenu.right,
+    #navmenu.right::before,
+    #navmenu.right::after {
+        right: 8px;
+    }
+
+
+    /* Hamburger Lines */
+    #navmenu::before {
+        top: 12px;
+        box-shadow: 0 6px 0 black; /* Creates second line */
+    }
+
+    #navmenu::after {
+        top: 24px;
+    }
+
+    /* X shape when checked */
+    #navmenu:checked::before {
+        top: 18px;
+        transform: rotate(45deg);
+        box-shadow: none;
+    }
+
+    #navmenu:checked::after {
+        top: 18px;
+        transform: rotate(-45deg);
+    }
+
+
+
+
+
+
+
+
+
+
+    #navmenu ~ nav {
+        inline-size: auto;
+        block-size: 100%;
+        max-block-size: 100%;
+    }
+
+    #navmenu ~ nav {
+        background-color: var(--dialog-bg);
+    }
+}
+
 </style>
 </head>
 <body>
 
 <header>
-    <input id="hamburger" type="checkbox" />
-    <label for="hamburger" class="right"><i></i></label>
+    <!-- <input id="hamburger" type="checkbox" />
+    <label for="hamburger" class="right"><i></i></label> -->
+    <input id="navmenu" type="checkbox" class="right" />
     <div><img src="/layout/image/logo.png"></div>
     <nav>
         <ol>
@@ -681,6 +652,17 @@ dialog.blur:is([open])::backdrop {
 </section>
 
 <main>
+    <!-- <br><br>
+    <button onclick="window.dialogRight.show();">Right</button>
+    <br><br>
+    <dialog id="dialogRight" class="right">
+        <h5>Right Dialog</h5>
+        <div>Some text here</div>
+        <nav class="right-align">
+            <button class="outlined" onclick="window.dialogRight.close();">Cancel</button>
+            <button class="" onclick="window.dialogRight.close();">Confirm</button>
+        </nav>
+    </dialog> -->
     Line 00 <br>
     Line 01 <br>
     Line 02 <br>
