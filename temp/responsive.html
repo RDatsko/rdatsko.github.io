@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,9 +129,9 @@ body > header > input[type="checkbox"] {
     }
 
     body > header ol li a {
-        padding: 30px;
-        font-size: 28px;
-        display: block;
+        /* padding: 30px; */
+        /* font-size: 28px; */
+        /* display: block; */
     }
 
     body > header ol li:hover a {
@@ -401,8 +402,8 @@ section#hero.header {
 /* Dialogs
  * ======================================== */
 
-dialog,
-#navmenu ~ nav {
+/* #navmenu ~ nav, */
+dialog {
     display: block;
     opacity: 0;
     border: none;
@@ -428,19 +429,19 @@ dialog,
     background-color: transparent;
 }
 
-dialog:is([open]),
-#navmenu:checked ~ nav {
+#navmenu:checked ~ nav,
+dialog:is([open]) {
     opacity: 1;
     visibility: visible;
     /* z-index: 12501; */
     box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
+/* #navmenu ~ nav, */
 dialog.left,
 dialog.right,
 dialog.top,
-dialog.bottom,
-#navmenu ~ nav {
+dialog.bottom {
     opacity: 1;
     padding: 1rem;
     transform: translate(-100%);
@@ -460,8 +461,8 @@ dialog.top, dialog.bottom {
     max-block-size: 100%;
 }
 
-dialog.right,
-#navmenu.right ~ nav {
+/* #navmenu.right ~ nav, */
+dialog.right {
     opacity: 1;
     padding: 1rem;
     block-size: 100%;
@@ -547,6 +548,28 @@ dialog.blur:is([open])::backdrop {
 
 
 @media screen and (max-width: 650px) {
+    #navmenu ~ nav {
+        display: block;
+        opacity: 0;
+        border: none;
+        position: fixed;
+        padding: 1.5rem;
+        /* z-index: -1; */
+        z-index: 12500;
+        inset: 10% auto auto 50%;
+        min-inline-size: 20rem;
+        max-inline-size: 100%;
+        max-block-size: 80%;
+        overflow-x: visible;
+        overflow-y: auto;
+        border-radius: 1.75rem;
+        outline: none;
+        background-color: var(--dialog-bg);
+        color: var(--dialog-text);
+        transform: translate(-50%,50%);
+        transition: all 0.3s, 0s background-color ease-in-out;
+    }
+
     #navmenu {
         appearance: none;
         width: 40px;
@@ -585,6 +608,17 @@ dialog.blur:is([open])::backdrop {
         right: 8px;
     }
 
+    #navmenu.right ~ nav {
+        opacity: 1;
+        padding: 1rem;
+        block-size: 100%;
+        max-block-size: 100%;
+        transform: translate(100%);
+    }
+
+    #navmenu.right:checked ~ nav {
+        transform: translate(0%);
+    }
 
     /* Hamburger Lines */
     #navmenu::before {
@@ -606,6 +640,12 @@ dialog.blur:is([open])::backdrop {
     #navmenu:checked::after {
         top: 18px;
         transform: rotate(-45deg);
+    }
+
+    #navmenu ~ nav {
+        opacity: 1;
+        padding: 1rem;
+        transform: translate(-100%);
     }
 
 
