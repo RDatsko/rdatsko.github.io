@@ -13,7 +13,6 @@
  * 
  */
 
-
  :root {
     /* stick to 60-30-(10 * 2) color rule */
 
@@ -29,7 +28,7 @@
 
     /* colors */
     --text:               light-dark( #131117, #ffffff );
-    --bg:                 light-dark( #ffffff, #0f0c18 );
+    --bg:                 light-dark( #ffffff, #000000 ); /* #0f0c18 */
     --primary:            light-dark( #362371, #a18edc );
     --secondary:          light-dark( #896ae7, #371895 );
     --accent:             light-dark( #3f0ad1, #632ef5 );
@@ -38,6 +37,10 @@
     --primarycontrast:    light-dark( #64d97b, #64d97b );
     --secondarycontrast:  light-dark( #ffdd00, #64d97b );
     --accentcontrast:     light-dark( #64d97b, #64d97b );
+
+    /* --primary-text:       light-dark( var(--bg),   var(--bg)   );
+    --secondary-text:     light-dark( var(--text), var(--text) );
+    --accent-text:        light-dark( var(--bg),   var(--text) ); */
 
     --primary-text:       light-dark( var(--bg),   var(--bg)   );
     --secondary-text:     light-dark( var(--text), var(--text) );
@@ -52,6 +55,10 @@
     --font: "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system;
     --border-radius: .4rem;
     --line-height: 1.2rem;
+
+    --dialog-bg:          light-dark( #ece7eb, #2b292d );
+    --dialog-text:        light-dark( #1c1b1e, #e6e1e6 );
+    --nav-width:          650px;
 
     /* light mode */
     --tbase: 260, 15%,  8%;
@@ -75,7 +82,7 @@
         color-scheme: light dark;
     }
     &:has(input[id="color-scheme"][value="light"]:checked),
-    &:has(input[id="color-scheme"][type="checkbox"]) {
+    &:has(input[id="color-scheme"][type="checkbox"]:not(:checked)) {
         color-scheme: light;
     }
     &:has(input[id="color-scheme"][value="dark"]:checked),
@@ -164,15 +171,6 @@
     --accent95: hsl(var(--abase), 95%);
 }
 
-
-
-
-
-
-
-
-
-
 /*
  * COSMUIC - Init
  * ========================================
@@ -180,33 +178,40 @@
  * 
  */
 
-* {
-    font-family: var(--font);
-    color: var(--text);
+ * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-size: 1rem;
+    font-family: var(--font, "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
 }
 
-html, body, * {
+html {
+    color-scheme: light dark;
+}
+
+/* html, body, * {
     -webkit-tap-highlight-color: transparent;
     position: relative;
     vertical-align: middle;
-    /* color: inherit; */
     margin: 0;
     padding: 0;
     border-radius: inherit;
     box-sizing: border-box;
-}
+} */
 
 html, body {
-    font-family: var(--font, "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
     font-size: var(--font-size, 13px);
-    overflow-x: hidden;
     width: 100%;
     height: 100%;
     background-color: var(--bg);
+}
+
+body {
+    overflow-y: scroll;
+}
+
+main {
+    padding: 0 1rem;
 }
 
 
@@ -224,7 +229,7 @@ html, body {
 /* a href link 
  * ======================================== */
 
- a {
+a {
     text-decoration: none;
     color: var(--primary);
     display: inline-block;
@@ -253,14 +258,10 @@ a.clear:after {
     height: 0;
 }
 
-
-
-
-
 /* Blockquote, pre, code
  * ======================================== */
 
-blockquote, pre, code, kbd {
+ blockquote, pre, code, kbd {
     font-family: monospace;
 }
 
@@ -270,14 +271,10 @@ kbd {
     padding: 0 .25rem
 }
 
-
-
-
-
 /* Buttons
  * ======================================== */
 
-button, a.button {
+ button, a.button {
     position: relative;
     display: inline-block;
     box-sizing: border-box;
@@ -360,7 +357,7 @@ a.button:hover:focus::before {
 
 button.text,
 a.button.text {
-    color: var(--primary);
+    color: var(--primary-text);
     background-color: transparent !important;
 }
 
@@ -560,21 +557,17 @@ button.chip:active::after {
     transition: background-size 0s;
 }
 
-
-
-
-
 /* Dialogs
  * ======================================== */
 
-dialog,
-#navmenu ~ span nav {
+dialog {
     display: block;
     opacity: 0;
     border: none;
     position: fixed;
     padding: 1.5rem;
-    z-index: -1;
+    /* z-index: -1; */
+    z-index: 12500;
     inset: 10% auto auto 50%;
     min-inline-size: 20rem;
     max-inline-size: 100%;
@@ -583,33 +576,35 @@ dialog,
     overflow-y: auto;
     border-radius: 1.75rem;
     outline: none;
-    background-color: #ccc;
+    background-color: var(--dialog-bg);
+    color: var(--dialog-text);
     transform: translate(-50%,50%);
     transition: all 0.3s, 0s background-color ease-in-out;
 }
 
+#navmenu ~ nav {
+    background-color: transparent;
+}
+
+#navmenu:checked ~ nav,
 dialog:is([open]) {
     opacity: 1;
     visibility: visible;
-    z-index: 10001;
+    /* z-index: 12501; */
     box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
 dialog.left,
 dialog.right,
 dialog.top,
-dialog.bottom,
-#navmenu.left ~ span nav,
-#navmenu.right ~ span nav {
+dialog.bottom {
     opacity: 1;
     padding: 1rem;
     transform: translate(-100%);
 }
 
 dialog.left,
-dialog.right,
-#navmenu.left ~ span nav,
-#navmenu.right ~ span nav {
+dialog.right {
     inline-size: auto;
     block-size: 100%;
     max-block-size: 100%;
@@ -622,23 +617,23 @@ dialog.top, dialog.bottom {
     max-block-size: 100%;
 }
 
-dialog.right,
-#navmenu.right ~ span nav {
+/* #navmenu.right ~ nav, */
+dialog.right {
     opacity: 1;
     padding: 1rem;
     block-size: 100%;
     max-block-size: 100%;
-    transform: translate(100%)
+    transform: translate(100%);
 }
 
 dialog.left,
-#navmenu.left ~ span nav {
+#navmenu.left ~ nav {
     inset: 0 auto auto 0;
     border-radius: 0 1rem 1rem 0;
 }
 
 dialog.right,
-#navmenu.right ~ span nav {
+#navmenu.right ~ nav {
     inset: 0 0 auto auto;
     inset-inline-end: 0;
     border-radius: 1rem 0 0 1rem;
@@ -670,12 +665,8 @@ dialog.left:is([open]),
 dialog.right:is([open]),
 dialog.top:is([open]),
 dialog.bottom:is([open]),
-#navmenu:checked ~ span nav {
+#navmenu:checked ~ nav {
     transform: translate(0);
-}
-
-#navmenu:checked ~ span nav {
-    box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
 dialog.blur:is([open])::backdrop {
@@ -683,14 +674,10 @@ dialog.blur:is([open])::backdrop {
     backdrop-filter: blur(1rem);
 }
 
-
-
-
-
 /* Form
  * ======================================== */
 
-fieldset {
+ fieldset {
     position: relative;
     border-radius: .25rem;
     padding: 1rem;
@@ -740,12 +727,14 @@ form textarea {
     box-sizing: border-box; /* Prevent padding from affecting height */
 }
 
+form, input,
 form textarea {
     line-height: 1.5rem; /* Adjust line-height for better text spacing */
     min-height: 3rem; /* Ensure a minimum height for the textarea */
     margin-bottom: -.25rem; /* Remove negative margin */
     padding-bottom: 0.5rem; /* Add extra padding for better alignment */
     resize: vertical; /* Allow vertical resizing */
+    border-radius: 0;
 }
 
 form input::placeholder,
@@ -781,7 +770,7 @@ form.outlined textarea {
 }
 
 form.outlined label {
-    background-color: white;
+    background-color: var(--bg);
     padding: 0 0.5rem;
 }
 
@@ -792,58 +781,30 @@ form.outlined textarea:focus {
 
 /* Filled Styles */
 form.filled div {
-    background-color: #ededed;
+    background-color: var(--primary-disabled);
     border-radius: var(--border-radius);
     overflow: hidden;
 }
 
- 
-
-
-
 /* Footer
  * ======================================== */
-
-footer {
-
-}
-
-
-
-
 
 /* Header
  * ======================================== */
 
-header {
+ body > header {
+    display: inline-flex;
     width: 100%;
-    height: 64px;
-    background-color: var(--bg);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    padding: 16px;
     justify-content: space-between;
-}
-
-body > header {
+    background-color: white;
+    /* padding: 20px 50px; */
+    height: 56px;
+    align-items: center;
     position: fixed;
     top: 0;
-    left: 0;
-    z-index: 1000;
-}
+    z-index: 12000;
 
-body > header > * {
-    display: flex;
-    align-items: center;
-}
-
-body > header a {
-    padding: 0 .75rem;
-}
-
-body > header + main {
-    margin-top: 64px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
 body > header img {
@@ -851,14 +812,96 @@ body > header img {
     padding: 7px;
 }
 
+body > header > div:first-of-type {
+    padding: 0 10px;
+}
 
+body > header + main {
+    margin-top: 56px;
+}
 
+body > header ol {
+    display: flex;
+    margin: auto 0;
+    list-style: none;
+    position: relative;
+}
 
+body > header ol li {
+    margin: 0 5px;
+}
+
+body > header ol li a,
+body > header ol li label {
+    font-size: 13px;
+    color: black;
+    /* text-transform: capitalize; */
+    text-decoration: none;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+
+    line-height: 1rem;
+    display: inline-block;
+}
+
+body > header ol li:hover a,
+body > header ol li:hover label {
+    background: #dfdfdf;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+body > header > nav {
+    display: block;
+}
+
+body > header > input[type="checkbox"] {
+    --webkit-appearance: none;
+    display: none;
+}
+
+@media screen and (max-width: 650px) {
+    body > header {
+        /* display: block; */
+        padding: 0;
+    }
+
+    body > header .icon {
+        display: inline-block;
+        /* margin: 20px 50px; */
+    }
+
+    body > header ol {
+        display: block;
+        /* background-color: #182334; */
+        height: 100%;
+    }
+
+    body > header ol li {
+        text-align: center;
+        margin: 0;
+        /* display: none; */
+        padding: 5px;
+    }
+
+    body > header ol li a {
+        /* padding: 30px; */
+        /* font-size: 28px; */
+        /* display: block; */
+    }
+
+    /* body > header ol li:hover a {
+        background-color: #e34856;
+        border-radius: 0;
+        color: white;
+    } */
+}
 
 /* Typography (h1, h2, h3, h4, h5, h6)
  * ======================================== */
 
-h1, h2, h3, h4, h5, h6 {
+ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
     display: block;
     align-items: center;
@@ -876,14 +919,10 @@ p {
     margin: .75rem 0;
 }
 
-
-
-
-
 /* Progress
  * ======================================== */
 
-/* Progress Circular */
+ /* Progress Circular */
 progress.circular {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1097,15 +1136,6 @@ progress.linear:indeterminate::-ms-fill {
     }
 }
 
-
-
-
-
-
-
-
-
-
 /*
  * COSMUIC - Custom classes
  * ========================================
@@ -1271,14 +1301,10 @@ progress.linear:indeterminate::-ms-fill {
     /* object-fit: cover; */
 }
 
-
-
-
-
 /* Chips
  * ======================================== */
 
-.chip > img {
+ .chip > img {
     /* padding: -0.25rem; */
     height: 100%;
     width: 100%;
@@ -1306,14 +1332,10 @@ progress.linear:indeterminate::-ms-fill {
     border-radius: .5rem;
 }
 
-
-
-
-
 /* Grid
  * ======================================== */
 
-.s1  { grid-column: span 1; }
+ .s1  { grid-column: span 1; }
 .s2  { grid-column: span 2; }
 .s3  { grid-column: span 3; }
 .s4  { grid-column: span 4; }
@@ -1368,14 +1390,10 @@ progress.linear:indeterminate::-ms-fill {
     position: relative;
 }
 
-
-
-
-
 /* Hero sections
  * ======================================== */
 
-.hero {
+ .hero {
     display: flex;
     position: relative;
     flex-wrap: nowrap;
@@ -1467,136 +1485,141 @@ progress.linear:indeterminate::-ms-fill {
     }
 }
 
-
 /* Navigation Menu Button
  * ======================================== */
 
-#navmenu {
-    -webkit-appearance: none;
-    appearance: none;
-    
-    position: fixed;
-    display: block;
+@media screen and (max-width: 650px) {
+    #navmenu ~ div {
+        padding: 0;
+    }
 
-    width: 24px;
-    height: 2px;
-    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 60%, rgba(0,0,0,0) 100%);
-    padding: 11px 0;
-    cursor: pointer;
+    #navmenu ~ nav {
+        display: block;
+        opacity: 0;
+        border: none;
+        position: fixed;
+        padding: 1.5rem;
+        /* z-index: -1; */
+        z-index: 12500;
+        inset: 10% auto auto 50%;
+        min-inline-size: 20rem;
+        max-inline-size: 100%;
+        max-block-size: 80%;
+        overflow-x: visible;
+        overflow-y: auto;
+        border-radius: 1.75rem;
+        outline: none;
+        background-color: var(--dialog-bg);
+        color: var(--dialog-text);
+        transform: translate(-50%,50%);
+        transition: all 0.3s, 0s background-color ease-in-out;
+    }
 
-    margin: 10px 15px;
-
-    border: 0px solid black;
-
-    z-index: 10002;
-}
-
-#navmenu:not(.right) {
-    left: 0;
-}
-
-#navmenu.right {
-    right: 0;
-}
-
-#navmenu:checked {
-    background: transparent !important;
-}
-
-#navmenu:before,
-#navmenu:after {
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 2px;
-    left: 50%;
-    background-color: rgba(0, 0, 0, 0.8);
-    content: "";
-    transition: -webkit-transform 0.35s;
-    transition: transform 0.35s;
-    transition: transform 0.35s, -webkit-transform 0.35s;
-    -webkit-transform-origin: 50% 50%;
-    transform-origin: 50% 50%;
-}
-
-#navmenu:before {
-    -webkit-transform: translate(-50%, -7px);
-    transform: translate(-50%, -7px);
-}
-
-#navmenu:after {
-    -webkit-transform: translate(-50%, 7px);
-    transform: translate(-50%, 7px);
-}
-
-#navmenu:checked:before {
-    -webkit-transform: translate(-50%, -50%) rotate(315deg);
-    transform: translate(-50%, -50%) rotate(315deg);
-}
-  
-#navmenu:checked:after {
-    -webkit-transform: translate(-50%, -50%) rotate(-315deg);
-    transform: translate(-50%, -50%) rotate(-315deg);
-}
-
-#navmenu ~ span > nav {
-    z-index: 10001;
-}
-
-#navmenu ~ span > nav > li {
-    list-style-type: none;
-}
-
-@media screen and (max-width: 749px) {
     #navmenu {
-        display: block;
-    }
-
-    #navmenu ~ span > nav {
-        z-index: 10001;
-    }
-
-    #navmenu ~ span > nav > li {
-        display: inline-flex;
-        flex-direction: column;
-    }
-
-    #navmenu ~ span > nav > li a {
-        display: inline-block;
-    }
-
-    #navmenu ~ span > nav a {
-        margin: .75rem 0;
-        display: block;
-        border-radius: 5px;
+        appearance: none;
+        width: 40px;
+        height: 40px;
+        position: fixed;
         cursor: pointer;
+        background: none;
+        border: none;
+        display: block !important;
+        z-index: 12550;
     }
 
-    #navmenu + span {
-        margin-left: 54px;
+    #navmenu::before,
+    #navmenu::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 2px;
+        background: black;
+        transition: transform 0.3s, top 0.3s;
     }
 
-    #navmenu.right + span {
-        margin-right: 54px;
-        margin-left: 0;
+    #navmenu.left,
+    #navmenu.left::before,
+    #navmenu.left::after {
+        left: 8px;
+    }
+
+    #navmenu.left ~ div:first-of-type {
+        margin-left: 56px;
+    }
+
+    #navmenu.right,
+    #navmenu.right::before,
+    #navmenu.right::after {
+        right: 8px;
+    }
+
+    #navmenu.right ~ nav {
+        opacity: 1;
+        padding: 1rem;
+        block-size: 100%;
+        max-block-size: 100%;
+        transform: translate(100%);
+    }
+
+    #navmenu.right:checked ~ nav {
+        transform: translate(0%);
+    }
+
+    /* Hamburger Lines */
+    #navmenu::before {
+        top: 12px;
+        box-shadow: 0 6px 0 black; /* Creates second line */
+    }
+
+    #navmenu::after {
+        top: 24px;
+    }
+
+    /* X shape when checked */
+    #navmenu:checked::before {
+        top: 18px;
+        transform: rotate(45deg);
+        box-shadow: none;
+    }
+
+    #navmenu:checked::after {
+        top: 18px;
+        transform: rotate(-45deg);
+    }
+
+    #navmenu ~ nav {
+        opacity: 1;
+        padding: 1rem;
+        transform: translate(-100%);
+    }
+
+    #navmenu ~ nav {
+        inline-size: auto;
+        block-size: 100%;
+        max-block-size: 100%;
+    }
+
+    #navmenu ~ nav {
+        background-color: var(--dialog-bg);
+    }
+
+    #navmenu ~ nav  ol {
+        position: absolute;
+        padding-top: 56px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+
+    #navmenu ~ nav  li {
+        text-align: left;
     }
 }
-
-@media screen and (min-width: 750px) {
-    #navmenu {
-        display: none;
-    }
-
-    #navmenu ~ span nav > *:not(li) {
-        display: none;
-    }
-}
-
 
 /* Miscellaneous
  * ======================================== */
 
-.round {
+ .round {
     border-radius: 1000em !important;
 }
-
