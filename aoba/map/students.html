@@ -23,9 +23,11 @@ html, body {
 }
 
 .container {
-    width: 50%;
+    position: relative;
+    width: 80%;
     margin: 0 auto;
     /* background-color: rgb(200, 224, 235); */
+    /* border: 1px solid magenta; */
 }
 
 g {
@@ -37,13 +39,9 @@ g:hover {
     fill: #6BB647; /* #5f976b; */
 }
 
-svg {
-    width: 100%;
-    height: 100%;
-}
-
 svg#map {
     width: 100%;
+    height: 100%;
 }
 
 g.selected {
@@ -56,20 +54,40 @@ g.hovered {
 }
 
 #slists {
-    position: relative;
-}
-
-#slists > * {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#slists span {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    /* pointer-events: none; */
+    cursor: pointer;
+}
+
+#slists > div {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    background-color: rgba(255, 255, 255, .85);
+    border: 1px solid black;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
 }
 
 [name="stlist"] {
     display: none;
 }
 
-[name="stlist"] + label + div {
+/* [name="stlist"] + label + div {
     display: block;
     opacity: 0;
     transition: all 0.3s ease-in-out;
@@ -78,11 +96,13 @@ g.hovered {
 [name="stlist"]:checked + label + div {
     display: block;
     opacity: 1;
-}
+} */
 
 </style>
 </head>
 <body>
+
+<span style="display: block; height: 100px;"></span>
 
 <div class="container">
     <svg enable_background="new 0 0 1000 647" id="map" pretty_print="False" style="stroke-linejoin: round; stroke:#000; fill: none;" version="1.1" viewBox="0 0 1000 647" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -290,48 +310,48 @@ g.hovered {
         <g id="Antartica">
             <path id="TF" d="M694.920406,618.784756L695.599910,616.036526L692.978968,615.508063L691.190071,614.182178L690.663109,619.063725L694.920406,618.784756Z "/>
         </g>
-
     </svg>
-</div>
 
 
-<div id="slists">
-    <input type="radio" id="SNorthAmerica" name="stlist">
-    <label for="SNorthAmerica"></label>
-    <div>
-        North America: Students
+    <div id="slists">
+        <div id="SNorthAmerica">
+            <span onclick="dlgClose('NorthAmerica');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            North America: Students
+        </div>
+        <div id="SSouthAmerica" >
+            <span onclick="dlgClose('SouthAmerica');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            South America: Students
+        </div>
+        <div id="SEurope">
+            <span onclick="dlgClose('Europe');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            Europe: Students
+        </div>
+        <div id="SAfrica">
+            <span onclick="dlgClose('Africa');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            Africa Students
+        </div>
+        <div id="SAsia">
+            <span onclick="dlgClose('Asia');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            Asia: Students
+        </div>
+        <div id="SAustralia">
+            <span onclick="dlgClose('Australia');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+            </span>
+            Australia: Students
+        </div>
+    
     </div>
-
-    <input type="radio" id="SSouthAmerica" name="stlist">
-    <label for="SSouthAmerica"></label>
-    <div>
-        South America: Students
-    </div>
-
-    <input type="radio" id="SEurope" name="stlist">
-    <label for="SEurope"></label>
-    <div>
-        Europe: Students
-    </div>
-
-    <input type="radio" id="SAfrica" name="stlist">
-    <label for="SAfrica"></label>
-    <div>
-        Africa: Students
-    </div>
-
-    <input type="radio" id="SAsia" name="stlist">
-    <label for="SAsia"></label>
-    <div>
-        Asia: Students
-    </div>
-
-    <input type="radio" id="SAustralia" name="stlist">
-    <label for="SAustralia"></label>
-    <div>
-        Australia: Students
-    </div>
-
 </div>
 
 <script>
@@ -347,13 +367,36 @@ g.hovered {
             // Add "selected" class to clicked element
             el.classList.add("selected");
 
+            // Make related div visible and clickable
+            const activeDiv = document.querySelector("#S" + selector);
+            if (activeDiv) {
+                activeDiv.style.opacity = 1;
+                activeDiv.style.pointerEvents = "auto";
+            }
+
             // Remove "selected" from all other regions
             ["NorthAmerica", "SouthAmerica", "Asia", "Australia", "Antartica", "Europe", "Africa"]
                 .filter(id => id !== selector) // Exclude the clicked element
-                .forEach(id => document.getElementById(id)?.classList.remove("selected"));
+                .forEach(id => {
+                    document.getElementById(id)?.classList.remove("selected");
+
+                    // Hide the associated div
+                    const el = document.querySelector("#S" + id);
+                    if (el) el.style.opacity = 0;
+                });
         });
     })(document.getElementById(selector));
 });
+
+function dlgClose(selector) {
+    const mapDiv = document.querySelector("#" + selector);
+    mapDiv.classList.remove("selected");
+
+    const activeDiv = document.querySelector("#S" + selector);
+    activeDiv.style.opacity = 0;
+    activeDiv.style.pointerEvents = "none";
+}
+
 
 </script>
 </body>
