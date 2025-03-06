@@ -562,12 +562,13 @@ button.chip:active::after {
 
 dialog {
     display: block;
+    /* display: none; */
     opacity: 0;
     border: none;
     position: fixed;
     padding: 1.5rem;
-    /* z-index: -1; */
-    z-index: 12500;
+    z-index: -1;
+    /* z-index: 12500; */
     inset: 10% auto auto 50%;
     min-inline-size: 20rem;
     max-inline-size: 100%;
@@ -590,7 +591,7 @@ dialog {
 dialog:is([open]) {
     opacity: 1;
     visibility: visible;
-    /* z-index: 12501; */
+    z-index: 12501;
     box-shadow: 0 0 0 1000vw rgba(0,0,0,0.35);
 }
 
