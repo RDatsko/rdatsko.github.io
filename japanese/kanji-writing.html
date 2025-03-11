@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<div id="kanji-canvas" class="content-block">
+<div id="kanji-canvas" class="content-block" style="position: fixed; bottom: 0;">
     <p class="center">Draw a kanji on the canvas, then click "Recognize" for a list of matches.</p>
     <div class="kanji-canvas-container">
         <canvas id="can" class="kanji-canvas" data-candidate-list="candidateList" width="256" height="256" tabindex="0" style="border: 1px solid black"></canvas>
@@ -16,7 +16,7 @@
             <button onclick="KanjiCanvas.deleteLast('can')" title="(CTRL+Z)">Undo</button>
             <button onclick="KanjiCanvas.recognize('can')" title="(CTRL+F)">Recognize</button>
         </div>
-        <div id="candidateList" class="kanji-canvas-candidates"></div>
+        <div id="candidateList" class="kanji-canvas-candidates" style="position: relative; height: 50px;></div>
     </div>
 </div>
 
