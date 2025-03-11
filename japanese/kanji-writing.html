@@ -12,6 +12,11 @@
     font-family: "Klee One", cursive;
     font-weight: 400;
     font-style: normal;
+
+    position: relative;
+    height: 30px;
+    font-size: 1.25rem;
+    padding: 10px 0;
 }
 </style>
 </head>
@@ -26,7 +31,7 @@
             <button onclick="KanjiCanvas.deleteLast('can')" title="(CTRL+Z)">Undo</button>
             <button onclick="KanjiCanvas.recognize('can')" title="(CTRL+F)">Recognize</button>
         </div>
-        <div id="candidateList" class="kanji-canvas-candidates" style="position: relative; height: 50px;"></div>
+        <div id="candidateList" class="kanji-canvas-candidates"></div>
     </div>
 </div>
 
