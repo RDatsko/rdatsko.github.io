@@ -22,6 +22,18 @@
 </head>
 <body>
 
+<div>
+<script>
+
+if ("ontouchstart" in document.documentElement) {
+    document.write("Your device is a touch screen device.");
+} else {
+    document.write("Your device is not a touch device");
+}
+
+</script>
+</div>
+
 <div id="kanji-canvas" class="content-block" style="position: fixed; bottom: 0;">
     <p class="center">Draw a kanji on the canvas, then click "Recognize" for a list of matches.</p>
     <div class="kanji-canvas-container">
