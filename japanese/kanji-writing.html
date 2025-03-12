@@ -22,6 +22,79 @@
 </head>
 <body>
 
+<header>
+    <input id="navmenu" type="checkbox" class="left" />
+    <div><img src="/layout/image/logo.png"></div>
+    <nav>
+        <ol>
+            <li><a href="/">HOME</a></li>
+
+            <input type="radio" name="panel" id="nav-web">
+            <li>
+                <label for="nav-web">WEB</label>
+                <div class="submenu">
+                    <a href="/cosmuic/" class="sub-item">
+                        <img src="/layout/image/css3-alt.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">COSMUIC</div>
+                            <div class="desc">Material UI like CSS for sites</div>
+                        </div>
+                    </a>
+
+                    <a href="/html-tools/" class="sub-item">
+                        <img src="/layout/image/tools-fill.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">HTML Stuff</div>
+                            <div class="desc">Some useful things for the web</div>
+                        </div>
+                    </a>
+
+                    <a href="/apps/" class="sub-item">
+                        <img src="/layout/image/application_window.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">Web Apps</div>
+                            <div class="desc">Various web based applications</div>
+                        </div>
+                    </a>
+
+                    <a href="/games/" class="sub-item">
+                        <img src="/layout/image/game-line.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">HTML Games</div>
+                            <div class="desc">Some web based HTML games</div>
+                        </div>
+                    </a>
+                </div>
+            </li>
+
+            <input type="radio" name="panel" id="nav-misc">
+            <li>
+                <label for="nav-misc">MISC</label>
+                <div class="submenu">
+                    <a href="/books/" class="sub-item">
+                        <img src="/layout/image/book-half.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">eBooks</div>
+                            <div class="desc">Custom eBooks using HTML & CSS</div>
+                        </div>
+                    </a>
+
+                    <a href="/japanese/" class="sub-item">
+                        <img src="/layout/image/letter-japanese-a.svg" class="material-icons-outlined"/>
+                        <div class="details">
+                            <div class="title">Japanese Study</div>
+                            <div class="desc">Tools for studying Japanese</div>
+                        </div>
+                    </a>
+                </div>
+            </li>
+
+
+            <li><a href="/about/">ABOUT</a></li>
+        </ol>
+    </nav>
+</header>
+
 <div>
 <script>
 
@@ -37,11 +110,11 @@ if ("ontouchstart" in document.documentElement) {
 <div id="kanji-canvas" class="content-block" style="position: fixed; bottom: 0;">
     <p class="center">Draw a kanji on the canvas, then click "Recognize" for a list of matches.</p>
     <div class="kanji-canvas-container">
-        <canvas id="can" class="kanji-canvas" data-candidate-list="candidateList" width="256" height="256" tabindex="0" style="border: 1px solid black"></canvas>
+        <canvas id="char1" class="kanji-canvas" data-candidate-list="candidateList" width="256" height="256" tabindex="0" style="border: 1px solid black"></canvas>
         <div class="kanji-canvas-controls">
-            <button onclick="KanjiCanvas.erase('can')" title="(CTRL+X)">Erase</button>
-            <button onclick="KanjiCanvas.deleteLast('can')" title="(CTRL+Z)">Undo</button>
-            <button onclick="KanjiCanvas.recognize('can')" title="(CTRL+F)">Recognize</button>
+            <button onclick="KanjiCanvas.erase('char1')" title="(CTRL+X)">Erase</button>
+            <button onclick="KanjiCanvas.deleteLast('char1')" title="(CTRL+Z)">Undo</button>
+            <button onclick="KanjiCanvas.recognize('char1')" title="(CTRL+F)">Recognize</button>
         </div>
         <div id="candidateList" class="kanji-canvas-candidates"></div>
     </div>
@@ -49,6 +122,10 @@ if ("ontouchstart" in document.documentElement) {
 
 <script src="kanji-canvas.min.js"></script>
 <script src="kanji-ref-patterns.js"></script>
-<script>KanjiCanvas.init('can');</script>
+<script>
+
+KanjiCanvas.init('char1');
+
+</script>
 </body>
 </html>
