@@ -298,67 +298,67 @@
 
 <script>
 
-(function() {
-  var appicon, center, create, footer, isMobile, overlay, popup;
+// (function() {
+//   var appicon, center, create, footer, isMobile, overlay, popup;
 
-  window.appname = "Japanese Study";
+//   window.appname = "Japanese Study";
 
-  isMobile = {
-    Android: function() {
-      return navigator.userAgent.match(/Android/i);
-    },
-    BlackBerry: function() {
-      return navigator.userAgent.match(/BlackBerry/i);
-    },
-    iOS: function() {
-      return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-    },
-    Opera: function() {
-      return navigator.userAgent.match(/Opera Mini/i);
-    },
-    Windows: function() {
-      return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
-    },
-    any: function() {
-      return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
-    }
-  };
+//   isMobile = {
+//     Android: function() {
+//       return navigator.userAgent.match(/Android/i);
+//     },
+//     BlackBerry: function() {
+//       return navigator.userAgent.match(/BlackBerry/i);
+//     },
+//     iOS: function() {
+//       return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+//     },
+//     Opera: function() {
+//       return navigator.userAgent.match(/Opera Mini/i);
+//     },
+//     Windows: function() {
+//       return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+//     },
+//     any: function() {
+//       return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
+//     }
+//   };
 
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    alert("Already Installed");
-  } else if (isMobile.any()) {
-    create = function(typ, clas, text, addto) {
-      var o;
-      o = document.createElement(typ || "div");
-      if (clas) {
-        o.className = clas;
-      }
-      if (text) {
-        o.innerText = text;
-      }
-      if (addto) {
-        addto.appendChild(o);
-      }
-      return o;
-    };
-    overlay = create("div", "pwa-install-overlay fade-in", "", document.body);
-    center = create("div", "pwa-center-container", "", overlay);
-    create("div", "before", "~", center);
-    popup = create("div", "pwa-install-popup", "", center);
-    appicon = create("div", "pwa-app-icon", "", popup);
-    create("div", "img", "", appicon);
-    create("div", "border", "", appicon);
-    create("div", "pwa-app-name", "Install " + window.appname, popup);
-    create("div", "pwa-message", "Install this application to your homescreen for quick and easy access when you're on the go!", popup);
-    footer = create("div", "pwa-footer", "", popup);
-    create("span", "", "Just tap", footer);
-    (create("ion-icon", "ios", "", footer)).name = "ios-share";
-    (create("ion-icon", "android", "", footer)).name = "md-more";
-    create("span", "", "then 'Add to Home Screen'", footer);
-    create("div", "after", "~", center);
-  }
+//   if (window.matchMedia('(display-mode: standalone)').matches) {
+//     alert("Already Installed");
+//   } else if (isMobile.any()) {
+//     create = function(typ, clas, text, addto) {
+//       var o;
+//       o = document.createElement(typ || "div");
+//       if (clas) {
+//         o.className = clas;
+//       }
+//       if (text) {
+//         o.innerText = text;
+//       }
+//       if (addto) {
+//         addto.appendChild(o);
+//       }
+//       return o;
+//     };
+//     overlay = create("div", "pwa-install-overlay fade-in", "", document.body);
+//     center = create("div", "pwa-center-container", "", overlay);
+//     create("div", "before", "~", center);
+//     popup = create("div", "pwa-install-popup", "", center);
+//     appicon = create("div", "pwa-app-icon", "", popup);
+//     create("div", "img", "", appicon);
+//     create("div", "border", "", appicon);
+//     create("div", "pwa-app-name", "Install " + window.appname, popup);
+//     create("div", "pwa-message", "Install this application to your homescreen for quick and easy access when you're on the go!", popup);
+//     footer = create("div", "pwa-footer", "", popup);
+//     create("span", "", "Just tap", footer);
+//     (create("ion-icon", "ios", "", footer)).name = "ios-share";
+//     (create("ion-icon", "android", "", footer)).name = "md-more";
+//     create("span", "", "then 'Add to Home Screen'", footer);
+//     create("div", "after", "~", center);
+//   }
 
-}).call(this);
+// }).call(this);
 
 </script>
 </body>
