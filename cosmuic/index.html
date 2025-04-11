@@ -2753,6 +2753,9 @@ function CodeColorizer(elmnt, mode) {
     if (lang == "js") {elmntTxt = jsMode(elmntTxt);}
     elmntObj.innerHTML = elmntTxt;
 
+    // Fix for COSMUIC css
+    cssdelimitercolor += "; font-family: " + elmntObj.style.fontFamily;
+
     function extract(str, start, end, func, repl) {
     var s, e, d = "", a = [];
     while (str.search(start) > -1) {
