@@ -1188,6 +1188,13 @@ progress.linear:indeterminate::-ms-fill {
     margin: .5rem .25rem;
 }
 
+.card2 > div > span,
+.card3 > div > span,
+.card5 > div > span {
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
 .card4 a.button, .card4 button {
     margin-right: 0.25rem;
     border-radius: 50%;
