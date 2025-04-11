@@ -2731,30 +2731,27 @@ function CodeColorizer(elmnt, mode) {
     var elmntObj = (document.getElementById(elmnt) || elmnt);
     var elmntTxt = elmntObj.innerHTML;
     var textColor = window.getComputedStyle(elmnt).color;
-    var tagcolor = "#808080";
-    var tagnamecolor = "#569cd6";
-    var attributecolor = "#9CDCFE";
-    var attributevaluecolor = "#CE9178";
-    var commentcolor = "green";
-    var cssselectorcolor = "brown";
-    var csspropertycolor = "red";
-    var csspropertyvaluecolor = "mediumblue";
-    var cssdelimitercolor = "black";
-    var cssimportantcolor = "red";  
-    var jscolor = "black";
-    var jskeywordcolor = "mediumblue";
-    var jsstringcolor = "brown";
-    var jsnumbercolor = "red";
-    var jspropertycolor = "black";
     elmntObj.style.fontFamily = "Consolas,'Courier New', monospace";
+    var tagcolor = "#808080";
+    var tagnamecolor = "#569cd6; font-family: " + elmntObj.style.fontFamily + ";";
+    var attributecolor = "#9CDCFE; font-family: " + elmntObj.style.fontFamily + ";"
+    var attributevaluecolor = "#CE9178; font-family: " + elmntObj.style.fontFamily + ";"
+    var commentcolor = "green; font-family: " + elmntObj.style.fontFamily + ";"
+    var cssselectorcolor = "brown; font-family: " + elmntObj.style.fontFamily + ";"
+    var csspropertycolor = "red; font-family: " + elmntObj.style.fontFamily + ";"
+    var csspropertyvaluecolor = "mediumblue; font-family: " + elmntObj.style.fontFamily + ";"
+    var cssdelimitercolor = "black; font-family: " + elmntObj.style.fontFamily + ";"
+    var cssimportantcolor = "red; font-family: " + elmntObj.style.fontFamily + ";"
+    var jscolor = "black; font-family: " + elmntObj.style.fontFamily + ";"
+    var jskeywordcolor = "mediumblue; font-family: " + elmntObj.style.fontFamily + ";"
+    var jsstringcolor = "brown; font-family: " + elmntObj.style.fontFamily + ";"
+    var jsnumbercolor = "red; font-family: " + elmntObj.style.fontFamily + ";"
+    var jspropertycolor = "black; font-family: " + elmntObj.style.fontFamily + ";"
     if (!lang) {lang = "html"; }
     if (lang == "html") {elmntTxt = htmlMode(elmntTxt);}
     if (lang == "css") {elmntTxt = cssMode(elmntTxt);}
     if (lang == "js") {elmntTxt = jsMode(elmntTxt);}
     elmntObj.innerHTML = elmntTxt;
-
-    // Fix for COSMUIC css
-    cssdelimitercolor += "; font-family: " + elmntObj.style.fontFamily;
 
     function extract(str, start, end, func, repl) {
     var s, e, d = "", a = [];
