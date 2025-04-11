@@ -2822,7 +2822,7 @@ function CodeColorizer(elmnt, mode) {
     if (result.substr(result.length - 4, 4) == "&gt;") {
         result = result.substring(0, result.length - 4) + `<span style="color:${tagcolor};font-family:${elmntObj.style.fontFamily};">&gt;</span>`;
     }
-    return `<span style="color:${tagnameecolor};font-family:${elmntObj.style.fontFamily};">` + result + "</span>";
+    return `<span style="color:${tagnamecolor};font-family:${elmntObj.style.fontFamily};">` + result + "</span>";
     }
     function attributeMode(txt) {
     var rest = txt, done = "", startpos, endpos, singlefnuttpos, doublefnuttpos, spacepos;
