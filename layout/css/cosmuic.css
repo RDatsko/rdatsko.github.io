@@ -1189,9 +1189,12 @@ progress.linear:indeterminate::-ms-fill {
     background-position: center;
     width: 2rem;
     height: 2rem;
+    min-width: 2rem;
+    min-height: 2rem;
     border: 0;
     background-color: transparent !important;
     padding: 0;
+    box-shadow: none;
 }
 
 .card1 div,
