@@ -261,12 +261,12 @@ a.clear:after {
 /* Blockquote, pre, code
  * ======================================== */
 
-blockquote, pre, code, kbd {
+pre, code, kbd {
     font-family: monospace;
 }
 
-blockquote, pre, code, kbd * {
-    font-family: Consolas, "Courier New", monospace
+pre, code, kbd * {
+    font-family: Consolas, "Courier New", monospace !important;
 }
 
 kbd {
