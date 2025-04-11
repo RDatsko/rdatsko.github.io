@@ -2732,6 +2732,7 @@ function CodeColorizer(elmnt, mode) {
     var elmntTxt = elmntObj.innerHTML;
     var textColor = window.getComputedStyle(elmnt).color;
     elmntObj.style.fontFamily = "Consolas,'Courier New', monospace";
+    var fontFamily = "Consolas,&apos;Courier New&apos;, monospace";
     var tagcolor = "#808080";
     var tagnamecolor = "#569cd6";
     var attributecolor = "#9CDCFE";
@@ -2818,11 +2819,11 @@ function CodeColorizer(elmnt, mode) {
         rest = rest.substr(endpos);
     }
     result = done + rest;
-    result = `<span style="color:${tagcolor};font-family:${elmntObj.style.fontFamily};">&lt;</span>` + result.substring(4);
+    result = `<span style="color:${tagcolor};font-family:${fontFamily};">&lt;</span>` + result.substring(4);
     if (result.substr(result.length - 4, 4) == "&gt;") {
-        result = result.substring(0, result.length - 4) + `<span style="color:${tagcolor};font-family:${elmntObj.style.fontFamily};">&gt;</span>`;
+        result = result.substring(0, result.length - 4) + `<span style="color:${tagcolor};font-family:${fontFamily};">&gt;</span>`;
     }
-    return `<span style="color:${tagnamecolor};font-family:${elmntObj.style.fontFamily};">` + result + "</span>";
+    return `<span style="color:${tagnamecolor};font-family:${fontFamily};">` + result + "</span>";
     }
     function attributeMode(txt) {
     var rest = txt, done = "", startpos, endpos, singlefnuttpos, doublefnuttpos, spacepos;
@@ -2840,17 +2841,17 @@ function CodeColorizer(elmnt, mode) {
             endpos = rest.indexOf("'", rest.indexOf("'", startpos) + 1);
         }
         if (!endpos || endpos == -1 || endpos < startpos) {endpos = rest.length;}
-        done += `<span style="color:${attributecolor};font-family:${elmntObj.style.fontFamily};">` + rest.substring(0, startpos) + `</span><span style="color:${textColor}">=</span>` + attributeValueMode(rest.substring(startpos + 1, endpos + 1));
+        done += `<span style="color:${attributecolor};font-family:${fontFamily};">` + rest.substring(0, startpos) + `</span><span style="color:${textColor}">=</span>` + attributeValueMode(rest.substring(startpos + 1, endpos + 1));
         rest = rest.substr(endpos + 1);
     }
     return done + rest;
 }
 
     function attributeValueMode(txt) {
-    return `<span style="color:${attributevaluecolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${attributevaluecolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function commentMode(txt) {
-    return `<span style="color:${commentcolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${commentcolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function cssMode(txt) {
     var rest = txt, done = "", s, e, comment, i, midz, c, cc;
@@ -2877,12 +2878,12 @@ function CodeColorizer(elmnt, mode) {
         rest = rest.substr(e);
     }
     rest = done + rest;
-    rest = rest.replace(/{/g, `<span style="color:${cssdelimitercolor};font-family:${elmntObj.style.fontFamily};">{</span>`);
-    rest = rest.replace(/}/g, `<span style="color:${cssdelimitercolor};font-family:${elmntObj.style.fontFamily};">}</span>`);
+    rest = rest.replace(/{/g, `<span style="color:${cssdelimitercolor};font-family:${fontFamily};">{</span>`);
+    rest = rest.replace(/}/g, `<span style="color:${cssdelimitercolor};font-family:${fontFamily};">}</span>`);
     for (i = 0; i < comment.arr.length; i++) {
         rest = rest.replace("W3CSSCOMMENTPOS", comment.arr[i]);
     }
-    return `<span style="color:${cssselectorcolor};font-family:${elmntObj.style.fontFamily};">` + rest + "</span>";
+    return `<span style="color:${cssselectorcolor};font-family:${fontFamily};">` + rest + "</span>";
     }
     function cssPropertyMode(txt) {
     var rest = txt, done = "", s, e, n, loop;
@@ -2904,11 +2905,11 @@ function CodeColorizer(elmnt, mode) {
         done += cssPropertyValueMode(rest.substring(s, e + 1));
         rest = rest.substr(e + 1);
     }
-    return `<span style="color:${csspropertycolor};font-family:${elmntObj.style.fontFamily};">` + done + rest + "</span>";
+    return `<span style="color:${csspropertycolor};font-family:${fontFamily};">` + done + rest + "</span>";
     }
     function cssPropertyValueMode(txt) {
     var rest = txt, done = "", s;
-    rest = `<span style="color:${cssdelimitercolor};font-family:${elmntObj.style.fontFamily};">` + rest.substring(1);
+    rest = `<span style="color:${cssdelimitercolor};font-family:${fontFamily};">` + rest.substring(1);
     while (rest.search(/!important/i) > -1) {
         s = rest.search(/!important/i);
         done += rest.substring(0, s);
@@ -2917,12 +2918,12 @@ function CodeColorizer(elmnt, mode) {
     }
     result = done + rest;    
     if (result.substr(result.length - 1, 1) == ";" && result.substr(result.length - 6, 6) != "&nbsp;" && result.substr(result.length - 4, 4) != "&lt;" && result.substr(result.length - 4, 4) != "&gt;" && result.substr(result.length - 5, 5) != "&amp;") {
-        result = result.substring(0, result.length - 1) + `<span style="color:${cssdelimitercolor};font-family:${elmntObj.style.fontFamily};">;</span>`;
+        result = result.substring(0, result.length - 1) + `<span style="color:${cssdelimitercolor};font-family:${fontFamily};">;</span>`;
     }
-    return `<span style="color:${csspropertyvaluecolor};font-family:${elmntObj.style.fontFamily};">` + result + "</span>";
+    return `<span style="color:${csspropertyvaluecolor};font-family:${fontFamily};">` + result + "</span>";
     }
     function cssImportantMode(txt) {
-    return `<span style="color:${cssimportantcolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${cssimportantcolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function jsMode(txt) {
     var rest = txt, done = "", esc = [], i, cc, tt = "", sfnuttpos, dfnuttpos, compos, comlinepos, keywordpos, numpos, mypos, dotpos, y;
@@ -2958,19 +2959,19 @@ function CodeColorizer(elmnt, mode) {
     for (i = 0; i < esc.length; i++) {
         rest = rest.replace("W3JSESCAPE", esc[i]);
     }
-    return `<span style="color:${jscolor};font-family:${elmntObj.style.fontFamily};">` + rest + "</span>";
+    return `<span style="color:${jscolor};font-family:${fontFamily};">` + rest + "</span>";
     }
     function jsStringMode(txt) {
-    return `<span style="color:${jsstringcolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${jsstringcolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function jsKeywordMode(txt) {
-    return `<span style="color:${jskeywordcolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${jskeywordcolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function jsNumberMode(txt) {
-    return `<span style="color:${jsnumbercolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${jsnumbercolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function jsPropertyMode(txt) {
-    return `<span style="color:${jspropertycolor};font-family:${elmntObj.style.fontFamily};">` + txt + "</span>";
+    return `<span style="color:${jspropertycolor};font-family:${fontFamily};">` + txt + "</span>";
     }
     function getDotPos(txt, func) {
     var x, i, j, s, e, arr = [".","<", " ", ";", "(", "+", ")", "[", "]", ",", "&", ":", "{", "}", "/" ,"-", "*", "|", "%"];
