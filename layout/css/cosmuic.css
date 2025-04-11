@@ -1185,7 +1185,7 @@ progress.linear:indeterminate::-ms-fill {
 .card2 button,
 .card3 button,
 .card5 button {
-    margin-top: .5rem .25rem;
+    margin: .5rem .25rem;
 }
 
 .card4 a.button, .card4 button {
