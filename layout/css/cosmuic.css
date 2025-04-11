@@ -1311,7 +1311,15 @@ progress.linear:indeterminate::-ms-fill {
 .card3.round,
 .card4.round,
 .card5.round {
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: 1.5rem !important;
+}
+
+.card1.square,
+.card2.square,
+.card3.square,
+.card4.square,
+.card5.square {
+    border-radius: 0 !important;
 }
 
 /* Chips
