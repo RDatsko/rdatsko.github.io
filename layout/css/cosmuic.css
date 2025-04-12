@@ -1346,6 +1346,20 @@ progress.linear:indeterminate::-ms-fill {
     border-radius: 0 !important;
 }
 
+@media screen and (max-width: 320px) {
+    .card5 {
+        flex-direction: column;
+    }
+
+    .card5 img {
+        width: 100%;
+    }
+
+    .card5 p:nth-child(2) {
+        overflow: visible;
+    }
+}
+
 /* Chips
  * ======================================== */
 
@@ -1702,6 +1716,6 @@ progress.linear:indeterminate::-ms-fill {
 /* Miscellaneous
  * ======================================== */
 
- .round {
+.round {
     border-radius: 1000em !important;
 }
