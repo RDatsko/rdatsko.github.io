@@ -369,8 +369,13 @@ a.button:hover:focus::before {
 
 button.text,
 a.button.text {
-    color: var(--primary-text);
+    color: var(--secondary-text);
     background-color: transparent !important;
+}
+
+button.default,
+a.button.default {
+    color: var(--primary);
 }
 
 /* Highlight, Ripple */
