@@ -3079,50 +3079,50 @@ function fixURLRef(id) {
 const articles = document.querySelectorAll('article');
 const asides = document.querySelectorAll('aside');
 
-articles.forEach((article, index) => {
-    const headings = Array.from(article.getElementsByTagName("h6"));
-    const aside = asides[index];
-    const ul = document.createElement("ul");
+// articles.forEach((article, index) => {
+//     const headings = Array.from(article.getElementsByTagName("h6"));
+//     const aside = asides[index];
+//     const ul = document.createElement("ul");
 
-    aside.appendChild(ul);
+//     aside.appendChild(ul);
 
-    headings.map((heading) => {
-        const id = heading.innerText.toLowerCase().replaceAll(" ", "_");
-        heading.setAttribute("id", id);
-        // const anchorElement = `<a href="#${id}">${heading.textContent}</a>`;
-        // const keyPointer = `<li>${anchorElement}</li>`;
-        const keyPointer = `<li><a onClick="fixURLRef('${id}');" id="${id}_fix">${heading.textContent}</a></li>`;
+//     headings.map((heading) => {
+//         const id = heading.innerText.toLowerCase().replaceAll(" ", "_");
+//         heading.setAttribute("id", id);
+//         // const anchorElement = `<a href="#${id}">${heading.textContent}</a>`;
+//         // const keyPointer = `<li>${anchorElement}</li>`;
+//         const keyPointer = `<li><a onClick="fixURLRef('${id}');" id="${id}_fix">${heading.textContent}</a></li>`;
 
-        ul.insertAdjacentHTML("beforeend", keyPointer);
-    });
+//         ul.insertAdjacentHTML("beforeend", keyPointer);
+//     });
 
-    const tocAnchors = aside.querySelectorAll("a");
+//     const tocAnchors = aside.querySelectorAll("a");
 
-    const obFunc = (entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                const index = headings.indexOf(entry.target);
-                tocAnchors.forEach((tab) => {
-                    tab.classList.remove("activetoc");
-                });
-                tocAnchors[index].classList.add("activetoc");
-                tocAnchors[index].scrollIntoView({
-                    block: "nearest",
-                    inline: "nearest"
-                });
-            }
-        });
-    };
+//     const obFunc = (entries) => {
+//         entries.forEach((entry) => {
+//             if (entry.isIntersecting) {
+//                 const index = headings.indexOf(entry.target);
+//                 tocAnchors.forEach((tab) => {
+//                     tab.classList.remove("activetoc");
+//                 });
+//                 tocAnchors[index].classList.add("activetoc");
+//                 tocAnchors[index].scrollIntoView({
+//                     block: "nearest",
+//                     inline: "nearest"
+//                 });
+//             }
+//         });
+//     };
 
-    const obOption = {
-        rootMargin: "-30px 0% -77%",
-        threshold: 1
-    };
+//     const obOption = {
+//         rootMargin: "-30px 0% -77%",
+//         threshold: 1
+//     };
 
-    const observer = new IntersectionObserver(obFunc, obOption);
+//     const observer = new IntersectionObserver(obFunc, obOption);
 
-    headings.forEach((hTwo) => observer.observe(hTwo));
-});
+//     headings.forEach((hTwo) => observer.observe(hTwo));
+// });
 
 </script>
 
