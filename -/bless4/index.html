@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bless4 - Home Page</title>
+<link rel="stylesheet" href="/layout/css/cosmuic.css">
+<style>
+
+.hero {
+    background-color: #000000;
+}
+
+@media (min-width: 500px) {
+    /* .hero h1 { color: white; } */
+    /* .hero p  { color: white; } */
+}
+
+@media (max-width: 499px) {
+    .hero-logo {
+        content: url("../assets/image/hero/bless4-logo1.png");
+    }
+}
+
+@media (min-width: 500px) {
+    .hero-logo {
+        content: url("../assets/image/hero/bless4-logo2.png");
+    }
+}
+
+</style>
+</head>
+<body>
+
+    <header>
+        <input id="navmenu" class="right" type="checkbox" />
+        <div>
+            <a href="../" class="clear"><img src="../layout/image/site_icon.png"></a> 
+            bless4
+        </div>
+        <nav>
+            <h6>bless4</h6>
+            <p>リンク</p>
+            <ol>
+                <li><a href="#">Link 1</a></li>
+                <li><a href="#">Link 2</a></li>
+                <li><a href="#">Link 3</a></li>
+                <li><a href="#">Link 4</a></li>
+                <li><a href="#">Link 5</a></li>
+            </ol>
+        </nav>
+    </header>
+    
+    <section class="hero square">
+        <img src="../assets/image/affiliates/square/bless4.jpg">
+        <span>
+            <img class="hero-logo">
+            <p>bless4は、兄妹のバイリンガル・コーラス・ダンス・グループ、音楽ユニット。</p>
+        </span>
+    </section>
+    
+    <main>
+        <section>
+            <p>Some Text.</p>
+            <p>Some Text.</p>
+            <p>Some Text.</p>
+            <p>Some Text.</p>
+            <p>Some Text.</p>
+        </section>
+    </main>
+    
+</body>
+</html>

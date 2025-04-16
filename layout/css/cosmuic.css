@@ -208,6 +208,7 @@ html, body {
 
 body {
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 main {
@@ -293,7 +294,7 @@ kbd {
     border: none;
     border-radius: 4px;
     padding: 0 1rem;
-    margin: 0 .35rem;
+    margin: 1rem .35rem 0.5rem;
     min-width: 4rem;
     height: 2.25rem;
     line-height: 2.25rem;
@@ -830,8 +831,10 @@ body > header img {
     padding: 7px;
 }
 
-body > header > div:first-of-type {
+body > header div:first-of-type {
     padding: 0 10px;
+    display: flex;
+    align-items: center;
 }
 
 body > header + main {
@@ -870,11 +873,16 @@ body > header ol li:hover label {
     cursor: pointer;
 }
 
-body > header > nav {
-    display: block;
+body > header nav {
+    display: flex;
 }
 
-body > header > input[type="checkbox"] {
+body > header nav > h6,
+body > header nav > p {
+    display: none;
+}
+
+body > header input[type="checkbox"] {
     --webkit-appearance: none;
     display: none;
 }
@@ -888,6 +896,11 @@ body > header > input[type="checkbox"] {
     body > header .icon {
         display: inline-block;
         /* margin: 20px 50px; */
+    }
+
+    body > header nav > h6,
+    body > header nav > p {
+        display: block;
     }
 
     body > header ol {
@@ -914,6 +927,13 @@ body > header > input[type="checkbox"] {
         border-radius: 0;
         color: white;
     } */
+}
+
+header > span {
+    display: flex;
+    margin: auto;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Typography (h1, h2, h3, h4, h5, h6)
@@ -1305,6 +1325,11 @@ progress.linear:indeterminate::-ms-fill {
     flex-direction: column;
 }
 
+.card4 a::after {
+    margin: 0;
+    height: 0;
+}
+
 .card4 div {
     position: absolute;
     bottom: 0;
@@ -1486,6 +1511,13 @@ progress.linear:indeterminate::-ms-fill {
     position: relative;
 }
 
+/* Main
+ * ======================================== */
+
+main {
+    margin: auto;
+}
+
 /* Hero sections
  * ======================================== */
 
@@ -1497,18 +1529,19 @@ progress.linear:indeterminate::-ms-fill {
     flex-direction: column;
     width: 100%;
     height: auto;
-    max-height: calc(100vh - 64px);
-    margin-top: 64px;
+    max-height: calc(100vh - 56px);
+    margin-top: 56px;
 }
 
-.hero img {
+.hero > img {
     width: auto;
     height: auto;
     position: relative;
     max-width: 100vw;
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 56px);
     object-fit: contain;
     z-index: 1;
+    margin: auto;
 }
 
 .hero > span {
@@ -1553,6 +1586,7 @@ progress.linear:indeterminate::-ms-fill {
         width: 50%;
         height: auto;
         left: 50%;
+        margin: 0;
     }
 }
 
@@ -1572,12 +1606,14 @@ progress.linear:indeterminate::-ms-fill {
         width: 50%;
         height: auto;
         left: 50%;
+        margin: 0;
     }
 
     .hero.square > img {
         width: 100%;
         height: auto;
         left: 0;
+        margin: 0;
     }
 }
 
@@ -1657,6 +1693,11 @@ progress.linear:indeterminate::-ms-fill {
         transform: translate(100%);
     }
 
+    #navmenu.left ~ nav h6,
+    #navmenu.left ~ nav p {
+        margin-left: 42px;
+    }
+
     #navmenu.right:checked ~ nav {
         transform: translate(0%);
     }
@@ -1701,7 +1742,7 @@ progress.linear:indeterminate::-ms-fill {
 
     #navmenu ~ nav  ol {
         position: absolute;
-        padding-top: 56px;
+        padding-top: 84px;
         bottom: 0;
         left: 0;
         right: 0;

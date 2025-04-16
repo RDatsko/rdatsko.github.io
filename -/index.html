@@ -1,0 +1,648 @@
+
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+<meta charset="UTF-8">
+
+<!-- メタタグ記述 -->
+<title>川満アート・テイメント株式会社 - ホメパゲ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="description" content="Page description" />
+
+<!-- og系記述 -->
+<meta property="og:title" content="Company Home Page" />
+<meta property="og:image" content="http://127.0.0.1/assets/image/share/og_homepage.jpg" />
+<meta property="og:url" content="http://12.0.0.1/" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="Description of the page" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:locale:alternate" content="en_US" />
+
+<!-- Twitter/𝕏系記述 -->
+<meta property="twitter:title" content="Company Home Page" />
+<meta property="twitter:image" content="http://127.0.0.1/assets/image/share/og_homepage.jpg" />
+<meta property="twitter:url" content="http://12.0.0.1/" />
+<meta property="twitter:description" content="Description of the page" />
+<meta property="twitter:creator" content="@example" />
+<meta property="twitter:site" content="@example" />
+<meta property="twitter:card" content="summary_large_image" />
+
+<link rel="stylesheet" type="text/css" href="/layout/css/cosmuic.css">
+<!-- <link rel="stylesheet" type="text/css" media="screen and (max-width: 959px)" href="/layout/css/sm.css">
+<link rel="stylesheet" type="text/css" media="screen and (min-width: 960px)" href="/layout/css/lg.css"> -->
+
+<!-- CSSファイル記述 -->
+<link rel="stylesheet" href="./layout/css/styles.css" />
+
+<style>
+
+.info > p:first-child {
+    font-size: 1.5rem;
+    width: 20rem;
+    border-bottom: 1px solid gray;
+    margin: 5rem 0 0.25rem 0;
+}
+
+.info > p:last-child {
+    font-size: 1rem;
+    margin: 0.25rem 0 3rem 0;
+}
+
+.card4 p:first-child {
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+.card4 div {
+    max-height: 2rem;
+    padding-top: 0;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <span>
+        <input id="navmenu" class="right" type="checkbox" />
+        <div>
+            <a href="/" class="clear"><img src="./layout/image/site_icon.png"></a> 
+            川満アート・テイメント株式会社
+        </div>
+        <nav>
+            <h6>川満ｱｰﾄ･ﾃｲﾒﾝﾄ</h6>
+            <p>リンク</p>
+            <ol>
+                <li><a href="#">アーティスト</a></li>
+                <li><a href="#">トピックス</a></li>
+                <li><a href="#">事業内容</a></li>
+                <li><a href="#">会社概要</a></li>
+                <li><a href="#">仕事のご依頼</a></li>
+            </ol>
+        </nav>
+        </span>
+</header>
+
+<style>
+/* body {
+    overflow-x: hidden;
+} */
+
+/* .hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} */
+</style>
+
+<section class="hero">
+    <img src="./assets/image/hero/company_main.jpg">
+    <span>
+        <h1>あなたの夢を現実にする場所</h1>
+        <p>Design your dream !</p>
+    </span>
+</section>
+
+<main>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit ullamcorper enim, et volutpat velit rutrum eu. Fusce sed venenatis urna. Suspendisse aliquam sodales aliquet. Mauris accumsan at risus sit amet sagittis. Cras vitae est placerat, varius metus at, viverra leo. Pellentesque congue elementum ante ac laoreet. Aenean semper leo quis elit bibendum blandit. Nullam sed auctor turpis. Pellentesque luctus hendrerit sapien sed faucibus. Aenean dictum urna at rutrum rutrum. Aliquam erat volutpat. Vestibulum bibendum risus scelerisque, venenatis velit nec, euismod leo. In hac habitasse platea dictumst.
+
+    <!-- Custom "Add to Home Screen" button -->
+    <button id="iosInstallButton" style="display: none; margin: 10px auto;">Add to Home Screen</button>
+
+    
+    <!-- Instructions for adding to home screen -->
+    <div id="iosInstructions" style="display: none; margin: 0 auto;">
+        <p>To add this site to your home screen:</p>
+        <p><strong>1.</strong> Tap the Share button ( <img src="share-icon.png" alt="Share Icon" style="height: 1em;"> ) at the bottom of the screen.</p>
+        <p><strong>2.</strong> Scroll down and tap <strong>Add to Home Screen</strong>.</p>
+    </div>
+
+    <a id="events"></a>
+    <div class="info">
+        <p>イベント情報</p>
+        <p>Upcoming Events</p>
+    </div>
+
+    <div class="grid">
+<!-- 
+        <div class="ticket s6 m4 l2">
+            <p>Artist 2</p>
+            <p>Home Live</p>
+            <img src="/assets/image/event/noimage.jpg">
+            <p>ABC Arena</p>
+            <p>1st January 2000</p>
+            <p>Open: 15:00 ~ Start: 15:30</p>
+            <hr>
+            <a class="button">BUY TICKET</a>
+        </div>
+
+        <div class="ticket s6 m4 l2">
+            <p>Artist 1</p>
+            <p>Home Live</p>
+            <img src="/assets/image/event/noimage.jpg">
+            <p>ABC Arena</p>
+            <p>1st January 2000</p>
+            <p>Open: 17:00 ~ Start: 17:30</p>
+            <hr>
+            <a class="button">BUY TICKET</a>
+        </div>
+
+        <div class="ticket s6 m4 l2">
+            <p>Group 1</p>
+            <p>Home Live</p>
+            <img src="/assets/image/event/noimage.jpg">
+            <p>ABC Arena</p>
+            <p>2nd January 2000</p>
+            <p>Open: 17:00 ~ Start: 17:30</p>
+            <hr>
+            <a class="button">BUY TICKET</a>
+        </div>
+
+        <div class="ticket s6 m4 l2">
+            <p>Group 2</p>
+            <p>Home Live</p>
+            <img src="/assets/image/event/noimage.jpg">
+            <p>ABC Arena</p>
+            <p>7th January 2000</p>
+            <p>Open: 17:00 ~ Start: 17:30</p>
+            <hr>
+            <a class="button">BUY TICKET</a>
+        </div>
+ -->
+
+
+
+
+
+
+
+
+
+
+<!--  
+        <div class="ticket s12 m6 l4">
+            <img src="/assets/image/event/20000101_event1.jpg">
+            <div>
+                <p>SAT<br>JANUARY 1ST<br>20XX</p>
+                <p>Show Name</p>
+                <p>Artist</p>
+                <p>OPEN: 15:00<br>START: 15:30</p>
+                <p>ABC Arena<br>Kawasaki, KNG</p>
+            </div>
+            <div>
+                <p>Price</p>
+                <span>
+                    <p>Adult:<br>$35</p>
+                    <p>Student:<br>$20</p>
+                    <p>Child:<br>$10</p>
+                </span>
+                <button>Button</button>
+            </div>
+        </div>
+
+        <div class="ticket s12 m6 l4">
+            <img src="/assets/image/event/20000101_event2.jpg">
+            <div>
+                <p>SAT<br>JANUARY 1ST<br>20XX</p>
+                <p>Show Name</p>
+                <p>Artist</p>
+                <p>OPEN: 15:00<br>START: 15:30</p>
+                <p>ABC Arena<br>Kawasaki, KNG</p>
+            </div>
+            <div>
+                <p>Price</p>
+                <span>
+                    <p>Adult:<br>$35</p>
+                    <p>Student:<br>$20</p>
+                    <p>Child:<br>$10</p>
+                </span>
+                <button>Button</button>
+            </div>
+        </div> -->
+
+        <div class="ticket sm12 md6 lg4">
+            <img src="./assets/image/event/20000101_event1.jpg">
+            <div>
+                <p><span>SAT</span><span>JANUARY 1</span><span>2000</span></p>
+                <P>Show Name</P>
+                <p>Artist 2</p>
+                <p><span>OPEN: 15:00</span><span>START: 15:30</span></p>
+                <p><span>ABC Arena</span><span>CITY, ABR</span></p>
+            </div>
+            <div>
+                <p><span>Adult:</span><span>$35</span></p>
+                <p><span>Student:</span><span>$20</span></p>
+                <p><span>Child:</span><span>$10</span></p>
+                <a href="" class="button">BUY</a>
+            </div>
+        </div>
+
+        <div class="ticket sm12 md6 gl4">
+            <img src="./assets/image/event/20000101_event2.jpg">
+            <div>
+                <p><span>SAT</span><span>JANUARY 1</span><span>2000</span></p>
+                <P>Show Name</P>
+                <p>Artist 1</p>
+                <p><span>OPEN: 17:00</span><span>START: 17:30</span></p>
+                <p><span>ABC Arena</span><span>CITY, ABR</span></p>
+            </div>
+            <div>
+                <p><span>Adult:</span><span>$35</span></p>
+                <p><span>Student:</span><span>$20</span></p>
+                <p><span>Child:</span><span>$10</span></p>
+                <a href="" class="button">BUY</a>
+            </div>
+        </div>
+
+        <div class="ticket sm12 md6 lg4">
+            <img src="./assets/image/event/20000102_event1.jpg">
+            <div>
+                <p><span>SUN</span><span>JANUARY 2</span><span>2000</span></p>
+                <P>Show Name</P>
+                <p>Group 1</p>
+                <p><span>OPEN: 15:00</span><span>START: 15:30</span></p>
+                <p><span>ABC Arena</span><span>CITY, ABR</span></p>
+            </div>
+            <div>
+                <p><span>Adult:</span><span>$35</span></p>
+                <p><span>Student:</span><span>$20</span></p>
+                <p><span>Child:</span><span>$10</span></p>
+                <a href="" class="button">BUY</a>
+            </div>
+        </div>
+
+        <div class="ticket sm12 md6 lg4">
+            <img src="./assets/image/event/20000107_event1.jpg">
+            <div>
+                <p><span>SAT</span><span>JANUARY 8</span><span>2000</span></p>
+                <P>Show Name</P>
+                <p>Group 2</p>
+                <p><span>OPEN: 17:00</span><span>START: 17:30</span></p>
+                <p><span>ABC Arena</span><span>CITY, ABR</span></p>
+            </div>
+            <div>
+                <p><span>Adult:</span><span>$35</span></p>
+                <p><span>Student:</span><span>$20</span></p>
+                <p><span>Child:</span><span>$10</span></p>
+                <a href="" class="button">BUY</a>
+            </div>
+        </div>
+
+    </div>
+
+    <a id="about"></a>
+    <div class="info">
+        <p>事業内容</p>
+        <p>About</p>
+    </div>
+
+    <div class="grid">
+
+        <div class="card3 sm12 md6 lg3">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            <div>
+                <p>アスレチック・ミュージック</p>
+                <p>
+                    プロを目指す本気のエンターテイメントスクール。 bless4による直接指導でアーティストを育成。 年２回開催する全生徒による発表会で半年間の成果を発揮しよう。<br>
+                    体験レッスン受付中!!
+                </p>
+                <span>
+                    <a href="" class="button text colored">詳細はこちら >></a>
+                </span>
+            </div>
+        </div>
+
+        <div class="card3 sm12 md6 lg3">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            <div>
+                <p>bless4スタジオ</p>
+                <p>
+                    音楽に合わせて楽しく手軽にダンスを始められるダンススクール。 年齢に合わせた３段階のコースで世代を問わずダンスが身につけられます。<br>
+                    体験レッスン受付中!!
+                </p>
+                <span>
+                    <a href="" class="button text colored">詳細はこちら >></a>
+                </span>
+            </div>
+        </div>
+
+        <div class="card3 sm12 md6 lg3">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            <div>
+                <p>bless4 WORLD</p>
+                <p>エンターテイメントが詰まったNew World！ 柿生初男女混合コーラスダンスグループ AMW、柿生の平和を守るご当地ヒーロー カキライザー、AIP (アニソンアイドルプロジェクト)などの限定コンテンツも！</p>
+                <span>
+                    <a href="" class="button text colored">詳細はこちら >></a>
+                </span>
+            </div>
+        </div>
+
+        <div class="card3 sm12 md6 lg3" style="opacity:0.3;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            <div>
+                <p>KAT-TV</p>
+                <p>KAT-TV 〜柿生からあなたへ繋がるTV〜<br>
+                    KATの活動や情報など地域に密着した内容をお届け<br>
+                    放送は毎月第2土曜日の14時からスタート！
+                </p>
+                <span>
+                    <a href="" class="button text colored">詳細はこちら >></a>
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <a id="affiliations"></a>
+    <div class="info">
+        <p>傘下</p>
+        <p>Affiliations</p>
+    </div>
+
+    <div class="grid">
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./akino/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>AKINO from bless4</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./amw/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>AMW</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./bless4/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>bless4</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./haru/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>HARU</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./kakai_rizer/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>KAKI RIZER</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./kanasa/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>KANASA from bless4</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+        <div class="card4 sm6 md4 lg2">
+            <a href="./seigi_no_mikata/">
+                <img src="/assets/image/noimage_uws.jpg">
+                <div>
+                    <p>SEIGI NO MIKATA</p>
+                    <button></button>
+                </div>
+            </a>
+        </div>
+
+    </div>
+<!-- 
+    <div class="grid">
+
+        <a href="./artist1/" class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/affiliates/artist1.jpg">
+            Artist 1
+        </a>
+
+        <a href="./group2/" class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/affiliates/group2.jpg">
+            Group 2
+        </a>
+
+        <a href="./group1/" class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/affiliates/group1.jpg">
+            Group 1
+        </a>
+
+        <a class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            Group 4
+        </a>
+
+        <a class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            Miscellaneous 2
+        </a>
+
+        <a class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            Miscellaneous 1
+        </a>
+
+        <a class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            Other 1
+        </a>
+
+        <a href="./artist2/" class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/affiliates/artist2.jpg">
+            Artist 2
+        </a>
+
+        <a class="chip square clear sm12 md6 lg3 affiliate" style="overflow: hidden;">
+            <img class="responsive" src="./assets/image/placeholder/noimage_ws.jpg">
+            Group 3
+        </a>
+
+    </div> -->
+
+<!-- 
+    <div class="grid">
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/affiliates/artist1.jpg">
+            <div>
+                <p>Artist 1</p>
+                <a href="./artist1/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/affiliates/group2.jpg">
+            <div>
+                <p>Group 2</p>
+                <a href="./group2/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/affiliates/group1.jpg">
+            <div>
+                <p>Group 1</p>
+                <a href="./group1/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/noimage_ws.jpg">
+            <div>
+                <p>Group 4</p>
+                <a href="./group4/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/noimage_ws.jpg">
+            <div>
+                <p>Miscellaneous 2</p>
+                <a href="./miscellaneous2/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/noimage_ws.jpg">
+            <div>
+                <p>Miscellaneous 1</p>
+                <a href="./miscellaneous1/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/noimage_ws.jpg">
+            <div>
+                <p>Other 1</p>
+                <a href="./other1/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/affiliates/artist2.jpg">
+            <div>
+                <p>Artist 2</p>
+                <a href="./artist2/index.html" class="button"></a>
+            </div>
+        </div>
+
+        <div class="card4 s6 m3 l2">
+            <img class="responsive" src="/assets/image/noimage_ws.jpg">
+            <div>
+                <p>Group 3</p>
+                <a href="./group3/index.html" class="button"></a>
+            </div>
+        </div>
+
+    </div>
+    -->
+
+    <a id="company"></a>
+    <div class="info">
+        <p>会社概要</p>
+        <p>Company Outline</p>
+    </div>
+
+    <a id="contact"></a>
+    <div class="info">
+        <p>仕事のご依頼</p>
+        <p>Contact Us</p>
+    </div>
+
+    <p>所属アーティストへのお仕事のご依頼は下のボタンよりお願いいたします。</p>
+
+    <button style="display: block; width: 50%; min-width: 17rem; margin: auto;">お仕事のご依頼はこちら  Job Offer</button>
+
+    <br>
+    
+</main>
+
+<!-- <footer>Copyright &copy; Company Name, Ltd. All Rights Reserved.</footer> -->
+
+<footer>
+    <div class="row1">
+        <span>
+            <div class="cols cols1">
+                <h4>川満アート・テイメント株式会社</h4>
+                <h5>あなたの夢を現実にする場所</h5>
+                <p>Design your dream !</p>
+                <!-- <div class="mail">
+                    <span class="fa fa-envelope"></span>
+                    <p>customer.support@gmail.com</p>
+                </div> -->
+            </div>
+            <div class="cols cols2">
+                <h2>Company</h2>
+                <a href="">About Us</a>
+                <a href="">Athletic Music</a>
+                <a href="">bless4 Studio</a>
+                <a href="">Contact Us</a>
+            </div>
+            <div class="cols cols3">
+                <h2>Hot Links</h2>
+                <a href="https://kat.shop-pro.jp/">Shop</a>
+                <a href="https://www.muevo-com.jp/campaigns/203">YTT Family</a>
+            </div>
+            <div class="cols cols4">
+                <h2>More from Us</h2>
+                <a href="">Fashion XChange</a>
+                <a href="">UP CYCLE FES</a>
+            </div>
+            <div class="cols cols5">
+                <h2>傘下</h2>
+                <a href="./akino/">AKINO from bless4</a>
+                <a href="./amw/">AMW</a>
+                <a href="./bless4/">bless4</a>
+                <a href="./haru/">HARU</a>
+            </div>
+            <div class="cols cols6">
+                <h2>&nbsp;</h2>
+                <a href="./kakirizer/">KAKI RIZER</a>
+                <a href="./kanasa/">KANASA from bless4</a>
+                <a href="./seigi_no_mikata/">SEIGI NO MIKATA</a>
+            </div>
+        </span>
+    </div>
+
+    <div class="row2">
+        <span>
+            <div class="cols" id="a">
+                Copyright &copy; Kawamitsu Arttainment Co., Ltd.<br>All Rights Reserved.
+            </div>
+            <div class="cols" id="b"></div>
+            <div class="cols" id="c">
+                <a class="fab fa-facebook"></a>
+                <a class="fab fa-linkedin"></a>
+                <a class="fab fa-instagram"></a>
+                <a class="fab fa-x-twitter"></a>
+                <a class="fab fa-youtube"></a>
+            </div>
+        </span>
+    </div>
+</footer>
+
+</body>
+</html>
