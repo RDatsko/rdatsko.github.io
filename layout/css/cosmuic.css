@@ -831,7 +831,8 @@ body > header img {
     padding: 7px;
 }
 
-body > header div:first-of-type {
+body > header > div:first-of-type,
+body > header > span > div:first-of-type {
     padding: 0 10px;
     display: flex;
     align-items: center;
@@ -1530,7 +1531,7 @@ main {
     width: 100%;
     height: auto;
     max-height: calc(100vh - 56px);
-    margin-top: 56px;
+    margin: 56px 0;
 }
 
 .hero > img {
