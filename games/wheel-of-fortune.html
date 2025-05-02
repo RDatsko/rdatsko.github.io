@@ -1,93 +1,756 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/layout/css/cosmuic.css">
-<link rel="stylesheet" href="/layout/css/styles.css">
-<title>Mystic Web: Wheel of Fortune</title>
+<title>Game Template</title>
+<style>
+
+html, body, * {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+    font-family: sans-serif;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+.game {
+    width: 100%;
+    height: 100%;
+    max-width: calc(100vh * (16 / 9));
+    max-height: calc(100vw * (9 / 16));
+    background-color: #333;
+    position: absolute;
+    display: flex;
+    font-size: calc(0.1 * max(10%, min(10vh * (16 / 9), 10vw)));
+    overflow: hidden;
+}
+
+.bgimg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+span {
+    background-color: magenta;
+    position: absolute;
+    font-size: 1em;
+    white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+table.game_board {
+    position: absolute;
+    width: 66%;
+    height: 40%;
+    top: 18.25%;
+    left: 25.75%;
+}
+table.game_board tr td {
+    width: 4.5em;
+    height: 5.35em;
+    border: 0.25em solid #000;
+    position: relative;
+    font-family: monospace;
+    font-size: 1em;
+    text-align: center;
+}
+
+table.game_board tr td::after {
+    background: #145837;
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+table.game_board tr td.contains::after {
+    background: #FFF;
+}
+
+table.game_board tr td.blank {
+    border: none;
+}
+
+table.game_board tr td.blank::after,
+table.game_board tr td.revealed::after {  display: none; }
+
+table.game_board tr td.revealed {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#wheel-play {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* display: none; */
+}
+
+#wheel {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    aspect-ratio: 1;
+    /* width: 100%;
+    height: auto; */
+    top: 65%;
+    left: 12.5%;
+}
+
+#wheel-canvas {
+    /* display: block; */
+    position: absolute;
+    overflow: visible;
+    /* top: 65%;
+    left: 10%; */
+    width: 75em;
+    height: 75em;
+    transition: rotate 0.8s;
+}
+
+#spin {
+    font: 1.5em/0 sans-serif;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    /* top: 50em;
+    left: 34.65em; */
+    top: 26em;
+    left: 26.25em;
+    width: 27em;
+    height: 27em;
+    margin: -15em;
+    background: #fff;
+    color: #fff;
+    box-shadow: 0 0 0 0.25em currentColor, 0 0px 0.5em 0.5em rgba(0, 0, 0, 0.6);
+    border: solid 0.25em #eee;
+    border-radius: 50%;
+}
+
+#spin::after {
+    content: "";
+    position: absolute;
+    top: -1.25em;
+    border: 1em solid transparent;
+    border-bottom-color: currentColor;
+    border-top: none;
+}
+
+#spin-value {
+    position: absolute;
+    width: 12em;
+    height: 4em;
+    /* bottom: 2em; */
+    /* right: 4em; */
+    bottom: 5.75em;
+    right: 2.65em;
+    border: 0.35em solid white;
+    background-color: black;
+    color: white;
+    padding: 0 1.5em;
+}
+
+#spin-value p {
+    font-size: 3.5em;
+    text-align: end;
+    transform-origin: 0;
+    white-space: nowrap;
+}
+
+#spin-img {
+    position: absolute;
+    left: 82%;
+    bottom: 18%;
+    width: 15%;
+    height: 12%;
+    display: block;
+}
+
+
+
+
+
+
+
+
+#scoreboard {
+    border: 0.5em;
+    position: absolute;
+    left: 1%;
+    top: 1%;
+    width: 15%;
+    height: 80%;
+    border: 0.025em solid #ccc;
+    background-color: #202020;
+    border-radius: 1em;
+}
+
+#scoreboard * {
+    color: white;
+    font-style: oblique;
+    font-weight: 700;
+}
+
+#scoreboard .header {
+    padding: 1em 2em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    border-bottom: solid 0.1em #444;
+    padding: 1em 0.5em;
+}
+
+.header h1 {
+    flex-grow: 1;
+    font-size: 1.5em;
+    font-weight: normal;
+}
+
+.player {
+    display: flex;
+    font-size: 1.1em;
+    border-bottom: solid 0.1em #444;
+    letter-spacing: 0.1em;
+    flex-direction: column;
+}
+
+.player-name {
+    flex-grow: 1;
+    padding: 0.25em 0 0.25em 0.5em;
+}
+
+.player-score {
+    width: 5em;
+    font-size: 2.5em;
+    text-align: right;
+    margin: 0 0em;
+}
+
+
+
+
+
+
+
+
+
+#letters {
+    position: absolute;
+    bottom: 8%;
+    width: 90%;
+    left: 0;
+    padding: 0% 5%;
+    color: white;
+    font-size: 4em;
+}
+
+#letters tr td {
+    position: relative;
+    transform: scale(0.65, 1);
+    width: 3.8%;
+    display: inline-block;
+    text-align: center;
+}
+
+#letters tr td.vowel {
+    color: red;
+}
+
+</style>
 </head>
 <body>
 
-<header>
-    <input id="navmenu" type="checkbox" class="left" />
-    <div><img src="/layout/image/logo.png"></div>
-    <nav>
-        <ol>
-            <li><a href="/">HOME</a></li>
-
-            <input type="radio" name="panel" id="nav-web">
-            <li>
-                <label for="nav-web">WEB</label>
-                <div class="submenu">
-                    <a href="/cosmuic/" class="sub-item">
-                        <img src="/layout/image/css3-alt.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">COSMUIC</div>
-                            <div class="desc">Material UI like CSS for sites</div>
-                        </div>
-                    </a>
-
-                    <a href="/html-tools/" class="sub-item">
-                        <img src="/layout/image/tools-fill.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">HTML Stuff</div>
-                            <div class="desc">Some useful things for the web</div>
-                        </div>
-                    </a>
-
-                    <a href="/apps/" class="sub-item">
-                        <img src="/layout/image/application_window.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">Web Apps</div>
-                            <div class="desc">Various web based applications</div>
-                        </div>
-                    </a>
-
-                    <a href="/games/" class="sub-item">
-                        <img src="/layout/image/game-line.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">HTML Games</div>
-                            <div class="desc">Some web based HTML games</div>
-                        </div>
-                    </a>
+<div class="container">
+    <div class="game">
+        <img class="bgimg" src="wheel-of-fortune.svg">
+        <div id="scoreboard">
+            <div class="header">
+                <h1>Scoreboard</h1>
+            </div>
+            <div class="players">
+                <div class="player">
+                    <div class="player-name">Player 1</div>
+                    <div class="player-score">0</div>
                 </div>
-            </li>
-
-            <input type="radio" name="panel" id="nav-misc">
-            <li>
-                <label for="nav-misc">MISC</label>
-                <div class="submenu">
-                    <a href="/books/" class="sub-item">
-                        <img src="/layout/image/book-half.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">eBooks</div>
-                            <div class="desc">Custom eBooks using HTML & CSS</div>
-                        </div>
-                    </a>
-
-                    <a href="/japanese/" class="sub-item">
-                        <img src="/layout/image/letter-japanese-a.svg" class="material-icons-outlined"/>
-                        <div class="details">
-                            <div class="title">Japanese Study</div>
-                            <div class="desc">Tools for studying Japanese</div>
-                        </div>
-                    </a>
+                <div class="player">
+                    <div class="player-name">Player 2</div>
+                    <div class="player-score">0</div>
                 </div>
-            </li>
+                <div class="player">
+                    <div class="player-name">Player 3</div>
+                    <div class="player-score">0</div>
+                </div>
+                <div class="player">
+                    <div class="player-name">Player 4</div>
+                    <div class="player-score">0</div>
+                </div>
+                <div class="player">
+                    <div class="player-name">Player 5</div>
+                    <div class="player-score">0</div>
+                </div>
+                <div class="player">
+                    <div class="player-name">Player 6</div>
+                    <div class="player-score">0</div>
+                </div>
+                <div class="player">
+                    <div class="player-name">Player 7</div>
+                    <div class="player-score">0</div>
+                </div>
+                <div class="player">
+                    <div class="player-name">Player 8</div>
+                    <div class="player-score">0</div>
+                </div>
+            </div>
+        </div>
+        <table class="game_board">
+            <tr>
+                <td class="blank"></td>
+                <td id="g1"></td><td id="g2"></td><td id="g3"></td><td id="g4"></td><td id="g5"></td>
+                <td id="g6"></td><td id="g7"></td><td id="g8"></td><td id="g9"></td><td id="g10"></td>
+                <td id="g11"></td><td id="g12"></td>
+                <td class="blank"></td>
+            </tr>
+            <tr>
+                <td id="g13"></td><td id="g14"></td><td id="g15"></td><td id="g16"></td>
+                <td id="g17"></td><td id="g18"></td><td id="g19"></td><td id="g20"></td>
+                <td id="g21"></td><td id="g22"></td><td id="g23"></td><td id="g24"></td>
+                <td id="g25"></td><td id="g26"></td>
+            </tr>
+            <tr>
+                <td id="g27"></td><td id="g28"></td><td id="g29"></td><td id="g30"></td>
+                <td id="g31"></td><td id="g32"></td><td id="g33"></td><td id="g34"></td>
+                <td id="g35"></td><td id="g36"></td><td id="g37"></td><td id="g38"></td>
+                <td id="g39"></td><td id="g40"></td>
+            </tr>
+            <tr>
+                <td class="blank"></td>
+                <td id="g41"></td><td id="g42"></td><td id="g43"></td><td id="g44"></td>
+                <td id="g45"></td><td id="g46"></td><td id="g47"></td><td id="g48"></td>
+                <td id="g49"></td><td id="g50"></td><td id="g51"></td><td id="g52"></td>
+                <td class="blank"></td>
+            </tr>
+        </table>
 
 
-            <li><a href="/about/">ABOUT</a></li>
-        </ol>
-    </nav>
-</header>
 
-<main>
-    <h3><b>Wheel of Fortune</b></h3>
-    <p>
-        -
-    </p>
-</main>
 
+        <table id="letters">
+            <tr>
+                <td onclick="letter('A');" class="vowel">A</td>
+                <td onclick="letter('B');">B</td>
+                <td onclick="letter('C');">C</td>
+                <td onclick="letter('D');">D</td>
+                <td onclick="letter('E');" class="vowel">E</td>
+                <td onclick="letter('F');">F</td>
+                <td onclick="letter('G');">G</td>
+                <td onclick="letter('H');">H</td>
+                <td onclick="letter('I');" class="vowel">I</td>
+                <td onclick="letter('J');">J</td>
+                <td onclick="letter('K');">K</td>
+                <td onclick="letter('L');">L</td>
+                <td onclick="letter('M');">M</td>
+                <td onclick="letter('N');">N</td>
+                <td onclick="letter('O');" class="vowel">O</td>
+                <td onclick="letter('P');">P</td>
+                <td onclick="letter('Q');">Q</td>
+                <td onclick="letter('R');">R</td>
+                <td onclick="letter('S');">S</td>
+                <td onclick="letter('T');">T</td>
+                <td onclick="letter('U');" class="vowel">U</td>
+                <td onclick="letter('V');">V</td>
+                <td onclick="letter('W');">W</td>
+                <td onclick="letter('X');">X</td>
+                <td onclick="letter('Y');">Y</td>
+                <td onclick="letter('Z');">Z</td>
+            </tr>
+        </table>
+
+
+        <div id="wheel-play">
+            <div style="background-color: #000; opacity: 0.65; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+            <div id="wheel">
+                <canvas id="wheel-canvas"></canvas>
+                <div id="spin"></div>
+            </div>    
+            <div id="spin-value"><p></p></div>
+        </div>
+        <div id="spin-img"></div>
+
+
+
+
+
+
+
+
+
+    </div>
+</div>
+
+
+<script>
+    let sectors = [
+        {color: "#D2C515", value: "600",  label: "$ 600"},
+        {color: "#b54841", value: "700",  label: "$ 700"},
+        {color: "#3991c1", value: "600",  label: "$ 600"},
+        {color: "#cd5919", value: "650",  label: "$ 650"},
+        {color: "#8264a6", value: "500",  label: "$ 500"},
+        {color: "#d4c71d", value: "700",  label: "$ 700"},
+        {color: "#d1798d", value: "500",  label: "$ 500"},
+        {color: "#c04f47", value: "600",  label: "$ 600"},
+        {color: "#3d9cd1", value: "550",  label: "$ 550"},
+        {color: "#049f6e", value: "500",  label: "$ 500"},
+        {color: "#e5839a", value: "600",  label: "$ 600"},
+        {color: "#1c1a19", value: "-1",   label: "BANKRUPT"},
+        {color: "#9975be", value: "650",  label: "$ 650"},
+        {color: "#dfd616", value: "850",  label: "$ 850"},
+        {color: "#49aae1", value: "700",  label: "$ 700"},
+        {color: "#dfe5dd", value: "0",    label: "LOSE A TURN"},
+        {color: "#d4574f", value: "800",  label: "$ 800"},
+        {color: "#9973bc", value: "500",  label: "$ 500"},
+        {color: "#e68398", value: "650",  label: "$ 650"},
+        {color: "#03a26e", value: "500",  label: "$ 500"},
+        {color: "#e7651c", value: "900",  label: "$ 900"},
+        {color: "#181614", value: "-1",   label: "BANKRUPT"},
+        {color: "#989b98", value: "5000", label: "$ 5000"},
+        {color: "#039364", value: "500",  label: "$ 500"},
+    ];
+
+const rand = (m, M) => Math.random() * (M - m) + m;
+let tot = sectors.length;
+const EL_spin = document.querySelector("#spin");
+const ctx = document.querySelector("#wheel-canvas").getContext('2d');
+const buttonAddEl = document.querySelector("#buttonAdd");
+const inputAddEl = document.querySelector("#add-name-input");
+const inputAddColor = document.querySelector("#add-color-input");
+const spinValueEl = document.querySelector("#spin-value > p");
+const dia = ctx.canvas.width;
+const rad = dia / 2;
+const PI = Math.PI;
+const TAU = 2 * PI;
+let arc = TAU / sectors.length;
+
+const friction = 0.997; // 0.995=soft, 0.99=mid, 0.98=hard
+let angVel = 0; // Angular velocity
+let ang = 0; // Angle in radians
+
+const getIndex = () => Math.floor(tot - ang / TAU * tot) % tot;
+
+function rotate() {
+    const sector = sectors[getIndex()];
+    ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
+    EL_spin.style.background = sector.color;
+
+    if (sector.label === "BANKRUPT" || sector.label === "LOSE A TURN") {
+        spinValueEl.style.transform = `scale(.55, 1)`;
+    } else {
+        spinValueEl.style.transform = `scale(1)`;
+    }
+
+    spinValueEl.textContent = sector.label;
+}
+
+function frame() {
+    if (!angVel) return;
+    angVel *= friction; // Decrement velocity by friction
+    if (angVel < 0.002) angVel = 0; // Bring to stop
+    ang += angVel; // Update angle
+    ang %= TAU; // Normalize angle
+    rotate();
+}
+
+function engine() {
+    frame();
+    requestAnimationFrame(engine)
+}
+
+// INIT
+rotate(); // Initial rotation
+engine(); // Start engine
+
+// EL_spin.addEventListener("click", () => {
+//     if (!angVel) angVel = rand(0.25, 0.35);
+// });
+
+document.querySelector("#spin-img").addEventListener("click", () => {
+    if (!angVel) angVel = rand(0.25, 0.35);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const canvas = document.getElementById("wheel-canvas");
+// const ctx = canvas.getContext("2d");
+
+// Dynamically set canvas size
+function resizeCanvas() {
+    let size = Math.min(window.innerWidth, window.innerHeight) * 0.6; // 60% of viewport
+    canvas.width = size;
+    canvas.height = size;
+    drawWheel();
+}
+
+
+function drawWheel() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let rad = canvas.width / 2;
+    let arc = (2 * Math.PI) / sectors.length;
+
+    sectors.forEach((sector, i) => {
+        let ang = arc * i;
+        ctx.save();
+
+        // Set shadow effect on left side of the slice
+        ctx.shadowColor = "rgba(0, 0, 0, 0.75)";  // Dark shadow
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 0;  // Offset shadow to the left
+        ctx.shadowOffsetY = 0;   // Keep shadow on the horizontal axis
+
+        // Draw sector
+        ctx.beginPath();
+        ctx.moveTo(rad, rad);
+        ctx.arc(rad, rad, rad, ang, ang + arc, false);
+        ctx.lineTo(rad, rad);
+        ctx.fillStyle = sector.color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Reset shadow effect for text drawing
+        ctx.shadowColor = "rgba(0, 0, 0, 1)"; // Remove shadow for text
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    
+        // Draw white border on the outer edge of the arc
+        ctx.beginPath();
+        ctx.lineWidth = 2;  // Set thickness of the border
+        ctx.strokeStyle = "#dedede";  // Set border color to white
+        ctx.arc(rad, rad, rad, ang, ang + arc, false);  // Draw only the outer arc
+        ctx.stroke();  // Apply stroke to the outer edge
+        ctx.closePath();
+
+        // Draw text
+        ctx.translate(rad, rad); // Move to center
+        ctx.rotate(ang + arc / 2); // Rotate for each sector
+
+        let fontSize = Math.floor(rad * 0.035); // Adjust text size based on wheel size
+        ctx.fillStyle = "#fff";
+        ctx.font = `${canvas.width * 0.035}px sans-serif`; // Dynamic font size
+        ctx.fontWeight = "900";
+
+        // Set shadow effect
+        ctx.shadowColor = "rgba(0, 0, 0, 1)";  // Dark shadow
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Set outline font
+        // ctx.font = `bold ${canvas.width * 0.035}px sans-serif`;
+        // ctx.lineWidth = fontSize * 0.15; // Make outline proportional to text size
+        // ctx.fillStyle = "#fff"; // Text color
+        // ctx.strokeStyle = "#000"; // Outline color
+        // ctx.lineWidth = "3em"; // Outline thickness
+
+
+
+
+        /** Horizontal Font **/
+
+        // ctx.textAlign = "right";
+        // ctx.fillText(sector.label, rad - 20, 10);
+
+
+
+
+
+        /** Vertical Font **/
+
+        // Adjust text position so it's "upright"
+        ctx.save();
+        ctx.translate(rad * 0.98, -arc * 0.15); // Move outward for better visibility
+        ctx.rotate(Math.PI / 2); // Rotate text upright
+
+        // Font Stylizing
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        // For Vertcal Font
+        let label = sector.label.toString();
+        let charHeight = parseInt(ctx.font); // Estimate character height
+        let yOffset = 0; // Center vertically
+
+        if (label === "LOSE A TURN") {
+            ctx.font = `${canvas.width * 0.025}px sans-serif`;
+            // Draw "LOSE" horizontally
+            ctx.fillStyle = "#000";
+
+            ctx.save();
+            ctx.rotate("90deg"); // Rotate back for horizontal text
+            ctx.fillText("LOSE", 0, 0); // Position above "A TURN"
+            ctx.restore();
+
+            // Draw "A TURN" vertically
+            let yOffset = 0;
+            fontSize *= 0.8;
+            yOffset += charHeight * 1.25;
+
+            for (let j = 5; j < label.length; j++) {
+                let char = label[j];
+
+                let charHeight = fontSize; // Default height
+                if (char === " ") {
+                    charHeight *= -0.15;  // Space = half height
+                } else if (char === "$") {
+                    // charHeight *= 1; // Dollar sign = 1.35x height
+                }
+
+                ctx.fillText(label[j], 0, yOffset + (j - 5) * charHeight);
+
+                // Move down for next character
+                yOffset += charHeight;
+            }
+        } else {
+            if (label === "BANKRUPT") {
+                ctx.font = `${canvas.width * 0.025}px sans-serif`;
+                fontSize *= .725;
+            }
+
+            // Default behavior for other labels
+            let yOffset = 0;
+            for (let j = 0; j < label.length; j++) {
+                let char = label[j];
+
+                let charHeight = fontSize; // Default height
+                if (char === " ") {
+                    charHeight *= -0.15;  // Space = half height
+                } else if (char === "$") {
+                    // charHeight *= 1; // Dollar sign = 1.35x height
+                }
+
+                ctx.fillText(label[j], 0, yOffset + j * charHeight);
+
+                // Move down for next character
+                yOffset += charHeight;
+            }
+        }
+
+
+
+
+
+
+
+
+
+        // for (let j = 0; j < label.length; j++) {
+        //     let char = label[j];
+
+        //     let charHeight = fontSize; // Default height
+        //     if (char === " ") {
+        //         charHeight *= -0.15;  // Space = half height
+        //     } else if (char === "$") {
+        //         // charHeight *= 1; // Dollar sign = 1.35x height
+        //     }
+
+        //     ctx.fillText(label[j], 0, yOffset + j * charHeight);
+
+        //     // Move down for next character
+        //     yOffset += charHeight;
+        // }
+
+        ctx.restore();
+
+
+
+
+
+        /** End Fonts **/
+
+        ctx.restore();
+    });
+
+    // Ensure canvas is visible
+    canvas.style.display = "block";
+}
+
+// Redraw on window resize
+window.addEventListener("resize", resizeCanvas);
+
+// Initialize canvas on page load
+resizeCanvas();
+
+</script>
 </body>
 </html>
