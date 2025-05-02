@@ -1067,6 +1067,10 @@ body > header li label {
     display: inline-block;
 }
 
+body > header nav li > label {
+    margin-top: 3px;
+}
+
 body > header li.more > a {
     margin-right: 0.25rem;
     border-radius: 50%;
