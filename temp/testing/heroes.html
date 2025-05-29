@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+
+body {
+  background: #111;
+  font-family: "Comfortaa", sans-serif;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+aside.context {
+  text-align: center;
+  color: #fff;
+  line-height: 1.7;
+}
+aside.context a {
+  text-decoration: none;
+  color: #fff;
+  padding: 3px 0;
+  border-bottom: 1px dashed;
+}
+aside.context a:hover {
+  border-bottom: 1px solid;
+}
+aside.context .explanation {
+  max-width: 700px;
+  margin: 6em auto 0;
+}
+
+footer {
+  text-align: center;
+  margin: 4em auto;
+  width: 100%;
+}
+footer a {
+  text-decoration: none;
+  display: inline-block;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px dashed #fff;
+  color: #fff;
+  margin: 5px;
+}
+footer a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+footer a .icons {
+  margin-top: 12px;
+  display: inline-block;
+  font-size: 20px;
+}
+
+.main-content {
+  text-align: center;
+  padding-bottom: 3em;
+}
+
+.options {
+  width: 75%;
+  left: 25%;
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  position: relative;
+  padding: 4em 2em 0 0;
+}
+.options__wrapper {
+  margin: auto;
+  position: relative;
+  max-width: 1200px;
+}
+.options__item {
+  margin: 40px 20px;
+  min-width: 17em;
+  scroll-snap-align: center;
+  background: #f8f8f8;
+  height: 400px;
+  border-radius: 20px;
+}
+.options__item:nth-child(1) {
+  margin-left: 3em !important;
+}
+/* .options__item:last-child {
+  min-width: 8.5em;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+} */
+
+.options__item {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  padding-bottom: 1em;
+  transition: box-shadow 0.2s ease, margin 0.1s ease-in-out, height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.options__item[data-type=strength] {
+  background: url(https://olivia-ng.com/codepen/background/red.png) top center;
+  background-size: 180%;
+}
+.options__item[data-type=agility] {
+  background: url(https://olivia-ng.com/codepen/background/green.png) top center/cover;
+  background-size: 220%;
+}
+.options__item[data-type=intelligence] {
+  background: url(https://olivia-ng.com/codepen/background/blue.png) top center/cover;
+  background-size: 100%;
+}
+.options__item img {
+  height: 400px;
+  width: 300px;
+  object-fit: contain;
+  top: -40px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  margin-left: -15px;
+}
+.options__item:nth-child(9) img {
+  width: 160%;
+  margin-left: 0;
+}
+.options__item:nth-child(12) img {
+  height: 450px;
+  margin-left: 0;
+}
+.options__item__info {
+  top: 335px;
+  color: #fff;
+  text-align: left;
+  padding: 1em 1.5em;
+  position: relative;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  height: 48px;
+  overflow: hidden;
+}
+.options__item__info p {
+  font: 800 26px Muli;
+}
+.options__item__info span {
+  display: inline-block;
+  font: 300 14px Muli;
+  text-transform: capitalize;
+  padding: 0.2em 0.7em 0.3em;
+  background: rgba(255, 255, 255, 0.4);
+  margin: 5px 8px 0 0;
+  border-radius: 50px;
+}
+.options__item:hover {
+  cursor: pointer;
+  height: calc(430px);
+  margin: 0px 20px;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+}
+.options__item:hover .options__item__info {
+  height: 82px;
+  transition: 0.3s ease 0.2s;
+}
+
+::-webkit-scrollbar {
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  margin: 0 160px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+h1 {
+  position: absolute;
+  transform: rotate(-90deg);
+  top: 35%;
+  color: #ccc;
+  font: 900 100px/1 Muli;
+  text-align: left;
+  left: -5%;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  z-index: 10;
+}
+h1 span {
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  background: -webkit-linear-gradient(#777, transparent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+h1 span:nth-of-type(2) {
+  display: inline-block;
+  margin-left: 0.5em;
+  top: -0.4em;
+}
+h1:before {
+  content: "";
+  position: absolute;
+  right: -25%;
+  width: 150%;
+  bottom: -50px;
+  background: purple;
+  height: 150px;
+  background: linear-gradient(rgba(0, 0, 0, 0), #111, rgba(255, 255, 255, 0));
+}
+
+@media screen and (max-width: 1000px) {
+  h1 {
+    font: 900 80px/1 Muli;
+  }
+}
+@media screen and (max-width: 750px) {
+  h1 {
+    font: 900 50px/1 Muli;
+    left: -20%;
+    top: 45%;
+  }
+  h1 br {
+    display: none;
+  }
+  h1 span:nth-of-type(2) {
+    top: 0;
+  }
+
+  ::-webkit-scrollbar-track {
+    margin: 0 50px;
+  }
+
+  .options__item:last-child {
+    display: none;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* BEGIN CARD DESIGN */
+.hero {
+  display: inline-block;
+  position: relative;
+  /* width: 400px; */
+  /* min-width: 400px; */
+  /* height: 400px; */
+  border-radius: 30px;
+  overflow:hidden;
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.3);
+  margin: 30px;
+}
+
+.hero-profile-img {
+  height: 70%;
+}
+
+.hero-description-bk {
+  background-image: linear-gradient(0deg , #3f5efb, #fc466b);
+  border-radius: 30px;
+  position: absolute;
+  top: 55%;
+  left: -5px;
+  height: 65%;
+  width: 108%;
+  transform: skew(19deg, -9deg);
+}
+
+.second .hero-description-bk {
+  background-image: linear-gradient(-20deg , #bb7413, #e7d25c)
+}
+
+.hero-logo {
+  height: 80px;
+  width: 80px;
+  border-radius: 20px;
+  background-color: #fff;
+  position: absolute;
+  bottom: 30%;
+  left: 30px;
+  overflow:hidden;
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.7);
+}
+
+.hero-logo img {
+  height: 100%;
+}
+
+.hero-description {
+  position: absolute;
+  color: #fff;
+  font-weight: 900;
+  left: 150px;
+  bottom: 26%;
+}
+
+.hero-btn {
+  position: absolute;
+  color: #fff;
+  right: 30px;
+  bottom: 10%;
+  padding: 10px 20px;
+  border: 1px solid #fff;
+}
+
+.hero-btn a {
+  color: #fff;
+}
+
+.hero-date {
+  position: absolute;
+  color: #fff;
+  left: 30px;
+  bottom: 10%;
+}
+
+</style>
+</head>
+<body>
+
+
+<div class="main-content">
+  <div class="options__wrapper">
+    <h1> <span>Dota 2</span><br/><span>Heroes</span></h1>
+    <div class="options" id="scroll-event">
+
+        <div class="options__item first hero">
+            <img class="hero-profile-img" src="https://cdn.gamer-network.net/2018/metabomb/leagueoflegendsbestcarrychampions2018pantheon.jpg" alt="">
+            <div class="hero-description-bk"></div>
+            <div class="hero-logo">
+                <img src="https://miscmedia-9gag-fun.9cache.com/images/thumbnail-facebook/1557291375.3948_Dy2yZu_n.jpg" alt="">
+            </div>
+            <div class="hero-description">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div  class="hero-date">
+                <p>20.02.2019</p>
+            </div>
+            <div class="hero-btn">
+                <a href="#">Learn More</a>
+            </div>
+        </div>
+
+        <div class="options__item second hero">
+            <img class="hero-profile-img" src="https://i.pinimg.com/originals/9f/b1/ff/9fb1ffb05dd28039d1a06ad8e90cbd75.jpg" alt="">
+            <div class="hero-description-bk"></div>
+            <div class="hero-logo">
+                <img src="https://miscmedia-9gag-fun.9cache.com/images/thumbnail-facebook/1557291375.3948_Dy2yZu_n.jpg" alt="">
+            </div>
+            <div class="hero-description">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div  class="hero-date">
+                <p>20.02.2019</p>
+            </div>
+            <div class="hero-btn">
+                <a href="#">Learn More</a>
+            </div>
+        </div>
+      <!-- <div class="options__item" data-type="strength"><img src="https://olivia-ng.com/codepen/dota/axe.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Axe</p><span>strength</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="agility"><img src="https://olivia-ng.com/codepen/dota/naga.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Naga Siren</p><span>agility</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/invoker.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Invoker</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="agility"><img src="https://olivia-ng.com/codepen/dota/bounty.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Bounty Hunter</p><span>agility</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/necro.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Necrophos</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/enchantress.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Enchantress</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="strength"><img src="https://olivia-ng.com/codepen/dota/earthsh.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Earthshaker</p><span>strength</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/storm.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Storm Spirit</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="agility"><img src="https://olivia-ng.com/codepen/dota/ember.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Ember Spirit</p><span>agility</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="strength"><img src="https://olivia-ng.com/codepen/dota/earth.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Earth Spirit</p><span>strength</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/rubick.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Rubick</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="agility"><img src="https://olivia-ng.com/codepen/dota/troll.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Troll Warlord</p><span>agility</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="strength"><img src="https://olivia-ng.com/codepen/dota/kunkka.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Kunkka</p><span>strength</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="intelligence"><img src="https://olivia-ng.com/codepen/dota/puck.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Puck</p><span>intelligence</span><span>range</span>
+        </div>
+      </div>
+      <div class="options__item" data-type="agility"><img src="https://olivia-ng.com/codepen/dota/jugger.png" height="100%"/>
+        <div class="options__item__info">
+          <p>Juggernaut</p><span>agility</span><span>melee</span>
+        </div>
+      </div>
+      <div class="options__item"></div> -->
+    </div>
+  </div>
+</div>
+<!--aside.context
+.explanation
+	| Some kind of explanation that is 
+	a(href="" target="_blank") interesting here
+	| .
+
+-->
+<!--footer
+a(href="https://twitter.com/meowlivia_" target="_blank")
+	i.icon-social-twitter.icons
+a(href="https://github.com/oliviale" target="_blank")
+	i.icon-social-github.icons
+a(href="https://dribbble.com/oliviale" target="_blank")
+	i.icon-social-dribbble.icons
+-->
+
+</body>
+</html>

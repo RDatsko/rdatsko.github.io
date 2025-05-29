@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta http-equiv="content-security-policy" content="frame-src * blob: http: https: vscode-webview:; script-src 'unsafe-inline' data: http: https: vscode-webview:; font-src 'self' data: http: https:; img-src 'self' data: http: https:; style-src 'unsafe-inline' http: https:; media-src 'self' data:; object-src 'self' data:  http: https:;">
+<title></title>
+<style id="_defaultStyles">
+    :root {
+/* --background-color: #1e1e1e;
+--color: #d4d4d4;
+--font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", HelveticaNeue-Light, Ubuntu, "Droid Sans", sans-serif;
+--font-size: 13px;
+--font-weight: normal;
+--link-active-color: #3794ff;
+--link-color: #3794ff; */
+--vscode-font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", HelveticaNeue-Light, Ubuntu, "Droid Sans", sans-serif;
+--vscode-font-weight: normal;
+--vscode-font-size: 13px;
+--vscode-editor-font-family: Consolas, 'Courier New', monospace;
+--vscode-editor-font-weight: normal;
+--vscode-editor-font-size: 14px;
+--text-link-decoration: none;
+--link-active-color: #3794ff;
+--link-color: #3794ff;
+
+--vscode-activityBar-background: #333333;
+--vscode-activityBar-dropBackground: rgba(255, 255, 255, 0.12);
+--vscode-activityBar-foreground: #ffffff;
+--vscode-activityBar-inactiveForeground: rgba(255, 255, 255, 0.6);
+--vscode-activityBarBadge-background: #007acc;
+--vscode-activityBarBadge-foreground: #ffffff;
+--vscode-badge-background: #4d4d4d;
+--vscode-badge-foreground: #ffffff;
+--vscode-breadcrumb-activeSelectionForeground: #e0e0e0;
+--vscode-breadcrumb-background: #1e1e1e;
+--vscode-breadcrumb-focusForeground: #e0e0e0;
+--vscode-breadcrumb-foreground: rgba(204, 204, 204, 0.8);
+--vscode-breadcrumbPicker-background: #252526;
+--vscode-button-background: #0e639c;
+--vscode-button-foreground: #ffffff;
+--vscode-button-hoverBackground: #1177bb;
+--vscode-debugExceptionWidget-background: #420b0d;
+--vscode-debugExceptionWidget-border: #a31515;
+--vscode-debugToolBar-background: #333333;
+--vscode-descriptionForeground: rgba(204, 204, 204, 0.7);
+--vscode-diffEditor-insertedTextBackground: rgba(155, 185, 85, 0.2);
+--vscode-diffEditor-removedTextBackground: rgba(255, 0, 0, 0.2);
+--vscode-dropdown-background: #3c3c3c;
+--vscode-dropdown-border: #3c3c3c;
+--vscode-dropdown-foreground: #f0f0f0;
+--vscode-editor-background: #1e1e1e;
+--vscode-editor-findMatchBackground: #515c6a;
+--vscode-editor-findMatchHighlightBackground: rgba(234, 92, 0, 0.33);
+--vscode-editor-findRangeHighlightBackground: rgba(58, 61, 65, 0.4);
+--vscode-editor-font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", HelveticaNeue-Light, Ubuntu, "Droid Sans", sans-serif;
+--vscode-editor-font-size: 13px;
+--vscode-editor-font-weight: normal;
+--vscode-editor-foreground: #d4d4d4;
+--vscode-editor-hoverHighlightBackground: rgba(38, 79, 120, 0.25);
+--vscode-editor-inactiveSelectionBackground: #3a3d41;
+--vscode-editor-lineHighlightBorder: #282828;
+--vscode-editor-rangeHighlightBackground: rgba(255, 255, 255, 0.04);
+--vscode-editor-selectionBackground: #264f78;
+--vscode-editor-selectionHighlightBackground: rgba(173, 214, 255, 0.15);
+--vscode-editor-snippetFinalTabstopHighlightBorder: #525252;
+--vscode-editor-snippetTabstopHighlightBackground: rgba(124, 124, 124, 0.3);
+--vscode-editor-wordHighlightBackground: rgba(87, 87, 87, 0.72);
+--vscode-editor-wordHighlightStrongBackground: rgba(0, 73, 114, 0.72);
+--vscode-editorActiveLineNumber-foreground: #c6c6c6;
+--vscode-editorBracketMatch-background: rgba(0, 100, 0, 0.1);
+--vscode-editorBracketMatch-border: #888888;
+--vscode-editorCodeLens-foreground: #999999;
+--vscode-editorCursor-foreground: #aeafad;
+--vscode-editorError-foreground: #ea4646;
+--vscode-editorGroup-border: #444444;
+--vscode-editorGroup-dropBackground: rgba(83, 89, 93, 0.5);
+--vscode-editorGroupHeader-noTabsBackground: #1e1e1e;
+--vscode-editorGroupHeader-tabsBackground: #252526;
+--vscode-editorGutter-addedBackground: #587c0c;
+--vscode-editorGutter-background: #1e1e1e;
+--vscode-editorGutter-commentRangeForeground: #c5c5c5;
+--vscode-editorGutter-deletedBackground: #94151b;
+--vscode-editorGutter-modifiedBackground: #0c7d9d;
+--vscode-editorHint-foreground: rgba(238, 238, 238, 0.7);
+--vscode-editorHoverWidget-background: #252526;
+--vscode-editorHoverWidget-border: #454545;
+--vscode-editorIndentGuide-activeBackground: #707070;
+--vscode-editorIndentGuide-background: #404040;
+--vscode-editorInfo-foreground: #008000;
+--vscode-editorLineNumber-activeForeground: #c6c6c6;
+--vscode-editorLineNumber-foreground: #858585;
+--vscode-editorLink-activeForeground: #4e94ce;
+--vscode-editorMarkerNavigation-background: #2d2d30;
+--vscode-editorMarkerNavigationError-background: #ea4646;
+--vscode-editorMarkerNavigationInfo-background: #008000;
+--vscode-editorMarkerNavigationWarning-background: #4d9e4d;
+--vscode-editorOverviewRuler-addedForeground: rgba(0, 122, 204, 0.6);
+--vscode-editorOverviewRuler-border: rgba(127, 127, 127, 0.3);
+--vscode-editorOverviewRuler-bracketMatchForeground: #a0a0a0;
+--vscode-editorOverviewRuler-commonContentForeground: rgba(96, 96, 96, 0.4);
+--vscode-editorOverviewRuler-currentContentForeground: rgba(64, 200, 174, 0.5);
+--vscode-editorOverviewRuler-deletedForeground: rgba(0, 122, 204, 0.6);
+--vscode-editorOverviewRuler-errorForeground: rgba(255, 18, 18, 0.7);
+--vscode-editorOverviewRuler-findMatchForeground: rgba(246, 185, 77, 0.7);
+--vscode-editorOverviewRuler-incomingContentForeground: rgba(64, 166, 255, 0.5);
+--vscode-editorOverviewRuler-infoForeground: rgba(18, 18, 136, 0.7);
+--vscode-editorOverviewRuler-modifiedForeground: rgba(0, 122, 204, 0.6);
+--vscode-editorOverviewRuler-rangeHighlightForeground: rgba(0, 122, 204, 0.6);
+--vscode-editorOverviewRuler-selectionHighlightForeground: rgba(160, 160, 160, 0.8);
+--vscode-editorOverviewRuler-warningForeground: rgba(18, 136, 18, 0.7);
+--vscode-editorOverviewRuler-wordHighlightForeground: rgba(160, 160, 160, 0.8);
+--vscode-editorOverviewRuler-wordHighlightStrongForeground: rgba(192, 160, 192, 0.8);
+--vscode-editorPane-background: #1e1e1e;
+--vscode-editorRuler-foreground: #5a5a5a;
+--vscode-editorSuggestWidget-background: #252526;
+--vscode-editorSuggestWidget-border: #454545;
+--vscode-editorSuggestWidget-foreground: #d4d4d4;
+--vscode-editorSuggestWidget-highlightForeground: #0097fb;
+--vscode-editorSuggestWidget-selectedBackground: #062f4a;
+--vscode-editorUnnecessaryCode-opacity: rgba(0, 0, 0, 0.67);
+--vscode-editorWarning-foreground: #4d9e4d;
+--vscode-editorWhitespace-foreground: rgba(227, 228, 226, 0.16);
+--vscode-editorWidget-background: #252526;
+--vscode-editorWidget-border: #454545;
+--vscode-errorForeground: #f48771;
+--vscode-extensionButton-prominentBackground: #327e36;
+--vscode-extensionButton-prominentForeground: #ffffff;
+--vscode-extensionButton-prominentHoverBackground: #28632b;
+--vscode-focusBorder: rgba(14, 99, 156, 0.8);
+--vscode-foreground: #cccccc;
+--vscode-gitDecoration-addedResourceForeground: #81b88b;
+--vscode-gitDecoration-conflictingResourceForeground: #6c6cc4;
+--vscode-gitDecoration-deletedResourceForeground: #c74e39;
+--vscode-gitDecoration-ignoredResourceForeground: #8c8c8c;
+--vscode-gitDecoration-modifiedResourceForeground: #e2c08d;
+--vscode-gitDecoration-submoduleResourceForeground: #8db9e2;
+--vscode-gitDecoration-untrackedResourceForeground: #73c991;
+--vscode-input-background: #3c3c3c;
+--vscode-input-foreground: #cccccc;
+--vscode-input-placeholderForeground: #a6a6a6;
+--vscode-inputOption-activeBorder: #007acc;
+--vscode-inputValidation-errorBackground: #5a1d1d;
+--vscode-inputValidation-errorBorder: #be1100;
+--vscode-inputValidation-infoBackground: #063b49;
+--vscode-inputValidation-infoBorder: #007acc;
+--vscode-inputValidation-warningBackground: #352a05;
+--vscode-inputValidation-warningBorder: #b89500;
+--vscode-list-activeSelectionBackground: #094771;
+--vscode-list-activeSelectionForeground: #ffffff;
+--vscode-list-dropBackground: #383b3d;
+--vscode-list-errorForeground: #f88070;
+--vscode-list-focusBackground: #062f4a;
+--vscode-list-highlightForeground: #0097fb;
+--vscode-list-hoverBackground: #2a2d2e;
+--vscode-list-inactiveFocusBackground: #313135;
+--vscode-list-inactiveSelectionBackground: #37373d;
+--vscode-list-invalidItemForeground: #b89500;
+--vscode-list-warningForeground: #4d9e4d;
+--vscode-menu-background: #252526;
+--vscode-menu-foreground: #cccccc;
+--vscode-menu-selectionBackground: #094771;
+--vscode-menu-selectionForeground: #ffffff;
+--vscode-menu-separatorBackground: #bbbbbb;
+--vscode-menubar-selectionBackground: rgba(255, 255, 255, 0.1);
+--vscode-menubar-selectionForeground: #cccccc;
+--vscode-merge-commonContentBackground: rgba(96, 96, 96, 0.16);
+--vscode-merge-commonHeaderBackground: rgba(96, 96, 96, 0.4);
+--vscode-merge-currentContentBackground: rgba(64, 200, 174, 0.2);
+--vscode-merge-currentHeaderBackground: rgba(64, 200, 174, 0.5);
+--vscode-merge-incomingContentBackground: rgba(64, 166, 255, 0.2);
+--vscode-merge-incomingHeaderBackground: rgba(64, 166, 255, 0.5);
+--vscode-notificationCenterHeader-background: #303031;
+--vscode-notificationLink-foreground: #3794ff;
+--vscode-notifications-background: #252526;
+--vscode-notifications-border: #303031;
+--vscode-panel-background: #1e1e1e;
+--vscode-panel-border: rgba(128, 128, 128, 0.35);
+--vscode-panel-dropBackground: rgba(255, 255, 255, 0.12);
+--vscode-panelTitle-activeBorder: rgba(128, 128, 128, 0.35);
+--vscode-panelTitle-activeForeground: #e7e7e7;
+--vscode-panelTitle-inactiveForeground: rgba(231, 231, 231, 0.6);
+--vscode-peekView-border: #007acc;
+--vscode-peekViewEditor-background: #001f33;
+--vscode-peekViewEditor-matchHighlightBackground: rgba(255, 143, 0, 0.6);
+--vscode-peekViewEditorGutter-background: #001f33;
+--vscode-peekViewResult-background: #252526;
+--vscode-peekViewResult-fileForeground: #ffffff;
+--vscode-peekViewResult-lineForeground: #bbbbbb;
+--vscode-peekViewResult-matchHighlightBackground: rgba(234, 92, 0, 0.3);
+--vscode-peekViewResult-selectionBackground: rgba(51, 153, 255, 0.2);
+--vscode-peekViewResult-selectionForeground: #ffffff;
+--vscode-peekViewTitle-background: #1e1e1e;
+--vscode-peekViewTitleDescription-foreground: rgba(204, 204, 204, 0.7);
+--vscode-peekViewTitleLabel-foreground: #ffffff;
+--vscode-pickerGroup-border: #3f3f46;
+--vscode-pickerGroup-foreground: #3794ff;
+--vscode-progressBar-background: #0e70c0;
+--vscode-scrollbar-shadow: #000000;
+--vscode-scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+--vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+--vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+--vscode-settings-checkboxBackground: #3c3c3c;
+--vscode-settings-checkboxBorder: #3c3c3c;
+--vscode-settings-checkboxForeground: #f0f0f0;
+--vscode-settings-dropdownBackground: #3c3c3c;
+--vscode-settings-dropdownBorder: #3c3c3c;
+--vscode-settings-dropdownForeground: #f0f0f0;
+--vscode-settings-dropdownListBorder: #454545;
+--vscode-settings-headerForeground: #e7e7e7;
+--vscode-settings-modifiedItemIndicator: #0c7d9d;
+--vscode-settings-numberInputBackground: #292929;
+--vscode-settings-numberInputForeground: #cccccc;
+--vscode-settings-textInputBackground: #292929;
+--vscode-settings-textInputForeground: #cccccc;
+--vscode-sideBar-background: #252526;
+--vscode-sideBar-dropBackground: rgba(255, 255, 255, 0.12);
+--vscode-sideBarSectionHeader-background: rgba(128, 128, 128, 0.2);
+--vscode-sideBarTitle-foreground: #bbbbbb;
+--vscode-statusBar-background: #007acc;
+--vscode-statusBar-debuggingBackground: #cc6633;
+--vscode-statusBar-debuggingForeground: #ffffff;
+--vscode-statusBar-foreground: #ffffff;
+--vscode-statusBar-noFolderBackground: #68217a;
+--vscode-statusBar-noFolderForeground: #ffffff;
+--vscode-statusBarItem-activeBackground: rgba(255, 255, 255, 0.18);
+--vscode-statusBarItem-hoverBackground: rgba(255, 255, 255, 0.12);
+--vscode-statusBarItem-prominentBackground: #388a34;
+--vscode-statusBarItem-prominentHoverBackground: #369432;
+--vscode-tab-activeBackground: #1e1e1e;
+--vscode-tab-activeForeground: #ffffff;
+--vscode-tab-border: #252526;
+--vscode-tab-inactiveBackground: #2d2d2d;
+--vscode-tab-inactiveForeground: rgba(255, 255, 255, 0.5);
+--vscode-tab-unfocusedActiveForeground: rgba(255, 255, 255, 0.5);
+--vscode-tab-unfocusedInactiveForeground: rgba(255, 255, 255, 0.25);
+--vscode-terminal-ansiBlack: #000000;
+--vscode-terminal-ansiBlue: #2472c8;
+--vscode-terminal-ansiBrightBlack: #666666;
+--vscode-terminal-ansiBrightBlue: #3b8eea;
+--vscode-terminal-ansiBrightCyan: #29b8db;
+--vscode-terminal-ansiBrightGreen: #23d18b;
+--vscode-terminal-ansiBrightMagenta: #d670d6;
+--vscode-terminal-ansiBrightRed: #f14c4c;
+--vscode-terminal-ansiBrightWhite: #e5e5e5;
+--vscode-terminal-ansiBrightYellow: #f5f543;
+--vscode-terminal-ansiCyan: #11a8cd;
+--vscode-terminal-ansiGreen: #0dbc79;
+--vscode-terminal-ansiMagenta: #bc3fbc;
+--vscode-terminal-ansiRed: #cd3131;
+--vscode-terminal-ansiWhite: #e5e5e5;
+--vscode-terminal-ansiYellow: #e5e510;
+--vscode-terminal-background: #1e1e1e;
+--vscode-terminal-border: rgba(128, 128, 128, 0.35);
+--vscode-terminal-foreground: #cccccc;
+--vscode-terminal-selectionBackground: rgba(255, 255, 255, 0.25);
+--vscode-textBlockQuote-background: rgba(127, 127, 127, 0.1);
+--vscode-textBlockQuote-border: rgba(0, 122, 204, 0.5);
+--vscode-textCodeBlock-background: rgba(10, 10, 10, 0.4);
+--vscode-textLink-activeForeground: #3794ff;
+--vscode-textLink-foreground: #3794ff;
+--vscode-textPreformat-foreground: #d7ba7d;
+--vscode-textSeparator-foreground: rgba(255, 255, 255, 0.18);
+--vscode-titleBar-activeBackground: #3c3c3c;
+--vscode-titleBar-activeForeground: #cccccc;
+--vscode-titleBar-inactiveBackground: rgba(60, 60, 60, 0.6);
+--vscode-titleBar-inactiveForeground: rgba(204, 204, 204, 0.6);
+--vscode-widget-shadow: #000000; }
+
+body {
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-editor-font-family);
+    font-weight: var(--vscode-editor-font-weight);
+    font-size: var(--vscode-editor-font-size);
+    margin: 0;
+    padding: 0 20px;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+a {
+    color: var(--vscode-textLink-foreground);
+}
+
+a:hover {
+    color: var(--vscode-textLink-activeForeground);
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 1px solid -webkit-focus-ring-color;
+    outline-offset: -1px;
+}
+
+code {
+    color: var(--vscode-textPreformat-foreground);
+}
+
+blockquote {
+    background: var(--vscode-textBlockQuote-background);
+    border-color: var(--vscode-textBlockQuote-border);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(121, 121, 121, 0.4);
+}
+body.vscode-light::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 100, 100, 0.4);
+}
+body.vscode-high-contrast::-webkit-scrollbar-thumb {
+    background-color: rgba(111, 195, 223, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 100, 100, 0.7);
+}
+body.vscode-light::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 100, 100, 0.7);
+}
+body.vscode-high-contrast::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(111, 195, 223, 0.8);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: rgba(85, 85, 85, 0.8);
+}
+body.vscode-light::-webkit-scrollbar-thumb:active {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+body.vscode-high-contrast::-webkit-scrollbar-thumb:active {
+    background-color: rgba(111, 195, 223, 0.8);
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+/*
+ * This file contains all default CSS rules for the dark vscode them, used for various diagrams and graphs.
+ * Use the "antlr4.customcss" setting in vscode to specify your own file, if you like to override some rules.
+ *
+ * Usually most of the appearance is defined in light.css and here we only have some adjustments for
+ * the dark theme.
+ */
+
+ body.vscode-dark svg {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+/* ATN graphs. */
+
+body.vscode-dark .marker {
+  fill: #eee;
+  stroke: none;
+}
+
+body.vscode-dark .stateLabel {
+  fill: #202020;
+}
+
+body.vscode-dark .stateTypeLabel {
+  fill: #404040;
+}
+
+body.vscode-dark .linkLabel {
+  fill: #ddd;
+}
+
+body.vscode-dark .state {
+  stroke: white;
+  filter: url(#white-glow);
+}
+
+/* Railroad diagrams */
+
+body.vscode-dark .atn-graph-save-image {
+    background: rgba(206, 11, 70, 1) url('../misc/save-dark.png');
+}
+
+body.vscode-dark .rrd-save-image {
+    background: rgba(10, 188, 80, 1) url('../misc/save-dark.png');
+}
+
+body.vscode-dark .call-graph-save-image {
+    background: rgba(255, 191, 15, 1) url('../misc/save-dark.png');
+}
+
+body.vscode-dark .parse-tree-save-image {
+    background: rgba(49, 112, 212, 1) url('../misc/save-dark.png');
+}
+
+body.vscode-dark svg.railroad-diagram path {
+	/* The connection lines. */
+	stroke-width: 2;
+	stroke: darkgray;
+	fill: rgba(0, 0, 0, 0);
+}
+
+body.vscode-dark svg.railroad-diagram text {
+	/* All text except comments. */
+	font: bold 12px Hack, "Source Code Pro", monospace;
+	text-anchor: middle;
+	fill: #404040;
+	/* Use fill instead of color for svg text. */
+}
+
+body.vscode-dark svg.railroad-diagram text.comment {
+	/* Comment text */
+	font: italic 10px Hack, "Source Code Pro", monospace;
+	fill: #909090;
+}
+
+body.vscode-dark svg.railroad-diagram g.non-terminal rect {
+	/* The non-terminal boxes. */
+	stroke-width: 2;
+	stroke: #404040;
+	fill: rgba(255, 255, 255, 1);
+}
+
+body.vscode-dark svg.railroad-diagram g.terminal rect {
+	/* The terminal boxes. */
+	stroke-width: 2;
+	stroke: #404040;
+	fill: rgba(255, 255, 255, 0.7);
+}
+
+body.vscode-dark svg.railroad-diagram text.diagram-text {
+	/* Multiple choice text, not working atm. */
+	font-size: 12px Hack, "Source Code Pro", monospace;
+	fill: red;
+}
+
+body.vscode-dark svg.railroad-diagram path.diagram-text {
+	/* Multiple choice text, not working atm. */
+	stroke-width: 1;
+	stroke: red;
+	fill: white;
+	cursor: help;
+}
+
+body.vscode-dark svg.railroad-diagram g.diagram-text:hover path.diagram-text {
+	/* Multiple choice text, not working atm. */
+	fill: #f00;
+}
+
+/* Call graphs */
+
+body.vscode-dark .node-source {
+    fill: #e6db74;
+}
+
+body.vscode-dark .node-target {
+    fill: #45aa73;
+}
+
+body.vscode-dark .module-1 {
+    fill: #0ca9fd;
+}
+
+body.vscode-dark .module-2 {
+    fill: #63bf8d;
+}
+
+body.vscode-dark .module-3 {
+    fill: #ff8801;
+}
+
+body.vscode-dark .module-4 {
+    fill: #b9fc34;
+}
+
+body.vscode-dark .module-5 {
+    fill: #90e0e0;
+}
+
+body.vscode-dark .module-6 {
+    fill: #b4a3f5;
+}
+
+body.vscode-dark .module-7 {
+    fill: #f92672;
+}
+
+body.vscode-dark .module-8 {
+    fill: #e9e901;
+}
+
+body.vscode-dark .module-9 {
+    fill: #83be69;
+}
+
+body.vscode-dark .module-10 {
+    fill: #f1d18c;
+}
+
+body.vscode-dark .node:hover {
+    fill: #fff;
+}
+
+body.vscode-dark .node-source {
+    fill: #ff5711;
+}
+
+body.vscode-dark .node-target {
+    fill: #45aa73;
+}
+
+body.vscode-dark .link-source,
+body.vscode-dark .link-target {
+    stroke-opacity: 1;
+    stroke-width: 2px;
+}
+
+body.vscode-dark .link {
+    stroke: #fff;
+    stroke-opacity: .2;
+    fill: none;
+    pointer-events: none;
+	animation: fadeIn 0.5s ease-out 0.2s 1 normal backwards;
+}
+
+body.vscode-dark .link-source {
+    stroke-opacity: 1;
+    stroke-width: 2px;
+    stroke: #45aa73;
+	animation: none;
+}
+
+body.vscode-dark .link-target {
+    stroke-opacity: 1;
+    stroke-width: 2px;
+    stroke: #ff5711;
+	animation: none;
+}
+
+body.vscode-dark .link-dimmed {
+    stroke-opacity: 0.075;
+    animation: fadeOut 0.25s ease-out 0s 1 normal backwards;
+}
+
+/* Parse trees */
+body.vscode-dark .tree-node {
+    cursor: pointer;
+    stroke-width: 2;
+    stroke: #404040;
+    fill: rgba(255, 255, 255, 1);
+}
+
+body.vscode-dark g .tree-root {
+    cursor: pointer;
+    stroke-width: 2;
+    fill: #3a3c37;
+    stroke: #ffffff;
+}
+
+body.vscode-dark g .tree-leaf {
+    cursor: move;
+    stroke-width: 2;
+    fill: #828e66;
+    stroke: #ffffff;
+}
+
+body.vscode-dark g .tree-error {
+    cursor: move;
+    stroke-width: 2;
+    fill: rgb(187, 43, 33);
+    stroke: #ffffff;
+}
+
+body.vscode-dark g .token-value {
+    fill: white;
+    stroke: none;
+    font: 12pt "Source Code Pro", "Hack", "Consolas", "Andale Mono", monospace;
+}
+
+body.vscode-dark g .token-range {
+    fill: #bb832c;
+    stroke: none;
+    font: 8pt "Source Code Pro", "Hack", "Consolas", "Andale Mono", monospace;
+}
+
+/* Default CSS for internal elements, only visible in vscode */
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+body {
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-font-family);
+    font-weight: var(--vscode-font-weight);
+    font-size: var(--vscode-font-size);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 46px);
+    min-height: 150px;
+}
+
+.resizer-preview {
+    position: relative;
+    width: 600px;
+    max-width: calc(100% - 50px);
+    height: 400px;
+    max-height: calc(100% - 50px);
+    margin: 15px auto;
+    border: 10px solid #333;
+    border-radius: 5px;
+}
+
+.resizer-devtools {
+    display: flex;
+    width: 100%;
+    border-top: 10px solid #333;
+}
+
+#devtools-container {
+    position: relative;
+    width: 100%;
+}
+
+iframe {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.resize-handle {
+    position: absolute;
+    background: transparent;
+    width: 10px;
+    height: 10px;
+    z-index: 10;
+}
+
+.resize-handle.right {
+    top: 0;
+    right: -10px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+.resize-handle.bottom {
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    cursor: ns-resize;
+}
+
+.resize-handle.top {
+    top: -10px;
+    left: 0;
+    width: 100%;
+    cursor: ns-resize;
+}
+
+.resize-handle.corner {
+    right: -10px;
+    bottom: -10px;
+    cursor: nwse-resize;
+}
+
+#omnibar {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    max-height: 36px;
+    padding: 0 6px;
+    border-bottom: 1px solid var(--vscode-editorGroup-border);
+}
+
+#omnibar .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin: 0 2px;
+    border-radius: 50%;
+    transition: 0.25s;
+}
+
+#omnibar .button[disabled] svg path {
+    opacity: 0.4;
+}
+
+#omnibar .button:not([disabled]):hover {
+    background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+#omnibar .button:not([disabled]):active {
+    background-color: #E2E2E2;
+}
+
+#omnibar .button svg path {
+    fill: var(--vscode-editor-foreground);
+}
+
+#omnibar .button.extension {
+    position: relative;
+}
+
+#omnibar .button.extension img {
+    width: 16px;
+}
+
+#omnibar .button.extension[data-disabled] {
+    filter: grayscale(1) opacity(50%);
+}
+
+#omnibar .button.extension[data-notifications]:before {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 12px;
+    min-width: 12px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px var(--vscode-editor-foreground);
+    background-color: var(--vscode-input-background);
+    color: #FFFFFF;
+    font-size: 6px;
+    content: attr(data-notifications);
+}
+
+#omnibar #address-bar {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    margin: 0 8px 0 6px;
+    border-radius: 20px;
+    background-color: rgb(62, 62, 62);
+    white-space: pre;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+#omnibar #address-bar.selected {
+    box-shadow: 0 0 0 1px #B3CEFB, inset 0 0 0 1px #B3CEFB;
+    background-color: #FFFFFF;
+}
+
+#omnibar #address-bar .address-bar-button {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    width: 16px;
+    padding: 0 4px;
+    margin: 0 2px;
+    border-radius: 99px;
+    font-size: 14px;
+    transition: background-color 0.25s;
+}
+
+#omnibar #address-bar .address-bar-button.show-special {
+    margin-right: 9px;
+}
+
+#omnibar #address-bar .address-bar-button svg path {
+    fill: #5F6368;
+}
+
+#omnibar #address-bar .address-bar-button svg.favourite path {
+    fill: #4285F4;
+}
+
+body #omnibar .button svg {
+    width: 14px;
+    height: 14px;
+}
+
+#omnibar #address-bar .address-bar-button svg.https, 
+#omnibar #address-bar .address-bar-button img.https, 
+#omnibar #address-bar .address-bar-button .special.https,
+#omnibar #address-bar .address-bar-button svg.error, 
+#omnibar #address-bar .address-bar-button img.error, 
+#omnibar #address-bar .address-bar-button .special.error,
+#omnibar #address-bar .address-bar-button svg.favicon, 
+#omnibar #address-bar .address-bar-button svg.not-favourite, 
+#omnibar #address-bar .address-bar-button svg.favourite, 
+#omnibar #address-bar .address-bar-button img.favicon, 
+#omnibar #address-bar .address-bar-button img.not-favourite, 
+#omnibar #address-bar .address-bar-button img.favourite,
+#omnibar #address-bar .address-bar-button .special.favicon, 
+#omnibar #address-bar .address-bar-button .special.not-favourite, 
+#omnibar #address-bar .address-bar-button .special.favourite {
+    width: 16px;
+    height: 16px;
+}
+
+#omnibar #address-bar .address-bar-button svg.special, 
+#omnibar #address-bar .address-bar-button img.special, 
+#omnibar #address-bar .address-bar-button .special.special {
+    position: relative;
+    margin-left: 10px;
+    color: #5F6368;
+    user-select: none;
+}
+
+#omnibar #address-bar .address-bar-button svg.special:before, 
+#omnibar #address-bar .address-bar-button img.special:before, 
+#omnibar #address-bar .address-bar-button .special.special:before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -10px;
+    width: 1px;
+    background-color: #9D9E9F;
+    content: "";
+    transition: 0.25s;
+}
+
+#omnibar #address-bar .address-bar-button svg.hide, 
+#omnibar #address-bar .address-bar-button img.hide, 
+#omnibar #address-bar .address-bar-button .special.hide {
+    display: none;
+}
+
+#omnibar #address-bar .address-bar-button:not([disabled]):hover {
+    background-color: #D6D8DA;
+}
+
+#omnibar #address-bar .address-bar-button:not([disabled]):hover .special:before {
+    opacity: 0;
+}
+
+#omnibar #address-bar .address-bar-button:not([disabled]):active {
+    background-color: #C9CBCD;
+}
+
+#omnibar #address-bar #address {
+    flex-grow: 1;
+    font-size: 14px;
+    outline: 0;
+}
+
+#omnibar #address-bar #address .protocol {
+    color: #5F6368;
+}
+
+#omnibar #address-bar #address .domain {
+    color: #202124;
+}
+
+#omnibar #address-bar #address .extension {
+    color: #80868B;
+}
+
+#omnibar #address-bar:has(#address:focus) {
+	outline: 2px solid var(--vscode-focusBorder);
+}
+
+.seperator {
+    width: 1px;
+    height: 16px;
+    margin: 0 6px 0 8px;
+    background-color: var(--vscode-editorGroup-border);
+}
+
+
+
+
+
+
+
+
+
+
+
+#deviceemu {
+    width: 100%;
+    height: 26px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ruler {
+    width: 4096px;
+    height: 19px;
+    border-top: 1px solid var(--vscode-editorGroup-border);
+    border-bottom: 1px solid var(--vscode-editorGroup-border);
+}
+
+
+</style>
+</head>
+<body class="vscode-dark">
+<div id="omnibar">
+    <div class="button" id="back-button" title="Click to go back, don't hold for history" disabled="" data-ripple="">
+        <svg viewBox="0 0 16 16">
+            <path d="M16,7H3.8l5.6-5.6L8,0L0,8l8,8l1.4-1.4L3.8,9H16V7z"></path>
+        </svg>
+    </div>
+    <div class="button" id="forward-button" title="Click to go forward, don't hold for history" disabled="" data-ripple="">
+        <svg viewBox="0 0 16 16">
+            <path d="M8,0L6.6,1.4L12.2,7H0v2h12.2l-5.6,5.6L8,16l8-8L8,0z"></path>
+        </svg>
+    </div>
+    <div class="button" id="refresh" title="Reload page" data-ripple="">
+        <svg viewBox="0 0 16 16">
+            <path d="M13.6,2.3C12.2,0.9,10.2,0,8,0C3.6,0,0,3.6,0,8s3.6,8,8,8c3.7,0,6.8-2.5,7.7-6h-2.1c-0.8,2.3-3,4-5.6,4c-3.3,0-6-2.7-6-6 s2.7-6,6-6c1.7,0,3.1,0.7,4.2,1.8L9,7h7V0L13.6,2.3z"></path>
+        </svg>
+    </div>
+    <div class="button" id="home" title="Open the home page" data-ripple="">
+        <svg viewBox="2 2 19 19">
+            <path fill-rule="evenodd" d="M11.03 2.59a1.5 1.5 0 011.94 0l7.5 6.363a1.5 1.5 0 01.53 1.144V19.5a1.5 1.5 0 01-1.5 1.5h-5.75a.75.75 0 01-.75-.75V14h-2v6.25a.75.75 0 01-.75.75H4.5A1.5 1.5 0 013 19.5v-9.403c0-.44.194-.859.53-1.144l7.5-6.363zM12 3.734l-7.5 6.363V19.5h5v-6.25a.75.75 0 01.75-.75h3.5a.75.75 0 01.75.75v6.25h5v-9.403L12 3.734z"/>
+        </svg>
+    </div>
+    <div id="address-bar" class="-selected">
+        <div id="info" class="address-bar-button -show-special" data-ripple="">
+            <!-- <svg viewBox="0 0 16 16" class="https">
+                <path d="M12.6,5.3h-0.8V3.8C11.8,1.7,10.1,0,8,0S4.2,1.7,4.2,3.8v1.5H3.4C2.6,5.3,1.9,6,1.9,6.9v7.6c0,0.8,0.7,1.5,1.5,1.5h9.1 c0.8,0,1.5-0.7,1.5-1.5V6.9C14.1,6,13.4,5.3,12.6,5.3z M10.4,5.3H5.6V3.8c0-1.3,1.1-2.4,2.4-2.4s2.4,1.1,2.4,2.4V5.3z"></path>
+            </svg> -->
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="1"/>
+                <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"/>
+                <path d="M12,10a1,1,0,0,0-1,1v5a1,1,0,0,0,2,0V11A1,1,0,0,0,12,10Z"/>
+            </svg>
+            <img src="" alt="" class="favicon hide">
+            <div class="special hide">Special</div>
+        </div>
+        <div id="address" contenteditable="true"><span class="protocol">http://</span><span class="domain">127.0.0.1</span><span class="extension">/</span></div>
+        <div id="bookmark" class="address-bar-button" data-ripple="">
+            <svg viewBox="0 0 16 16" class="not-favourite">
+                <path d="M16,5.8l-5.8-0.5L8,0L5.8,5.3L0,5.8l4.4,3.8l-1.3,5.6l4.9-3l4.9,3l-1.3-5.6L16,5.8z M8,10.7l-3,1.8l0.8-3.4L3.1,6.8l3.5-0.3 L8,3.3l1.4,3.2l3.5,0.3l-2.7,2.3l0.8,3.4L8,10.7z"></path>
+            </svg>
+            <svg viewBox="0 0 16 16" class="favourite hide">
+                <path d="M8,12.2l4.9,3l-1.3-5.6L16,5.8l-5.8-0.5L8,0L5.8,5.3L0,5.8l4.4,3.8l-1.3,5.6L8,12.2z"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="button extension" extension-id="3" title="LastPass" data-notifications="1" data-ripple="">
+        <img src="" alt="" style="background-color: lightgray;">
+    </div>
+    <div class="seperator"></div>
+    <div class="button" id="refresh" title="Customise and Control Google Chrome" data-ripple="">
+        <svg viewBox="0 0 16 16">
+            <path d="M8,4c1.1,0,2-0.9,2-2S9.1,0,8,0S6,0.9,6,2S6.9,4,8,4z M8,6C6.9,6,6,6.9,6,8s0.9,2,2,2s2-0.9,2-2S9.1,6,8,6z M8,12 c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S9.1,12,8,12z"></path>
+        </svg>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="deviceemu">
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="ruler">
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="preview-container" id="preview-container">
+    <div class="resizer-preview" id="preview-window">
+        <iframe id="target" src="http://${site}:${port}/" style="background-color: white;"></iframe>
+        <div class="resize-handle right" id="handleRight"></div>
+        <div class="resize-handle bottom" id="handleBottom"></div>
+        <div class="resize-handle corner" id="handleCorner"></div>
+    </div>
+</div>
+
+<div class="resizer-devtools" id="devtools-container">
+    <iframe id="devtools"></iframe>
+    <div class="resize-handle top" id="handleDevTop"></div>
+</div>
+
+<script>
+
+const previewWindow = document.getElementById('preview-window');
+const previewContainer = document.getElementById('preview-container');
+const DevToolsContainer = document.getElementById('devtools-container');
+
+function initResize(handle, direction) {
+    handle.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const pStartWidth = previewWindow.offsetWidth;
+        const pStartHeight = previewWindow.offsetHeight;
+        const dStartHeight = DevToolsContainer.offsetHeight;
+
+        function onPointerMove(e) {
+            if (direction === 'right' || direction === 'both') {
+                previewWindow.style.width = `${pStartWidth + ((e.clientX - startX) * 2)}px`;
+            }
+            if (direction === 'bottom' || direction === 'both') {
+                previewWindow.style.height = `${pStartHeight + (e.clientY - startY)}px`;
+            }
+            if (direction === 'top') {
+                DevToolsContainer.style.height = `${((e.clientY) * -1) + startY + dStartHeight - 10}px`;
+                previewContainer.style.height =  `${window.innerHeight - (((e.clientY) * -1) + startY + dStartHeight + 36)}px`;
+            }
+        }
+
+        function onPointerUp(e) {
+            handle.removeEventListener('pointermove', onPointerMove);
+            handle.removeEventListener('pointerup', onPointerUp);
+            handle.releasePointerCapture(e.pointerId);
+        }
+
+        handle.addEventListener('pointermove', onPointerMove);
+        handle.addEventListener('pointerup', onPointerUp);
+    });
+}
+
+initResize(document.getElementById('handleRight'), 'right');
+initResize(document.getElementById('handleBottom'), 'bottom');
+initResize(document.getElementById('handleCorner'), 'both');
+initResize(document.getElementById('handleDevTop'), 'top');
+
+</script>
+</body>
+</html>
