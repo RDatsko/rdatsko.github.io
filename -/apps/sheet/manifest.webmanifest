@@ -1,0 +1,21 @@
+{
+    "short_name": "C-Example",
+    "name": "Company Example",
+    "icons": [
+      {
+        "src": "./image/site_icon_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "./image/site_icon_512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/-/index.html",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+  }
+  
