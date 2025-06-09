@@ -606,7 +606,7 @@ pre[class*="language-"] > code[class*="language-"] {
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const codeValue = urlParams.get("code");
+    const codeValue = urlParams.get("code")?.toLowerCase();
     if (!codeValue) {
         return run();
     }
