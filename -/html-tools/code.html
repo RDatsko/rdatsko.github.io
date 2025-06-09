@@ -606,7 +606,7 @@ pre[class*="language-"] > code[class*="language-"] {
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const codeValue = urlParams.get("code")?.toLowerCase();
+    const codeValue = urlParams.get("code");
     if (!codeValue) {
         return run();
     }
@@ -615,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("code-title").textContent = codeValue;
 
     // Convert to filesystem-friendly version (e.g. My Example → My_Example)
-    const safeCodeValue = codeValue.replace(/\s+/g, "_");
+    const safeCodeValue = codeValue.replace(/\s+/g, "_").toLowerCase();
 
     // Helper to fetch+populate+highlight a single file
     function loadFile(dir, ext, textareaId, updateIndex) {
