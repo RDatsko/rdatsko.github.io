@@ -1,18 +1,18 @@
 document.addEventListener("DOMContentLoaded", e => {
     let card_number_input = document.querySelector("form fieldset.card-number input"),
-        card_number_display = document.querySelector(".card .cc-number");
+        card_number_display = document.querySelector("#ccard .cc-number");
     
     let card_holder_input = document.querySelector("form fieldset.card-holder input"),
-        card_holder_display = document.querySelector(".card .cc-holder");
+        card_holder_display = document.querySelector("#ccard .cc-holder");
 
     let expiry_month_select = document.querySelector("form fieldset.expiry-month > select"),
-        expiry_month_display = document.querySelector(".card .expiry-month");
+        expiry_month_display = document.querySelector("#ccard .expiry-month");
     
     let expiry_year_select = document.querySelector("form fieldset.expiry-year > select"),
-        expiry_year_display = document.querySelector(".card .expiry-year");
+        expiry_year_display = document.querySelector("#ccard .expiry-year");
     
     let cvc_input = document.querySelector("form fieldset.cvc input"),
-        cvc_display = document.querySelector(".card .ccv > div");
+        cvc_display = document.querySelector("#ccard .ccv > div");
 
     let form = document.querySelector("form");
 
