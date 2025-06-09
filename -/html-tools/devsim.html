@@ -297,7 +297,9 @@ i:has(input.auto_refresh:checked ~ label) {
 </head>
 <body>
 
+<header>
 <iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
 
 <main>
     <div class="container">
@@ -422,7 +424,9 @@ i:has(input.auto_refresh:checked ~ label) {
     </div>
 </main>
 
+<footer>
 <iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer>
 
 <script>
 
