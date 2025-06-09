@@ -195,13 +195,15 @@ input[id="js"]:checked ~ div > label[for="js"] {
   width: 100%;
   height: 100%;
 }
+
+
 #html-code, #css-code, #js-code,
 #highlighting1, #highlighting2, #highlighting3,
 #highlighting1 *, #highlighting2 *, #highlighting3 * {
   /* Also add text styles to highlighing tokens */
-  font-size: 12pt;
-  font-family: monospace;
-  line-height: 18pt;
+  font-size: 0.75rem !important;
+  font-family: monospace !important;
+  line-height: 1.5rem !important;
   tab-size: 4;
 }
 
@@ -261,15 +263,15 @@ p code {
 pre[class*="language-"],
 code[class*="language-"] {
 	color: #d4d4d4;
-	font-size: 13px;
+	/* font-size: 13px; */
 	text-shadow: none;
-	font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace;
+	/* font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace; */
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
-	line-height: 1.5;
+	/* line-height: 1.5; */
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
@@ -615,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("code-title").textContent = codeValue;
 
     // Convert to filesystem-friendly version (e.g. My Example → My_Example)
-    const safeCodeValue = codeValue.replace(/\s+/g, "_");
+    const safeCodeValue = codeValue.replace(/\s+/g, "_").toLowerCase();
 
     // Helper to fetch+populate+highlight a single file
     function loadFile(dir, ext, textareaId, updateIndex) {
