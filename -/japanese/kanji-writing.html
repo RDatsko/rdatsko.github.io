@@ -24,7 +24,9 @@
 </head>
 <body>
 
+<header>
 <iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
 
 <div>
 <script>
@@ -51,7 +53,9 @@ if ("ontouchstart" in document.documentElement) {
     </div>
 </div>
 
+<footer>
 <iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer>
 
 <script src="kanji-canvas.min.js"></script>
 <script src="kanji-ref-patterns.js"></script>

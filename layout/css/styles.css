@@ -200,7 +200,7 @@ body > header + main {
     margin-top: 75px;
 }
 
-body > iframe {
+body > header > iframe, body > footer > iframe {
     width: 0;
     height: 0;
     border: 0;

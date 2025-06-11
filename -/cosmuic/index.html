@@ -202,6 +202,134 @@ body > main > nav {
     }
 }
 
+
+/* Codebox */
+
+.codebox {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    min-height: 15rem;
+    max-height: 25rem;
+    margin: 4rem 0;
+    background: #1e1e1e;
+    color: #ddd;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    justify-content: space-between;
+}
+
+.codebox > header {
+    background: #2d2d2d;
+    padding: 7px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.codebox > header > div {
+    display: flex;
+    gap: 8px;
+}
+
+.codebox > header > div > div {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.codebox > header > span {
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.codebox > header button {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    height: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    margin: 0;
+    box-shadow: none;
+    line-height: unset;
+    padding: 0;
+    min-width: 20px;
+    white-space: nowrap;
+    display: flex;
+}
+
+.codebox > header svg {
+    width: 20px;
+    height: 20px;
+    fill: #d4d4d4;
+}
+
+.codebox > header > div > div:nth-child(1) { background: #ff5f56; }
+.codebox > header > div > div:nth-child(2) { background: #ffbd2e; }
+.codebox > header > div > div:nth-child(3) { background: #27c93f; }
+
+.codebox > main {
+    /* display: flex ; */
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    padding: .5rem;
+    flex: 0 1 auto;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre;
+    overflow: auto;
+    margin-bottom: auto;
+}
+
+.codebox > footer {
+    background: #2d2d2d;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 12px;
+    color: #d4d4d4;
+}
+
+.codebox > footer > label {
+    background: rgba(86, 156, 214, 0.2);
+    color: #569cd6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: .5rem;
+    cursor: pointer;
+}
+
+.codebox > main {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
+
+.codebox > main::-webkit-scrollbar {
+    width: 12px;
+}
+
+.codebox > main::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.codebox > main::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+    /* border: 3px solid #f0f0f0; */
+}
+
+.codebox > main::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
 </style>
 </head>
 <body>
@@ -209,6 +337,12 @@ body > main > nav {
 <header>
 <iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
 </header>
+
+<svg style="display: none;">
+    <symbol id="icon-copy" viewBox="0 0 24 24">
+        <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path>
+    </symbol>
+</svg>
 
 <main>
     <nav>
@@ -410,6 +544,45 @@ body > main > nav {
             Just copy the code included from the samples from the left side and make any adjustments as necessary.
             Each section is designed to provide as much information as possible to clearly identify options that are available.
         </p>
+        <p>
+            It's easy to get started.
+            Feel free to copy the code box below to start with a simple template.  Just make the changes as needed and then add the rest.
+        </p>
+        <div class="codebox">
+            <header>
+                <div><div></div><div></div><div></div></div>
+                <span>Template - Example</span>
+                <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+            </header>
+            <main style="color: white;">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;link rel="stylesheet" href="/layout/css/cosmuic.css"&gt;
+&lt;title&gt;Document&lt;/title&gt;
+&lt;body&gt;
+&lt;/head&gt;
+
+&lt;header&gt;
+    &lt;!-- Header HTML Code --&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+    &lt;!-- Only if content maximum width is different than body width --&gt;
+    &lt;section&gt;
+        &lt;!-- Content HTML Code --&gt;
+    &lt;/section&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+    &lt;!-- Footer HTML Code --&gt;
+&lt;/footer&gt;
+
+&lt;body&gt;
+&lt;/html&gt;</main>
+            <footer><label>HTML</label></footer>
+        </div>
     </article>
     <aside>
     </aside>
@@ -774,54 +947,56 @@ body > main > nav {
             There are some included cards in COSMUIC for convenience.   These cards on the most
             commonly used ones in the Materal UI along with some additional ones.
         </p>
+        <p>For information regarding the <code>data-grid</code> attribute, please reference the <a onclick="jump('grids')">grids</a> section from the menu list.</p>
         <br>
         <h6>Card Samples</h6>
         <br>
         <div class="grid">
     
-            <div class="card1 xs12 sm6 md4 lg3 xl2">
+            <div class="card1" data-grid="x12-s6-m4-l3-X2">
                 <div>
                     <p>Title</p>
                     <p>Some Text</p>
                 </div>
             </div>
     
-            <div class="card1 round xs12 sm6 md4 lg3 xl2">
+            <div class="card1 round" data-grid="x12-s6-m4-l3-X2">
                 <div>
                     <p>Title</p>
                     <p>Some Text</p>
                 </div>
             </div>
     
-            <div class="card1 clear xs12 sm6 md4 lg3 xl2">
+            <div class="card1 clear" data-grid="x12-s6-m4-l3-X2">
                 <div>
                     <p>Title</p>
                     <p>Some Text</p>
                 </div>
             </div>
     
-            <div class="card1 round clear xs12 sm6 md4 lg3 xl2">
+            <div class="card1 round clear" data-grid="x12-s6-m4-l3-X2">
                 <div>
                     <p>Title</p>
                     <p>Some Text</p>
                 </div>
             </div>
 
-            <div class="expansion xs12 sm12 md12 lg12 xl12">
-                <details>
-                    <summary><span><b>CODE: </b>Card Type 1</span></summary>
-                </details>
-                <div>
-                    <pre><code class="colorize">&lt;div class="card1 sm12 md6 lg3"&gt;
+            <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+                <header>
+                    <div><div></div><div></div><div></div></div>
+                    <span>Card Type 1</span>
+                    <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+                </header>
+                <main>&lt;div class="card1" data-grid="x12-s12-m6-l3-X2"&gt;
     &lt;div&gt;
         &lt;p>Title&lt;/p&gt;
         &lt;p&gt;Some Text&lt;/p&gt;
     &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                </div>
+&lt;/div&gt;</main>
+                <footer><label>HTML</label></footer>
             </div>
-    
-            <div class="card2 xs12 sm6 md4 lg3 xl2">
+
+            <div class="card2" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -830,7 +1005,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card2 round xs12 sm6 md4 lg3 xl2">
+            <div class="card2 round" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -839,7 +1014,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card2 clear xs12 sm6 md4 lg3 xl2">
+            <div class="card2 clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -848,7 +1023,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card2 round clear xs12 sm6 md4 lg3 xl2">
+            <div class="card2 round clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -856,24 +1031,25 @@ body > main > nav {
                     <button>Button</button>
                 </div>
             </div>
-    
-            <div class="expansion xs12 sm12 md12 lg12 xl12">
-                <details>
-                    <summary><span><b>CODE: </b>Card Type 2</span></summary>
-                </details>
-                <div>
-                    <pre><code class="colorize">&lt;div class="card2 sm12 md6 lg3"&gt;
+
+            <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+                <header>
+                    <div><div></div><div></div><div></div></div>
+                    <span>Card Type 2</span>
+                    <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+                </header>
+                <main>&lt;div class="card2" data-grid="x12-s12-m6-l3-X2"&gt;
     &lt;img src="image.jpg"&gt;
     &lt;div&gt;
         &lt;p&gt;Title&lt;/p&gt;
         &lt;p&gt;Some Text&lt;/p&gt;
         &lt;button&gt;Button&lt;/button&gt;
     &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                </div>    
+&lt;/div&gt;</main>
+                <footer><label>HTML</label></footer>
             </div>
-            
-            <div class="card3 xs12 sm6 md4 lg3 xl2">
+
+            <div class="card3" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -882,7 +1058,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card3 round xs12 sm6 md4 lg3 xl2">
+            <div class="card3 round" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -891,7 +1067,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card3 clear xs12 sm6 md4 lg3 xl2">
+            <div class="card3 clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -903,7 +1079,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card3 round clear xs12 sm6 md4 lg3 xl2">
+            <div class="card3 round clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -915,23 +1091,24 @@ body > main > nav {
                 </div>
             </div>
 
-            <div class="expansion xs12 sm12 md12 lg12 xl12">
-                <details>
-                    <summary><span><b>CODE: </b>Card Type 3</span></summary>
-                </details>
-                <div>
-                    <pre><code class="colorize">&lt;div class="card3 sm12 md6 lg3"&gt;
+            <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+                <header>
+                    <div><div></div><div></div><div></div></div>
+                    <span>Card Type 3</span>
+                    <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+                </header>
+                <main>&lt;div class="card3" data-grid="x12-s12-m6-l3-X2"&gt;
     &lt;img src="image.jpg"&gt;
     &lt;div&gt;
         &lt;p&gt;Title&lt;/p&gt;
-        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/p&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, ...&lt;/p&gt;
         &lt;button&gt;Button&lt;/button&gt;
     &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                </div>    
+&lt;/div&gt;</main>
+                <footer><label>HTML</label></footer>
             </div>
 
-            <div class="card4 xs12 sm6 md4 lg3 xl2">
+            <div class="card4" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -939,7 +1116,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card4 round xs12 sm6 md4 lg3 xl2">
+            <div class="card4 round" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -947,7 +1124,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card4 clear xs12 sm6 md4 lg3 xl2">
+            <div class="card4 clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -955,7 +1132,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card4 round clear xs12 sm6 md4 lg3 xl2">
+            <div class="card4 round clear" data-grid="x12-s6-m4-l3-X2">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -963,22 +1140,23 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="expansion xs12 sm12 md12 lg12 xl12">
-                <details>
-                    <summary><span><b>CODE: </b>Card Type 4</span></summary>
-                </details>
-                <div>
-                    <pre><code class="colorize">&lt;div class="card4 sm12 md6 lg3"&gt;
+            <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+                <header>
+                    <div><div></div><div></div><div></div></div>
+                    <span>Card Type 4</span>
+                    <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+                </header>
+                <main>&lt;div class="card4" data-grid="x12-s12-m6-l3-X2"&gt;
     &lt;img src="image.jpg"&gt;
     &lt;div&gt;
         &lt;p&gt;Title&lt;/p&gt;
         &lt;button&gt;&lt;/button&gt;
     &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                </div>    
+&lt;/div&gt;</main>
+                <footer><label>HTML</label></footer>
             </div>
 
-            <div class="card5 xs12 sm12 md12 lg6 xl6">
+            <div class="card5" data-grid="xs12 sm12 md12 lg6 xl6">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -987,7 +1165,7 @@ body > main > nav {
                 </div>
             </div>
     
-            <div class="card5 xs12 sm12 md12 lg6 xl6">
+            <div class="card5" data-grid="xs12 sm12 md12 lg6 xl6">
                 <img src="/assets/image/noimage.jpg">
                 <div>
                     <p>Title</p>
@@ -999,20 +1177,21 @@ body > main > nav {
                 </div>
             </div>
 
-            <div class="expansion xs12 sm12 md12 lg12 xl12">
-                <details>
-                    <summary><span><b>CODE: </b>Card Type 5</span></summary>
-                </details>
-                <div>
-                    <pre><code class="colorize">&lt;div class="card5 sm12 md6 lg3"&gt;
+            <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+                <header>
+                    <div><div></div><div></div><div></div></div>
+                    <span>Card Type 5</span>
+                    <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+                </header>
+                <main>&lt;div class="card5" data-grid="x12-s12-m6-l3-X2"&gt;
     &lt;img src="image.jpg"&gt;
     &lt;div&gt;
         &lt;p&gt;Title&lt;/p&gt;
-        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/p&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, ...&lt;/p&gt;
         &lt;button&gt;Button&lt;/button&gt;
     &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                </div>    
+&lt;/div&gt;</main>
+                <footer><label>HTML</label></footer>
             </div>
 
         </div>
@@ -1023,13 +1202,13 @@ body > main > nav {
         </p>
         <p>
             <b>Style 1:</b> This is the default for cards it uses the primary color as the backgrund color.<br>
-            <pre><code class="colorize">&lt;div class="card1 sm12 md6 lg3"&gt;</code></pre><br>
+            <pre><code class="colorize">&lt;div class="card1" data-grid="x12-s12-m6-l3-X2"&gt;</code></pre><br>
             <b>Style 2:</b> This adds larger rounding to the card but otherwise is the same a style 1.<br>
-            <pre><code class="colorize">&lt;div class="card1 round sm12 md6 lg3"&gt;</code></pre><br>
+            <pre><code class="colorize">&lt;div class="card1 round" data-grid="x12-s12-m6-l3-X2"&gt;</code></pre><br>
             <b>Style 3:</b> The clear tag on this makes the background transparent and adds a border around the card.<br>
-            <pre><code class="colorize">&lt;div class="card1 clear sm12 md6 lg3"&gt;</code></pre><br>
+            <pre><code class="colorize">&lt;div class="card1 clear" data-grid="x12-s12-m6-l3-X2"&gt;</code></pre><br>
             <b>Style 4:</b> The clear tag on this makes the background transparent and adds a border around the card while adding larger rounding to the card. <br>
-            <pre><code class="colorize">&lt;div class="card1 round clear sm12 md6 lg3"&gt;</code></pre><br>
+            <pre><code class="colorize">&lt;div class="card1 round clear" data-grid="x12-s12-m6-l3-X2"&gt;</code></pre><br>
         </p>
     </article>
     <aside></aside>
@@ -1695,6 +1874,24 @@ body > main > nav {
     <article>
         <h4>Grids</h4>
         <p>Description</p>
+
+        <div class="codebox" data-grid="x12-x12-m12-l12-X12">
+            <header>
+                <div><div></div><div></div><div></div></div>
+                <span>Grid Example</span>
+                <div><svg><use href="#icon-copy"/></svg><button>Copy</button></div>
+            </header>
+            <main>&lt;div class="grid"&gt;
+
+    &lt;div data-grid="x12-s12-m6-l3-X2"&gt;
+    &lt;/div&gt;
+
+    &lt;div data-grid="x12-s12-m6-l3-X2"&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;</main>
+            <footer><label>HTML</label></footer>
+        </div>
     </article>
     <aside>
     </aside>
@@ -2721,6 +2918,10 @@ document.querySelectorAll("code.colorize").forEach(function(el) {
     CodeColorizer(el);
 });
 
+document.querySelectorAll(".codebox > main").forEach(function(el) {
+    CodeColorizer(el);
+});
+
 function CodeColorizer(elmnt, mode) {
     var lang = (mode || "html");
     var elmntObj = (document.getElementById(elmnt) || elmnt);
@@ -3117,6 +3318,57 @@ const asides = document.querySelectorAll('aside');
 function COSMUICSelect() {
     jump(document.getElementById("cosmuic-select").value);
 }
+
+
+</script>
+
+<script>
+document.addEventListener('click', function(event) {
+    // Only target buttons inside a .codebox
+    const button = event.target.closest('button');
+    if (!button) return;
+
+    const codebox = button.closest('.codebox');
+    if (!codebox) return;
+
+    // Optional: Only react to buttons that say "Copy"
+    if (button.textContent.trim() !== 'Copy') return;
+
+    // Find the <main> element inside this .codebox
+    const main = codebox.querySelector('main');
+    if (!main) return;
+
+    // Create a temporary element to extract plain text
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = main.innerHTML;
+
+    // Remove all span and other tags, leaving just the text
+    const spans = tempDiv.querySelectorAll('span');
+    spans.forEach(span => {
+        span.replaceWith(...span.childNodes);
+    });
+
+    // Decode HTML entities
+    const textArea = document.createElement('textarea');
+    textArea.style.position = 'fixed'; // Prevent scrolling to bottom
+    textArea.style.opacity = '0';
+    textArea.value = tempDiv.textContent
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    // Optional feedback
+    button.textContent = 'Copied!';
+    setTimeout(() => {
+        button.textContent = 'Copy';
+    }, 1500);
+});
+</script>
 
 
 </script>
