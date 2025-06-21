@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/layout/css/cosmuic.css">
+<link rel="stylesheet" href="/layout/css/styles.css">
+<title>Mystic's Web: Home Page</title>
+<style>
+
+.pwa-install-overlay {
+    position: fixed;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.pwa-install-overlay .pwa-center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+}
+
+.pwa-install-overlay .pwa-center-container * {
+    flex-shrink: 0;
+}
+
+.pwa-install-overlay .pwa-center-container .before, .pwa-install-overlay .pwa-center-container .after {
+    position: relative;
+    display: block;
+    opacity: 0;
+    width: 100%;
+}
+
+.pwa-install-overlay .pwa-center-container .before {
+    height: calc(var(--safe-area-inset-top) + 32px);
+    height: 32px;
+}
+
+.pwa-install-overlay .pwa-center-container .after {
+    height: calc(var(--safe-area-inset-bottom) + 32px);
+    height: 32px;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    width: calc(100% - 64px);
+    max-width: 300px;
+    background-color: #fff;
+    color: #000;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup {
+        background-color: #444;
+        color: #fff;
+    }
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup ion-icon.close {
+    font-size: 22px;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-name {
+    margin: 14px 0 0 0;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon {
+    position: relative;
+    margin: 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 22.5%;
+}
+
+@supports (mask-size: cover) or (-webkit-mask-size: cover) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .img {
+        border-radius: 0;
+        -webkit-mask-image: url(https://re-source01.sfo2.cdn.digitaloceanspaces.com/res-uploads/ios-mask.svg);
+        -webkit-mask-size: cover;
+        mask-image: url(https://re-source01.sfo2.cdn.digitaloceanspaces.com/res-uploads/ios-mask.svg);
+        mask-size: cover;
+    }
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .img::after {
+    position: absolute;
+    content: "";
+    background-image: url(https://outside-sales.res.evdev.online/apple-touch-icon.png);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@supports not (-webkit-overflow-scrolling: touch) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .img::after {
+        background-image: url(https://outside-sales.res.evdev.online/android-chrome-192x192.png);
+    }
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 22.5%;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+}
+@supports (mask-size: cover) or (-webkit-mask-size: cover) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border {
+        border-radius: 0;
+        border: none;
+        -webkit-mask-image: url(https://re-source01.sfo2.cdn.digitaloceanspaces.com/res-uploads/ios-mask-border-64.svg);
+        -webkit-mask-size: cover;
+        mask-image: url(https://re-source01.sfo2.cdn.digitaloceanspaces.com/res-uploads/ios-mask-border-64.svg);
+        mask-size: cover;
+    }
+
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border::after {
+        position: absolute;
+        content: "";
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.25);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border::after {
+        background-color: rgba(255, 255, 255, 0.5);
+        }
+    }
+}
+
+@supports not (-webkit-overflow-scrolling: touch) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-app-icon .border {
+        display: none;
+    }
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-message {
+    margin: 16px auto;
+    text-align: center;
+    font-size: 14px;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer {
+    margin: 16px auto 0 auto;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@supports (-webkit-overflow-scrolling: touch) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer {
+        align-items: flex-end;
+    }
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer ion-icon {
+    font-size: 20px;
+}
+
+.pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer ion-icon.ios {
+    margin: 0 4px;
+    color: #007AFF;
+}
+
+@supports not (-webkit-overflow-scrolling: touch) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer ion-icon.ios {
+        display: none;
+    }
+}
+
+@supports (-webkit-overflow-scrolling: touch) {
+    .pwa-install-overlay .pwa-center-container .pwa-install-popup .pwa-footer ion-icon.android {
+        display: none;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
+
+<main>
+    <h3><b>Japanese Study Materials</b></h3>
+    <p>
+        - <a href="kanji-writing.html">kanji writing practice</a> -
+    </p>
+</main>
+
+<footer>
+<iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer>
+
+<script>
+
+// (function() {
+//   var appicon, center, create, footer, isMobile, overlay, popup;
+
+//   window.appname = "Japanese Study";
+
+//   isMobile = {
+//     Android: function() {
+//       return navigator.userAgent.match(/Android/i);
+//     },
+//     BlackBerry: function() {
+//       return navigator.userAgent.match(/BlackBerry/i);
+//     },
+//     iOS: function() {
+//       return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+//     },
+//     Opera: function() {
+//       return navigator.userAgent.match(/Opera Mini/i);
+//     },
+//     Windows: function() {
+//       return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+//     },
+//     any: function() {
+//       return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
+//     }
+//   };
+
+//   if (window.matchMedia('(display-mode: standalone)').matches) {
+//     alert("Already Installed");
+//   } else if (isMobile.any()) {
+//     create = function(typ, clas, text, addto) {
+//       var o;
+//       o = document.createElement(typ || "div");
+//       if (clas) {
+//         o.className = clas;
+//       }
+//       if (text) {
+//         o.innerText = text;
+//       }
+//       if (addto) {
+//         addto.appendChild(o);
+//       }
+//       return o;
+//     };
+//     overlay = create("div", "pwa-install-overlay fade-in", "", document.body);
+//     center = create("div", "pwa-center-container", "", overlay);
+//     create("div", "before", "~", center);
+//     popup = create("div", "pwa-install-popup", "", center);
+//     appicon = create("div", "pwa-app-icon", "", popup);
+//     create("div", "img", "", appicon);
+//     create("div", "border", "", appicon);
+//     create("div", "pwa-app-name", "Install " + window.appname, popup);
+//     create("div", "pwa-message", "Install this application to your homescreen for quick and easy access when you're on the go!", popup);
+//     footer = create("div", "pwa-footer", "", popup);
+//     create("span", "", "Just tap", footer);
+//     (create("ion-icon", "ios", "", footer)).name = "ios-share";
+//     (create("ion-icon", "android", "", footer)).name = "md-more";
+//     create("span", "", "then 'Add to Home Screen'", footer);
+//     create("div", "after", "~", center);
+//   }
+
+// }).call(this);
+
+</script>
+</body>
+</html>

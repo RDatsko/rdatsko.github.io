@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/layout/css/cosmuic.css">
+<link rel="stylesheet" href="/layout/css/styles.css">
+<link rel="stylesheet" href="/layout/css/paper.css">
+<title>Mystic's Web: About</title>
+<style>@page { size: A4 }</style>
+<style>
+
+@media print {
+    body.A4 > header,
+    body.A4 > footer {
+        display: none;
+    }
+
+    body > header[data-nav] ~ main {
+        max-width: 100%;
+        position: absolute;
+        top: 0;
+    }
+}
+
+</style>
+</head>
+<body class="A4">
+
+<header data-nav="left">
+<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
+
+<main>
+    <section class="sheet padding-10mm">
+        <article>
+            <h2>.</h2>
+        </article>
+    </section>
+</main>
+
+<footer>
+<iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer>
+
+</body>
+</html>
