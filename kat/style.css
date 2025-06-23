@@ -1,0 +1,357 @@
+@charset "utf-8";
+
+
+
+.hover-opacity {
+  transition-property: opacity;
+  transition-duration: 0.3s;
+}
+.hover-opacity:hover {
+  opacity: 0.7; 
+}
+ß
+
+
+/* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから google font
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/
+
+/*noto-sans-jp*/
+/*<uniquifier>: Use a unique and descriptive class name*/
+/* <weight>: Use a value from 100 to 900*/
+.noto-sans-jp-w100{
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.noto-sans-jp-w200{
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.noto-sans-jp-w300{
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.noto-sans-jp-w400{
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.noto-sans-jp-w500{
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+/*Oooh Baby*/
+.oooh-baby-regular {
+  font-family: "Oooh Baby", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+
+
+
+/* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから main visual
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/
+
+#main_area{
+  width: 100%;
+  color: #333;
+  font-size: 16px !important;
+ }
+
+ #main_area .text{
+  position: relative;
+ }
+
+
+
+#main_area h1, h2, h3,h4,h5{width: 100%; display: block; transition: 0.5s;}
+
+#main_area h1{
+  /*position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);*/
+
+  line-height: 1.35;
+
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 2.75em;
+}
+
+#main_area h2{
+  position: absolute;
+
+  font-family: "Oooh Baby", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+/**/
+@media screen and (min-width: 350px){
+  #main_area .text{
+    height: 12em;
+  }
+
+  #main_area h1{
+    font-size: 2.45em;
+    font-weight: 400;
+    text-align: center;
+    margin: 32px 0 16px 0;
+    display: block;
+  }
+
+  #main_area h2{
+    font-size: 1.75em;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    transform: rotate( -16deg ) scaleX(1.1);
+    bottom: 0px;
+    right: 30px;
+  }
+
+  .nullify{
+    padding: 0 0em;
+  }
+
+
+}
+
+
+/**/
+@media screen and (min-width: 480px){
+  #main_area h1{
+    font-size: 2.2em;
+  }
+
+  #main_area h2{
+    font-size: 2.35em;
+    right: 10%;
+  }
+
+  .nullify{
+    padding: 0 2em;
+  }
+
+}
+
+/**/
+@media screen and (min-width:740px){
+  #main_area h1{
+    font-size: 3.0em;
+  }
+
+  #main_area h2{
+    font-size: 3.0em;
+    position: absolute;
+    bottom: -15%;
+    right: 10%;
+  }
+}
+
+
+/**/
+@media screen and (min-width:1024px){
+  #main_area .text{
+    height: 12em;
+  }
+
+  #main_area h1{
+    font-size: 3.55em;
+  }
+
+  #main_area h2{
+    font-size: 3.55em;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    transform: rotate( -12deg ) scaleX(1.1);
+    bottom: -40%;
+    right: 15%;
+  }
+
+  .nullify{
+    padding: 0 13em;
+  }
+}
+
+
+
+
+
+/* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから slider img
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/
+
+
+ .slider li{
+  position: relative;
+ }
+
+ .slider li h1{
+    position: absolute;
+    bottom:8px;
+    right:16px;
+    font-size:30px;
+    color: red;
+    padding:0;
+    margin:0;
+    color: #fff !important;
+  }
+
+ /**/
+@media screen and (min-width: 350px){
+}
+
+
+/**/
+@media screen and (min-width: 480px){
+}
+
+/**/
+@media screen and (min-width:740px){
+}
+
+
+/**/
+@media screen and (min-width:1024px){
+}
+
+ /* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから 事業内容
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/
+
+.support , .levelup , .entertainment{
+  position: relative;
+ }
+
+ ..support , .levelup , .entertainment{
+  height: 6.0em;
+ }
+
+ .support h1{
+  color : #cd853f ;
+  letter-spacing : 2px;
+  text-shadow    : 
+       2px  2px 1px #fff,
+      -2px  2px 1px #fff,
+       2px -2px 1px #fff,
+      -2px -2px 1px #fff,
+       2px  0px 1px #fff,
+       0px  2px 1px #fff,
+      -2px  0px 1px #fff,
+       0px -2px 1px #fff;
+ }
+
+  .levelup h1{
+  color : #1e90ff ;
+  letter-spacing : 2px;
+  text-shadow    : 
+       2px  2px 1px #fff,
+      -2px  2px 1px #fff,
+       2px -2px 1px #fff,
+      -2px -2px 1px #fff,
+       2px  0px 1px #fff,
+       0px  2px 1px #fff,
+      -2px  0px 1px #fff,
+       0px -2px 1px #fff;
+ }
+
+  .entertainment h1{
+  color : #ff1493;
+  letter-spacing : 2px;
+  text-shadow    : 
+       2px  2px 1px #fff,
+      -2px  2px 1px #fff,
+       2px -2px 1px #fff,
+      -2px -2px 1px #fff,
+       2px  0px 1px #fff,
+       0px  2px 1px #fff,
+      -2px  0px 1px #fff,
+       0px -2px 1px #fff;
+ }
+
+
+ .support h2{
+  color:#cd853f;
+ }
+ .levelup h2{
+  color:#1e90ff;
+ }
+ .entertainment h2{
+  color:#ff1493;
+ }
+
+ .about h1{
+  z-index: 101;
+  font-size: 1.0em;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+  margin: 0 !important;
+  padding: 64px 0 0 0 !important;
+ }
+
+ .about h2{
+  z-index: 100;
+  font-size: 2.2em;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+  margin: 0 !important;
+  padding: 0 !important;
+ }
+
+  .about p{
+    display: block;
+    text-align: left;
+ }
+
+  .about .item {
+    text-align: center !important;
+ }
+
+   .about .item span{
+    padding: 4px 32px;
+    font-size: 1.00em;
+    display: inline-block;
+    border-radius: 16px;
+    background-color: #f1f1f1;
+    margin-bottom: 6px;
+ }
+
+ .rd_8{border-radius:8px; }
+
+ /* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから 
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/
+
+ /* ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+ここから 
+ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■*/

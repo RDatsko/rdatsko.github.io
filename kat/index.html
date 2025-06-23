@@ -1,0 +1,871 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="header-only.css">
+<link rel="stylesheet" href="prism-vsc-dark-plus.css">
+<link rel="stylesheet" href="events.css">
+
+<!--fontawesome-->
+<script src="https://kit.fontawesome.com/cf6b55f3a6.js" crossorigin="anonymous"></script>
+
+<title>Mystic's Web: KAT Stuff</title>
+<style>
+/* Codebox */
+
+.codebox {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;
+    /* max-width: 800px; */
+    min-height: 15rem;
+    max-height: 25rem;
+    /* margin: 4rem 0 10rem 0; */
+    margin: 2rem 0 2rem 0;
+    background: #1e1e1e;
+    color: #ddd;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    justify-content: space-between;
+}
+
+.codebox > header {
+    background: #2d2d2d;
+    padding: 7px 15px;
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 1000;
+    flex-direction: row;
+}
+
+.codebox > header::before {
+    width: 60px;
+    height: 20px;
+    content: '';
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='30' viewBox='0 0 120 60'%3E%3Ccircle cx='0' cy='20' r='12' fill='%23ff5f57' /%3E%3Ccircle cx='40' cy='20' r='12' fill='%23ffbd2e' /%3E%3Ccircle cx='80' cy='20' r='12' fill='%2327c93f' /%3E%3C/svg%3E");
+}
+
+.codebox > header::after {
+    content: 'Copy';
+    position: absolute;
+    right: 1rem;
+    width: auto;
+    margin: 0 5px;
+    padding-left: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='icon-copy' style='width: 20px; height: 20px; fill: %23d4d4d4;' viewBox='0 0 24 24'%3E%3Cpath d='M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    display: block;
+    font-weight: 700;
+}
+
+.copy-click-area {
+    position: absolute;
+    top: 7px; /* aligns with header padding */
+    right: 1rem;
+    z-index: 1001;
+    cursor: pointer;
+    background: transparent;
+    color: white;
+    width: 100px;
+    height: 1.5rem;
+    text-align: right;
+}
+
+.codebox > main {
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    flex: 1 1 auto;
+    font-family: Consolas, 'Courier New', Courier, monospace;
+    overflow: auto;
+    margin-bottom: auto;
+    color: white;
+}
+
+.codebox > main {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
+
+.codebox > main::-webkit-scrollbar {
+    width: 12px;
+}
+
+.codebox > main::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.codebox > main::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+    /* border: 3px solid #f0f0f0; */
+}
+
+.codebox > main::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.codebox > footer {
+    background: #2d2d2d;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 12px;
+    color: #d4d4d4;
+}
+
+.codebox > footer[data-ext*="html"]::before,
+.codebox > footer[data-ext*="css"]::before,
+.codebox > footer[data-ext*="js"]::before,
+.codebox > footer[data-ext*="json"]::before,
+.codebox > footer[data-ext*="php"]::before {
+    background: rgba(86, 156, 214, 0.2);
+    color: #569cd6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: .5rem;
+    cursor: pointer;
+}
+
+.codebox > footer[data-ext*="html"]::before { content: "HTML"; }
+.codebox > footer[data-ext*="css"]::before  { content: "CSS"; }
+.codebox > footer[data-ext*="js"]::before   { content: "JavaScript"; }
+.codebox > footer[data-ext*="json"]::before { content: "JSON"; }
+.codebox > footer[data-ext*="php"]::before  { content: "PHP"; }
+
+
+
+
+.sidebar-navigation {
+    webkit-box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    -moz-box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    position: fixed;
+    z-index: 400;
+    background-color: #fff;
+    /* border-right: 1px solid #ccc; */
+    width: 200px;
+    /* height: 100%; */
+    top: 75px;
+    bottom: 25px;
+    /* overflow-y: auto; */
+    overflow: hidden;
+    /* border-radius: 1rem; */
+    margin: 5px;
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+}
+
+.sidebar-navigation > div {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    display: block;
+}
+
+.sidebar-navigation .title {
+    display: block;
+    font-size: 14px;
+    line-height: 16px;
+    background-color: #fff;
+    align-items: center;
+    font-weight: 600;
+    padding: 16px;
+    border-bottom: 1px solid #ccc;
+}
+
+.sidebar-navigation ul {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-navigation ul li {
+    display: block;
+    cursor: pointer;
+}
+
+.sidebar-navigation ul li a {
+    position: relative;
+    display: block;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #2e2e2e;
+    -webkit-transition: all 0.3s linear;
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    transition: all 0.3s linear;
+}
+
+.sidebar-navigation ul li a svg {
+    /* font-size: 24px; */
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+.sidebar-navigation ul li:hover > a, .sidebar-navigation ul li.selected > a {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-navigation ul li ul {
+    display: none;
+}
+
+.sidebar-navigation ul li ul li {
+    font-weight: 400;
+}
+
+.sidebar-navigation ul li ul.open {
+    display: block;
+}
+
+.sidebar-navigation ul li ul li a {
+    color: #495d62;
+    border-color: rgba(255, 255, 255, 0.1);
+    font-weight: 400;
+}
+
+.sidebar-navigation ul li ul li:hover > a, .sidebar-navigation ul li ul li.selected > a {
+    background-color: #e6ebed;
+}
+
+.sidebar-navigation ul li ul li:hover > a:before, .sidebar-navigation ul li ul li.selected > a:before {
+    margin-right: 10px;
+}
+
+.sidebar-navigation ul li ul li.selected.selected--last > a {
+    background-color: #94aab0;
+    color: #fff;
+}
+
+.sidebar-navigation ul li ul li.selected.selected--last > a:before {
+    background-color: #fff;
+}
+
+.subMenuColor1 {
+    background-color: #fbfcfc;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.subMenuColor2 {
+    background-color: white;
+}
+
+.content {
+    margin-left: 225px;
+}
+
+
+
+
+
+
+[name="css"], [name="css"] + label {
+    display: none;
+}
+
+[name="css"] + label + article,
+[name="css"] + label + article + aside {
+    display: none;
+}
+
+[name="css"] + label + article {
+    width: 100%;
+    /* height: 100%;
+    overflow: scroll; */
+    /* padding: 10px 25px; */
+    padding-bottom: 10px;
+}
+
+[name="css"]:checked + label + article,
+[name="css"]:checked + label + article + aside {
+    display: block;
+}
+</style>
+</head>
+<body class="line-numbers">
+
+<header>
+<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
+
+<main>
+<!-- 
+    <div class="codebox php">
+        <header>index.php</header>
+        <main>
+            <pre><code class="language-php"></code></pre>
+        </main>
+        <footer data-ext="php"></footer>
+        <div class="copy-click-area"></div>
+    </div>
+-->
+
+    <div class="sidebar-navigation">
+        <div>
+            <ul>
+                <li><a href="#about" onclick="jump('about')">KAT </a></li>
+                <li><a href="#events" onclick="jump('events')">イベント </a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content">
+
+
+
+
+
+
+
+
+
+
+        <input type="radio" id="about" name="css" checked>
+        <label for="about"></label>
+        <article>
+            <br>
+            <h1>KATのウェブサイトのこと</h1>
+            <br>
+
+            <p>
+                このページでは、カスタムCSSを使用しているヘッダーを除き、Bootstrap 5を使用しています。
+            </p>
+
+        </article>
+
+
+
+
+
+
+
+
+
+
+        <input type="radio" id="events" name="css">
+        <label for="events"></label>
+        <article>
+
+            <br>
+            <h1>イベント</h1>
+            <br>
+
+            <div class="container mb_80">
+    <div class="row">
+
+    <div class="col-12 col-md-4 mb_64 article d-flex">
+        <div class="event d-flex flex-column align-self-end justify-content-between">
+            <a href="" class="hover-opacity d-flex" style="pointer-events:none;">
+                <img src="https://bless4.jp/img/topics/20250628_akino_20th.jpg" width="100%" class="hover-opacity">
+            </a>
+            <div class="d-flex flex-column align-self-end" style="width: 100%;">
+                <h6 class="artist">AKINO from bless4</h6>
+                <h2 class="title">僕の地獄に音楽は絶えない</h2>
+                <p class="description">【一般発売（先着）】2025/4/27(日)10:00-6/27(金)18:00</p>
+                <p style="font-size: .75rem; color: #777;">
+                    <i class="fa fa-map-marker"></i> 日本、東京都、渋谷区<br>
+                    <i class="fa fa-map-location-dot"></i> Veats Shibuya<br>
+                    <i class="fa fa-calendar"></i> 6月 28日 (土) <span style="position: absolute; left: 65%;"><i class="fa fa-clock"></i> 17:30</span><br>
+                    <i></i>   <span style="position: absolute; left: 65%;"><i></i> </span><br>
+                </p>
+                <a href="https://eplus.jp/sf/detail/4294400001-P0030001" targer="_blank">
+                    詳細はこちら
+                    <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>    <div class="col-12 col-md-4 mb_64 article d-flex">
+        <div class="event d-flex flex-column align-self-end justify-content-between">
+            <a href="" class="hover-opacity d-flex" style="pointer-events:none;">
+                <img src="https://pbs.twimg.com/media/GtKADPybcAA_bft?format=jpg&name=large" width="100%" class="hover-opacity">
+            </a>
+            <div class="d-flex flex-column align-self-end" style="width: 100%;">
+                <h6 class="artist">AKINO from bless4</h6>
+                <h2 class="title">デザインフェスタ Vol.61</h2>
+                <p class="description">AKINOファッションブランド"美YOU-T"を纏い代表曲「海色」等に合わせて唯一無二のモデルショーに挑戦します</p>
+                <p style="font-size: .75rem; color: #777;">
+                    <i class="fa fa-map-marker"></i> 日本、東京都、江東区<br>
+                    <i class="fa fa-map-location-dot"></i> 東京ビッグサイト<br>
+                    <i class="fa fa-calendar"></i> 7月 05日 (土)  ~<span style="position: absolute; left: 65%;"><i class="fa fa-clock"></i> 12:20</span><br>
+                    <i></i> 7月 06日 (日)<span style="position: absolute; left: 65%;"><i></i> </span><br>
+                </p>
+                <a href="https://designfesta.com/" targer="_blank">
+                    詳細はこちら
+                    <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>    <div class="col-12 col-md-4 mb_64 article d-flex">
+        <div class="event d-flex flex-column align-self-end justify-content-between">
+            <a href="" class="hover-opacity d-flex" style="pointer-events:none;">
+                <img src="https://pbs.twimg.com/media/GrEO5akbgAA0nxZ?format=jpg&name=large" width="100%" class="hover-opacity">
+            </a>
+            <div class="d-flex flex-column align-self-end" style="width: 100%;">
+                <h6 class="artist">KANASA from bless4</h6>
+                <h2 class="title">『４ever』</h2>
+                <p class="description">KANASAのソロデビュー4周年はbless4スタジオで一緒にお祝いしよう🥂</p>
+                <p style="font-size: .75rem; color: #777;">
+                    <i class="fa fa-map-marker"></i> 日本、神奈川県、川崎市<br>
+                    <i class="fa fa-map-location-dot"></i> bless4スタジオ<br>
+                    <i class="fa fa-calendar"></i> 7月 20日 (日) <span style="position: absolute; left: 65%;"><i class="fa fa-clock"></i> 17:00</span><br>
+                    <i></i>   <span style="position: absolute; left: 65%;"><i></i> </span><br>
+                </p>
+                <a href="https://kat.shop-pro.jp/?pid=173365334" targer="_blank">
+                    詳細はこちら
+                    <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+            <div class="codebox php">
+                <header>index.php</header>
+                <main>
+                    <pre><code class="language-php">&lt;?php
+    $event = json_decode(file_get_contents("events.json"), true)['events'];
+    $artist = "all";
+    include ( dirname(__FILE__) . '/event.php' );
+?&gt;</code></pre>
+                </main>
+                <footer data-ext="php"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <p>
+                上記のコード内の「$artist 」がJSONファイル内の 「id 」と一致すれば、その情報が画面に表示される。
+                もし「$artist = "all"; 」とすると、今日の日付以降に表示されるすべてのアーティストを表示する。
+                最初から順番に表示されるので、JSONファイルを日付順に並べることをお勧めする。
+                不要になったら削除すればよい。
+            </p>
+
+            <div class="codebox json">
+                <header>events.json</header>
+                <main>
+                    <pre><code class="language-json">{
+    "events": [
+        {
+            "id": "amw",
+            "artist": "AMW",
+            "title": "AMW3周年Color Party",
+            "description": "会場をAMWカラーでいっぱいにしたい！<br>ドレスコードは【青・紫・ピンク・黄・緑】全色or推し色を身に付けご来場下さい💡差し入れ等もカラーだと嬉しいです☺️",
+            "date": "2025-06-21",
+            "enddate": "",
+            "place": "bless4スタジオ",
+            "city": "神奈川県、川崎市",
+            "country": "日本",
+            "open": "",
+            "start": "17:30",
+            "end": "",
+            "price": "0",
+            "image": "https://pbs.twimg.com/media/Gr3-binWAAA0Y5n?format=jpg&name=900x900",
+            "url": "https://kat.shop-pro.jp/?pid=184674423",
+            "soldout": false
+        },
+        {
+            "id": "akino",
+            "artist": "AKINO from bless4",
+            "title": "僕の地獄に音楽は絶えない",
+            "description": "【一般発売（先着）】2025/4/27(日)10:00-6/27(金)18:00",
+            "date": "2025-06-28",
+            "enddate": "",
+            "place": "Veats Shibuya",
+            "city": "東京都、渋谷区",
+            "country": "日本",
+            "open": "17:00",
+            "start": "17:30",
+            "end": "",
+            "price": "6,500 +",
+            "image": "https://bless4.jp/img/topics/20250628_akino_20th.jpg",
+            "url": "https://eplus.jp/sf/detail/4294400001-P0030001",
+            "soldout": false
+        },
+        {
+            "id": "akino",
+            "artist": "AKINO from bless4",
+            "title": "デザインフェスタ Vol.61",
+            "description": "AKINOファッションブランド\"美YOU-T\"を纏い代表曲「海色」等に合わせて唯一無二のモデルショーに挑戦します",
+            "date": "2025-07-05",
+            "enddate": "2025-07-06",
+            "place": "東京ビッグサイト",
+            "city": "東京都、江東区",
+            "country": "日本",
+            "open": "",
+            "start": "12:20",
+            "end": "",
+            "price": "",
+            "image": "https://pbs.twimg.com/media/GtKADPybcAA_bft?format=jpg&name=large",
+            "url": "https://designfesta.com/",
+            "soldout": false
+        },
+        {
+            "id": "kanasa",
+            "artist": "KANASA from bless4",
+            "title": "『４ever』",
+            "description": "KANASAのソロデビュー4周年はbless4スタジオで一緒にお祝いしよう🥂",
+            "date": "2025-07-20",
+            "enddate": "",
+            "place": "bless4スタジオ",
+            "city": "神奈川県、川崎市",
+            "country": "日本",
+            "open": "16:30",
+            "start": "17:00",
+            "end": "",
+            "price": "3,500",
+            "image": "https://pbs.twimg.com/media/GrEO5akbgAA0nxZ?format=jpg&name=large",
+            "url": "https://kat.shop-pro.jp/?pid=173365334",
+            "soldout": false
+        }
+    ]
+}</code></pre>
+                </main>
+                <footer data-ext="json"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <p>
+                date 「値と 」enddate "値がある。
+                これらの値によって、複数日のイベントが可能になる。
+                また、「start 」と 「end 」があり、開始と終了の時間や複数の時間を指定することができます。<br>
+                1つのイベントに複数のアーティストを追加するには、「 | 」を使用します。
+                例えば、アップサイクルフェスティバルは以下のようになります：
+            </p>
+            <pre><code class="language-json">"id": "amw|akino|kanasa|bless4"</code></pre>
+
+            <div class="codebox php">
+                <header>event.php</header>
+                <main>
+                    <pre><code class="language-php">&lt;?php
+
+$today = new DateTime(); /* defaults to "now" */
+
+function dateConvertion($date) {
+    $parts = explode('-', $date);
+
+    if (count($parts) !== 3) {
+        // Handle invalid date format
+        return [
+            'month' =&gt; '',
+            'day'   =&gt; '',
+            'week'  =&gt; ''
+        ];
+    }
+
+    list($year, $month, $day) = $parts;
+    $week = date('w', strtotime($date));
+    $day = $day . "日";
+
+    switch ($month) {
+        case  1: $month = "1月"; break;
+        case  2: $month = "2月"; break;
+        case  3: $month = "3月"; break;
+        case  4: $month = "4月"; break;
+        case  5: $month = "5月"; break;
+        case  6: $month = "6月"; break;
+        case  7: $month = "7月"; break;
+        case  8: $month = "8月"; break;
+        case  9: $month = "9月"; break;
+        case 10: $month = "10月"; break;
+        case 11: $month = "11月"; break;
+        case 12: $month = "12月"; break;
+    }
+
+    switch ($week) {
+        case  0: $week = "(日)"; break;
+        case  1: $week = "(月)"; break;
+        case  2: $week = "(火)"; break;
+        case  3: $week = "(水)"; break;
+        case  4: $week = "(木)"; break;
+        case  5: $week = "(金)"; break;
+        case  6: $week = "(土)"; break;
+    }
+
+    return [
+        'month' =&gt; $month,
+        'day'   =&gt; $day,
+        'week'  =&gt; $week,
+    ];
+}
+
+
+for ($i = 0; $i &lt; count($event); $i++) {
+
+    $ids = explode('|', $event[$i]['id']);
+    if ((in_array($artist, $ids) || $artist === "all") && (strtotime($event[$i]['date']) &gt;= strtotime(date('Y-m-d')))) {
+
+        $start = dateConvertion($event[$i]['date']);
+        $smonth = $start['month'];
+        $sday   = $start['day'];
+        $sweek  = $start['week'];
+
+        $end = dateConvertion($event[$i]['enddate']);
+        $emonth = $end['month'];
+        $eday   = $end['day'];
+        $eweek  = $end['week'];
+
+        $url = $event[$i]['url'];
+        $icon = $event[$i]['button'];
+
+        if($event[$i]['soldout']) { $soldout = " data-tag=\"soldout\""; } else { $soldout = ""; }
+        if (empty($event[$i]['enddate'])) {
+            $continue = "";
+            $emonth = "";
+            $eday   = "";
+            $eweek  = "";
+        } else {
+            $continue = " ~";
+            $end = dateConvertion($event[$i]['enddate']);
+            $emonth = $end['month'];
+            $eday   = $end['day'];
+            $eweek  = $end['week'];
+        }
+
+echo &lt;&lt;&lt;HTML
+    &lt;div class="col-12 col-md-4 mb_64 article d-flex"&gt;
+        &lt;div class="event d-flex flex-column align-self-end justify-content-between"&gt;
+            &lt;a href="" class="hover-opacity d-flex" style="pointer-events:none;"&gt;
+                &lt;img src="{$event[$i]['image']}" width="100%" class="hover-opacity"&gt;
+            &lt;/a&gt;
+            &lt;div class="d-flex flex-column align-self-end" style="width: 100%;"&gt;
+                &lt;h6 class="artist"&gt;{$event[$i]['artist']}&lt;/h6&gt;
+                &lt;h2 class="title"&gt;{$event[$i]['title']}&lt;/h2&gt;
+                &lt;p class="description"&gt;{$event[$i]['description']}&lt;/p&gt;
+                &lt;p style="font-size: .75rem; color: #777;"&gt;
+                    &lt;i class="fa fa-map-marker"&gt;&lt;/i&gt; {$event[$i]['country']}、 {$event[$i]['city']}&lt;br&gt;
+                    &lt;i class="fa fa-map-location-dot"&gt;&lt;/i&gt; {$event[$i]['place']}&lt;br&gt;
+                    &lt;i class="fa fa-calendar"&gt;&lt;/i&gt; $smonth $sday $sweek $continue&lt;span style="position: absolute; left: 65%;"&gt;&lt;i class="fa fa-clock"&gt;&lt;/i&gt; {$event[$i]['start']}&lt;/span&gt;&lt;br&gt;
+                    &lt;i&gt;&lt;/i&gt; $emonth $eday $eweek&lt;span style="position: absolute; left: 65%;"&gt;&lt;i&gt;&lt;/i&gt; {$event[$i]['end']}&lt;/span&gt;&lt;br&gt;
+                &lt;/p&gt;
+                &lt;a href="{$event[$i]['url']}" targer="_blank"&gt;
+                    詳細はこちら
+                    &lt;i class="fa-solid fa-angles-right" aria-hidden="true"&gt;&lt;/i&gt;
+                &lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+HTML;
+    }
+}
+?&gt;</code></pre></main>
+                <footer data-ext="php"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <div class="codebox css">
+                <header>events.css</header>
+                <main>
+                    <pre><code class="language-css">.event {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    position: relative;
+    height: 100%;
+}
+
+.event > div {
+    padding: 5px 15px 15px;
+}
+
+.event .artist {
+    font-size: .75rem;
+    color: #777;
+}
+
+.event .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    height: 3.25rem;
+    line-height: 1.5rem;
+}
+
+.event .place-date {
+    font-size: .5rem;
+}
+
+.event .description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    height: 12rem;
+}
+
+.event > a {
+    position: relative;
+    margin: auto;
+}
+
+.event > a > img {
+    position: relative;
+    width: 95%;
+    margin: 5% 2.5% 20px;
+    z-index: 2;
+    box-shadow: 0 10px 16px -6px rgba(22, 22, 22, 0.5);
+    border-radius: 8px;
+}
+
+.event p i {
+    display: inline-block;
+    width: 1.25rem;
+}</code></pre>
+                </main>
+                <footer data-ext="php"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+        </article>
+
+
+
+
+
+
+
+
+
+
+        <input type="radio" id="new" name="css">
+        <label for="new"></label>
+        <article>
+        </article>
+
+</main>
+
+<script>
+document.querySelectorAll('.codebox').forEach(codebox => {
+    const header = codebox.querySelector('header');
+    const main = codebox.querySelector('main > pre > code');
+
+    // Create an invisible overlay div positioned over the ::after copy area
+    const overlay = document.createElement('div');
+    overlay.className = 'copy-click-area';
+    codebox.appendChild(overlay);
+
+    // Position overlay relative to header
+    const positionOverlay = () => {
+        const headerRect = header.getBoundingClientRect();
+        const codeboxRect = codebox.getBoundingClientRect();
+        overlay.style.right = `${header.offsetRight}px`; // align right
+    };
+    
+    positionOverlay(); // Initial positioning
+    window.addEventListener('resize', positionOverlay); // Responsive
+
+    overlay.addEventListener('click', () => {
+        navigator.clipboard.writeText(main.textContent)
+            .then(() => {
+                overlay.textContent = '✓ Copied!';
+                overlay.style.color = 'white';
+                overlay.style.backgroundColor = '#2d2d2d';
+                setTimeout(() => {
+                    overlay.textContent = '';
+                    overlay.style.color = '';
+                    overlay.style.backgroundColor = 'transparent';
+                }, 3000);
+            })
+            .catch(err => {
+                console.error('Copy failed', err);
+            });
+    });
+});
+
+</script>
+
+<script>
+
+function jump(id) {
+    window.scrollTo({ top: 0 });
+    document.getElementById(id).checked = true;
+    // document.getElementById('menu-btn').checked = false;
+}
+
+// Wait until the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the hash from the URL (e.g., #radio1)
+    var hash = window.location.hash;
+
+    // If there's a hash value, proceed
+    if (hash) {
+        // Remove the '#' from the hash to get the ID
+        var elementId = hash.substring(1);
+
+        // Get the radio button element with that ID
+        var radioButton = document.getElementById(elementId);
+
+        // If the element exists and is a radio button, click it
+        if (radioButton && radioButton.type === 'radio') {
+            radioButton.click();
+        }
+    }
+
+    document.querySelectorAll('code').forEach(el => el.setAttribute('translate', 'no'));
+});
+
+document.querySelectorAll('input[type="radio"].code').forEach(radio => {
+    radio.addEventListener('click', function () {
+        if (this.checked) {
+            this.checked = false;
+        }
+    });
+});
+    
+</script>
+
+<script>window.Prism = window.Prism || {};</script>
+<script src="prism.js"></script>
+</body>
+</html>
