@@ -650,7 +650,7 @@ header > span, main {
     }
 
     body > header input + li > label:after {
-        content: "â•‹" !important;
+        content: "╋" !important;
         position: absolute !important;
         top: 0 !important;
         right: 1em !important;
@@ -669,7 +669,7 @@ header > span, main {
     }
 
     body > header input:checked + li > label:after {
-        content: "â”" !important;
+        content: "━" !important;
     }
 
     body > header nav > ol > li:nth-child(3) > .submenu {
