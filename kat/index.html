@@ -332,6 +332,28 @@
 [name="css"]:checked + label + article + aside {
     display: block;
 }
+
+#kat-select {
+    position: fixed;
+    display: none;
+    bottom: 0px;
+    width: 100%;
+    height: 35px;
+    z-index: 100;
+    left: 0;
+}
+
+@media screen and (max-width: 650px) {
+    .sidebar-navigation { display: none; }
+    #kat-select { display: block; }
+    .content { margin-left: 0; }
+}
+
+@media screen and (min-width: 650px) {
+    .sidebar-navigation { display: block; }
+    #kat-select { display: none; }
+}
+
 </style>
 </head>
 <body class="line-numbers">
@@ -356,10 +378,16 @@
         <div>
             <ul>
                 <li><a href="#about" onclick="jump('about')">KAT </a></li>
-                <li><a href="#events" onclick="jump('events')">イベント </a></li>
+                <li><a href="#events" onclick="jump('events')">イベント</a></li>
             </ul>
         </div>
     </div>
+
+    <select id="kat-select" onchange="KATSelect()">
+        <option value="about">KAT</option>
+        <option value="events">イベント</option>
+    </select>
+
 
     <div class="content">
 
@@ -867,6 +895,14 @@ document.querySelectorAll('input[type="radio"].code').forEach(radio => {
     });
 });
     
+</script>
+
+<script>
+
+function KATSelect() {
+    jump(document.getElementById("kat-select").value);
+}
+
 </script>
 
 <script>window.Prism = window.Prism || {};</script>
