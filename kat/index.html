@@ -489,7 +489,8 @@
             <p>
                 上記のコード内の「$artist 」がJSONファイル内の 「id 」と一致すれば、その情報が画面に表示される。
                 もし「$artist = "all"; 」とすると、今日の日付以降に表示されるすべてのアーティストを表示する。
-                最初から順番に表示されるので、JSONファイルを日付順に並べることをお勧めする。
+                <s>最初から順番に表示されるので、JSONファイルを日付順に並べることをお勧めする。</s>
+                イベントを自動的にソートし、日付順に並べます。
                 不要になったら削除すればよい。
             </p>
 
@@ -592,6 +593,10 @@
                     <pre><code class="language-php">&lt;?php
 
 $today = new DateTime(); /* defaults to "now" */
+
+usort($event, function ($a, $b) {
+    return strtotime($a['date']) - strtotime($b['date']);
+});
 
 function dateConvertion($date) {
     $parts = explode('-', $date);

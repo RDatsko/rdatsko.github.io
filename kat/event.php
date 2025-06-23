@@ -2,6 +2,10 @@
 
 $today = new DateTime(); /* defaults to "now" */
 
+usort($event, function ($a, $b) {
+    return strtotime($a['date']) - strtotime($b['date']);
+});
+
 function dateConvertion($date) {
     $parts = explode('-', $date);
 
