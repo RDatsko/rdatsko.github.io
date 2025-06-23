@@ -460,6 +460,30 @@ main > select {
 .clist > li > span {
     line-height: 1.5rem;
 }
+
+
+
+
+#cosmuic-select {
+    position: fixed;
+    display: none;
+    bottom: 0px;
+    width: 100%;
+    height: 35px;
+    z-index: 10000;
+    left: 0;
+}
+
+@media screen and (max-width: 650px) {
+    .sidebar-navigation { display: none; }
+    #cosmuic-select { display: block; }
+    .content { margin-left: 0; }
+}
+
+@media screen and (min-width: 650px) {
+    .sidebar-navigation { display: block; }
+    #cosmuic-select { display: none; }
+}
 </style>
 </head>
 <body>
@@ -575,9 +599,64 @@ main > select {
         </div>
     </div>
 
+    <select id="cosmuic-select" onchange="COSMUICSelect()">
+        <option value="about">About</option>
+        <option value="prepare">Prepare &amp; Info</option>
+        <option value="template">Template</option>
+        <option value="colors">Colors</option>
+        <option value="iconography">Iconography</option>
+        <option value="motion">Motion</option>
+        <option value="illustration">Illustration</option>
+        <option value="typography">Typography</option>
+        <option value="interactions">Interactions</option>
+        <option value="layouts">Layouts</option>
+        <option value="spacing">Spacing</option>
+        <option value="grid">Grid</option>
+        <option value="cards">Cards</option>
+        <option value="hero">Hero</option>
+        <option value="alerts">Alerts</option>
+        <option value="avatars">Avatars</option>
+        <option value="badges">Badges</option>
+        <option value="banners">Banners</option>
+        <option value="buttons">Buttons</option>
+        <option value="checkboxes">Checkboxes</option>
+        <option value="dialogs">Dialogs</option>
+        <option value="code_snippets">Code snippets</option>
+        <option value="data_tables">Data tables</option>
+        <option value="data_visualization">Data visualization</option>
+        <option value="dropdowns">Dropdowns</option>
+        <option value="forms">Forms</option>
+        <option value="labels">Labels</option>
+        <option value="links">Links</option>
+        <option value="lists">Lists</option>
+        <option value="modal">Modal</option>
+        <option value="pagination">Pagination</option>
+        <option value="popovers">Popovers</option>
+        <option value="progress_bars">Progress bars</option>
+        <option value="radio_buttons">Radio buttons</option>
+        <option value="search">Search</option>
+        <option value="segmented_control">Segmented control</option>
+        <option value="skeleton_loader">Skeleton loader</option>
+        <option value="sorting">Sorting</option>
+        <option value="spinner">Spinner</option>
+        <option value="switch">Switch</option>
+        <option value="tabs">Tabs</option>
+        <option value="toasts">Toasts</option>
+        <option value="toggles">Toggles</option>
+        <option value="tooltips">Tooltips</option>
+        <option value="empty_states">Empty states</option>
+        <option value="navigation">Navigation</option>
+        <option value="plugin_about">About</option>
+        <option value="plugin_buy_button">Buy Buttons</option>
+        <option value="plugin_artgallery">Photo Gallery</option>
+        <option value="plugin_shop_card">Shop Cards</option>
+        <option value="plugin_tickets">Tickets</option>
+        <option value="plugin_timeline">Timeline</option>
+    </select>
+
     <div class="content">
 
-        
+
 
 
 
@@ -4601,11 +4680,11 @@ function CodeColorizer(elmnt, mode) {
     var cssparanthesiscolor = "#da70d6"
     var cssdelimitercolor = "#d4d4d4";
     var cssimportantcolor = "#569cd6";  
-    var jscolor = "black";
-    var jskeywordcolor = "mediumblue";
-    var jsstringcolor = "brown";
-    var jsnumbercolor = "red";
-    var jspropertycolor = "black";
+    var jscolor = "#9cdcfe";
+    var jskeywordcolor = "#569cd6";
+    var jsstringcolor = "#ce9178";
+    var jsnumbercolor = "#b5cea8";
+    var jspropertycolor = "#dcdcaa";
     if (!lang) {lang = "html"; }
     if (lang == "html") {elmntTxt = htmlMode(elmntTxt);}
     if (lang == "css") {elmntTxt = cssMode(elmntTxt);}
