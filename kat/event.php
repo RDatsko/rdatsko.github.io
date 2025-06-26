@@ -103,7 +103,7 @@ echo <<<HTML
                     <i class="fa fa-calendar"></i> $smonth $sday $sweek $continue<span style="position: absolute; left: 65%;"><i class="fa fa-clock"></i> {$event[$i]['start']}</span><br>
                     <i></i> $emonth $eday $eweek<span style="position: absolute; left: 65%;"><i></i> {$event[$i]['end']}</span><br>
                 </p>
-                <a href="{$event[$i]['url']}" targer="_blank">
+                <a href="{$event[$i]['url']}" target="_blank">
                     詳細はこちら
                     <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
                 </a>

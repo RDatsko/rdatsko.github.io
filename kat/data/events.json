@@ -1,6 +1,25 @@
 {
     "events": [
         {
+            "id": "kanasa",
+            "artist": "KANASA from bless4",
+            "title": "『４ever』",
+            "description": "KANASAのソロデビュー4周年はbless4スタジオで一緒にお祝いしよう🥂",
+            "date": "2025-07-20",
+            "enddate": "",
+            "place": "bless4スタジオ",
+            "city": "神奈川県、川崎市",
+            "country": "日本",
+            "open": "16:30",
+            "start": "17:00",
+            "end": "",
+            "price": "3,500",
+            "image": "https://pbs.twimg.com/media/GrEO5akbgAA0nxZ?format=jpg&name=large",
+            "url": "https://kat.shop-pro.jp/?pid=173365334",
+            "button": "BUY",
+            "soldout": false
+        },
+        {
             "id": "amw",
             "artist": "AMW",
             "title": "AMW3周年Color Party",
@@ -54,25 +73,6 @@
             "price": "",
             "image": "https://pbs.twimg.com/media/GtKADPybcAA_bft?format=jpg&name=large",
             "url": "https://designfesta.com/",
-            "button": "BUY",
-            "soldout": false
-        },
-        {
-            "id": "kanasa",
-            "artist": "KANASA from bless4",
-            "title": "『４ever』",
-            "description": "KANASAのソロデビュー4周年はbless4スタジオで一緒にお祝いしよう🥂",
-            "date": "2025-07-20",
-            "enddate": "",
-            "place": "bless4スタジオ",
-            "city": "神奈川県、川崎市",
-            "country": "日本",
-            "open": "16:30",
-            "start": "17:00",
-            "end": "",
-            "price": "3,500",
-            "image": "https://pbs.twimg.com/media/GrEO5akbgAA0nxZ?format=jpg&name=large",
-            "url": "https://kat.shop-pro.jp/?pid=173365334",
             "button": "BUY",
             "soldout": false
         }

@@ -1,0 +1,151 @@
+a.btnlink {
+    display: inline-block;
+    position: relative;
+    width: 136px;
+    height: 44px;
+    border: 2px solid #e7e7e7;
+    background-color: #fff;
+    border-radius: .5rem;
+    margin: .25rem;
+}
+
+a.btnlink > img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+/* 
+a.btnlink.katshop     { background-image: url('/image/svg/katshop.svg'); }
+a.btnlink.amazon      { background-image: url('/image/svg/amazon.svg'); }
+a.btnlink.apple-music { background-image: url('/image/svg/apple-music.svg'); }
+a.btnlink.itunes      { background-image: url('/image/svg/itunes.svg'); }
+a.btnlink.google-play { background-image: url('/image/svg/google-play.svg'); }
+a.btnlink.spotify     { background-image: url('/image/svg/spotify.svg'); }
+a.btnlink.youtube     { background-image: url('/image/svg/youtube.svg'); }
+a.btnlink.yt-music    { background-image: url('/image/svg/yt-music.svg'); }
+*/
+
+
+
+
+
+a.buy {
+    position: relative;
+    display: inline-block;
+    padding: 0.3125rem 0.875rem;
+    padding-left: 2.8125rem;
+    border: 1px solid #e7e7e7;
+    background-position: center left 0.75rem;
+    background-color: #fff;
+    background-size: 1.5rem 1.5rem;
+    background-repeat: no-repeat;
+    text-decoration: none;
+    height: 48px;
+    width: 144px;
+    border-radius: .75rem;
+    margin: 8px;
+    content: '';
+}
+
+a.buy::before,
+a.buy::after {
+    /* width: 100%; */
+    /* height: 100%; */
+    height: 40px;
+    margin-top: 0;
+    -webkit-transition: none;
+    transition: none;
+    line-height: 35px;
+    text-align: left;
+}
+
+a.buy::before {
+    position: absolute;
+    width: 100%;
+    left: 8px;
+    top: 8px;
+    background-size: 28px 28px;
+    background-repeat: no-repeat;
+    font-size: 10px;
+    padding-left: 38px;
+    line-height: 8px;
+}
+
+a.buy::after {
+    margin-top: 6px;
+    width: 96px;
+    font-weight: 500;
+    position: absolute;
+}
+
+a.buy:hover::after {
+    background-color: transparent;
+}
+
+a.buy.amazon {
+    background-color: white;
+    color: black;
+    font-family: "Amazon Ember", "Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-variation-settings: "width" 100;
+}
+a.buy.amazon::before { background-image: url("../svg/amazon-color.svg"); content: "Available on" }
+a.buy.amazon::after  { content: "amazon"; }
+
+
+
+a.buy.kat {
+    background-color: white;
+    color: black;
+}
+a.buy.kat::before { background-image: url("../svg/cart.svg"); content: "Buy at" }
+a.buy.kat::after  { content: "KAT Shop"; }
+
+
+
+a.buy.google-play {
+    background-color: black;
+    color: #efefeb;
+    font-family: 'Google Sans', 'Noto Sans', Roboto, 'Segoe UI', 'San Francisco', 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+    font-variation-settings: "width" 100;
+}
+a.buy.google-play::before { background-image: url("../svg/brand-google-play.svg"); content: "GET IT ON"}
+a.buy.google-play::after  { content: "Google Play"; }
+
+
+
+a.buy.itunes {
+    background-color: black;
+    color: #efefeb;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+}
+a.buy.itunes::before { background-image: url("../svg/apple.svg"); content: "Available on" }
+a.buy.itunes::after  { content: "iTunes"; }
+
+
+
+a.buy.spotify {
+    background-color: black;
+    color: #efefeb;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+}
+a.buy.spotify::before { background-image: url("../svg/spotify.svg"); content: "" }
+a.buy.spotify::after  { content: "Spotify"; }
+
+
+
+
+a.buy.youtube {
+    background-color: white;
+    color: black;
+    font-family: Roboto, 'Google Sans', 'Noto Sans', 'Segoe UI', 'San Francisco', 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+    font-variation-settings: "width" 100;
+}
+a.buy.youtube::before { background-image: url("../svg/yt_music.svg"); content: "" }
+a.buy.youtube::after  { content: "Music"; font-size: 2rem; margin-top: 0; font-family: "Saira Extra Condensed", sans-serif; font-weight: 500; font-style: normal;
+}
+

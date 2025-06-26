@@ -155,7 +155,7 @@ body > header {
 body > header, header > span {
     width: 100% !important;
     height: 64px !important;
-    z-index: 12000 !important;
+    z-index: 1000 !important;
     display: flex !important;
     justify-content: space-between !important;
 }
