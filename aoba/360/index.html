@@ -223,14 +223,16 @@ input[readonly].copyable {
 <style>
 div#Hikarigaoka,
 div#Bunkyo,
-div#Meguro {
+div#Meguro,
+div#Summerhill {
     width: 750px;
     height: 500px;
 }
 
 div#Hikarigaoka span,
 div#Bunkyo span,
-div#Meguro span {
+div#Meguro span,
+div#Summerhill span {
     visibility: visible !important;
     font-size: 0.7em;
     margin: 0 12.5%;
@@ -239,6 +241,9 @@ div#Meguro span {
 </head>
 <body>
 
+
+<h1>Bunkyo</h1>
+<div id="Summerhill"></div>
 
 <h1>Bunkyo</h1>
 <div id="Bunkyo"></div>
@@ -865,6 +870,35 @@ pannellum.viewer('Meguro', {
                     "type": "scene",
                     "text": "Meguro Level 1 Classroom",
                     "sceneId": "1F"
+                },
+            ]
+        },
+    }
+});
+
+pannellum.viewer('Summerhill', {
+    "default": {
+        "firstScene": "K5 Classroom",
+        "author": "Summerhill",
+        "sceneFadeDuration": 1000,
+        "autoLoad": true,
+        "showFullscreenCtrl": true
+    },
+    "scenes": {
+        "K5Classroom": {
+            "title": "K5 Classroom",
+            "type": "equirectangular",
+            "compass": true,
+            "northOffset": 0,
+            "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_3F-K5.jpg",
+            "autoLoad": true,
+            "hotSpots": [
+                {
+                    "pitch": 0,
+                    "yaw": -150,
+                    "type": "scene",
+                    "text": "Kitchen",
+                    "sceneId": "kitchen"
                 },
             ]
         },
