@@ -1,6 +1,6 @@
 pannellum.viewer('Summerhill', {
     "default": {
-        "firstScene": "kitchen",
+        "firstScene": "1Fhallway",
         "author": "Summerhill",
         "sceneFadeDuration": 1000,
         "autoLoad": true,
