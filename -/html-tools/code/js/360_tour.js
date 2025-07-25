@@ -23,6 +23,13 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
+                    "yaw": 10,
+                    "type": "scene",
+                    "text": "2F Hallway",
+                    "sceneId": "2Fhallway"
+                },
+                {
+                    "pitch": 0,
                     "yaw": 71,
                     "type": "scene",
                     "text": "Imaginarium Classroom",
