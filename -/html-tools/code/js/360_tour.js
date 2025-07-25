@@ -4,7 +4,7 @@ document.oncontextmenu = document.body.oncontextmenu = function() { return false
 // Initialize Pannellum viewer
 const viewerSummerhill = pannellum.viewer('Summerhill', {
     "default": {
-        "firstScene": "playground",
+        "firstScene": "3Flibrary",
         "author": "Summerhill",
         "sceneFadeDuration": 1000,
         "autoLoad": true,
@@ -126,29 +126,29 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "autoLoad": true,
             "hotSpots": [
                 {
-                    "pitch": 0,
-                    "yaw": -150,
+                    "pitch": -15,
+                    "yaw": 30,
                     "type": "scene",
                     "text": "1F Hallway",
                     "sceneId": "1Fhallway"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 10,
                     "type": "scene",
                     "text": "3F Hallway",
                     "sceneId": "3Fhallway"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 90,
                     "type": "scene",
                     "text": "Full Moon Classroom",
                     "sceneId": "2Ffullmoon"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -113,
                     "type": "scene",
                     "text": "Half Moon Classroom",
                     "sceneId": "2Fhalfmoon"
@@ -165,7 +165,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 174,
                     "type": "scene",
                     "text": "2F Hallway",
                     "sceneId": "2Fhallway"
@@ -182,7 +182,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 58,
                     "type": "scene",
                     "text": "2F Hallway",
                     "sceneId": "2Fhallway"
@@ -198,29 +198,22 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "autoLoad": true,
             "hotSpots": [
                 {
-                    "pitch": 0,
-                    "yaw": -150,
+                    "pitch": -15,
+                    "yaw": 30,
                     "type": "scene",
                     "text": "2F Hallway",
                     "sceneId": "2Fhallway"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
-                    "type": "scene",
-                    "text": "location",
-                    "sceneId": "1Flocation"
-                },
-                {
-                    "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -90,
                     "type": "scene",
                     "text": "K5 Classroom",
                     "sceneId": "3Fk5classroom"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 90,
                     "type": "scene",
                     "text": "Library and Gym",
                     "sceneId": "3Flibrary"
@@ -237,14 +230,14 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 43,
                     "type": "scene",
                     "text": "3F Hallway",
                     "sceneId": "3Fhallway"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 90,
                     "type": "scene",
                     "text": "Kitchen",
                     "sceneId": "3Fkitchen"
@@ -261,7 +254,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -60,
                     "type": "scene",
                     "text": "K5 Classroom",
                     "sceneId": "3Fk5classroom"
@@ -278,7 +271,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 150,
                     "type": "scene",
                     "text": "3F Hallway",
                     "sceneId": "3Fhallway"
