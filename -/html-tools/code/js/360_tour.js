@@ -4,7 +4,7 @@ document.oncontextmenu = document.body.oncontextmenu = function() { return false
 // Initialize Pannellum viewer
 const viewerSummerhill = pannellum.viewer('Summerhill', {
     "default": {
-        "firstScene": "1Fhallway",
+        "firstScene": "playground",
         "author": "Summerhill",
         "sceneFadeDuration": 1000,
         "autoLoad": true,
@@ -21,21 +21,21 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 71,
                     "type": "scene",
                     "text": "Imaginarium Classroom",
                     "sceneId": "1Fimaginarium"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -93,
                     "type": "scene",
                     "text": "Sunset Classroom",
                     "sceneId": "1Fsunset"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 103,
                     "type": "scene",
                     "text": "Sunshine Classroom",
                     "sceneId": "1Fsunshine"
@@ -52,7 +52,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 155,
                     "type": "scene",
                     "text": "1F Hallway",
                     "sceneId": "1Fhallway"
@@ -69,7 +69,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 121,
                     "type": "scene",
                     "text": "1F Hallway",
                     "sceneId": "1Fhallway"
@@ -86,14 +86,14 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -50,
                     "type": "scene",
                     "text": "1F Hallway",
                     "sceneId": "1Fhallway"
                 },
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": 165,
                     "type": "scene",
                     "text": "Outdoor Playground",
                     "sceneId": "playground"
@@ -110,7 +110,7 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
             "hotSpots": [
                 {
                     "pitch": 0,
-                    "yaw": -150,
+                    "yaw": -18,
                     "type": "scene",
                     "text": "Sunshine Classroom",
                     "sceneId": "1Fsunshine"
