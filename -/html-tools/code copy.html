@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/layout/css/styles.css" />
-<title>Code Samples</title>
+<link rel="stylesheet" href="/layout/css/cosmuic.css">
+<link rel="stylesheet" href="/layout/css/styles.css">
+<title>Mystic Web: Code Sample</title>
 <style>
 body {
     overflow: hidden;
@@ -23,7 +24,7 @@ code {
 .code-container {
     position: relative;
     height: 100%;
-    width: calc(100% - 2rem);
+    width: 100%;
     /* max-width: 800px; */
     display: flex;
     flex-direction: column-reverse;
@@ -45,7 +46,6 @@ code {
 .code-container > input#html:checked ~ .code-content #code-html { display: block; }
 .code-container > input#css:checked ~  .code-content #code-css  { display: block; }
 .code-container > input#js:checked ~   .code-content #code-js   { display: block; }
-.code-container > input#inc:checked ~  .code-content #code-inc   { display: block; }
 
 .code-header {
     background: #2d2d2d;
@@ -100,7 +100,6 @@ code {
     min-width: 20px;
     white-space: nowrap;
     display: flex;
-    color: white;
 }
 
 .action-btn:hover {
@@ -154,8 +153,7 @@ code {
 
 input[id="html"]:checked ~ div > label[for="html"],
 input[id="css"]:checked ~ div > label[for="css"],
-input[id="js"]:checked ~ div > label[for="js"],
-input[id="inc"]:checked ~ div > label[for="inc"] {
+input[id="js"]:checked ~ div > label[for="js"] {
     color: #24425a;
     background-color: #569cd6;
 }
@@ -197,8 +195,8 @@ input[id="inc"]:checked ~ div > label[for="inc"] {
 
 /* Please see the article */
 
-#html-code, #css-code, #js-code, #inc-code,
-#highlighting1, #highlighting2, #highlighting3, #highlighting4 {
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3 {
   /* Both elements need the same text and space styling so they are directly on top of each other */
   margin: 0;
   padding: 0;
@@ -208,9 +206,9 @@ input[id="inc"]:checked ~ div > label[for="inc"] {
 }
 
 
-#html-code, #css-code, #js-code, #inc-code,
-#highlighting1, #highlighting2, #highlighting3, #highlighting4,
-#highlighting1 *, #highlighting2 *, #highlighting3 *, #highlighting4 * {
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3,
+#highlighting1 *, #highlighting2 *, #highlighting3 * {
   /* Also add text styles to highlighing tokens */
   font-size: 0.75rem !important;
   font-family: monospace !important;
@@ -219,8 +217,8 @@ input[id="inc"]:checked ~ div > label[for="inc"] {
 }
 
 
-#html-code, #css-code, #js-code, #inc-code,
-#highlighting1, #highlighting2, #highlighting3, #highlighting4 {
+#html-code, #css-code, #js-code,
+#highlighting1, #highlighting2, #highlighting3 {
   /* In the same place */
   position: absolute;
   top: 0;
@@ -232,35 +230,35 @@ input[id="inc"]:checked ~ div > label[for="inc"] {
 
 /* Move the textarea in front of the result */
 
-#html-code, #css-code, #js-code, #inc-code {
+#html-code, #css-code, #js-code {
   z-index: 1;
 }
-#highlighting1, #highlighting2, #highlighting3, #highlighting4 {
+#highlighting1, #highlighting2, #highlighting3 {
   z-index: 0;
 }
 
 
 /* Make textarea almost completely transparent */
 
-#html-code, #css-code, #js-code, #inc-code {
+#html-code, #css-code, #js-code {
   color: transparent;
   background: transparent;
   caret-color: white; /* Or choose your favourite color */
 }
 
 /* Can be scrolled */
-#html-code, #css-code, #js-code, #inc-code {
+#html-code, #css-code, #js-code {
   overflow: auto;
   white-space: pre; /* Allows textarea to scroll horizontally */
 }
 
-#highlighting1, #highlighting2, #highlighting3, #highlighting4 {
+#highlighting1, #highlighting2, #highlighting3 {
   overflow: auto;
   white-space: nowrap; /* Allows textarea to scroll horizontally */
 }
 
 /* No resize on textarea */
-#html-code, #css-code, #js-code, #inc-code {
+#html-code, #css-code, #js-code {
   resize: none;
 }
 
@@ -565,13 +563,11 @@ pre[class*="language-"] > code[class*="language-"] {
         <input type="radio" id="html" name="lang" value="1" checked />
         <input type="radio" id="css" name="lang" value="2" />
         <input type="radio" id="js" name="lang" value="3" />
-        <input type="radio" id="inc" name="lang" value="4" />
 
         <div class="code-footer">
             <label class="language-tag" for="html">HTML</label>
             <label class="language-tag" for="css">CSS</label>
             <label class="language-tag" for="js">JavaScript</label>
-            <label class="language-tag" for="inc">includes</label>
         </div>
 
         <div class="code-content">
@@ -592,12 +588,6 @@ pre[class*="language-"] > code[class*="language-"] {
                     <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()"></textarea>
                     <pre id="highlighting3" aria-hidden="true">
                         <code class="language-js" id="highlighting-content3"></code>
-                    </pre>
-                </div>
-                <div id="code-inc">
-                    <textarea id="inc-code" spellcheck="false" oninput="update(this.value, 4); sync_scroll(this, 4);" onscroll="sync_scroll(this, 4);" onkeydown="check_tab(this, event, 4);" onkeyup="run()"></textarea>
-                    <pre id="highlighting4" aria-hidden="true">
-                        <code class="language-html" id="highlighting-content4"></code>
                     </pre>
                 </div>
             </div>
@@ -624,9 +614,9 @@ pre[class*="language-"] > code[class*="language-"] {
 
 </main>
 
-<!-- <footer>
+<footer>
 <iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</footer> -->
+</footer>
 
 <script>
 
@@ -669,10 +659,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch HTML, CSS and JS in parallel
     Promise.all([
-        loadFile("html",     "html", "html-code", 1),
-        loadFile("css",      "css",  "css-code",  2),
-        loadFile("js",       "js",   "js-code",   3),
-        loadFile("includes", "html", "inc-code",  4),
+        loadFile("html", "html", "html-code", 1),
+        loadFile("css",  "css",  "css-code",  2),
+        loadFile("js",   "js",   "js-code",   3),
     ]).then(() => {
         run();
     });
@@ -687,8 +676,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
     const map = {
         "1": "html-code",
         "2": "css-code",
-        "3": "js-code",
-        "4": "inc-code"
+        "3": "js-code"
     };
 
     const textareaId = map[selected.value];
@@ -721,21 +709,19 @@ function run() {
     const htmlCode = document.querySelector('#html-code').value;
     const cssCode = document.querySelector('#css-code').value;
     const jsCode = document.querySelector('#js-code').value;
-    const incCode = document.querySelector('#inc-code').value;
     const output = document.querySelector('#output');
 
-const fullContent = `
-<html>
-<head>
-${incCode}
-<style>${cssCode}</style>
-</head>
-<body>
-${htmlCode}
-<script>${jsCode}<\/script>
-</body>
-</html>
-`;
+    const fullContent = `
+        <html>
+        <head>
+        <style>${cssCode}</style>
+        </head>
+        <body>
+        ${htmlCode}
+        <script>${jsCode}<\/script>
+        </body>
+        </html>
+    `;
 
     // Reset the iframe by writing a new document
     output.srcdoc = fullContent;
