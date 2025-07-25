@@ -1,0 +1,223 @@
+html,
+body {
+    height: 100%
+}
+
+.site-wrapper {
+    display: table;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding-left: 10px;
+    padding-right: 10px
+}
+
+.cover-container {
+    margin-right: auto;
+    margin-left: auto
+}
+
+.masthead {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: #fff
+}
+
+.masthead-brand {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 600
+}
+
+.masthead-stars {
+    margin-left: 20px;
+    margin-top: 13px;
+    display: none
+}
+
+@media(min-width:992px) {
+    .masthead-stars {
+        display: block
+    }
+}
+
+.masthead-nav>li {
+    float: left
+}
+
+.masthead-nav>li+li {
+    margin-left: 2px
+}
+
+.masthead-nav>li>a {
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333
+}
+
+.masthead-nav>li.active>a,
+.masthead-nav>li.active>a:hover,
+.masthead-nav>li.active>a:focus {
+    color: #fff;
+    background-color: #777
+}
+
+@media(min-width:768px) {
+    .masthead-brand {
+        float: left
+    }
+    .masthead-nav {
+        float: right
+    }
+}
+
+.cover .btn-lg {
+    padding: 10px 20px;
+    font-weight: 600
+}
+
+.mastfoot {
+    background-color: #f8f8f8;
+    color: #777;
+    margin: 0 auto;
+    padding-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px
+}
+
+.mastfoot a {
+    color: #777;
+    font-weight: 600
+}
+
+.site-wrapper {
+    margin-bottom: -65px;
+    min-height: 100%
+}
+
+.mastfoot,
+.site-wrapper:after {
+    height: 65px
+}
+
+.cover {
+    padding-bottom: 65px
+}
+
+@media(min-width:768px) {
+    .cover-container {
+        width: 750px
+    }
+}
+
+@media(min-width:992px) {
+    .cover-container {
+        width: 970px
+    }
+}
+
+a.active {
+    color: #333
+}
+
+.pnlm-container {
+    font-family: source sans pro, sans-serif
+}
+
+div#panorama {
+    width: 100%;
+    height: 400px
+}
+
+input[readonly].copyable {
+    background-color: #fff;
+    cursor: initial
+}
+
+.copy-btn-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBmaWxsPSIjMzMzIiBkPSJtNDIuODU3IDkyLjg1N2g1MHYtMzUuNzE0aC0yMy4yMTRjLTIuOTU3NiAwLTUuMzU3MS0yLjM5OTYtNS4zNTcxLTUuMzU3MnYtMjMuMjE1aC0yMS40Mjl6bTE0LjI4Ni04MC4zNTd2LTMuNTcxNGMwLTAuOTQ4Ny0wLjgzNzA1LTEuNzg1Ny0xLjc4NTctMS43ODU3aC0zOS4yODZjLTAuOTQ4NjYgMC0xLjc4NTcgMC44MzctMS43ODU3IDEuNzg1N3YzLjU3MTRjMCAwLjk0ODcgMC44MzcwNSAxLjc4NTcgMS43ODU3IDEuNzg1N2gzOS4yODZjMC45NDg2NiAwIDEuNzg1Ny0wLjgzNyAxLjc4NTctMS43ODU3em0xNC4yODYgMzcuNWgxNi42ODVsLTE2LjY4NS0xNi42ODV6bTI4LjU3MSA3LjE0M3YzNy41YzAgMi45NTctMi40IDUuMzU3LTUuMzU3IDUuMzU3aC01My41NzJjLTIuOTU3NiAwLTUuMzU3MS0yLjM5OTYtNS4zNTcxLTUuMzU3MXYtOC45MjloLTMwLjM1N2MtMi45NTc0IDAtNS4zNTctMi4zOTktNS4zNTctNS4zNTd2LTc1YzAtMi45NTc0IDIuMzk5Ni01LjM1NyA1LjM1NzEtNS4zNTdoNjAuNzE0YzIuOTU3NiAwIDUuMzU3MSAyLjM5OTYgNS4zNTcxIDUuMzU3MXYxOC4zMDRjMC43MjU0NSAwLjQ0NjQgMS4zOTUxIDAuOTQ4NyAyLjAwODkgMS41NjI1bDIyLjc2OCAyMi43NjdjMi4xMjEgMi4xMjEgMy43OTUgNi4xOTQgMy43OTUgOS4xNTJ6Ii8+PC9zdmc+Cg==);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 1em
+}
+
+.nav-justified>li>a {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 0;
+    font-weight: 700;
+    color: #777;
+    text-align: center;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-bottom: 0
+}
+
+.nav-justified>li>a:hover {
+    background-color: #f4f4f4;
+    color: #666
+}
+
+.nav-justified>.active>a,
+.nav-justified>.active>a:hover,
+.nav-justified>.active>a:focus {
+    background-color: #e7e7e7
+}
+
+.nav-justified>li:first-child>a {
+    border-radius: 5px 5px 0 0
+}
+
+.nav-justified>li:last-child>a {
+    border-radius: 0 0 5px 5px;
+    border-bottom: 1px solid #ddd
+}
+
+@media(min-width:768px) {
+    .nav-justified {
+        max-height: 52px
+    }
+    .nav-justified>li>a {
+        border-right: 0;
+        border-bottom: 1px solid #ddd
+    }
+    .nav-justified>li:first-child>a {
+        border-radius: 5px 0 0 5px
+    }
+    .nav-justified>li:last-child>a {
+        border-right: 1px solid #ddd;
+        border-radius: 0 5px 5px 0
+    }
+}
+
+.api-toc ul {
+    list-style: none;
+    padding-left: 0
+}
+
+.api-toc>*>ul>li>a {
+    font-weight: 700;
+    color: #333
+}
+
+.api-toc ul>li>ul>li>a {
+    font-weight: 400
+}
+
+@media(min-width:1200px) {
+    .container {
+        width: 970px
+    }
+}
+
+div#Summerhill {
+    width: 750px;
+    height: 500px;
+}
+
+div#Summerhill span {
+    visibility: visible !important;
+    font-size: 0.7em;
+    margin: 0 12.5%;
+}
