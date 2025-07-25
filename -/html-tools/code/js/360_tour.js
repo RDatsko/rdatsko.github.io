@@ -4,11 +4,13 @@ document.oncontextmenu = document.body.oncontextmenu = function() { return false
 // Initialize Pannellum viewer
 const viewerSummerhill = pannellum.viewer('Summerhill', {
     "default": {
-        "firstScene": "3Flibrary",
-        "author": "Summerhill",
+        "firstScene": "1Fhallway",
         "sceneFadeDuration": 1000,
         "autoLoad": true,
-        "showFullscreenCtrl": true
+        "showFullscreenCtrl": true,
+        "showSceneName": false,
+        "crossOrigin": "anonymous",
+        "showAbout": false
     },
     "scenes": {
         "1Fhallway": {
