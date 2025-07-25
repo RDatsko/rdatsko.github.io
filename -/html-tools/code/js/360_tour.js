@@ -16,7 +16,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "1Fhallway": {
             "title": "1F Hallway",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_1F-hallway.jpg",
             "autoLoad": true,
@@ -54,7 +53,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "1Fimaginarium": {
             "title": "Imaginarium Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_1F-imaginarium.jpg",
             "autoLoad": true,
@@ -71,7 +69,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "1Fsunset": {
             "title": "Sunset Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_1F-sunset.jpg",
             "autoLoad": true,
@@ -88,7 +85,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "1Fsunshine": {
             "title": "Sunshine Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_1F-sunshine.jpg",
             "autoLoad": true,
@@ -112,7 +108,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "playground": {
             "title": "Outdoor Playground",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_playground.jpg",
             "autoLoad": true,
@@ -129,7 +124,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "2Fhallway": {
             "title": "2F Hallway",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_2F-hallway.jpg",
             "autoLoad": true,
@@ -167,7 +161,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "2Ffullmoon": {
             "title": "Full Moon Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_2F-fullmoon.jpg",
             "autoLoad": true,
@@ -184,7 +177,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "2Fhalfmoon": {
             "title": "Half Moon Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_2F-halfmoon.jpg",
             "autoLoad": true,
@@ -201,7 +193,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "3Fhallway": {
             "title": "3F Hallway",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_3F-hallway.jpg",
             "autoLoad": true,
@@ -232,7 +223,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "3Fk5classroom": {
             "title": "K5 Classroom",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_3F-k5.jpg",
             "autoLoad": true,
@@ -256,7 +246,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "3Fkitchen": {
             "title": "Kitchen",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_3F-kitchen.jpg",
             "autoLoad": true,
@@ -273,7 +262,6 @@ const viewerSummerhill = pannellum.viewer('Summerhill', {
         "3Flibrary": {
             "title": "Library and Gym",
             "type": "equirectangular",
-            "compass": true,
             "northOffset": 0,
             "panorama": "https://rdatsko.github.io/aoba/360/images/Summerhill_3F-library-gym.jpg",
             "autoLoad": true,
