@@ -340,7 +340,7 @@ function populateSceneSelector(viewer, selectorId, orderArray) {
     });
 }
 
-const meguroOrder = [
+const summerhillOrder = [
     "Playground",
     "1F Hallway", "1F Imaginarium Classroom", "1F Sunset Classroom", "1F Sunshine Classroom",
     "2F Hallway", "2F Full Moon Classroom", "2F Half Moon Classroom",
