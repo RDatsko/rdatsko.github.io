@@ -17236,60 +17236,88 @@ body {
       book.open(bookData);
     }
 
-    book.ready.then(() => {
-      // Navigation loaded
-      book.loaded.navigation.then(function(toc){
-        // console.log(toc);
-      });
+  // Wait for the book to be ready
+  book.ready.then(function() {
+    // When the book is ready, load the navigation and set up events
+    book.loaded.navigation.then(function(toc) {
+      // You can use the toc here if needed
+      // console.log(toc);
+    });
 
-      var next = document.getElementById("next");
-      next.addEventListener("click", function(){
-        rendition.next();
-      }, false);
+    // Next and Previous buttons for manual navigation
+    var next = document.getElementById("next");
+    next.addEventListener("click", function() {
+      rendition.next();
+    }, false);
 
-      var prev = document.getElementById("prev");
-      prev.addEventListener("click", function(){
-        rendition.prev();
-      }, false);
+    var prev = document.getElementById("prev");
+    prev.addEventListener("click", function() {
+      rendition.prev();
+    }, false);
 
-      document.addEventListener("keyup", function(e){
+    // Keyboard navigation (left and right arrow keys)
+    document.addEventListener("keyup", function(e) {
+      if (e.keyCode === 37) {
+        rendition.prev(); // Left Arrow
+      }
+      if (e.keyCode === 39) {
+        rendition.next(); // Right Arrow
+      }
+    }, false);
 
-        // Left Key
-        if ((e.keyCode || e.which) == 37) {
-          rendition.prev();
-        }
-
-        // Right Key
-        if ((e.keyCode || e.which) == 39) {
-          rendition.next();
-        }
-
-      }, false);
-
-      // Listen for swipeleft event
-      window.addEventListener("swipeleft", function(event) {
-        rendition.next();
-      });
-
-      // Listen for swiperight event
-      window.addEventListener("swiperight", function(event) {
-        rendition.prev();
-      });
+    window.addEventListener('touchstart', function(event){
+      //console.log(event);
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+      //console.log(`the start is at X: ${startX}px and the Y is at ${startY}px`)
+      
     })
+      
+      window.addEventListener('touchend', function(event){
+      //console.log(event);
+      endX = event.changedTouches[0].clientX;
+      endY = event.changedTouches[0].clientY;
+      //console.log(`the start is at X: ${endX}px and the Y is at ${endY}px`)
+        
+      handleTouch(startX, endX)
+      
+    })
+    //console.log(`the start is at X: ${startX}px and the Y is at ${startY}px`)
 
-    // displayed.then(function(renderer){
-    //   // -- do stuff
+    // // Listen for swipeleft event
+    // window.addEventListener("swipeleft", function(event) {
+    //   rendition.next();
     // });
 
-    var inputElement = document.getElementById("input");
-    inputElement.addEventListener('change', function (e) {
-      var file = e.target.files[0];
-      if (window.FileReader) {
-          var reader = new FileReader();
-          reader.onload = openBook;
-          reader.readAsArrayBuffer(file);
-      }
-    });
+    // // Listen for swiperight event
+    // window.addEventListener("swiperight", function(event) {
+    //   rendition.prev();
+    // });
+
+  }).catch(function(error) {
+    console.error("Error loading book:", error);
+  });
+
+var startX;
+var startY;
+var endX;
+var endY;
+var treshold = 100; 
+
+//Function to handle swipes
+function handleTouch(start, end){
+  //calculate the distance on x-axis and o y-axis. Check wheter had the great moving ratio.
+  var xDist = endX - startX;
+  var yDist = endY - startY;
+  console.log(xDist);
+  console.log(yDist);
+  if(endX - startX < 0){
+    rendition.prev();
+  }else{
+    rendition.next();
+  }
+}
+
 </script>
 
 </body>
