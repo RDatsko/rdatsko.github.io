@@ -83,6 +83,7 @@ main {
 
 body > header ~ main {
     top: 106px;
+    margin: 0;
 }
 
 /* 
@@ -655,25 +656,26 @@ menu ul.can-hover li:hover ~ li:focus > ul,
 <script>
 
 // JavaScript code for resizing
-const resizer = document.getElementById('resizer');
-const panel = document.getElementById('panel');
+// const resizer = document.getElementById('resizer');
+// const panel = document.getElementById('panel');
 
-resizer.addEventListener('mousedown', initResize, false);
+// resizer.addEventListener('mousedown', initResize, false);
 
-function initResize(e) {
-    window.addEventListener('mousemove', resize, false);
-    window.addEventListener('mouseup', stopResize, false);
-}
+// function initResize(e) {
+//     window.addEventListener('mousemove', resize, false);
+//     window.addEventListener('mouseup', stopResize, false);
+// }
 
-function resize(e) {
-    panel.style.width = (window.innerWidth - e.clientX) + 'px';
-}
+// function resize(e) {
+//     panel.style.width = (window.innerWidth - e.clientX) + 'px';
+// }
 
-function stopResize() {
-    window.removeEventListener('mousemove', resize, false);
-    window.removeEventListener('mouseup', stopResize, false);
-}
+// function stopResize() {
+//     window.removeEventListener('mousemove', resize, false);
+//     window.removeEventListener('mouseup', stopResize, false);
+// }
 
+// JavaScript code for Menus
 const menuItems = document.querySelectorAll('.can-hover > li');
 let focusedItem = null;
 
@@ -757,7 +759,7 @@ function Exit() {
 
 
 
-
+// JavaScript code for Context Menu
 
 // let contextMenu = null;
 let contextMenu = document.querySelector(".context-menu");
