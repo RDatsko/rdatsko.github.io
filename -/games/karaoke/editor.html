@@ -627,8 +627,8 @@ menu ul.can-hover li:hover ~ li:focus > ul,
 }
 
 #cover {
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 128px;
+    max-height: 128px;
     border: 1px solid #ccc;
     margin-top: 5px;
     display: block;
@@ -655,6 +655,7 @@ menu ul.can-hover li:hover ~ li:focus > ul,
                 <li tabindex="0" aria-haspopup="true">File
                     <ul>
                         <li><a onclick="OpenFile();">Open</a></li>
+                        <li><a onclick=""><s>Change Cover</s></a></li>
                         <li><a onclick="SaveFile();">Save As…</a></li>
                     </ul>
                 </li>
@@ -667,10 +668,6 @@ menu ul.can-hover li:hover ~ li:focus > ul,
 <main>
     <span id="panel">
         <div id="tagInfo" style="display:none;">
-            <div id="tagList"></div>
-            <button id="addTagBtn">Add Tag</button>
-            <br><br>
-
             <div>
                 <strong>Cover Art:</strong><br>
                 <img id="cover" alt="No cover art">
@@ -678,6 +675,10 @@ menu ul.can-hover li:hover ~ li:focus > ul,
                 <input type="file" id="coverInput" accept="image/*">
                 <button id="removeCoverBtn">Remove Cover</button>
             </div><br>
+
+            <div id="tagList"></div>
+            <button id="addTagBtn">Add Tag</button>
+            <br><br>
         </div>
 
         <div id="loading" style="display:none; font-style:italic; color:gray; margin:10px 0;">
