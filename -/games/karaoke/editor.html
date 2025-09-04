@@ -651,7 +651,7 @@ menu ul.can-hover li:hover ~ li:focus > ul,
                 <li tabindex="0" aria-haspopup="true">File
                     <ul>
                         <li><a onclick="OpenFile();">Open</a></li>
-                        <li><a onclick="">Save</a></li>
+                        <li><a onclick="SaveFile();">Save</a></li>
                     </ul>
                 </li>
             </ul>
@@ -852,6 +852,62 @@ function OpenFile() {
 
 function SaveFile() {
     closeMainMenu();
+
+        if (!arrayBuffer) return alert("No MP3 loaded.");
+
+    const writer = new ID3Writer(arrayBuffer);
+
+    // Collect all tags from UI
+    document.querySelectorAll(".tag-row").forEach(row => {
+        const key = row.querySelector(".tag-key").value.trim();
+        let value = row.querySelector(".tag-value").value.trim();
+        if (!key || !value) return;
+
+        const frame = keyToFrame[key.toLowerCase()] || key;
+
+        // Try parsing JSON if it looks like an object
+        try {
+            if (value.startsWith("{") || value.startsWith("[")) {
+                value = JSON.parse(value);
+            }
+        } catch (e) { /* ignore, keep as string */ }
+
+        if (frame === "COMM") {
+            writer.setFrame('COMM', { description: '', text: value });
+        } else if (frame === "TPE1") {
+            writer.setFrame(frame, [value]); // artist expects array
+        } else {
+            writer.setFrame(frame, value);
+        }
+    });
+
+    // Cover art logic
+    if (newCover) {
+        const byteString = atob(newCover.dataURL.split(',')[1]);
+        const byteArray = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+            byteArray[i] = byteString.charCodeAt(i);
+        }
+        writer.setFrame('APIC', {
+        type: 3,
+        data: byteArray,
+        description: "Cover",
+        mimeType: newCover.format
+        });
+    } else if (removeCover) {
+        // Skip APIC entirely
+    }
+
+    writer.addTag();
+
+    const blob = writer.getBlob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "updated_" + mp3File.name;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function SaveAsFile() {
