@@ -985,65 +985,6 @@ const keyToFrame = {
     track: 'TRCK'
 };
 
-fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    document.getElementById("loading").style.display = "block"; // show loading
-
-    mp3File = file;
-    newCover = null;
-    removeCover = false;
-    tagList.innerHTML = "";
-
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        arrayBuffer = ev.target.result;
-
-        jsmediatags.read(file, {
-            onSuccess: function(tag) {
-                document.getElementById("loading").style.display = "none"; // hide loading
-                const tags = tag.tags;
-
-                // Render all found tags
-                Object.keys(tags).forEach((key) => {
-                if (key === "picture") return; // handled separately
-
-                let value = tags[key];
-                if (typeof value === "object" && value !== null) {
-                    if ("text" in value) {
-                        value = value.text; // handle comment-like objects
-                    } else {
-                        value = JSON.stringify(value); // fallback
-                    }
-                }
-                addTagRow(key, value);
-                });
-
-                // Cover art
-                if (tags.picture) {
-                    const pic = tags.picture;
-                    let base64String = "";
-                    for (let i = 0; i < pic.data.length; i++) {
-                        base64String += String.fromCharCode(pic.data[i]);
-                    }
-                    const base64 = btoa(base64String);
-                    cover.src = `data:${pic.format};base64,${base64}`;
-                } else {
-                    cover.src = "";
-                    cover.alt = "No cover art";
-                }
-
-                tagInfo.style.display = "block";
-            },
-            onError: function(err) {
-                alert("Error reading tags: " + err.type);
-            }
-        });
-    };
-    reader.readAsArrayBuffer(file);
-});
-
 function addTagRow(key = "", value = "") {
     const row = document.createElement("div");
     row.className = "tag-row";
