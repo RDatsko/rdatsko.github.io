@@ -169,7 +169,7 @@ function addTagRow(key = "", value = "") {
     if (typeof value === "string" && !value.startsWith("{") && !value.startsWith("[")) {
         valueField = `<input class="tag-value" placeholder="Value" value="${value.replace(/"/g, '&quot;')}">`;
     } else {
-        valueField = `<textarea class="tag-value" placeholder="Value" rows="2" cols="40">${value}</textarea>`;
+        valueField = `<textarea class="tag-value" placeholder="Value" rows="2" cols="40" style="resize: none;">${value}</textarea>`;
     }
 
     row.innerHTML = `
