@@ -84,6 +84,7 @@ main {
 body > header ~ main {
     top: 106px;
     margin: 0;
+    max-width: 100vw;
 }
 
 /* 
@@ -144,16 +145,16 @@ body > header ~ main {
 
 #panel {
     display: block;
-    width: 350px;
+    width: 425px;
     overflow: auto; /* Add overflow property for content */
-    resize: horizontal; /* Allow resizing horizontally */
+    /* resize: horizontal; Allow resizing horizontally */
     height: 100%; /* Make it fill the entire height */
 }
 
 #resizer {
     width: 5px;
     height: 100%; /* Make it fill the entire height */
-    cursor: ew-resize; /* Set cursor for resizing */
+    /* cursor: ew-resize; Set cursor for resizing */
 }
 
 menu {
