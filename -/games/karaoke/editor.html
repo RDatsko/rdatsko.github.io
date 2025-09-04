@@ -78,7 +78,9 @@ main {
     display: flex;
     flex-grow: 1;
     height: calc(100vh - 106px); /* calc(100vh - 42px); */
+    max-height: calc(100vh - 106px);
     overflow: hidden;
+    padding: 0;
 }
 
 body > header ~ main {
@@ -148,7 +150,9 @@ body > header ~ main {
     width: 425px;
     overflow: auto; /* Add overflow property for content */
     /* resize: horizontal; Allow resizing horizontally */
-    height: 100%; /* Make it fill the entire height */
+    /* height: 100%;*/ /* Make it fill the entire height */
+    height: calc(100% - 20px);
+    padding: 10px;
 }
 
 #resizer {
