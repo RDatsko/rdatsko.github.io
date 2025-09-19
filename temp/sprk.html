@@ -1,45 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bluetooth Battery Reader</title>
+<title>Bluetooth Example</title>
 </head>
 <body>
-  <button id="scan">Connect & Read Battery</button>
-  <pre id="output"></pre>
+<button id="scan">Scan for Bluetooth Device</button>
+<pre id="output"></pre>
 
-  <script>
-    const button = document.getElementById('scan');
-    const output = document.getElementById('output');
+<script>
+const button = document.getElementById('scan');
+const output = document.getElementById('output');
 
-    button.addEventListener('click', async () => {
-      try {
-        // Only show devices whose name starts with "SK" and that expose the Battery Service
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [
-            { namePrefix: 'SK', services: ['battery_service'] }
-          ]
-        });
-
-        output.textContent = `Selected device: ${device.name || 'Unnamed'}\n`;
-
-        // Connect to the GATT server
-        const server = await device.gatt.connect();
-
-        // Get the Battery Service
-        const service = await server.getPrimaryService('battery_service');
-
-        // Get the Battery Level Characteristic
-        const characteristic = await service.getCharacteristic('battery_level');
-
-        // Read the battery level value
-        const value = await characteristic.readValue();
-        const batteryLevel = value.getUint8(0);
-
-        output.textContent += `Battery Level: ${batteryLevel}%`;
-      } catch (error) {
-        output.textContent = `Error: ${error}`;
-      }
+button.addEventListener('click', async () => {
+    try {
+    // Request a Bluetooth device (no filters = shows all available devices)
+    const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true
+        // Or filter by services:
+        // filters: [{ services: ['battery_service'] }]
     });
-  </script>
+
+    output.textContent = `Selected device: ${device.name || 'Unnamed'}\nID: ${device.id}`;
+
+    // Optionally connect to the GATT server
+    const server = await device.gatt.connect();
+        output.textContent += `\nConnected to GATT server: ${server.connected}`;
+    } catch (error) {
+        output.textContent = `Error: ${error}`;
+    }
+});
+</script>
 </body>
 </html>
