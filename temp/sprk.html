@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Bluetooth Example</title>
+  <title>Bluetooth Battery Reader</title>
 </head>
 <body>
-<button id="scan">Scan for Bluetooth Device</button>
-<pre id="output"></pre>
+  <button id="scan">Connect & Read Battery</button>
+  <pre id="output"></pre>
 
-<script>
-const button = document.getElementById('scan');
-const output = document.getElementById('output');
+  <script>
+    const button = document.getElementById('scan');
+    const output = document.getElementById('output');
 
-button.addEventListener('click', async () => {
-    try {
-        // Prompt the user to select a Bluetooth device with the Battery Service
+    button.addEventListener('click', async () => {
+      try {
+        // Only show devices whose name starts with "SK" and that expose the Battery Service
         const device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: ['battery_service'] }]
+          filters: [
+            { namePrefix: 'SK', services: ['battery_service'] }
+          ]
         });
 
         output.textContent = `Selected device: ${device.name || 'Unnamed'}\n`;
@@ -34,10 +36,10 @@ button.addEventListener('click', async () => {
         const batteryLevel = value.getUint8(0);
 
         output.textContent += `Battery Level: ${batteryLevel}%`;
-    } catch (error) {
+      } catch (error) {
         output.textContent = `Error: ${error}`;
-    }
-});
-</script>
+      }
+    });
+  </script>
 </body>
 </html>
