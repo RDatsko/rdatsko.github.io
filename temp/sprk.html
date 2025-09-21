@@ -27,6 +27,16 @@ button.addEventListener('click', async () => {
 
     // Optionally connect to the GATT server
     const server = await device.gatt.connect();
+        // Get the Battery Service
+        const service = await server.getPrimaryService('battery_service');
+
+        // Get the Battery Level Characteristic
+        const characteristic = await service.getCharacteristic('battery_level');
+
+        // Read the battery level value
+        const value = await characteristic.readValue();
+        const batteryLevel = value.getUint8(0);
+
         output.textContent += `\nConnected to GATT server: ${server.connected}`;
     } catch (error) {
         output.textContent = `Error: ${error}`;
