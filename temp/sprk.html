@@ -15,9 +15,12 @@ button.addEventListener('click', async () => {
     try {
     // Request a Bluetooth device (no filters = shows all available devices)
     const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true
+        // acceptAllDevices: true
         // Or filter by services:
         // filters: [{ services: ['battery_service'] }]
+        filters: [
+            { namePrefix: 'SK', services: ['battery_service'] }
+        ]
     });
 
     output.textContent = `Selected device: ${device.name || 'Unnamed'}\nID: ${device.id}`;
