@@ -1,47 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Bluetooth Example</title>
+  <meta charset="utf-8">
+  <title>SPRK+ GATT Explorer</title>
 </head>
 <body>
-<button id="scan">Scan for Bluetooth Device</button>
-<pre id="output"></pre>
+  <button id="scan">Scan for SPRK+</button>
+  <pre id="output">Click “Scan” to begin.</pre>
 
-<script>
-const button = document.getElementById('scan');
-const output = document.getElementById('output');
+  <script>
+    const button = document.getElementById('scan');
+    const output = document.getElementById('output');
 
-button.addEventListener('click', async () => {
-    try {
-    // Request a Bluetooth device (no filters = shows all available devices)
-    const device = await navigator.bluetooth.requestDevice({
-        // acceptAllDevices: true
-        // Or filter by services:
-        // filters: [{ services: ['battery_service'] }]
-        filters: [
-            { namePrefix: 'SK' }
-        ]
-    });
-
-    output.textContent = `Selected device: ${device.name || 'Unnamed'}\nID: ${device.id}`;
-
-    // Optionally connect to the GATT server
-    const server = await device.gatt.connect();
-        // Get the Battery Service
-        const service = await server.getPrimaryService('battery_service');
-
-        // Get the Battery Level Characteristic
-        const characteristic = await service.getCharacteristic('battery_level');
-
-        // Read the battery level value
-        const value = await characteristic.readValue();
-        const batteryLevel = value.getUint8(0);
-
-        output.textContent += `\nConnected to GATT server: ${server.connected}`;
-    } catch (error) {
-        output.textContent = `Error: ${error}`;
+    function log(...args) {
+      output.textContent += args.join(' ') + '\n';
     }
-});
-</script>
+
+    button.addEventListener('click', async () => {
+      output.textContent = ''; // clear
+
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [
+            { namePrefix: 'SK' },    // many SPRK+ devices have names like "SK-xxxx"
+            // { name: 'SPRK+' }      // sometimes direct name works
+          ],
+          optionalServices: [
+            /* include candidate services you suspect or want to try:
+               - standard services, e.g. device_information (0x180A)
+               - battery_service (0x180F)
+               - generic_access / generic_attribute
+               - any custom ones you know or find
+            */
+            'device_information',
+            'battery_service',
+            // Custom candidate service UUIDs (if you want to test these)
+            '22bb746f-2ba0-7554-2d6f-726568705327',
+            '22bb746f-2bb0-7554-2d6f-726568705327',
+            '00001016-d102-11e1-9b23-00025b00a5a5'
+          ]
+        });
+
+        log('Selected device:', device.name || 'Unnamed', 'ID:', device.id);
+
+        const server = await device.gatt.connect();
+        log('Connected:', server.connected);
+
+        const services = await server.getPrimaryServices();
+        log('Services found:', services.length);
+
+        for (const service of services) {
+          log('---');
+          log('Service UUID:', service.uuid);
+
+          let chars;
+          try {
+            chars = await service.getCharacteristics();
+          } catch (err) {
+            log('  Could not get characteristics for this service:', err);
+            continue;
+          }
+
+          for (const char of chars) {
+            log('  Characteristic UUID:', char.uuid);
+            log('    Properties:', JSON.stringify(char.properties));
+
+            // Try read if readable
+            if (char.properties.read) {
+              try {
+                const value = await char.readValue();
+                // Convert value to hex or numbers
+                const arr = [];
+                for (let i = 0; i < value.byteLength; i++) {
+                  arr.push(value.getUint8(i));
+                }
+                log('    Read value:', arr.map(b => b.toString(16).padStart(2, '0')).join(' '));
+              } catch (err) {
+                log('    Read error:', err);
+              }
+            }
+
+            // Try notifications if supported
+            if (char.properties.notify || char.properties.indicate) {
+              try {
+                await char.startNotifications();
+                char.addEventListener('characteristicvaluechanged', (event) => {
+                  const evVal = event.target.value;
+                  const arr2 = [];
+                  for (let i = 0; i < evVal.byteLength; i++) {
+                    arr2.push(evVal.getUint8(i));
+                  }
+                  log('    Notification from', char.uuid, ':', arr2.map(b => b.toString(16).padStart(2, '0')).join(' '));
+                });
+                log('    Notifications started for', char.uuid);
+              } catch (err) {
+                log('    Notification error:', err);
+              }
+            }
+          }
+        }
+
+      } catch (error) {
+        log('Error:', error);
+      }
+    });
+  </script>
 </body>
 </html>
