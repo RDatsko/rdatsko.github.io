@@ -2,122 +2,55 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SPRK+ GATT Explorer & Tester</title>
-  <style>
-    body { font-family: monospace; padding: 12px; }
-    pre { white-space: pre-wrap; background:#f7f7f7; padding:10px; border-radius:6px; }
-    button { padding:8px 12px; font-size:16px; }
-  </style>
+  <title>SPRK+ JS Example</title>
 </head>
 <body>
-  <h2>SPRK+ GATT Explorer & Tester</h2>
-  <p>Open in Chrome (HTTPS or localhost). Click <b>Scan</b>, connect to your SPRK+ and watch output below.</p>
-  <button id="scan">Scan for SPRK+</button>
-  <pre id="output">Output will appear here.</pre>
+  <button id="scan">Scan for SK devices</button>
+  <pre id="output"></pre>
 
-<script>
-const btn = document.getElementById('scan');
-const out = document.getElementById('output');
+  <script>
+    const button = document.getElementById('scan');
+    const output = document.getElementById('output');
+    const log = (...args) => output.textContent += args.join(' ') + '\n';
 
-function log(...args){ out.textContent += args.map(a=>String(a)).join(' ') + '\n'; }
-function clear() { out.textContent = ''; }
+    button.addEventListener('click', async () => {
+      output.textContent = '';
 
-function toHex(buf){
-  const arr = new Uint8Array(buf);
-  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join(' ');
-}
+      try {
+        // 🔍 Scan for devices starting with "SK"
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: 'SK' }],
+          optionalServices: [
+            // Add known services here
+            '0000180a-0000-1000-8000-00805f9b34fb', // Device Info
+            '22bb746f-2bb0-7554-2d6f-726568705327', // Main Sphero Control
+            '22bb746f-2ba0-7554-2d6f-726568705327'  // Async/Commands
+          ]
+        });
 
-function tryInterpret(valueBuffer){
-  const arr = Array.from(new Uint8Array(valueBuffer));
-  // Heuristic: single byte 0-100 likely battery percentage
-  if(arr.length === 1 && arr[0] >= 0 && arr[0] <= 100) return `${arr[0]}  (possible battery %)`;
-  // Heuristic: ASCII printable?
-  const asText = String.fromCharCode(...arr);
-  if(/^[\x20-\x7E]+$/.test(asText)) return `${asText} (ascii)`;
-  return `hex: ${toHex(valueBuffer)}`;
-}
+        log(`✅ Found device: ${device.name} (${device.id})`);
 
-btn.addEventListener('click', async () => {
-  clear();
+        // 🔗 Connect
+        const server = await device.gatt.connect();
+        log('Connected to GATT server');
 
-  try {
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'SK' }, { namePrefix: 'SPRK' }, { namePrefix: 'Sphero' }],
-      optionalServices: [
-        'device_information',            // 0x180A
-        'battery_service',               // 0x180F (may not exist on SPRK+)
-        // community vendor/custom UUIDs observed in peripheral dumps:
-        '22bb746f-2ba0-7554-2d6f-726568705327',
-        '22bb746f-2bb0-7554-2d6f-726568705327',
-        '00001016-d102-11e1-9b23-00025b00a5a5'
-      ]
-    });
+        // Example: read Device Info (manufacturer)
+        const infoService = await server.getPrimaryService('0000180a-0000-1000-8000-00805f9b34fb');
+        const manufChar = await infoService.getCharacteristic('00002a29-0000-1000-8000-00805f9b34fb');
+        const value = await manufChar.readValue();
+        const decoder = new TextDecoder('utf-8');
+        log('Manufacturer:', decoder.decode(value));
 
-    log(`Selected device: ${device.name || 'Unnamed'}  id:${device.id}`);
-    device.addEventListener('gattserverdisconnected', () => log('Device disconnected'));
+        // Example: read battery (custom)
+        const controlService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
+        const batteryChar = await controlService.getCharacteristic('22bb746f-2bb8-7554-2d6f-726568705327');
+        const battVal = await batteryChar.readValue();
+        log('Battery %:', battVal.getUint8(0));
 
-    const server = await device.gatt.connect();
-    log('Connected:', server.connected);
-    log('Enumerating primary services...');
-    const services = await server.getPrimaryServices();
-    log(`Found ${services.length} service(s).`);
-
-    for (const svc of services) {
-      log('------------------------------');
-      log('Service UUID:', svc.uuid);
-
-      let chars;
-      try { chars = await svc.getCharacteristics(); }
-      catch(e){ log('  Could not get characteristics:', e); continue; }
-
-      log(`  Characteristics: ${chars.length}`);
-      for (const ch of chars) {
-        log('  --------------------------');
-        log('  Char UUID:', ch.uuid);
-        // properties list
-        const props = Object.entries(ch.properties).filter(([k,v])=>v).map(([k])=>k).join(', ');
-        log('    Properties:', props || '(none)');
-
-        // READ
-        if (ch.properties.read) {
-          try {
-            const val = await ch.readValue();
-            const interpreted = tryInterpret(val.buffer);
-            log('    Read:', interpreted);
-          } catch (e) {
-            log('    Read error:', e);
-          }
-        }
-
-        // NOTIFY / INDICATE
-        if (ch.properties.notify || ch.properties.indicate) {
-          try {
-            await ch.startNotifications();
-            log('    Notifications started.');
-            ch.addEventListener('characteristicvaluechanged', (ev) => {
-              const v = ev.target.value;
-              log(`    Notification (${ch.uuid}):`, tryInterpret(v.buffer));
-            });
-          } catch (e) {
-            log('    Notification error:', e);
-          }
-        }
-
-        // WRITE hint
-        if (ch.properties.write || ch.properties.writeWithoutResponse) {
-          log('    Writable: you may try writing here (manual test).');
-        }
+      } catch (err) {
+        log('❌ Error:', err);
       }
-    }
-
-    log('--- Enumeration complete. Inspect outputs above.');
-  } catch (err) {
-    log('ERROR:', err);
-    if (err.name === 'SecurityError') {
-      log('Tip: include the service UUID(s) you intend to access in optionalServices during requestDevice().');
-    }
-  }
-});
-</script>
+    });
+  </script>
 </body>
 </html>
