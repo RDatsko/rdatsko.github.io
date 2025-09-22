@@ -1,56 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>SPRK+ JS Example</title>
+<meta charset="UTF-8">
+<title>Sphero BLE Dashboard</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+  h1 { color: #333; }
+  .status { margin-top: 10px; padding: 10px; background: #fff; border-radius: 5px; }
+  .log { margin-top: 10px; padding: 10px; background: #222; color: #0f0; height: 200px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;}
+  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+</style>
 </head>
 <body>
-  <button id="scan">Scan for SK devices</button>
-  <pre id="output"></pre>
 
-  <script>
-    const button = document.getElementById('scan');
-    const output = document.getElementById('output');
-    const log = (...args) => output.textContent += args.join(' ') + '\n';
+<h1>Sphero BLE Dashboard</h1>
 
-    button.addEventListener('click', async () => {
-      output.textContent = '';
+<button id="connectBtn">Connect to Sphero</button>
 
-      try {
-        // 🔍 Scan for devices starting with "SK"
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ namePrefix: 'SK' }],
-          optionalServices: [
-            // Add known services here
-            '0000180a-0000-1000-8000-00805f9b34fb', // Device Info
-            '22bb746f-2bb0-7554-2d6f-726568705327', // Main Sphero Control
-            '22bb746f-2ba0-7554-2d6f-726568705327'  // Async/Commands
-          ]
-        });
+<div class="status" id="status">Status: Not connected</div>
+<div class="status" id="battery">Battery: N/A</div>
+<div class="status" id="led">LED: N/A</div>
+<div class="status" id="orientation">Orientation: N/A</div>
+<div class="status" id="velocity">Velocity: N/A</div>
 
-        log(`✅ Found device: ${device.name} (${device.id})`);
+<div class="log" id="log"></div>
 
-        // 🔗 Connect
-        const server = await device.gatt.connect();
-        log('Connected to GATT server');
+<script>
+const logEl = document.getElementById('log');
+function log(msg) {
+  logEl.textContent += msg + '\n';
+  logEl.scrollTop = logEl.scrollHeight;
+}
 
-        // Example: read Device Info (manufacturer)
-        const infoService = await server.getPrimaryService('0000180a-0000-1000-8000-00805f9b34fb');
-        const manufChar = await infoService.getCharacteristic('00002a29-0000-1000-8000-00805f9b34fb');
-        const value = await manufChar.readValue();
-        const decoder = new TextDecoder('utf-8');
-        log('Manufacturer:', decoder.decode(value));
+async function connectSphero() {
+  try {
+    document.getElementById('status').textContent = 'Status: Scanning for devices...';
 
-        // Example: read battery (custom)
-        const controlService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
-        const batteryChar = await controlService.getCharacteristic('22bb746f-2bb8-7554-2d6f-726568705327');
-        const battVal = await batteryChar.readValue();
-        log('Battery %:', battVal.getUint8(0));
-
-      } catch (err) {
-        log('❌ Error:', err);
-      }
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ namePrefix: 'SK-' }],
+      optionalServices: [
+        'battery_service',                       // Battery
+        '22bb746f-2bb0-7554-2d6f-726568705327', // Main Sphero Control (LED)
+        '22bb746f-2ba0-7554-2d6f-726568705327'  // IMU (orientation & velocity)
+      ]
     });
-  </script>
+
+    log(`✅ Found device: ${device.name} (${device.id})`);
+    document.getElementById('status').textContent = 'Status: Connecting...';
+
+    const server = await device.gatt.connect();
+    document.getElementById('status').textContent = 'Status: Connected';
+
+    // BATTERY
+    const batteryService = await server.getPrimaryService('battery_service');
+    const batteryChar = await batteryService.getCharacteristic('battery_level');
+    const batteryValue = await batteryChar.readValue();
+    const batteryPercent = batteryValue.getUint8(0);
+    document.getElementById('battery').textContent = `Battery: ${batteryPercent}%`;
+    log(`Battery level: ${batteryPercent}%`);
+
+    // LED
+    const ledService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
+    const ledChar = await ledService.getCharacteristic('22bb746f-2bb4-7554-2d6f-726568705327');
+
+    const r = 0, g = 128, b = 255; // Example color: blue
+    const ledCommand = new Uint8Array([0xFF, r, g, b, 0x00]);
+    await ledChar.writeValue(ledCommand);
+    document.getElementById('led').textContent = `LED: RGB(${r}, ${g}, ${b})`;
+    log(`LED color set to RGB(${r},${g},${b})`);
+
+    // ORIENTATION & VELOCITY
+    const imuService = await server.getPrimaryService('22bb746f-2ba0-7554-2d6f-726568705327');
+    const orientationChar = await imuService.getCharacteristic('22bb746f-2ba3-7554-2d6f-726568705327');
+    const velocityChar = await imuService.getCharacteristic('22bb746f-2ba5-7554-2d6f-726568705327');
+
+    await orientationChar.startNotifications();
+    orientationChar.addEventListener('characteristicvaluechanged', (event) => {
+      const value = event.target.value;
+      const qx = value.getInt16(0, true) / 16384.0;
+      const qy = value.getInt16(2, true) / 16384.0;
+      const qz = value.getInt16(4, true) / 16384.0;
+      const qw = value.getInt16(6, true) / 16384.0;
+      document.getElementById('orientation').textContent = 
+        `Orientation (quat): qx:${qx.toFixed(3)}, qy:${qy.toFixed(3)}, qz:${qz.toFixed(3)}, qw:${qw.toFixed(3)}`;
+    });
+
+    await velocityChar.startNotifications();
+    velocityChar.addEventListener('characteristicvaluechanged', (event) => {
+      const value = event.target.value;
+      const vx = value.getInt16(0, true) / 1000;
+      const vy = value.getInt16(2, true) / 1000;
+      const vz = value.getInt16(4, true) / 1000;
+      document.getElementById('velocity').textContent = 
+        `Velocity: vx:${vx.toFixed(3)}, vy:${vy.toFixed(3)}, vz:${vz.toFixed(3)}`;
+    });
+
+    log('Orientation & velocity notifications started.');
+
+  } catch (error) {
+    document.getElementById('status').textContent = 'Status: Error';
+    log(`❌ Error: ${error}`);
+  }
+}
+
+document.getElementById('connectBtn').addEventListener('click', connectSphero);
+</script>
+
 </body>
 </html>
