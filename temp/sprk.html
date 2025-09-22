@@ -56,60 +56,116 @@ async function connectSphero() {
     const server = await device.gatt.connect();
     document.getElementById('status').textContent = 'Status: Connected';
 
+const services = await server.getPrimaryServices();
+log('Services found:', services.length);
+
+        for (const service of services) {
+          log('---');
+          log('Service UUID:', service.uuid);
+
+          let chars;
+          try {
+            chars = await service.getCharacteristics();
+          } catch (err) {
+            log('  Could not get characteristics for this service:', err);
+            continue;
+          }
+
+          for (const char of chars) {
+            log('  Characteristic UUID:', char.uuid);
+            log('    Properties:', JSON.stringify(char.properties));
+
+            // Try read if readable
+            if (char.properties.read) {
+              try {
+                const value = await char.readValue();
+                // Convert value to hex or numbers
+                const arr = [];
+                for (let i = 0; i < value.byteLength; i++) {
+                  arr.push(value.getUint8(i));
+                }
+                log('    Read value:', arr.map(b => b.toString(16).padStart(2, '0')).join(' '));
+              } catch (err) {
+                log('    Read error:', err);
+              }
+            }
+
+            // Try notifications if supported
+            if (char.properties.notify || char.properties.indicate) {
+              try {
+                await char.startNotifications();
+                char.addEventListener('characteristicvaluechanged', (event) => {
+                  const evVal = event.target.value;
+                  const arr2 = [];
+                  for (let i = 0; i < evVal.byteLength; i++) {
+                    arr2.push(evVal.getUint8(i));
+                  }
+                  log('    Notification from', char.uuid, ':', arr2.map(b => b.toString(16).padStart(2, '0')).join(' '));
+                });
+                log('    Notifications started for', char.uuid);
+              } catch (err) {
+                log('    Notification error:', err);
+              }
+            }
+          }
+        }
+
     // -------------------
     // BATTERY
     // -------------------
-    const mainService = await server.getPrimaryService(SPP_SERVICE);
-    const batteryChar = await mainService.getCharacteristic(BATTERY_CHAR);
-    const batteryValue = await batteryChar.readValue();
-    const batteryPercent = batteryValue.getUint8(0);
-    document.getElementById('battery').textContent = `Battery: ${batteryPercent}%`;
-    log(`Battery level: ${batteryPercent}%`);
+    // const mainService = await server.getPrimaryService(SPP_SERVICE);
+    // const batteryChar = await mainService.getCharacteristic(BATTERY_CHAR);
+    // const batteryValue = await batteryChar.readValue();
+    // const batteryPercent = batteryValue.getUint8(0);
+    // document.getElementById('battery').textContent = `Battery: ${batteryPercent}%`;
+    // log(`Battery level: ${batteryPercent}%`);
 
     // -------------------
     // LED
     // -------------------
-    const ledChar = await mainService.getCharacteristic(LED_CHAR);
-    const r = 0, g = 128, b = 255; // Blue
-    // Proper Sphero LED packet: [0xFF, R, G, B, 0x00] works on SK
-    await ledChar.writeValue(new Uint8Array([0xFF, r, g, b, 0x00]));
-    document.getElementById('led').textContent = `LED: RGB(${r}, ${g}, ${b})`;
-    log(`LED color set to RGB(${r},${g},${b})`);
+    // const ledChar = await mainService.getCharacteristic(LED_CHAR);
+    // const r = 0, g = 128, b = 255; // Blue
+    // // Proper Sphero LED packet: [0xFF, R, G, B, 0x00] works on SK
+    // await ledChar.writeValue(new Uint8Array([0xFF, r, g, b, 0x00]));
+    // document.getElementById('led').textContent = `LED: RGB(${r}, ${g}, ${b})`;
+    // log(`LED color set to RGB(${r},${g},${b})`);
 
     // -------------------
     // IMU (Orientation & Velocity)
     // -------------------
-    const imuService = await server.getPrimaryService(IMU_SERVICE);
-    const imuConfigChar = await imuService.getCharacteristic(IMU_STREAM_CONFIG_CHAR);
-    const orientationChar = await imuService.getCharacteristic(IMU_ORIENTATION_CHAR);
-    const velocityChar = await imuService.getCharacteristic(IMU_VELOCITY_CHAR);
+    // const imuService = await server.getPrimaryService(IMU_SERVICE);
+    // const imuConfigChar = await imuService.getCharacteristic(IMU_STREAM_CONFIG_CHAR);
+    // const orientationChar = await imuService.getCharacteristic(IMU_ORIENTATION_CHAR);
+    // const velocityChar = await imuService.getCharacteristic(IMU_VELOCITY_CHAR);
 
-    // Enable streaming: configure IMU (example: 50Hz, all data)
-    const enableStreamPacket = new Uint8Array([0x01, 0x64, 0xFF, 0xFF]); // streamRate=100ms (10Hz), all sensors
-    await imuConfigChar.writeValue(enableStreamPacket);
+    // // Enable streaming: configure IMU (example: 50Hz, all data)
+    // const enableStreamPacket = new Uint8Array([0x01, 0x64, 0xFF, 0xFF]); // streamRate=100ms (10Hz), all sensors
+    // await imuConfigChar.writeValue(enableStreamPacket);
 
-    await orientationChar.startNotifications();
-    orientationChar.addEventListener('characteristicvaluechanged', (event) => {
-      const value = event.target.value;
-      const qx = value.getInt16(0, true) / 16384.0;
-      const qy = value.getInt16(2, true) / 16384.0;
-      const qz = value.getInt16(4, true) / 16384.0;
-      const qw = value.getInt16(6, true) / 16384.0;
-      document.getElementById('orientation').textContent = 
-        `Orientation (quat): qx:${qx.toFixed(3)}, qy:${qy.toFixed(3)}, qz:${qz.toFixed(3)}, qw:${qw.toFixed(3)}`;
-    });
+    // await orientationChar.startNotifications();
+    // orientationChar.addEventListener('characteristicvaluechanged', (event) => {
+    //   const value = event.target.value;
+    //   const qx = value.getInt16(0, true) / 16384.0;
+    //   const qy = value.getInt16(2, true) / 16384.0;
+    //   const qz = value.getInt16(4, true) / 16384.0;
+    //   const qw = value.getInt16(6, true) / 16384.0;
+    //   document.getElementById('orientation').textContent = 
+    //     `Orientation (quat): qx:${qx.toFixed(3)}, qy:${qy.toFixed(3)}, qz:${qz.toFixed(3)}, qw:${qw.toFixed(3)}`;
+    // });
 
-    await velocityChar.startNotifications();
-    velocityChar.addEventListener('characteristicvaluechanged', (event) => {
-      const value = event.target.value;
-      const vx = value.getInt16(0, true) / 1000;
-      const vy = value.getInt16(2, true) / 1000;
-      const vz = value.getInt16(4, true) / 1000;
-      document.getElementById('velocity').textContent = 
-        `Velocity: vx:${vx.toFixed(3)}, vy:${vy.toFixed(3)}, vz:${vz.toFixed(3)}`;
-    });
+    // await velocityChar.startNotifications();
+    // velocityChar.addEventListener('characteristicvaluechanged', (event) => {
+    //   const value = event.target.value;
+    //   const vx = value.getInt16(0, true) / 1000;
+    //   const vy = value.getInt16(2, true) / 1000;
+    //   const vz = value.getInt16(4, true) / 1000;
+    //   document.getElementById('velocity').textContent = 
+    //     `Velocity: vx:${vx.toFixed(3)}, vy:${vy.toFixed(3)}, vz:${vz.toFixed(3)}`;
+    // });
 
-    log('Orientation & velocity streaming enabled.');
+    // log('Orientation & velocity streaming enabled.');
+
+
 
   } catch (error) {
     document.getElementById('status').textContent = 'Status: Error';
