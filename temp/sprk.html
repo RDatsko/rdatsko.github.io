@@ -50,6 +50,9 @@ async function connectSphero() {
     const server = await device.gatt.connect();
     document.getElementById('status').textContent = 'Status: Connected';
 
+    // LED & Battery Service
+    const mainService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
+
     // Battery
     const batteryChar = await mainService.getCharacteristic('22bb746f-2bb2-7554-2d6f-726568705327');
     const batteryValue = await batteryChar.readValue();
