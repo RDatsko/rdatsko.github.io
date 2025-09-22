@@ -32,16 +32,22 @@ function log(msg) {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
+// Sphero SK service UUIDs
+const SPP_SERVICE = '22bb746f-2bb0-7554-2d6f-726568705327';
+const IMU_SERVICE = '22bb746f-2ba0-7554-2d6f-726568705327';
+const BATTERY_CHAR = '22bb746f-2bb2-7554-2d6f-726568705327';
+const LED_CHAR = '22bb746f-2bb4-7554-2d6f-726568705327';
+const IMU_ORIENTATION_CHAR = '22bb746f-2ba3-7554-2d6f-726568705327';
+const IMU_VELOCITY_CHAR = '22bb746f-2ba5-7554-2d6f-726568705327';
+const IMU_STREAM_CONFIG_CHAR = '22bb746f-2ba1-7554-2d6f-726568705327';
+
 async function connectSphero() {
   try {
     document.getElementById('status').textContent = 'Status: Scanning for devices...';
 
     const device = await navigator.bluetooth.requestDevice({
       filters: [{ namePrefix: 'SK-' }],
-      optionalServices: [
-        '22bb746f-2bb0-7554-2d6f-726568705327', // Main Sphero Control (LED)
-        '22bb746f-2ba0-7554-2d6f-726568705327'  // IMU (orientation & velocity)
-      ]
+      optionalServices: [SPP_SERVICE, IMU_SERVICE]
     });
 
     log(`✅ Found device: ${device.name} (${device.id})`);
@@ -50,30 +56,37 @@ async function connectSphero() {
     const server = await device.gatt.connect();
     document.getElementById('status').textContent = 'Status: Connected';
 
-    // LED & Battery Service
-    const mainService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
-
-    // Battery
-    const batteryChar = await mainService.getCharacteristic('22bb746f-2bb2-7554-2d6f-726568705327');
+    // -------------------
+    // BATTERY
+    // -------------------
+    const mainService = await server.getPrimaryService(SPP_SERVICE);
+    const batteryChar = await mainService.getCharacteristic(BATTERY_CHAR);
     const batteryValue = await batteryChar.readValue();
     const batteryPercent = batteryValue.getUint8(0);
     document.getElementById('battery').textContent = `Battery: ${batteryPercent}%`;
     log(`Battery level: ${batteryPercent}%`);
 
+    // -------------------
     // LED
-    const ledService = await server.getPrimaryService('22bb746f-2bb0-7554-2d6f-726568705327');
-    const ledChar = await ledService.getCharacteristic('22bb746f-2bb4-7554-2d6f-726568705327');
-
-    const r = 0, g = 128, b = 255; // Example color: blue
-    const ledCommand = new Uint8Array([0xFF, r, g, b, 0x00]);
-    await ledChar.writeValue(ledCommand);
+    // -------------------
+    const ledChar = await mainService.getCharacteristic(LED_CHAR);
+    const r = 0, g = 128, b = 255; // Blue
+    // Proper Sphero LED packet: [0xFF, R, G, B, 0x00] works on SK
+    await ledChar.writeValue(new Uint8Array([0xFF, r, g, b, 0x00]));
     document.getElementById('led').textContent = `LED: RGB(${r}, ${g}, ${b})`;
     log(`LED color set to RGB(${r},${g},${b})`);
 
-    // ORIENTATION & VELOCITY
-    const imuService = await server.getPrimaryService('22bb746f-2ba0-7554-2d6f-726568705327');
-    const orientationChar = await imuService.getCharacteristic('22bb746f-2ba3-7554-2d6f-726568705327');
-    const velocityChar = await imuService.getCharacteristic('22bb746f-2ba5-7554-2d6f-726568705327');
+    // -------------------
+    // IMU (Orientation & Velocity)
+    // -------------------
+    const imuService = await server.getPrimaryService(IMU_SERVICE);
+    const imuConfigChar = await imuService.getCharacteristic(IMU_STREAM_CONFIG_CHAR);
+    const orientationChar = await imuService.getCharacteristic(IMU_ORIENTATION_CHAR);
+    const velocityChar = await imuService.getCharacteristic(IMU_VELOCITY_CHAR);
+
+    // Enable streaming: configure IMU (example: 50Hz, all data)
+    const enableStreamPacket = new Uint8Array([0x01, 0x64, 0xFF, 0xFF]); // streamRate=100ms (10Hz), all sensors
+    await imuConfigChar.writeValue(enableStreamPacket);
 
     await orientationChar.startNotifications();
     orientationChar.addEventListener('characteristicvaluechanged', (event) => {
@@ -96,7 +109,7 @@ async function connectSphero() {
         `Velocity: vx:${vx.toFixed(3)}, vy:${vy.toFixed(3)}, vz:${vz.toFixed(3)}`;
     });
 
-    log('Orientation & velocity notifications started.');
+    log('Orientation & velocity streaming enabled.');
 
   } catch (error) {
     document.getElementById('status').textContent = 'Status: Error';
