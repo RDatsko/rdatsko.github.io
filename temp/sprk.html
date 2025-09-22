@@ -2,108 +2,122 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SPRK+ GATT Explorer</title>
+  <title>SPRK+ GATT Explorer & Tester</title>
+  <style>
+    body { font-family: monospace; padding: 12px; }
+    pre { white-space: pre-wrap; background:#f7f7f7; padding:10px; border-radius:6px; }
+    button { padding:8px 12px; font-size:16px; }
+  </style>
 </head>
 <body>
+  <h2>SPRK+ GATT Explorer & Tester</h2>
+  <p>Open in Chrome (HTTPS or localhost). Click <b>Scan</b>, connect to your SPRK+ and watch output below.</p>
   <button id="scan">Scan for SPRK+</button>
-  <pre id="output">Click “Scan” to begin.</pre>
+  <pre id="output">Output will appear here.</pre>
 
-  <script>
-    const button = document.getElementById('scan');
-    const output = document.getElementById('output');
+<script>
+const btn = document.getElementById('scan');
+const out = document.getElementById('output');
 
-    function log(...args) {
-      output.textContent += args.join(' ') + '\n';
-    }
+function log(...args){ out.textContent += args.map(a=>String(a)).join(' ') + '\n'; }
+function clear() { out.textContent = ''; }
 
-    button.addEventListener('click', async () => {
-      output.textContent = ''; // clear
+function toHex(buf){
+  const arr = new Uint8Array(buf);
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join(' ');
+}
 
-      try {
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [
-            { namePrefix: 'SK' },    // many SPRK+ devices have names like "SK-xxxx"
-            // { name: 'SPRK+' }      // sometimes direct name works
-          ],
-          optionalServices: [
-            /* include candidate services you suspect or want to try:
-               - standard services, e.g. device_information (0x180A)
-               - battery_service (0x180F)
-               - generic_access / generic_attribute
-               - any custom ones you know or find
-            */
-            'device_information',
-            'battery_service',
-            // Custom candidate service UUIDs (if you want to test these)
-            '22bb746f-2ba0-7554-2d6f-726568705327',
-            '22bb746f-2bb0-7554-2d6f-726568705327',
-            '00001016-d102-11e1-9b23-00025b00a5a5'
-          ]
-        });
+function tryInterpret(valueBuffer){
+  const arr = Array.from(new Uint8Array(valueBuffer));
+  // Heuristic: single byte 0-100 likely battery percentage
+  if(arr.length === 1 && arr[0] >= 0 && arr[0] <= 100) return `${arr[0]}  (possible battery %)`;
+  // Heuristic: ASCII printable?
+  const asText = String.fromCharCode(...arr);
+  if(/^[\x20-\x7E]+$/.test(asText)) return `${asText} (ascii)`;
+  return `hex: ${toHex(valueBuffer)}`;
+}
 
-        log('Selected device:', device.name || 'Unnamed', 'ID:', device.id);
+btn.addEventListener('click', async () => {
+  clear();
 
-        const server = await device.gatt.connect();
-        log('Connected:', server.connected);
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ namePrefix: 'SK' }, { namePrefix: 'SPRK' }, { namePrefix: 'Sphero' }],
+      optionalServices: [
+        'device_information',            // 0x180A
+        'battery_service',               // 0x180F (may not exist on SPRK+)
+        // community vendor/custom UUIDs observed in peripheral dumps:
+        '22bb746f-2ba0-7554-2d6f-726568705327',
+        '22bb746f-2bb0-7554-2d6f-726568705327',
+        '00001016-d102-11e1-9b23-00025b00a5a5'
+      ]
+    });
 
-        const services = await server.getPrimaryServices();
-        log('Services found:', services.length);
+    log(`Selected device: ${device.name || 'Unnamed'}  id:${device.id}`);
+    device.addEventListener('gattserverdisconnected', () => log('Device disconnected'));
 
-        for (const service of services) {
-          log('---');
-          log('Service UUID:', service.uuid);
+    const server = await device.gatt.connect();
+    log('Connected:', server.connected);
+    log('Enumerating primary services...');
+    const services = await server.getPrimaryServices();
+    log(`Found ${services.length} service(s).`);
 
-          let chars;
+    for (const svc of services) {
+      log('------------------------------');
+      log('Service UUID:', svc.uuid);
+
+      let chars;
+      try { chars = await svc.getCharacteristics(); }
+      catch(e){ log('  Could not get characteristics:', e); continue; }
+
+      log(`  Characteristics: ${chars.length}`);
+      for (const ch of chars) {
+        log('  --------------------------');
+        log('  Char UUID:', ch.uuid);
+        // properties list
+        const props = Object.entries(ch.properties).filter(([k,v])=>v).map(([k])=>k).join(', ');
+        log('    Properties:', props || '(none)');
+
+        // READ
+        if (ch.properties.read) {
           try {
-            chars = await service.getCharacteristics();
-          } catch (err) {
-            log('  Could not get characteristics for this service:', err);
-            continue;
-          }
-
-          for (const char of chars) {
-            log('  Characteristic UUID:', char.uuid);
-            log('    Properties:', JSON.stringify(char.properties));
-
-            // Try read if readable
-            if (char.properties.read) {
-              try {
-                const value = await char.readValue();
-                // Convert value to hex or numbers
-                const arr = [];
-                for (let i = 0; i < value.byteLength; i++) {
-                  arr.push(value.getUint8(i));
-                }
-                log('    Read value:', arr.map(b => b.toString(16).padStart(2, '0')).join(' '));
-              } catch (err) {
-                log('    Read error:', err);
-              }
-            }
-
-            // Try notifications if supported
-            if (char.properties.notify || char.properties.indicate) {
-              try {
-                await char.startNotifications();
-                char.addEventListener('characteristicvaluechanged', (event) => {
-                  const evVal = event.target.value;
-                  const arr2 = [];
-                  for (let i = 0; i < evVal.byteLength; i++) {
-                    arr2.push(evVal.getUint8(i));
-                  }
-                  log('    Notification from', char.uuid, ':', arr2.map(b => b.toString(16).padStart(2, '0')).join(' '));
-                });
-                log('    Notifications started for', char.uuid);
-              } catch (err) {
-                log('    Notification error:', err);
-              }
-            }
+            const val = await ch.readValue();
+            const interpreted = tryInterpret(val.buffer);
+            log('    Read:', interpreted);
+          } catch (e) {
+            log('    Read error:', e);
           }
         }
 
-      } catch (error) {
-        log('Error:', error);
+        // NOTIFY / INDICATE
+        if (ch.properties.notify || ch.properties.indicate) {
+          try {
+            await ch.startNotifications();
+            log('    Notifications started.');
+            ch.addEventListener('characteristicvaluechanged', (ev) => {
+              const v = ev.target.value;
+              log(`    Notification (${ch.uuid}):`, tryInterpret(v.buffer));
+            });
+          } catch (e) {
+            log('    Notification error:', e);
+          }
+        }
+
+        // WRITE hint
+        if (ch.properties.write || ch.properties.writeWithoutResponse) {
+          log('    Writable: you may try writing here (manual test).');
+        }
       }
-    });
-  </script>
+    }
+
+    log('--- Enumeration complete. Inspect outputs above.');
+  } catch (err) {
+    log('ERROR:', err);
+    if (err.name === 'SecurityError') {
+      log('Tip: include the service UUID(s) you intend to access in optionalServices during requestDevice().');
+    }
+  }
+});
+</script>
 </body>
 </html>
