@@ -163,6 +163,9 @@
 
         const server = await device.gatt.connect();
         log('Connected:', server.connected);
+        if(server.connected) {
+          document.getElementById('status').textContent = "Status: Connected";
+        }
 
         const services = await server.getPrimaryServices();
         log('Services found:', services.length);
