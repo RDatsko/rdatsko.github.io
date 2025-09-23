@@ -158,7 +158,8 @@
           ]
         });
 
-        log('Selected device:', device.name || 'Unnamed', 'ID:', device.id);
+        log('Selected device:', device.name || 'Unnamed');
+        log('ID:', device.id);
 
         const server = await device.gatt.connect();
         log('Connected:', server.connected);
