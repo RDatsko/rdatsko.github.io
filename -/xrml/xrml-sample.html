@@ -612,7 +612,24 @@ pre[class*="language-"] > code[class*="language-"] {
                     </pre>
                 </div>
                 <div id="code-js">
-                    <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()"></textarea>
+                    <textarea id="js-code" spellcheck="false" oninput="update(this.value, 3); sync_scroll(this, 3);" onscroll="sync_scroll(this, 3);" onkeydown="check_tab(this, event, 3);" onkeyup="run()">console.log("Global variable $XR is used");
+console.log($XR);
+
+/* OK  */    // document.querySelector('#ball').parentNode.removeChild(document.querySelector('#ball'));
+
+// console.log($XR);
+
+var clock = new THREE.Clock();
+
+let i = 0;
+
+setInterval(function() {
+//    if(i-- < 0) { i = i + 360; }
+//    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
+    //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
+    $XR.Scene.children[0].rotation.y -= clock.getDelta();
+}, 10);
+</textarea>
                     <pre id="highlighting3" aria-hidden="true">
                         <code class="language-js" id="highlighting-content3"></code>
                     </pre>
