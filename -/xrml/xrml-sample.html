@@ -685,6 +685,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //         update(text, updateIndex);
     //     })
         const ta = document.getElementById(textareaId);
+        ta.value = document.getElementById(textareaId).innerText;
         update(text, updateIndex);
     //     .catch(err => {
     //         // Only log actual fetch problems, not missing optional files
