@@ -1,0 +1,60 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>WebXR Application</title>
+    </head>
+    <body>
+    <script src="./dist/xrml.js">console.clear();</script>
+
+
+    <xr-camera></xr-camera>
+    <xr-scene></xr-scene>
+
+    <xr-model src="./assets/models/world.glb"></xr-model>
+
+    <xr-cube id="box"
+        position="1, 0, -5"
+        color="#ff00ff"
+        rotation="0, Math.PI * 45 / 180, 0">
+    </xr-cube>
+
+    <xr-sphere id="ball"
+        position="-1, 0, -5"
+    ></xr-sphere>
+
+    <xr-plane id="plane"
+        position="1, 0, -5"
+        color="#ffffff"
+        rotation="Math.PI / 2 * -1, 0, 0">
+    </xr-plane>
+
+    <xr-light position="0, 300, 200"></xr-light>
+
+    <script>
+    //        console.log("Global variable $XR is used");
+    //        console.log($XR);
+
+    /* OK  */    // document.querySelector('#ball').parentNode.removeChild(document.querySelector('#ball'));
+
+    //        console.log($XR);
+
+    var clock = new THREE.Clock();
+
+    let i = 0;
+
+    setInterval(function() {
+    //    if(i-- < 0) { i = i + 360; }
+    //    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
+        //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
+        $XR.Scene.children[0].rotation.y -= clock.getDelta();
+    },10);
+
+
+    </script>
+
+
+    </body>
+    </html>
