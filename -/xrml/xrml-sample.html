@@ -635,7 +635,7 @@ setInterval(function() {
                     </pre>
                 </div>
                 <div id="code-inc">
-                    <textarea id="inc-code" spellcheck="false" oninput="update(this.value, 4); sync_scroll(this, 4);" onscroll="sync_scroll(this, 4);" onkeydown="check_tab(this, event, 4);" onkeyup="run()"><script src="xrml.min.js">console.clear();</script></textarea>
+                    <textarea id="inc-code" spellcheck="false" oninput="update(this.value, 4); sync_scroll(this, 4);" onscroll="sync_scroll(this, 4);" onkeydown="check_tab(this, event, 4);" onkeyup="run()"></textarea>
                     <pre id="highlighting4" aria-hidden="true">
                         <code class="language-html" id="highlighting-content4"></code>
                     </pre>
@@ -767,6 +767,7 @@ const fullContent = `
 <html>
 <head>
 ${incCode}
+<script src="./xrml.min.js">console.clear();</script>
 <style>${cssCode}</style>
 </head>
 <body>
