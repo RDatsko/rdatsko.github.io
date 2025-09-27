@@ -684,24 +684,20 @@ document.addEventListener("DOMContentLoaded", () => {
     //         ta.value = text;
     //         update(text, updateIndex);
     //     })
-        const ta = document.getElementById(textareaId);
-        ta.value = document.getElementById(textareaId).innerText;
-        update(text, updateIndex);
     //     .catch(err => {
     //         // Only log actual fetch problems, not missing optional files
     //         console.error(err);
     //     });
+        update(document.getElementById(textareaId).innerHTML, updateIndex);
     }
 
-    // Fetch HTML, CSS and JS in parallel
-    Promise.all([
-        loadFile("html",     "html", "html-code", 1),
-        loadFile("css",      "css",  "css-code",  2),
-        loadFile("js",       "js",   "js-code",   3),
-        loadFile("includes", "html", "inc-code",  4),
-    ]).then(() => {
-        run();
-    });
+    // HTML, CSS and JS in parallel
+    loadFile("html",     "html", "html-code", 1);
+    loadFile("css",      "css",  "css-code",  2);
+    loadFile("js",       "js",   "js-code",   3);
+    loadFile("includes", "html", "inc-code",  4);
+
+    run();
 });
 
 document.getElementById("copy-btn").addEventListener("click", () => {
