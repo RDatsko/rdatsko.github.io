@@ -579,9 +579,7 @@ pre[class*="language-"] > code[class*="language-"] {
         <div class="code-content">
             <div>
                 <div id="code-html">
-                    <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"></textarea>
-                    <pre id="highlighting1" aria-hidden="true">
-                        <code class="language-html" id="highlighting-content1"><xr-camera></xr-camera>
+                    <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"><xr-camera></xr-camera>
 <xr-scene></xr-scene>
 
 <xr-model src="./assets/models/world.glb"></xr-model>
@@ -602,7 +600,9 @@ pre[class*="language-"] > code[class*="language-"] {
     rotation="Math.PI / 2 * -1, 0, 0">
 </xr-plane>
 
-<xr-light position="0, 300, 200"></xr-light></code>
+<xr-light position="0, 300, 200"></xr-light></textarea>
+                    <pre id="highlighting1" aria-hidden="true">
+                        <code class="language-html" id="highlighting-content1"></code>
                     </pre>
                 </div>
                 <div id="code-css">
@@ -618,9 +618,9 @@ pre[class*="language-"] > code[class*="language-"] {
                     </pre>
                 </div>
                 <div id="code-inc">
-                    <textarea id="inc-code" spellcheck="false" oninput="update(this.value, 4); sync_scroll(this, 4);" onscroll="sync_scroll(this, 4);" onkeydown="check_tab(this, event, 4);" onkeyup="run()"></textarea>
+                    <textarea id="inc-code" spellcheck="false" oninput="update(this.value, 4); sync_scroll(this, 4);" onscroll="sync_scroll(this, 4);" onkeydown="check_tab(this, event, 4);" onkeyup="run()"><script src="xrml.min.js"></script></textarea>
                     <pre id="highlighting4" aria-hidden="true">
-                        <code class="language-html" id="highlighting-content4"><script src="xrml.min.js"></script></code>
+                        <code class="language-html" id="highlighting-content4"></code>
                     </pre>
                 </div>
             </div>
