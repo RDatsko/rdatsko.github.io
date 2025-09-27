@@ -667,7 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // const safeCodeValue = codeValue.replace(/\s+/g, "_").toLowerCase();
 
     // // Helper to fetch+populate+highlight a single file
-    // function loadFile(dir, ext, textareaId, updateIndex) {
+    function loadFile(dir, ext, textareaId, updateIndex) {
     //     return fetch(`./code/${dir}/${safeCodeValue}.${ext}`)
     //     .then(res => {
     //         if (res.status === 404) {
@@ -684,23 +684,23 @@ document.addEventListener("DOMContentLoaded", () => {
     //         ta.value = text;
     //         update(text, updateIndex);
     //     })
+        const ta = document.getElementById(textareaId);
+        update(text, updateIndex);
     //     .catch(err => {
     //         // Only log actual fetch problems, not missing optional files
     //         console.error(err);
     //     });
-    // }
+    }
 
-    // // Fetch HTML, CSS and JS in parallel
-    // Promise.all([
-    //     loadFile("html",     "html", "html-code", 1),
-    //     loadFile("css",      "css",  "css-code",  2),
-    //     loadFile("js",       "js",   "js-code",   3),
-    //     loadFile("includes", "html", "inc-code",  4),
-    // ]).then(() => {
-    //     run();
-    // });
-
-    run();
+    // Fetch HTML, CSS and JS in parallel
+    Promise.all([
+        loadFile("html",     "html", "html-code", 1),
+        loadFile("css",      "css",  "css-code",  2),
+        loadFile("js",       "js",   "js-code",   3),
+        loadFile("includes", "html", "inc-code",  4),
+    ]).then(() => {
+        run();
+    });
 });
 
 document.getElementById("copy-btn").addEventListener("click", () => {
