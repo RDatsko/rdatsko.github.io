@@ -309,7 +309,7 @@ setTimeout(function() {
 }, 5000);
 
 var newScript = document.createElement("script");
-newScript.src = "./js/xrml.min.js";
+newScript.src = "./js/xrml.js";
 
 document.querySelector('#output').contentDocument.head.appendChild(newScript);
 setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforeend', "<div id='zzz'></div>") }, 3000);
