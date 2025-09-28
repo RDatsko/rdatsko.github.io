@@ -579,7 +579,9 @@ pre[class*="language-"] > code[class*="language-"] {
         <div class="code-content">
             <div>
                 <div id="code-html">
-                    <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"><xr-camera></xr-camera>
+                    <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"><!-- Setup XR Scene -->
+
+<xr-camera></xr-camera>
 <xr-scene></xr-scene>
 
 <xr-model src="/-/xrml/assets/models/world.glb"></xr-model>
@@ -669,6 +671,10 @@ setInterval(function() {
 </footer> -->
 
 <script>
+
+setTimeout(function() {
+    window.$iXR = document.querySelector('#output').contentWindow.$XR;    
+}, 5000);
 
 document.addEventListener("DOMContentLoaded", () => {
     // const urlParams = new URLSearchParams(window.location.search);
@@ -827,5 +833,183 @@ Prism.languages.clike={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,lookb
 Prism.languages.javascript=Prism.languages.extend("clike",{"class-name":[Prism.languages.clike["class-name"],{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$A-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\.(?:constructor|prototype))/,lookbehind:!0}],keyword:[{pattern:/((?:^|\})\s*)catch\b/,lookbehind:!0},{pattern:/(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,lookbehind:!0}],function:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,number:{pattern:RegExp("(^|[^\\w$])(?:NaN|Infinity|0[bB][01]+(?:_[01]+)*n?|0[oO][0-7]+(?:_[0-7]+)*n?|0[xX][\\dA-Fa-f]+(?:_[\\dA-Fa-f]+)*n?|\\d+(?:_\\d+)*n|(?:\\d+(?:_\\d+)*(?:\\.(?:\\d+(?:_\\d+)*)?)?|\\.\\d+(?:_\\d+)*)(?:[Ee][+-]?\\d+(?:_\\d+)*)?)(?![\\w$])"),lookbehind:!0},operator:/--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/}),Prism.languages.javascript["class-name"][0].pattern=/(\b(?:class|extends|implements|instanceof|interface|new)\s+)[\w.\\]+/,Prism.languages.insertBefore("javascript","keyword",{regex:{pattern:RegExp("((?:^|[^$\\w\\xA0-\\uFFFF.\"'\\])\\s]|\\b(?:return|yield))\\s*)/(?:(?:\\[(?:[^\\]\\\\\r\n]|\\\\.)*\\]|\\\\.|[^/\\\\\\[\r\n])+/[dgimyus]{0,7}|(?:\\[(?:[^[\\]\\\\\r\n]|\\\\.|\\[(?:[^[\\]\\\\\r\n]|\\\\.|\\[(?:[^[\\]\\\\\r\n]|\\\\.)*\\])*\\])*\\]|\\\\.|[^/\\\\\\[\r\n])+/[dgimyus]{0,7}v[dgimyus]{0,7})(?=(?:\\s|/\\*(?:[^*]|\\*(?!/))*\\*/)*(?:$|[\r\n,.;:})\\]]|//))"),lookbehind:!0,greedy:!0,inside:{"regex-source":{pattern:/^(\/)[\s\S]+(?=\/[a-z]*$)/,lookbehind:!0,alias:"language-regex",inside:Prism.languages.regex},"regex-delimiter":/^\/|\/$/,"regex-flags":/^[a-z]+$/}},"function-variable":{pattern:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)\s*=>))/,alias:"function"},parameter:[{pattern:/(function(?:\s+(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)?\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\))/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$a-z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*=>)/i,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/(\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*=>)/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*\s*)\(\s*|\]\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*\{)/,lookbehind:!0,inside:Prism.languages.javascript}],constant:/\b[A-Z](?:[A-Z_]|\dx?)*\b/}),Prism.languages.insertBefore("javascript","string",{hashbang:{pattern:/^#!.*/,greedy:!0,alias:"comment"},"template-string":{pattern:/`(?:\\[\s\S]|\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}|(?!\$\{)[^\\`])*`/,greedy:!0,inside:{"template-punctuation":{pattern:/^`|`$/,alias:"string"},interpolation:{pattern:/((?:^|[^\\])(?:\\{2})*)\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}/,lookbehind:!0,inside:{"interpolation-punctuation":{pattern:/^\$\{|\}$/,alias:"punctuation"},rest:Prism.languages.javascript}},string:/[\s\S]+/}},"string-property":{pattern:/((?:^|[,{])[ \t]*)(["'])(?:\\(?:\r\n|[\s\S])|(?!\2)[^\\\r\n])*\2(?=\s*:)/m,lookbehind:!0,greedy:!0,alias:"property"}}),Prism.languages.insertBefore("javascript","operator",{"literal-property":{pattern:/((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,lookbehind:!0,alias:"property"}}),Prism.languages.markup&&(Prism.languages.markup.tag.addInlined("script","javascript"),Prism.languages.markup.tag.addAttribute("on(?:abort|blur|change|click|composition(?:end|start|update)|dblclick|error|focus(?:in|out)?|key(?:down|up)|load|mouse(?:down|enter|leave|move|out|over|up)|reset|resize|scroll|select|slotchange|submit|unload|wheel)","javascript")),Prism.languages.js=Prism.languages.javascript;
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+// setTimeout(function() {
+//     window.$iXR = document.querySelector('#output').contentWindow.$XR;    
+// }, 5000);
+
+// var newScript = document.createElement("script");
+// newScript.src = "../../js/xrml.min.js";
+
+// document.querySelector('#output').contentDocument.head.appendChild(newScript);
+// setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforeend', "<div id='zzz'></div>") }, 3000);
+
+    
+// setTimeout(function() {
+//     document.querySelector('#html-code').value = `<!-- Setup XR Scene -->
+
+// <xr-camera></xr-camera>
+// <xr-scene color="#87ceeb"></xr-scene>
+
+
+// <!-- Setup Controls -->
+
+// <xr-controller></xr-controller>   <!-- VR Controllers -->
+// <xr-gamepad></xr-gamepad>         <!-- XBox like gamepads -->
+// <xr-hands></xr-hands>             <!-- hand tracking -->
+// <xr-keyboard></xr-keyboard>       <!-- keyboard -->
+// <xr-mouse></xr-mouse>             <!-- mouse -->
+// <xr-touchscreen></xr-touchscreen> <!-- onscreen gamepad -->
+
+
+// <!-- Objects -->
+
+// <xr-light id="worldlight"
+//     type="hemisphere"
+//     position="2, 1, 1"
+//     color="#4488bb"
+//     ground="#002244"
+//     power="0.1"
+//     intensity="0.3"
+// ></xr-light>
+
+// <xr-light id="sunlight"
+//     type="directional"
+//     color="#ffffff"
+//     intensity="0.6"
+//     position="-5, 25, -1"
+//     shadow
+// ></xr-light>
+
+// <xr-model id="world" 
+//     src="/assets/models/world.glb"
+// ></xr-model>
+
+// <xr-cube id="box"
+//     position="1, 2.5, -14"
+//     color="#ff00ff"
+//     rotation="0, Math.PI * 45 / 180, 0"
+//     shadow
+// ></xr-cube>
+
+// <xr-sphere id="ball"
+//     position="-1, 1.5, -8"
+//     shadow
+// ></xr-sphere>
+
+// <xr-plane id="plane"
+//     position="-2.25, .78, -10"
+//     color="#ffffff"
+//     rotation="Math.PI / 2 * -1, 0, 0"
+//     shadow
+// ></xr-plane>
+// `;
+
+//     document.querySelector('#js-code').value = `
+// var clock = new THREE.Clock();
+
+// let i = 0;
+
+// setInterval(function() {
+//     $XR.Scene.children[2].rotation.y -= clock.getDelta();
+// },10);
+// `;
+// }, 1000);
+
+// setTimeout(function() {
+//     update(document.querySelector('#html-code').value, 1);
+//   update(document.querySelector('#css-code').value, 2);
+//   update(document.querySelector('#js-code').value, 3);
+//     run();
+// }, 3000);
+    
+    
+// run();
+
+// function run() {
+//     let xrmlCode = `<div id="VRScene" style="position: absolute; top: 0px; width: 100vw; height: 100vh; display: block;"><canvas data-engine="three.js r149" width="479" height="400" style="display: block; width: 479px; height: 400px;"></canvas></div><style></style><button id="VRButton" style="position: absolute; bottom: 20px; padding: 12px 6px; border: 1px solid rgb(255, 255, 255); border-radius: 4px; background: rgba(0, 0, 0, 0.1); color: rgb(255, 255, 255); font: 13px sans-serif; text-align: center; opacity: 0.5; outline: none; z-index: 999; cursor: auto; left: calc(50% - 75px); width: 150px;">VR NOT SUPPORTED</button>`;
+//     let htmlCode = document.querySelector('#html-code').value;
+//     let cssCode  = document.querySelector('#css-code').value;
+//     let jsCode   = document.querySelector('#js-code').value;
+//     let output   = document.querySelector('#output');
+
+
+// // HTML
+// /*
+//     let html = "<style>" + cssCode + "</style>" + htmlCode;
+//     output.contentWindow.eval(jsCode);
+// */
+// // XRML
+// /*
+//     let html = "<style>" + cssCode + "</style>" + htmlCode;
+//     output.contentDocument.body.appendChild(newScript);
+//     output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
+//     output.contentWindow.eval(jsCode);
+// */
+
+// // Test
+//     let html = "<style>" + cssCode + "</style>" + htmlCode;
+//     output.contentDocument.body.querySelector('#zzz').innerHTML = html;
+//     output.contentWindow.eval(jsCode);
+
+// }
+
+// function update(text, num) {
+//   let result_element = eval(`document.querySelector("#highlighting-content${num}")`);
+//   // Handle final newlines (see article)
+//   if(text[text.length-1] == "\n") {
+//     text += " ";
+//   }
+//   // Update code
+//   result_element.innerHTML = text.replace(new RegExp("&", "g"), "&amp;").replace(new RegExp("<", "g"), "&lt;"); /* Global RegExp */
+//   // Syntax Highlight
+//   Prism.highlightElement(result_element);
+// }
+
+// function sync_scroll(element, num) {
+//   /* Scroll result to scroll coords of event - sync with textarea */
+//   let result_element = eval(`document.querySelector("#highlighting${num}")`);;
+//   // Get and set x and y
+//   result_element.scrollTop = element.scrollTop;
+//   result_element.scrollLeft = element.scrollLeft;
+// }
+
+// function check_tab(element, event, num) {
+//   let code = element.value;
+//   if(event.key == "Tab") {
+//     /* Tab key pressed */
+//     event.preventDefault(); // stop normal
+//     let before_tab = code.slice(0, element.selectionStart); // text before tab
+//     let after_tab = code.slice(element.selectionEnd, element.value.length); // text after tab
+//     let cursor_pos = element.selectionStart + 1; // where cursor moves after tab - moving forward by 1 char to after tab
+//     element.value = before_tab + "\t" + after_tab; // add tab char
+//     // move cursor
+//     element.selectionStart = cursor_pos;
+//     element.selectionEnd = cursor_pos;
+//     eval(`update(element.value, ${num})`); // Update text to include indent
+//   }
+// }
+</script>
 </body>
 </html>
