@@ -251,12 +251,9 @@ p code {
 
 </style>
 <body>
-<header>
-<input id="hamburger" class="hamburger" type="checkbox" />
-<label for="hamburger" class="hamburger"><i></i></label>
-<span>[ Logo ]</span>
-<script src="./js/navmenu.js"></script>
-<script src="./js/prism.js"></script>
+
+<header data-nav="left">
+<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
 </header>
 
 <main style="max-width: 100%;">
