@@ -15,6 +15,16 @@
     padding: 0;
 }
 
+body {
+    overflow: hidden;
+}
+
+main {
+    position: relative;
+    height: calc(100vh - 56px - 2rem);
+    margin: 1rem auto;
+}
+
 .container {
     width: 100%;
     position: absolute;
@@ -249,6 +259,7 @@ p code {
 <script src="./js/prism.js"></script>
 </header>
 
+<main style="max-width: 100%;">
 <div class="container">
 
     <div class="left">
@@ -286,6 +297,7 @@ p code {
         <iframe id="output"></iframe>
     </div>
 </div>
+</main>
 
 </body>
 <script>
