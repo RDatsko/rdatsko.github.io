@@ -582,7 +582,7 @@ pre[class*="language-"] > code[class*="language-"] {
                     <textarea id="html-code" spellcheck="false" oninput="update(this.value, 1); sync_scroll(this, 1);" onscroll="sync_scroll(this, 1);" onkeydown="check_tab(this, event, 1);" onkeyup="run()"><xr-camera></xr-camera>
 <xr-scene></xr-scene>
 
-<xr-model src="./assets/models/world.glb"></xr-model>
+<xr-model src="/-/xrml/assets/models/world.glb"></xr-model>
 
 <xr-cube id="box"
     position="1, 0, -5"
@@ -617,16 +617,16 @@ console.log($XR);
 
 /* OK  */    // document.querySelector('#ball').parentNode.removeChild(document.querySelector('#ball'));
 
-// console.log($XR);
+console.log($XR);
 
 var clock = new THREE.Clock();
 
 let i = 0;
 
 setInterval(function() {
-//    if(i-- < 0) { i = i + 360; }
-//    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
-    //console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
+    if(i-- < 0) { i = i + 360; }
+    $XR.Scene.children[0].rotation.y = i * (Math.PI / 180);
+    console.log($XR.Scene.children[0].rotation._y = i * (Math.PI / 180));
     $XR.Scene.children[0].rotation.y -= clock.getDelta();
 }, 10);
 </textarea>
@@ -765,9 +765,10 @@ function run() {
 
 const fullContent = `
 <html>
+<base href="https://rdatsko.github.io/-/xrml/">
 <head>
+<script src="./xrml.js" defer>console.clear();<\/script>
 ${incCode}
-<script src="./xrml.min.js">console.clear();<\/script>
 <style>${cssCode}</style>
 </head>
 <body>
