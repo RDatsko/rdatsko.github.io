@@ -289,6 +289,10 @@ p code {
 
 </main>
 
+<!-- <footer>
+<iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer> -->
+
 </body>
 <script>
 
@@ -297,7 +301,7 @@ setTimeout(function() {
 }, 5000);
 
 var newScript = document.createElement("script");
-newScript.src = "../../js/xrml.min.js";
+newScript.src = "./xrml.min.js";
 
 document.querySelector('#output').contentDocument.head.appendChild(newScript);
 setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforeend', "<div id='zzz'></div>") }, 3000);
@@ -340,7 +344,7 @@ setTimeout(function() {
 ></xr-light>
 
 <xr-model id="world" 
-    src="/assets/models/world.glb"
+    src="./assets/models/world.glb"
 ></xr-model>
 
 <xr-cube id="box"
@@ -391,41 +395,10 @@ function run() {
     let jsCode   = document.querySelector('#js-code').value;
     let output   = document.querySelector('#output');
 
-
-// HTML
-/*
-    let html = "<style>" + cssCode + "</style>" + htmlCode;
-    output.contentWindow.eval(jsCode);
-*/
-// XRML
-/*
-    let html = "<style>" + cssCode + "</style>" + htmlCode;
-    output.contentDocument.body.appendChild(newScript);
-    output.contentDocument.body.insertAdjacentHTML('afterbegin', html);
-    output.contentWindow.eval(jsCode);
-*/
-
-// Test
     let html = "<style>" + cssCode + "</style>" + htmlCode;
     output.contentDocument.body.querySelector('#zzz').innerHTML = html;
     output.contentWindow.eval(jsCode);
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function update(text, num) {
   let result_element = eval(`document.querySelector("#highlighting-content${num}")`);
@@ -446,10 +419,6 @@ function sync_scroll(element, num) {
   result_element.scrollTop = element.scrollTop;
   result_element.scrollLeft = element.scrollLeft;
 }
-
-
-
-
 
 function check_tab(element, event, num) {
   let code = element.value;
