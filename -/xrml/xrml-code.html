@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html>
 <head>
@@ -7,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/layout/css/cosmuic.css">
 <link rel="stylesheet" href="/layout/css/styles.css">
-<title>Mystic Web: XRML Playground</title>
+<link rel="stylesheet" type="text/css" href="./prism.css">
 <script>
 /* PrismJS 1.29.0
 https://prismjs.com/download.html#themes=prism-tomorrow&languages=markup+css+clike+javascript */
@@ -17,286 +15,8 @@ Prism.languages.markup={comment:{pattern:/<!--(?:(?!<!--)[\s\S])*?-->/,greedy:!0
 Prism.languages.clike={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,lookbehind:!0,greedy:!0},{pattern:/(^|[^\\:])\/\/.*/,lookbehind:!0,greedy:!0}],string:{pattern:/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0},"class-name":{pattern:/(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,lookbehind:!0,inside:{punctuation:/[.\\]/}},keyword:/\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,boolean:/\b(?:false|true)\b/,function:/\b\w+(?=\()/,number:/\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,operator:/[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,punctuation:/[{}[\];(),.:]/};
 Prism.languages.javascript=Prism.languages.extend("clike",{"class-name":[Prism.languages.clike["class-name"],{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$A-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\.(?:constructor|prototype))/,lookbehind:!0}],keyword:[{pattern:/((?:^|\})\s*)catch\b/,lookbehind:!0},{pattern:/(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,lookbehind:!0}],function:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,number:{pattern:RegExp("(^|[^\\w$])(?:NaN|Infinity|0[bB][01]+(?:_[01]+)*n?|0[oO][0-7]+(?:_[0-7]+)*n?|0[xX][\\dA-Fa-f]+(?:_[\\dA-Fa-f]+)*n?|\\d+(?:_\\d+)*n|(?:\\d+(?:_\\d+)*(?:\\.(?:\\d+(?:_\\d+)*)?)?|\\.\\d+(?:_\\d+)*)(?:[Ee][+-]?\\d+(?:_\\d+)*)?)(?![\\w$])"),lookbehind:!0},operator:/--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/}),Prism.languages.javascript["class-name"][0].pattern=/(\b(?:class|extends|implements|instanceof|interface|new)\s+)[\w.\\]+/,Prism.languages.insertBefore("javascript","keyword",{regex:{pattern:RegExp("((?:^|[^$\\w\\xA0-\\uFFFF.\"'\\])\\s]|\\b(?:return|yield))\\s*)/(?:(?:\\[(?:[^\\]\\\\\r\n]|\\\\.)*\\]|\\\\.|[^/\\\\\\[\r\n])+/[dgimyus]{0,7}|(?:\\[(?:[^[\\]\\\\\r\n]|\\\\.|\\[(?:[^[\\]\\\\\r\n]|\\\\.|\\[(?:[^[\\]\\\\\r\n]|\\\\.)*\\])*\\])*\\]|\\\\.|[^/\\\\\\[\r\n])+/[dgimyus]{0,7}v[dgimyus]{0,7})(?=(?:\\s|/\\*(?:[^*]|\\*(?!/))*\\*/)*(?:$|[\r\n,.;:})\\]]|//))"),lookbehind:!0,greedy:!0,inside:{"regex-source":{pattern:/^(\/)[\s\S]+(?=\/[a-z]*$)/,lookbehind:!0,alias:"language-regex",inside:Prism.languages.regex},"regex-delimiter":/^\/|\/$/,"regex-flags":/^[a-z]+$/}},"function-variable":{pattern:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)\s*=>))/,alias:"function"},parameter:[{pattern:/(function(?:\s+(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)?\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\))/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$a-z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*=>)/i,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/(\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*=>)/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*\s*)\(\s*|\]\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*\{)/,lookbehind:!0,inside:Prism.languages.javascript}],constant:/\b[A-Z](?:[A-Z_]|\dx?)*\b/}),Prism.languages.insertBefore("javascript","string",{hashbang:{pattern:/^#!.*/,greedy:!0,alias:"comment"},"template-string":{pattern:/`(?:\\[\s\S]|\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}|(?!\$\{)[^\\`])*`/,greedy:!0,inside:{"template-punctuation":{pattern:/^`|`$/,alias:"string"},interpolation:{pattern:/((?:^|[^\\])(?:\\{2})*)\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}/,lookbehind:!0,inside:{"interpolation-punctuation":{pattern:/^\$\{|\}$/,alias:"punctuation"},rest:Prism.languages.javascript}},string:/[\s\S]+/}},"string-property":{pattern:/((?:^|[,{])[ \t]*)(["'])(?:\\(?:\r\n|[\s\S])|(?!\2)[^\\\r\n])*\2(?=\s*:)/m,lookbehind:!0,greedy:!0,alias:"property"}}),Prism.languages.insertBefore("javascript","operator",{"literal-property":{pattern:/((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,lookbehind:!0,alias:"property"}}),Prism.languages.markup&&(Prism.languages.markup.tag.addInlined("script","javascript"),Prism.languages.markup.tag.addAttribute("on(?:abort|blur|change|click|composition(?:end|start|update)|dblclick|error|focus(?:in|out)?|key(?:down|up)|load|mouse(?:down|enter|leave|move|out|over|up)|reset|resize|scroll|select|slotchange|submit|unload|wheel)","javascript")),Prism.languages.js=Prism.languages.javascript;
 </script>
+<title>HTML Code Editor</title>
 </head>
-<style>
-pre[class*="language-"],
-code[class*="language-"] {
-	color: #d4d4d4;
-	font-size: 13px;
-	text-shadow: none;
-	font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace;
-	direction: ltr;
-	text-align: left;
-	white-space: pre;
-	word-spacing: normal;
-	word-break: normal;
-	line-height: 1.5;
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	tab-size: 4;
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
-}
-
-pre[class*="language-"]::selection,
-code[class*="language-"]::selection,
-pre[class*="language-"] *::selection,
-code[class*="language-"] *::selection {
-	text-shadow: none;
-	background: #264F78;
-}
-
-@media print {
-	pre[class*="language-"],
-	code[class*="language-"] {
-		text-shadow: none;
-	}
-}
-
-pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
-	background: #1e1e1e;
-}
-
-:not(pre) > code[class*="language-"] {
-	padding: .1em .3em;
-	border-radius: .3em;
-	color: #db4c69;
-	background: #1e1e1e;
-}
-/*********************************************************
-* Tokens
-*/
-.namespace {
-	opacity: .7;
-}
-
-.token.doctype .token.doctype-tag {
-	color: #569CD6;
-}
-
-.token.doctype .token.name {
-	color: #9cdcfe;
-}
-
-.token.comment,
-.token.prolog {
-	color: #6a9955;
-}
-
-.token.punctuation,
-.language-html .language-css .token.punctuation,
-.language-html .language-javascript .token.punctuation {
-	color: #d4d4d4;
-}
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.inserted,
-.token.unit {
-	color: #b5cea8;
-}
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.deleted {
-	color: #ce9178;
-}
-
-.language-css .token.string.url {
-	text-decoration: underline;
-}
-
-.token.operator,
-.token.entity {
-	color: #d4d4d4;
-}
-
-.token.operator.arrow {
-	color: #569CD6;
-}
-
-.token.atrule {
-	color: #ce9178;
-}
-
-.token.atrule .token.rule {
-	color: #c586c0;
-}
-
-.token.atrule .token.url {
-	color: #9cdcfe;
-}
-
-.token.atrule .token.url .token.function {
-	color: #dcdcaa;
-}
-
-.token.atrule .token.url .token.punctuation {
-	color: #d4d4d4;
-}
-
-.token.keyword {
-	color: #569CD6;
-}
-
-.token.keyword.module,
-.token.keyword.control-flow {
-	color: #c586c0;
-}
-
-.token.function,
-.token.function .token.maybe-class-name {
-	color: #dcdcaa;
-}
-
-.token.regex {
-	color: #d16969;
-}
-
-.token.important {
-	color: #569cd6;
-}
-
-.token.italic {
-	font-style: italic;
-}
-
-.token.constant {
-	color: #9cdcfe;
-}
-
-.token.class-name,
-.token.maybe-class-name {
-	color: #4ec9b0;
-}
-
-.token.console {
-	color: #9cdcfe;
-}
-
-.token.parameter {
-	color: #9cdcfe;
-}
-
-.token.interpolation {
-	color: #9cdcfe;
-}
-
-.token.punctuation.interpolation-punctuation {
-	color: #569cd6;
-}
-
-.token.boolean {
-	color: #569cd6;
-}
-
-.token.property,
-.token.variable,
-.token.imports .token.maybe-class-name,
-.token.exports .token.maybe-class-name {
-	color: #9cdcfe;
-}
-
-.token.selector {
-	color: #d7ba7d;
-}
-
-.token.escape {
-	color: #d7ba7d;
-}
-
-.token.tag {
-	color: #569cd6;
-}
-
-.token.tag .token.punctuation {
-	color: #808080;
-}
-
-.token.cdata {
-	color: #808080;
-}
-
-.token.attr-name {
-	color: #9cdcfe;
-}
-
-.token.attr-value,
-.token.attr-value .token.punctuation {
-	color: #ce9178;
-}
-
-.token.attr-value .token.punctuation.attr-equals {
-	color: #d4d4d4;
-}
-
-.token.entity {
-	color: #569cd6;
-}
-
-.token.namespace {
-	color: #4ec9b0;
-}
-/*********************************************************
-* Language Specific
-*/
-
-pre[class*="language-javascript"],
-code[class*="language-javascript"],
-pre[class*="language-jsx"],
-code[class*="language-jsx"],
-pre[class*="language-typescript"],
-code[class*="language-typescript"],
-pre[class*="language-tsx"],
-code[class*="language-tsx"] {
-	color: #9cdcfe;
-}
-
-pre[class*="language-css"],
-code[class*="language-css"] {
-	color: #ce9178;
-}
-
-pre[class*="language-html"],
-code[class*="language-html"] {
-	color: #d4d4d4;
-}
-
-.language-regex .token.anchor {
-	color: #dcdcaa;
-}
-
-.language-html .token.punctuation {
-	color: #808080;
-}
-/*********************************************************
-* Line highlighting
-*/
-pre[class*="language-"] > code[class*="language-"] {
-	position: relative;
-	z-index: 1;
-}
-
-.line-highlight.line-highlight {
-	background: #f7ebc6;
-	box-shadow: inset 5px 0 0 #f7d87c;
-	z-index: 0;
-}
-</style>
-
-
 <style>
 * {
     box-sizing: border-box;
@@ -530,12 +250,13 @@ p code {
 
 </style>
 <body>
-
-<header data-nav="left">
-<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+<header>
+<input id="hamburger" class="hamburger" type="checkbox" />
+<label for="hamburger" class="hamburger"><i></i></label>
+<span>[ Logo ]</span>
+<script src="../../js/navmenu.js"></script>
+<script src="../../js/prism.js"></script>
 </header>
-
-<main style="max-width: 100%;">
 
 <div class="container">
 
@@ -575,12 +296,6 @@ p code {
     </div>
 </div>
 
-</main>
-
-<!-- <footer>
-<iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</footer> -->
-
 </body>
 <script>
 
@@ -589,7 +304,7 @@ setTimeout(function() {
 }, 5000);
 
 var newScript = document.createElement("script");
-newScript.src = "./xrml.min.js";
+newScript.src = "../../js/xrml.min.js";
 
 document.querySelector('#output').contentDocument.head.appendChild(newScript);
 setTimeout( function() { output.contentDocument.body.insertAdjacentHTML('beforeend', "<div id='zzz'></div>") }, 3000);
@@ -632,7 +347,7 @@ setTimeout(function() {
 ></xr-light>
 
 <xr-model id="world" 
-    src="./assets/models/world.glb"
+    src="/-/xrml/assets/models/world.glb"
 ></xr-model>
 
 <xr-cube id="box"
