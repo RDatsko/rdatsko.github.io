@@ -790,7 +790,7 @@ ${htmlCode}
 `;
 
     // Reset the iframe by writing a new document
-    // output.srcdoc = fullContent;
+    output.srcdoc = fullContent;
     output.contentWindow.eval(jsCode);
 }
 
