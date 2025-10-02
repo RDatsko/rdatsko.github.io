@@ -1,0 +1,86 @@
+@charset "utf-8";
+
+a{text-decoration: none !important;}
+
+.btn_area{
+    text-align: end;
+    font-size: 0.8em !important;
+    }
+
+            .btn_area a{
+                transition: 0.2s;
+                color: #333333 !important;
+            }
+            .btn_area a:hover{
+                transition: 0.1s;
+                color: #20c997 !important;
+            }
+
+            .e_btn{
+                display: inline-block !important;
+                padding: 3px 10px 3px 25px;
+                border-radius: 1000px;
+                border:solid 2px #333333;
+                margin-bottom: 10px;
+                background-color: #f9f9f9;
+            }
+
+            .e_btn > i{color:#20c997;}
+
+            .btn_area a:hover > i{color:#20c997; padding-left: 10px; transition: 0.2s;}
+
+            .detail{
+                font-size: 0.9em !important;
+            }
+
+            .place a{
+                color: #20c997 !important;
+            }
+
+            i{
+            width: 2.0em;
+            text-align: center;
+            }
+
+            .eyecatch{
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            overflow: hidden;
+            height: 360px;
+
+            background-color:#f9f9f9 ;
+            }
+
+            .eyecatch{
+            border-radius: 6px;
+            }
+
+            .item {
+            width: 100%;
+            }
+
+            .item > img {
+            display: block;
+            margin: auto;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+            }
+
+            .item:hover > img {
+            transform: scale(0.9);
+            }
+
+            .catch{
+                display: block;
+                font-size: 90%;
+            }
+            .title_main{
+                display: block;
+                font-size: 125%;
+            }
+            .title_sub{
+                display: block;
+                font-size: 75%;
+            }
