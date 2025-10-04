@@ -32,6 +32,11 @@ div.code-info > i {
     margin: 0;
 }
 
+div.code-info > i > span {
+    font-size: 12px;
+}
+
+
 div.code-info .label-hidden {
     max-width: 0;
     opacity: 0;
