@@ -62,7 +62,7 @@ div.code-info:hover .label-hidden {
     opacity: 1;
 }
 
-div.code-info::before {
+div.code-info > i::before {
     display: inline;
     margin-right: .5rem;
 }
