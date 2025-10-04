@@ -1,3 +1,7 @@
+.ifix {
+    position: relative;
+}
+
 div.code-info {
     position: relative;
     display: inline-flex;
