@@ -1,5 +1,6 @@
 .ifix {
-    position: relative;
+    position: absolute;
+    left: 0;
 }
 
 div.code-info {
