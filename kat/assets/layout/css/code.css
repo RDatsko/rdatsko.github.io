@@ -56,3 +56,8 @@ div.code-info:hover .label-hidden {
     margin-left: 8px;
     opacity: 1;
 }
+
+div.code-info::before {
+    display: inline;
+    margin-right: .5rem;
+}
