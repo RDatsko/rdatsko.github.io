@@ -35,17 +35,95 @@
 <link rel="stylesheet" href="/kat/assets/layout/css/style.css">
 <link rel="stylesheet" href="/kat/assets/layout/css/code.css">
 <link rel="stylesheet" href="/kat/assets/layout/css/events.css">
+
+<link rel="stylesheet" href="/kat/assets/layout/css/prism.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/header.css">
 <title>Company</title>
 <style>
+.affiliates a {
+    text-decoration: none;
+    color: var(--primary);
+    display: inline-block;
+    position: relative;
+    /* line-height: calc(1rem + 3px); */
+    line-height: 1rem;
+    cursor: pointer;
+    /* top: 3px; */
+    margin-bottom: 1.5rem;
+}
 
+.affiliates img {
+    width: 100%;
+    border-radius: 0.75rem;
+}
+
+.affiliates > div {
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+    border-radius: 0;
+    padding-top: 1rem;
+    color: white;
+    flex-direction: row;
+}
 </style>
 </head>
 <body>
 
-<header>
-
+<header data-nav="right">
+    <span>
+        <input type="checkbox">
+        <div><a href="/kat/" class="clear"><img src="/kat/assets/layout/svg/logo.svg" style="width: 50px; height: 50px;"></a>Company Name</div>
+        <nav>
+            <ol>
+                <li><a href="/kat/#">アーティスト</a></li>
+                <li><a href="/kat/#">トピックス</a></li>
+                <li><a href="/kat/#">事業内容</a></li>
+                <li><a href="/kat/#">会社概要</a></li>
+                <li><a href="/kat/#">仕事のご依頼</a></li>
+            </ol>
+        </nav>
+    </span>
 </header>
 
+<div class="show-code" style="--top: 5rem;">
+    <input type="checkbox" class="code-toggle" id="toggle-hero" hidden />
+    <label class="code-checkbox" for="toggle-hero">
+        <i class="icon-code"><span>Hero Section</span></i>
+    </label>
+    <div class="label-hidden">
+
+        <p>
+            ヒーローセクションには、私が作成した2種類のスタイルがあります。
+            1つは全画面のヒーロー、もう1つは横幅が半分のヒーローです。
+            スクロールを増やさないように、ヒーローセクションの高さは100vhを超えないようにし、必要に応じてそれ以下に設定することもできます。<br><br>
+            トップページには全幅のヒーローセクションが使用されており、アーティストページではモバイル対応の半幅ヒーローのサンプルが表示されています。
+        </p>
+
+        <!-- Start Codebox -->
+        <div class="codebox html" style="margin-bottom: 1rem;">
+            <header>Hero Section</header>
+            <main>
+                <pre><code class="language-html line-numbers">&lt;section class="hero"&gt;
+    &lt;img src="/kat/assets/images/hero/company-hero.jpg"&gt;
+&lt;/section&gt;</code></pre>
+            </main>
+            <footer data-ext="html"></footer>
+            <div class="copy-click-area"></div>
+        </div>
+        <!-- End Codebox -->
+
+        <!-- Start Codebox -->
+        <div class="codebox css" style="margin-bottom: 1rem;">
+            <header>hero.css</header>
+            <main>
+                <pre><code class="language-css line-numbers"></code></pre>
+            </main>
+            <footer data-ext="css"></footer>
+            <div class="copy-click-area"></div>
+        </div>
+        <!-- End Codebox -->
+
+    </div>
+</div>
 <section class="hero">
     <img src="/kat/assets/images/hero/company-hero.jpg">
 </section>
@@ -55,18 +133,415 @@
         <h1>所属アーティスト</h1>
         <h2>Artists</h2>
     </div>
+    <div class="show-code" style="--top: -3rem;">
+        <input type="checkbox" class="code-toggle" id="toggle-artists" hidden />
+        <label class="code-checkbox" for="toggle-artists">
+            <i class="icon-code"><span>Code</span></i>
+        </label>
+        <div class="label-hidden">
+
+            <p>
+                アーティストやグループの画像は、解像度が250px × 100pxです。画像のどこかに名前が配置された小さな画像が使用されています。
+            </p>
+
+            <!-- Start Codebox -->
+            <div class="codebox html" style="margin-bottom: 1rem;">
+                <header>Affiliates</header>
+                <main>
+                    <pre><code class="language-html line-numbers">&lt;div class="container mb_80"&gt;
+        &lt;div class="row affiliates"&gt;
+            &lt;a href="/kat/artist1/" class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex"&gt;
+                &lt;img src="/kat/assets/images/affiliates/buttons/artist1.jpg"&gt;
+            &lt;/a&gt;
+            &lt;a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex"&gt;
+                &lt;img src="/kat/assets/images/affiliates/buttons/artist2.jpg"&gt;
+            &lt;/a&gt;
+            &lt;a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex"&gt;
+                &lt;img src="/kat/assets/images/affiliates/buttons/group1.jpg"&gt;
+            &lt;/a&gt;
+            &lt;a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex"&gt;
+                &lt;img src="/kat/assets/images/affiliates/buttons/group2.jpg"&gt;
+            &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;</code></pre>
+                </main>
+                <footer data-ext="html"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+
+            <!-- Start Codebox -->
+            <div class="codebox css" style="margin-bottom: 1rem;">
+                <header>affiliates.css</header>
+                <main>
+                    <pre><code class="language-css line-numbers">.affiliates a {
+    text-decoration: none;
+    color: var(--primary);
+    display: inline-block;
+    position: relative;
+    line-height: 1rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+}
+
+.affiliates img {
+    width: 100%;
+    border-radius: 0.75rem;
+}
+
+.affiliates &gt; div {
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+    border-radius: 0;
+    padding-top: 1rem;
+    color: white;
+    flex-direction: row;
+}</code></pre>
+                </main>
+                <footer data-ext="css"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+        </div>
+    </div>
+    <div class="container mb_80">
+        <div class="row affiliates">
+            <a href="/kat/artist1/" class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex">
+                <img src="/kat/assets/images/affiliates/buttons/artist1.jpg">
+            </a>
+            <a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex">
+                <img src="/kat/assets/images/affiliates/buttons/artist2.jpg">
+            </a>
+            <a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex">
+                <img src="/kat/assets/images/affiliates/buttons/group1.jpg">
+            </a>
+            <a class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex">
+                <img src="/kat/assets/images/affiliates/buttons/group2.jpg">
+            </a>
+        </div>
+    </div>
 
     <div class="container head mb_16">
         <h1>トピックス</h1>
         <h2>Topics</h2>
     </div>
-    <div class="ifix">
-        <div class="code-info" style="top: -2rem; left: 1rem; ">
+    <div class="show-code" style="--top: -3rem;">
+        <input type="checkbox" class="code-toggle" id="toggle-events" hidden />
+        <label class="code-checkbox" for="toggle-events">
             <i class="icon-code"><span>Code</span></i>
-            <span class="label-hidden">Put Code here</span>
+        </label>
+        <div class="label-hidden">
+
+            <!-- Start Codebox -->
+            <div class="codebox json" style="margin-bottom: 1rem;">
+                <header>Events Code</header>
+                <main>
+                    <pre><code class="language-html line-numbers">&lt;div class="container mb_80"&gt;
+    &lt;div id="events" class="row"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                </main>
+                <footer data-ext="html"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+
+            <p>
+                上記のコード内の「$artist 」がJSONファイル内の 「id 」と一致すれば、その情報が画面に表示される。
+                もし「$artist = "all"; 」とすると、今日の日付以降に表示されるすべてのアーティストを表示する。
+                <s>最初から順番に表示されるので、JSONファイルを日付順に並べることをお勧めする。</s>
+                イベントを自動的にソートし、日付順に並べます。
+                不要になったら削除すればよい。
+            </p>
+
+            <!-- Start Codebox -->
+            <div class="codebox json" style="margin-bottom: 1rem;">
+                <header>events.json</header>
+                <main>
+                    <pre><code class="language-json line-numbers">{
+    "events": [
+        {
+            "id": "artist1",
+            "artist": "Artist 1 Name",
+            "title": "Spring Fun",
+            "description": "Description",
+            "date": "2027-04-20",
+            "enddate": "",
+            "place": "Location",
+            "city": "~県、~市",
+            "country": "日本",
+            "open": "",
+            "start": "17:30",
+            "end": "",
+            "price": "0",
+            "image": "/kat/assets/images/events/20000101_event2.jpg",
+            "url": "#event_url1",
+            "button": "MAP",
+            "soldout": false
+        },
+        {
+            "id": "artist2",
+            "artist": "Artist 2 Name",
+            "title": "Birthday Party",
+            "description": "Description of event",
+            "date": "2027-05-02",
+            "enddate": "",
+            "place": "Location",
+            "city": "~県、~市",
+            "country": "日本",
+            "open": "16:30",
+            "start": "17:00",
+            "end": "",
+            "price": "3,500",
+            "image": "/kat/assets/images/events/20000101_event1.jpg",
+            "url": "#event_url1",
+            "button": "BUY",
+            "soldout": false
+        },
+        {
+            "id": "group1",
+            "artist": "Group 1 Name",
+            "title": "Mega Bash",
+            "description": "Description",
+            "date": "2025-06-28",
+            "enddate": "",
+            "place": "Location",
+            "city": "東京都、~区",
+            "country": "日本",
+            "open": "17:00",
+            "start": "17:30",
+            "end": "",
+            "price": "6,500 +",
+            "image": "/kat/assets/images/events/20000102_event1.jpg",
+            "url": "#",
+            "button": "BUY",
+            "soldout": false
+        },
+        {
+            "id": "group2",
+            "artist": "Group 2 Name",
+            "title": "Title",
+            "description": "Description",
+            "date": "2025-07-05",
+            "enddate": "2025-07-06",
+            "place": "Location",
+            "city": "東京都、~区",
+            "country": "日本",
+            "open": "",
+            "start": "12:20",
+            "end": "",
+            "price": "",
+            "image": "/kat/assets/images/events/20000107_event1.jpg",
+            "url": "#",
+            "button": "BUY",
+            "soldout": false
+        }
+    ]
+}</code></pre>
+                </main>
+                <footer data-ext="json"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+
+            <!-- Start Codebox -->
+            <div class="codebox js" style="margin-bottom: 1rem;">
+                <header>events.js</header>
+                <main>
+                    <pre><code class="language-js line-numbers">// Default artist
+const artist = "all";
+
+// Escape HTML special characters to prevent XSS
+function escapeHTML(str) {
+    if (!str) return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/&lt;/g, "&lt;")
+        .replace(/&gt;/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Convert date into Japanese format
+function dateConversion(date) {
+    if (!date) {
+        return { month: "", day: "", week: "" };
+    }
+    const parts = date.split("-");
+    if (parts.length !== 3) {
+        return { month: "", day: "", week: "" };
+    }
+    let [year, month, day] = parts;
+    const d = new Date(date);
+    let week = d.getDay();
+
+    day = `${day}日`;
+
+    const months = {
+        1: "1月", 2: "2月", 3: "3月", 4: "4月",
+        5: "5月", 6: "6月", 7: "7月", 8: "8月",
+        9: "9月", 10: "10月", 11: "11月", 12: "12月"
+    };
+
+    const weeks = ["(日)", "(月)", "(火)", "(水)", "(木)", "(金)", "(土)"];
+
+    return {
+        month: months[parseInt(month, 10)],
+        day: day,
+        week: weeks[week]
+    };
+}
+
+// Render events into #events
+function renderEvents(events, artist) {
+    const container = document.getElementById("events");
+    container.innerHTML = ""; // clear first
+
+    // Sort by date
+    events.sort((a, b) =&gt; new Date(a.date) - new Date(b.date));
+
+    for (let i = 0; i &lt; events.length; i++) {
+        const ids = events[i].id.split("|");
+
+        if ((ids.includes(artist) || artist === "all") && (new Date(events[i].date) &gt;= new Date())) {
+            const start = dateConversion(events[i].date);
+            let { month: smonth, day: sday, week: sweek } = start;
+
+            let end = dateConversion(events[i].enddate);
+            let { month: emonth, day: eday, week: eweek } = end;
+
+            const url = escapeHTML(events[i].url);
+
+            let continueStr = "";
+            if (!events[i].enddate) {
+                emonth = eday = eweek = "";
+            } else {
+                continueStr = " ~";
+                end = dateConversion(events[i].enddate);
+                emonth = end.month;
+                eday = end.day;
+                eweek = end.week;
+            }
+
+            container.innerHTML += `
+                &lt;div class="col-12 col-md-4 mb_64 article d-flex"&gt;
+                    &lt;div class="event d-flex flex-column align-self-end justify-content-between"&gt;
+                        &lt;a href="" class="hover-opacity d-flex" style="pointer-events:none;"&gt;
+                            &lt;img src="${escapeHTML(events[i].image)}" width="100%" class="hover-opacity"&gt;
+                        &lt;/a&gt;
+                        &lt;div class="d-flex flex-column align-self-end" style="width: 100%;"&gt;
+                            &lt;h6 class="artist"&gt;${escapeHTML(events[i].artist)}&lt;/h6&gt;
+                            &lt;h2 class="title"&gt;${escapeHTML(events[i].title)}&lt;/h2&gt;
+                            &lt;p class="description"&gt;${escapeHTML(events[i].description)}&lt;/p&gt;
+                            &lt;p style="font-size: .75rem; color: #777;"&gt;
+                                &lt;i class="fa fa-map-marker"&gt;&lt;/i&gt; ${escapeHTML(events[i].country)}、 ${escapeHTML(events[i].city)}&lt;br&gt;
+                                &lt;i class="fa fa-map-location-dot"&gt;&lt;/i&gt; ${escapeHTML(events[i].place)}&lt;br&gt;
+                                &lt;i class="fa fa-calendar"&gt;&lt;/i&gt; ${smonth} ${sday} ${sweek} ${continueStr}
+                                &lt;span style="position: absolute; left: 65%;"&gt;
+                                    &lt;i class="fa fa-clock"&gt;&lt;/i&gt; ${escapeHTML(events[i].start)}
+                                &lt;/span&gt;&lt;br&gt;
+                                &lt;i&gt;&lt;/i&gt; ${emonth} ${eday} ${eweek}
+                                &lt;span style="position: absolute; left: 65%;"&gt;
+                                    &lt;i&gt;&lt;/i&gt; ${escapeHTML(events[i].end)}
+                                &lt;/span&gt;&lt;br&gt;
+                            &lt;/p&gt;
+                            &lt;a href="${url}" target="_blank"&gt;
+                                詳細はこちら
+                                &lt;i class="fa-solid fa-angles-right" aria-hidden="true"&gt;&lt;/i&gt;
+                            &lt;/a&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            `;
+        }
+    }
+}
+
+// Wait until DOM is ready, then fetch JSON
+document.addEventListener("DOMContentLoaded", () =&gt; {
+    fetch("/kat/assets/data/events.json")
+        .then(response =&gt; response.json())
+        .then(data =&gt; {
+            // Your PHP did: json_decode(..., true)['events']
+            renderEvents(data.events, artist);
+        })
+        .catch(err =&gt; {
+            console.error("Failed to load events.json:", err);
+        });
+});</code></pre>
+                </main>
+                <footer data-ext="js"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+
+            <!-- Start Codebox -->
+            <div class="codebox css" style="margin-bottom: 1rem;">
+                <header>events.css</header>
+                <main>
+                    <pre><code class="language-css line-numbers">.event {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    position: relative;
+    height: 100%;
+}
+
+.event &gt; div {
+    padding: 5px 15px 15px;
+}
+
+.event .artist {
+    font-size: .75rem;
+    color: #777;
+}
+
+.event .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    height: 3.25rem;
+    line-height: 1.5rem;
+}
+
+.event .place-date {
+    font-size: .5rem;
+}
+
+.event .description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    height: 12rem;
+}
+
+.event &gt; a {
+    position: relative;
+    margin: auto;
+}
+
+.event &gt; a &gt; img {
+    position: relative;
+    width: 95%;
+    margin: 5% 2.5% 20px;
+    z-index: 2;
+    box-shadow: 0 10px 16px -6px rgba(22, 22, 22, 0.5);
+    border-radius: 8px;
+}
+
+.event p i {
+    display: inline-block;
+    width: 1.25rem;
+}</code></pre>
+                </main>
+                <footer data-ext="css"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+            <!-- End Codebox -->
+
         </div>
     </div>
-    <div id="events"></div>
+    <div class="container mb_80">
+        <div id="events" class="row"></div>
+    </div>
 
     <div class="container head mb_32">
         <h1>事業内容</h1>
@@ -135,17 +610,17 @@
 -->
 
         <div class="row3">
-                <div class="cols" id="a">
-                    Copyright © Company Co., Ltd.<br>All Rights Reserved.
-                </div>
-                <!-- <div class="cols" id="b"></div> -->
-                <div class="cols sns-icons-ww" id="c">
-                    <a href="https://www.facebook.com/NULLCompanyName/"><img src="/kat/assets/svg/facebook-f-white.svg"></a>
-                    <a href="https://www.instagram.com/NULLCompanyName/"><img src="/kat/assets/svg/instagram-white.svg"></a>
-                    <a href="https://x.com/NULLCompanyName"><img src="/kat/assets/svg/twitter-x-logo-white.svg"></a>
-                    <a href="https://www.threads.net/@NULLCompanyName"><img src="/kat/assets/svg/instagram-threads-white.svg"></a>
-                    <a href="https://www.youtube.com/user/NULLCompanyName"><img src="/kat/assets/svg/youtube-line-white.svg"></a>
-                </div>
+            <div class="cols" id="a">
+                Copyright © Company Co., Ltd.<br>All Rights Reserved.
+            </div>
+            <!-- <div class="cols" id="b"></div> -->
+            <div class="cols sns-icons-ww" id="c">
+                <a href="https://www.facebook.com/NULLCompanyName/"><img src="/kat/assets/svg/facebook-f-white.svg"></a>
+                <a href="https://www.instagram.com/NULLCompanyName/"><img src="/kat/assets/svg/instagram-white.svg"></a>
+                <a href="https://x.com/NULLCompanyName"><img src="/kat/assets/svg/twitter-x-logo-white.svg"></a>
+                <a href="https://www.threads.net/@NULLCompanyName"><img src="/kat/assets/svg/instagram-threads-white.svg"></a>
+                <a href="https://www.youtube.com/user/NULLCompanyName"><img src="/kat/assets/svg/youtube-line-white.svg"></a>
+            </div>
         </div>
     </span>
 </footer>
@@ -273,5 +748,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 });
 </script>
+
+<script src="/kat/assets/js/prism.js"></script>
 </body>
 </html>
