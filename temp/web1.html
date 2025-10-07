@@ -1,0 +1,351 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vanilla Page Builder — single file</title>
+  <style>
+    :root{--panel-w:220px;--gap:12px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    html,body{height:100%;margin:0}
+    .app{display:grid;grid-template-columns:var(--panel-w) 1fr 280px;height:100vh;gap:var(--gap);padding:var(--gap);box-sizing:border-box}
+
+    /* left palette */
+    .palette{background:#0f172a;color:#fff;padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:10px}
+    .palette h3{margin:0 0 6px 0;font-size:14px}
+    .draggable{background:#111827;padding:8px;border-radius:6px;cursor:grab;border:1px solid rgba(255,255,255,0.04);user-select:none}
+    .draggable:active{cursor:grabbing}
+
+    /* canvas */
+    .canvas-wrap{background:linear-gradient(180deg,#eef2ff 0%, #fff 100%);display:flex;flex-direction:column;border-radius:10px;padding:10px}
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .canvas{flex:1;background:#fff;border:2px dashed rgba(15,23,42,0.12);margin-top:8px;border-radius:8px;position:relative;overflow:auto}
+    .page{width:1000px;height:700px;background:#fff;margin:16px auto;position:relative;box-shadow:0 4px 18px rgba(2,6,23,0.08);}
+
+    /* elements placed on page */
+    .page .el{position:absolute;min-width:40px;min-height:24px;padding:4px;box-sizing:border-box}
+    .page .el.selected{outline:2px solid #2563eb;border-radius:4px}
+
+    /* right panel */
+    .props{background:#0b1220;color:#fff;padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:10px}
+    .props h3{margin:0;font-size:14px}
+    label{display:block;font-size:12px;margin-bottom:6px}
+    input[type=text],input[type=number],select,textarea{width:100%;box-sizing:border-box;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#fff}
+    .btn{padding:8px 10px;border-radius:8px;background:#2563eb;border:none;color:#fff;cursor:pointer}
+    .muted{font-size:12px;color:#cbd5e1}
+
+    /* small helpers */
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+
+    /* export modal */
+    .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:16px;border-radius:8px;box-shadow:0 12px 40px rgba(2,6,23,0.2);z-index:999;max-width:90%;max-height:80%;overflow:auto}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="palette" id="palette">
+      <h3>Components</h3>
+      <div class="draggable" draggable="true" data-type="text">Text</div>
+      <div class="draggable" draggable="true" data-type="heading">Heading (H2)</div>
+      <div class="draggable" draggable="true" data-type="button">Button</div>
+      <div class="draggable" draggable="true" data-type="image">Image</div>
+      <div class="draggable" draggable="true" data-type="container">Container (div)</div>
+      <div style="flex:1"></div>
+      <button class="btn" id="exportBtn">Export HTML</button>
+    </div>
+
+    <div class="canvas-wrap">
+      <div class="toolbar">
+        <div class="muted">Drag components onto the white page. Click element to select and move it.</div>
+        <div style="flex:1"></div>
+        <button class="btn" id="clearBtn">Clear Page</button>
+      </div>
+      <div class="canvas" id="canvas">
+        <div class="page" id="page" tabindex="0"></div>
+      </div>
+    </div>
+
+    <div class="props" id="props">
+      <h3>Properties</h3>
+      <div id="noSelection">No element selected</div>
+
+      <div id="editor" class="hidden">
+        <label>Tag: <span id="propTag"></span></label>
+        <label>Text</label>
+        <textarea id="propText" rows="3"></textarea>
+
+        <div class="row">
+          <div>
+            <label>Width (px)</label>
+            <input type="number" id="propW" />
+          </div>
+          <div>
+            <label>Height (px)</label>
+            <input type="number" id="propH" />
+          </div>
+        </div>
+
+        <label>Left (px)</label>
+        <input type="number" id="propLeft" />
+        <label>Top (px)</label>
+        <input type="number" id="propTop" />
+
+        <label>Font size (px)</label>
+        <input type="number" id="propFont" />
+
+        <label>Background</label>
+        <input type="text" id="propBg" placeholder="#ffffff or transparent" />
+
+        <div class="row">
+          <button class="btn" id="applyBtn">Apply</button>
+          <button class="btn" id="deleteBtn" style="background:#ef4444">Delete</button>
+        </div>
+      </div>
+
+      <div style="flex:1"></div>
+      <div class="muted">Tip: Use keyboard arrows to nudge selected item. Press Delete to remove.</div>
+    </div>
+  </div>
+
+  <div id="exportModal" class="modal hidden">
+    <h3>Exported HTML</h3>
+    <textarea id="exportArea" style="width:100%;height:60vh"></textarea>
+    <div style="margin-top:8px;text-align:right">
+      <button class="btn" id="closeExport">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Simple page-builder in vanilla JS
+    (function(){
+      const palette = document.getElementById('palette');
+      const page = document.getElementById('page');
+      const canvas = document.getElementById('canvas');
+      const props = document.getElementById('props');
+      const editor = document.getElementById('editor');
+      const noSelection = document.getElementById('noSelection');
+
+      const propTag = document.getElementById('propTag');
+      const propText = document.getElementById('propText');
+      const propW = document.getElementById('propW');
+      const propH = document.getElementById('propH');
+      const propLeft = document.getElementById('propLeft');
+      const propTop = document.getElementById('propTop');
+      const propFont = document.getElementById('propFont');
+      const propBg = document.getElementById('propBg');
+      const applyBtn = document.getElementById('applyBtn');
+      const deleteBtn = document.getElementById('deleteBtn');
+
+      const exportBtn = document.getElementById('exportBtn');
+      const exportModal = document.getElementById('exportModal');
+      const exportArea = document.getElementById('exportArea');
+      const closeExport = document.getElementById('closeExport');
+      const clearBtn = document.getElementById('clearBtn');
+
+      let selected = null;
+      let draggingEl = null;
+      let offset = {x:0,y:0};
+
+      // palette drag
+      palette.addEventListener('dragstart', e=>{
+        const t = e.target.closest('.draggable');
+        if(!t) return;
+        e.dataTransfer.setData('text/plain', t.dataset.type);
+      });
+
+      // allow drop
+      page.addEventListener('dragover', e=>{ e.preventDefault(); });
+      page.addEventListener('drop', e=>{
+        e.preventDefault();
+        const type = e.dataTransfer.getData('text/plain');
+        const rect = page.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addComponent(type, x, y);
+      });
+
+      // add component factory
+      function addComponent(type,x=50,y=50){
+        let el;
+        if(type==='text'){
+          el = document.createElement('div'); el.innerText = 'Editable text';
+        } else if(type==='heading'){
+          el = document.createElement('h2'); el.innerText = 'Heading';
+        } else if(type==='button'){
+          el = document.createElement('button'); el.innerText = 'Click me';
+        } else if(type==='image'){
+          el = document.createElement('img'); el.src = 'https://via.placeholder.com/240x120?text=Image'; el.style.width='240px'; el.style.height='120px';
+        } else { // container
+          el = document.createElement('div'); el.innerText = 'Container'; el.style.padding='8px'; el.style.border='1px dashed #cbd5e1';
+        }
+        el.classList.add('el');
+        el.style.left = (x)+'px';
+        el.style.top = (y)+'px';
+        // make text elements editable on double click
+        if(!(el instanceof HTMLImageElement) && !(el instanceof HTMLButtonElement)){
+          el.setAttribute('contenteditable','true');
+        }
+        makeInteractive(el);
+        page.appendChild(el);
+        selectElement(el);
+      }
+
+      // click selection
+      page.addEventListener('click', e=>{
+        if(e.target === page) { selectElement(null); return; }
+        const el = e.target.closest('.el');
+        if(el) selectElement(el);
+      });
+
+      // make element draggable within page
+      function makeInteractive(el){
+        el.addEventListener('mousedown', ev=>{
+          if(ev.button!==0) return; // left button only
+          draggingEl = el;
+          const rect = el.getBoundingClientRect();
+          const parentRect = page.getBoundingClientRect();
+          offset.x = ev.clientX - rect.left;
+          offset.y = ev.clientY - rect.top;
+          ev.preventDefault();
+        });
+
+        // double click to edit text content
+        el.addEventListener('dblclick', ev=>{
+          if(el.hasAttribute('contenteditable')){
+            el.focus();
+          }
+        });
+      }
+
+      // global mousemove/up to move element
+      document.addEventListener('mousemove', e=>{
+        if(!draggingEl) return;
+        const parentRect = page.getBoundingClientRect();
+        let left = e.clientX - parentRect.left - offset.x;
+        let top = e.clientY - parentRect.top - offset.y;
+        // constrain
+        left = Math.max(0, Math.min(left, parentRect.width - (draggingEl.offsetWidth||40)));
+        top = Math.max(0, Math.min(top, parentRect.height - (draggingEl.offsetHeight||24)));
+        draggingEl.style.left = left + 'px';
+        draggingEl.style.top = top + 'px';
+        if(draggingEl === selected) updatePropsFromSelected();
+      });
+      document.addEventListener('mouseup', e=>{ draggingEl = null; });
+
+      // keyboard nudging and delete
+      document.addEventListener('keydown', e=>{
+        if(!selected) return;
+        const step = e.shiftKey?10:1;
+        if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
+          const left = parseInt(selected.style.left||0,10);
+          const top = parseInt(selected.style.top||0,10);
+          if(e.key==='ArrowLeft') selected.style.left = (left - step) + 'px';
+          if(e.key==='ArrowRight') selected.style.left = (left + step) + 'px';
+          if(e.key==='ArrowUp') selected.style.top = (top - step) + 'px';
+          if(e.key==='ArrowDown') selected.style.top = (top + step) + 'px';
+          updatePropsFromSelected();
+          e.preventDefault();
+        }
+        if(e.key==='Delete'){
+          selected.remove(); selectElement(null);
+        }
+      });
+
+      // selection helpers
+      function selectElement(el){
+        if(selected) selected.classList.remove('selected');
+        selected = el;
+        if(selected) selected.classList.add('selected');
+        refreshProps();
+      }
+
+      function refreshProps(){
+        if(!selected){ noSelection.classList.remove('hidden'); editor.classList.add('hidden'); return; }
+        noSelection.classList.add('hidden'); editor.classList.remove('hidden');
+        propTag.innerText = selected.tagName.toLowerCase();
+        updatePropsFromSelected();
+      }
+
+      function updatePropsFromSelected(){
+        propText.value = selected.innerText || '';
+        propW.value = parseInt(selected.style.width) || selected.offsetWidth || '';
+        propH.value = parseInt(selected.style.height) || selected.offsetHeight || '';
+        propLeft.value = parseInt(selected.style.left) || 0;
+        propTop.value = parseInt(selected.style.top) || 0;
+        const fs = window.getComputedStyle(selected).fontSize.replace('px','');
+        propFont.value = parseInt(fs) || '';
+        propBg.value = selected.style.background || (selected.style.backgroundColor || '');
+      }
+
+      applyBtn.addEventListener('click', ()=>{
+        if(!selected) return;
+        // text
+        if(!(selected instanceof HTMLImageElement) && !(selected instanceof HTMLButtonElement)){
+          selected.innerText = propText.value;
+        } else if(selected instanceof HTMLButtonElement){
+          selected.innerText = propText.value || 'Button';
+        }
+        // dims & pos
+        if(propW.value) selected.style.width = (propW.value) + 'px';
+        else selected.style.width = '';
+        if(propH.value) selected.style.height = (propH.value) + 'px';
+        else selected.style.height = '';
+        selected.style.left = (propLeft.value||0) + 'px';
+        selected.style.top = (propTop.value||0) + 'px';
+        if(propFont.value) selected.style.fontSize = (propFont.value) + 'px';
+        else selected.style.fontSize = '';
+        selected.style.background = propBg.value || '';
+      });
+
+      deleteBtn.addEventListener('click', ()=>{ if(selected){ selected.remove(); selectElement(null); } });
+
+      // clear page
+      clearBtn.addEventListener('click', ()=>{ if(confirm('Clear all elements on the page?')){ page.innerHTML=''; selectElement(null); } });
+
+      // export HTML
+      function exportHTML(){
+        // clone page content and produce minimal HTML
+        const clone = page.cloneNode(true);
+        // remove helper classes and contenteditable attributes
+        clone.querySelectorAll('.el').forEach(el=>{
+          el.classList.remove('selected');
+          el.removeAttribute('contenteditable');
+          // convert inline computed sizes to style attributes (keeps layout)
+          // leave images as-is
+        });
+        const html = `<!doctype html>\n<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Export</title></head><body>\n`+
+          '<div style="position:relative;width:' + clone.style.width + ';height:' + clone.style.height + ';">' + clone.innerHTML + '</div>\n</body></html>';
+        return html;
+      }
+
+      exportBtn.addEventListener('click', ()=>{
+        exportArea.value = exportHTML();
+        exportModal.classList.remove('hidden');
+      });
+      closeExport.addEventListener('click', ()=> exportModal.classList.add('hidden'));
+
+      // initialize with a sample element
+      addComponent('heading',80,40);
+      addComponent('text',80,120);
+
+      // small UX: clicking outside page should deselect
+      document.addEventListener('click', e=>{
+        if(!e.target.closest('.page') && !e.target.closest('.props') && !e.target.closest('.draggable')){
+          // don't deselect if interacting with props or palette
+          selectElement(null);
+        }
+      });
+
+      // helpful: allow pasting an image URL to selected image
+      propText.addEventListener('input', ()=>{
+        if(!selected) return;
+        if(selected instanceof HTMLImageElement){ selected.src = propText.value || selected.src; }
+        else{ /* keep text separate until apply */ }
+      });
+
+    })();
+  </script>
+</body>
+</html>
