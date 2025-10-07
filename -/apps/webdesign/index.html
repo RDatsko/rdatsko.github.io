@@ -7,50 +7,282 @@
 <link rel="stylesheet" href="/layout/css/styles.css">
 <link rel="stylesheet" href="editor.css">
 <title>Document</title>
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#sidebar {
+    width: 200px;
+    background: #f0f0f0;
+    padding: 10px;
+    box-sizing: border-box;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+}
+
+#toolbar {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#toolbar button {
+    padding: 6px;
+    border: 1px solid #aaa;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+#toolbar button.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+#canvas-wrap {
+    flex: 1;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: auto;
+}
+
+#canvas {
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: width 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.desktop #canvas { width: 1200px; }
+.tablet #canvas { width: 768px; }
+.mobile #canvas { width: 375px; }
+
+.draggable {
+    display: block;
+    padding: 8px;
+    background: #ddd;
+    margin-bottom: 8px;
+    cursor: grab;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.drop-zone {
+    min-height: 20px;
+    border: 2px dashed #ccc;
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 5px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.drop-zone.hover {
+    border-color: #666;
+    background: #f8f8f8;
+}
+
+.element {
+    padding: 10px;
+    background: #e8e8ff;
+    margin: 5px 0;
+    border-radius: 5px;
+    position: relative;
+    cursor: grab;
+    display: block;
+}
+
+.element button.remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 12px;
+    padding: 2px 5px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.element:hover button.remove-btn {
+    opacity: 1;
+}
+
+.insert-marker {
+    height: 4px;
+    background: #007bff;
+    border-radius: 2px;
+    margin: 2px 0;
+    transition: opacity 0.2s;
+}
+
+.placeholder {
+    border: 2px dashed #007bff;
+    margin: 5px 0;
+    height: 20px;
+    border-radius: 5px;
+    background: repeating-linear-gradient(45deg, #007bff22, #007bff22 10px, #fff 10px, #fff 20px);
+}
+</style>
 </head>
-<body>
+<body class="desktop">
 
 <header>
 <iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
 </header>
 
 <main class="app">
-    <div id="u_container" style="width:100%;height:100%;margin: 0;padding: 0;">
-        <div id="panels">
-            <div>
-                <span>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                </span>
-                <span>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                </span>
-            </div>
-            <div>
-                <span>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                    <button></button>
-                </span>
-            </div>
+    <div id="canvas-wrap">
+        <div id="canvas" class="drop-zone">
         </div>
-        <div id="sitedesign"></div>
+    </div>
+
+    <div id="sidebar">
+        <div id="toolbar">
+            <button id="desktopBtn" class="active">Desktop</button>
+            <button id="tabletBtn">Tablet</button>
+            <button id="mobileBtn">Mobile</button>
+        </div>
+
+        <h3>Elements</h3>
+        <div class="draggable" draggable="true" data-type="div">Div</div>
+        <div class="draggable" draggable="true" data-type="p">Paragraph</div>
+        <div class="draggable" draggable="true" data-type="h1">Heading</div>
+        <div class="draggable" draggable="true" data-type="img">Image</div>
     </div>
 </main>
 
 <footer>
 <iframe src="/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
 </footer>
-    
+
+<script>
+const draggables = document.querySelectorAll('.draggable');
+const canvas = document.getElementById('canvas');
+const body = document.body;
+let dragType = null;
+let draggedElement = null;
+let marker = document.createElement('div');
+marker.className = 'insert-marker';
+
+draggables.forEach(el => {
+    el.addEventListener('dragstart', e => {
+        dragType = e.target.dataset.type;
+        draggedElement = null;
+    });
+});
+
+function makeReorderable(el) {
+    el.draggable = true;
+    el.addEventListener('dragstart', e => {
+        dragType = null;
+        draggedElement = el;
+        setTimeout(() => el.style.opacity = '0.3', 0);
+    });
+    el.addEventListener('dragend', e => {
+        el.style.opacity = '1';
+    });
+}
+
+function makeRemovable(el) {
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '×';
+    removeBtn.className = 'remove-btn';
+    removeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        el.remove();
+    });
+    el.appendChild(removeBtn);
+}
+
+function makeDroppable(zone) {
+    zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        const target = e.target.closest('.element, #canvas');
+        if (!target || !canvas.contains(target)) return; // restrict drop area
+        target.classList.add('hover');
+
+        const rect = target.getBoundingClientRect();
+        const before = e.clientY < rect.top + rect.height / 3;
+        const after = e.clientY > rect.bottom - rect.height / 3;
+
+        if (!before && !after && target.classList.contains('element')) {
+            target.appendChild(marker);
+        } else {
+            if (before) target.parentNode.insertBefore(marker, target);
+            else target.parentNode.insertBefore(marker, target.nextSibling);
+        }
+    });
+
+    zone.addEventListener('dragleave', e => {
+        e.target.classList.remove('hover');
+    });
+
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+
+        let newEl;
+        if (draggedElement) {
+            newEl = draggedElement;
+        } else if (dragType) {
+            newEl = document.createElement(dragType);
+            newEl.className = 'element drop-zone';
+            newEl.setAttribute('contenteditable', dragType !== 'img');
+            newEl.innerHTML = dragType === 'img' ? '<img src="https://via.placeholder.com/150" alt="Image" style="max-width:100%;" />' : `${dragType} Element`;
+            makeDroppable(newEl);
+            makeReorderable(newEl);
+            makeRemovable(newEl);
+        }
+
+        if (marker.parentNode && canvas.contains(marker.parentNode)) {
+            marker.parentNode.insertBefore(newEl, marker);
+            marker.remove();
+        } else {
+            canvas.appendChild(newEl);
+        }
+
+        dragType = null;
+        draggedElement = null;
+    });
+}
+
+makeDroppable(canvas);
+
+// Device width toggles
+const desktopBtn = document.getElementById('desktopBtn');
+const tabletBtn = document.getElementById('tabletBtn');
+const mobileBtn = document.getElementById('mobileBtn');
+
+function setMode(mode) {
+    body.className = mode;
+    document.querySelectorAll('#toolbar button').forEach(btn => btn.classList.remove('active'));
+    if (mode === 'desktop') desktopBtn.classList.add('active');
+    if (mode === 'tablet') tabletBtn.classList.add('active');
+    if (mode === 'mobile') mobileBtn.classList.add('active');
+}
+
+desktopBtn.addEventListener('click', () => setMode('desktop'));
+tabletBtn.addEventListener('click', () => setMode('tablet'));
+mobileBtn.addEventListener('click', () => setMode('mobile'));
+</script>
+
 </body>
 </html>
