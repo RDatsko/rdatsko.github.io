@@ -187,11 +187,12 @@ main.app {
     /* background: repeating-linear-gradient(45deg, #007bff22, #007bff22 10px, #fff 10px, #fff 20px); */
 }
 
-#conponents {
+#components, #elements {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    overflow-y: auto;
+    /* overflow-y: auto; */
+    overflow: hidden auto;
 }
 
 #preview-area {
@@ -273,7 +274,7 @@ main.app {
         </div>
 
         <h5>Elements</h5>
-        <div id="Elements">
+        <div id="elements">
             <div class="draggable" draggable="true" data-type="div">
                 <svg viewBox="0 0 24 24">
                     <path fill="currentColor" d="M2 20h20V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h20a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1Z"></path>
