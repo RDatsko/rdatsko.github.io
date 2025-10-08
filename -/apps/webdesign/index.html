@@ -194,6 +194,13 @@ main.app {
     overflow-y: auto;
 }
 
+#preview-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100vw - 200px);
+}
+
 </style>
 </head>
 <body class="desktop">
@@ -203,20 +210,37 @@ main.app {
 </header>
 
 <main class="app">
-    <div id="canvas-wrap">
-        <div id="canvas" class="drop-zone">
-        </div>
-    </div>
-
-    <div id="sidebar">
+    <div id="preview-area">
         <div id="toolbar">
             <button id="desktopBtn" class="active">PC</button>
             <button id="tabletBtn">T</button>
             <button id="mobileBtn">M</button>
         </div>
+        <div id="canvas-wrap">
+            <div id="canvas" class="drop-zone">
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <!-- <div id="toolbar">
+            <button id="desktopBtn" class="active">PC</button>
+            <button id="tabletBtn">T</button>
+            <button id="mobileBtn">M</button>
+        </div> -->
+
+        <h5>Components</h5>
+        <div id="Components">
+            <div class="draggable" draggable="true" data-type="div">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M20.5,3L20.34,3.03L15,5.1L9,3L3.36,4.9C3.15,4.97 3,5.15 3,5.38V20.5A0.5,0.5 0 0,0 3.5,21L3.66,20.97L9,18.9L15,21L20.64,19.1C20.85,19.03 21,18.85 21,18.62V3.5A0.5,0.5 0 0,0 20.5,3M10,5.47L14,6.87V18.53L10,17.13V5.47M5,6.46L8,5.45V17.15L5,18.31V6.46M19,17.54L16,18.55V6.86L19,5.7V17.54Z"></path>
+                </svg>
+                <div>Map</div>
+            </div>
+        </div>
 
         <h3>Elements</h3>
-        <div id="conponents">
+        <div id="Elements">
             <div class="draggable" draggable="true" data-type="div">
                 <svg viewBox="0 0 24 24">
                     <path fill="currentColor" d="M2 20h20V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h20a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1Z"></path>
@@ -373,20 +397,20 @@ makeDroppable(canvas);
 
 // Device width toggles
 const desktopBtn = document.getElementById('desktopBtn');
-const tabletBtn = document.getElementById('tabletBtn');
-const mobileBtn = document.getElementById('mobileBtn');
+const tabletBtn  = document.getElementById('tabletBtn');
+const mobileBtn  = document.getElementById('mobileBtn');
 
 function setMode(mode) {
     body.className = mode;
     document.querySelectorAll('#toolbar button').forEach(btn => btn.classList.remove('active'));
     if (mode === 'desktop') desktopBtn.classList.add('active');
-    if (mode === 'tablet') tabletBtn.classList.add('active');
-    if (mode === 'mobile') mobileBtn.classList.add('active');
+    if (mode === 'tablet')   tabletBtn.classList.add('active');
+    if (mode === 'mobile')   mobileBtn.classList.add('active');
 }
 
 desktopBtn.addEventListener('click', () => setMode('desktop'));
-tabletBtn.addEventListener('click', () => setMode('tablet'));
-mobileBtn.addEventListener('click', () => setMode('mobile'));
+ tabletBtn.addEventListener('click', () => setMode('tablet'));
+ mobileBtn.addEventListener('click', () => setMode('mobile'));
 </script>
 
 </body>
