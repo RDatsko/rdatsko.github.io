@@ -257,12 +257,6 @@ main.app {
     </div>
 
     <div id="sidebar">
-        <!-- <div id="toolbar">
-            <button id="desktopBtn" class="active">PC</button>
-            <button id="tabletBtn">T</button>
-            <button id="mobileBtn">M</button>
-        </div> -->
-
         <h5>Components</h5>
         <div id="components">
             <div class="draggable" draggable="true" data-type="div">
@@ -380,12 +374,18 @@ function makeDroppable(zone) {
     zone.addEventListener('dragover', e => {
         e.preventDefault();
         const target = e.target.closest('.element, #canvas');
-        if (!target || !canvas.contains(target)) return; // restrict drop area
+        if (!target || !canvas.contains(target)) return;
+
         target.classList.add('hover');
 
         const rect = target.getBoundingClientRect();
-        const before = e.clientY < rect.top + rect.height / 3;
-        const after = e.clientY > rect.bottom - rect.height / 3;
+        const canvasRect = canvas.getBoundingClientRect();
+
+        // ✅ Adjusted mouse Y position to compensate for toolbar offset
+        const offsetY = e.clientY - canvasRect.top;
+
+        const before = offsetY < rect.top - canvasRect.top + rect.height / 3;
+        const after  = offsetY > rect.bottom - canvasRect.top - rect.height / 3;
 
         if (!before && !after && target.classList.contains('element')) {
             target.appendChild(marker);
@@ -409,7 +409,10 @@ function makeDroppable(zone) {
             newEl = document.createElement(dragType);
             newEl.className = 'element drop-zone';
             newEl.setAttribute('contenteditable', dragType !== 'img');
-            newEl.innerHTML = dragType === 'img' ? '<img src="https://via.placeholder.com/150" alt="Image" style="max-width:100%;" />' : `${dragType} Element`;
+            newEl.innerHTML = dragType === 'img'
+                ? '<img src="https://via.placeholder.com/150" alt="Image" style="max-width:100%;" />'
+                : `${dragType} Element`;
+
             makeDroppable(newEl);
             makeReorderable(newEl);
             makeRemovable(newEl);
