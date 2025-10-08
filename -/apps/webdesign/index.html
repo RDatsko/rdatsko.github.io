@@ -94,6 +94,26 @@ main.app {
     cursor: grab;
     border-radius: 4px;
     text-align: center;
+
+    user-select: none;
+    width: 45%;
+    min-width: 45px;
+    padding: 1em;
+    box-sizing: border-box;
+    min-height: 90px;
+    cursor: all-scroll;
+    font-size: 11px;
+    font-weight: lighter;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 3px;
+    margin: 10px 2.5% 5px;
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, .15);
+    transition: all .2s ease 0s;
+    transition-property: box-shadow, color;
 }
 
 .drop-zone {
@@ -155,6 +175,12 @@ main.app {
     /* background: repeating-linear-gradient(45deg, #007bff22, #007bff22 10px, #fff 10px, #fff 20px); */
 }
 
+#conponents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
 </style>
 </head>
 <body class="desktop">
@@ -177,12 +203,14 @@ main.app {
         </div>
 
         <h3>Elements</h3>
-        <div class="draggable" draggable="true" data-type="div">DIV</div>
-        <div class="draggable" draggable="true" data-type="p">P</div>
-        <div class="draggable" draggable="true" data-type="h1">H1</div>
-        <div class="draggable" draggable="true" data-type="h2">H2</div>
-        <div class="draggable" draggable="true" data-type="h3">H3</div>
-        <div class="draggable" draggable="true" data-type="img">Image</div>
+        <div id="conponents">
+            <div class="draggable" draggable="true" data-type="div">DIV</div>
+            <div class="draggable" draggable="true" data-type="p">P</div>
+            <div class="draggable" draggable="true" data-type="h1">H1</div>
+            <div class="draggable" draggable="true" data-type="h2">H2</div>
+            <div class="draggable" draggable="true" data-type="h3">H3</div>
+            <div class="draggable" draggable="true" data-type="img">Image</div>
+        </div>
     </div>
 </main>
 
