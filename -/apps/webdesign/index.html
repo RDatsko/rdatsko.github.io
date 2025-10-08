@@ -374,18 +374,12 @@ function makeDroppable(zone) {
     zone.addEventListener('dragover', e => {
         e.preventDefault();
         const target = e.target.closest('.element, #canvas');
-        if (!target || !canvas.contains(target)) return;
-
+        if (!target || !canvas.contains(target)) return; // restrict drop area
         target.classList.add('hover');
 
         const rect = target.getBoundingClientRect();
-        const canvasRect = canvas.getBoundingClientRect();
-
-        // ✅ Adjusted mouse Y position to compensate for toolbar offset
-        const offsetY = e.clientY - canvasRect.top;
-
-        const before = offsetY < rect.top - canvasRect.top + rect.height / 3;
-        const after  = offsetY > rect.bottom - canvasRect.top - rect.height / 3;
+        const before = e.clientY < rect.top + rect.height / 3;
+        const after = e.clientY > rect.bottom - rect.height / 3;
 
         if (!before && !after && target.classList.contains('element')) {
             target.appendChild(marker);
@@ -409,10 +403,7 @@ function makeDroppable(zone) {
             newEl = document.createElement(dragType);
             newEl.className = 'element drop-zone';
             newEl.setAttribute('contenteditable', dragType !== 'img');
-            newEl.innerHTML = dragType === 'img'
-                ? '<img src="https://via.placeholder.com/150" alt="Image" style="max-width:100%;" />'
-                : `${dragType} Element`;
-
+            newEl.innerHTML = dragType === 'img' ? '<img src="https://via.placeholder.com/150" alt="Image" style="max-width:100%;" />' : `${dragType} Element`;
             makeDroppable(newEl);
             makeReorderable(newEl);
             makeRemovable(newEl);
