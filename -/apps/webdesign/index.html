@@ -581,6 +581,7 @@ body {
                     </div>
                 </div>
             </div>
+            <button id="deleteBtn" style="background:#ef4444">Delete</button>
         </div>
     </main>
 </div>
@@ -892,6 +893,25 @@ document.addEventListener("keydown", function(e) {
         if (text === "") {
             e.preventDefault();
         }
+    }
+});
+</script>
+
+<script>
+let focusedElement = null;
+
+// Track the last clicked contenteditable element
+document.addEventListener("focusin", (e) => {
+    if (e.target.isContentEditable) {
+        focusedElement = e.target;
+    }
+});
+
+// When Delete button is clicked
+document.getElementById("deleteBtn").addEventListener("click", () => {
+    if (focusedElement && focusedElement.isConnected) {
+        focusedElement.remove();
+        focusedElement = null;
     }
 });
 </script>
