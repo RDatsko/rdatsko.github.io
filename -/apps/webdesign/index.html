@@ -900,19 +900,25 @@ document.addEventListener("keydown", function(e) {
 <script>
 let focusedElement = null;
 
-// Track the last clicked contenteditable element
-document.addEventListener("focusin", (e) => {
+// Wait for iframe to load, then set up listener inside it
+iframe.addEventListener("load", () => {
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+  // Track focus inside the iframe
+  iframeDoc.addEventListener("mousedown", (e) => {
     if (e.target.isContentEditable) {
-        focusedElement = e.target;
+      focusedElement = e.target;
     }
+  });
 });
 
-// When Delete button is clicked
-document.getElementById("deleteBtn").addEventListener("click", () => {
-    if (focusedElement && focusedElement.isConnected) {
-        focusedElement.remove();
-        focusedElement = null;
-    }
+// Delete button logic
+document.getElementById("deleteBtn").addEventListener("mousedown", (e) => {
+  e.preventDefault(); // don't steal focus
+  if (focusedElement && focusedElement.isConnected) {
+    focusedElement.remove();
+    focusedElement = null;
+  }
 });
 </script>
 </body>
