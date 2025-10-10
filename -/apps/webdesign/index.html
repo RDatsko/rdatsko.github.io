@@ -883,6 +883,17 @@ desktopBtn.addEventListener('click', () => setMode('desktop'));
 tabletBtn.addEventListener('click', () => setMode('tablet'));
 mobileBtn.addEventListener('click', () => setMode('mobile'));
 
+document.addEventListener("keydown", function(e) {
+    if ((e.key === "Backspace" || e.key === "Delete") && document.activeElement.isContentEditable) {
+        const el = document.activeElement;
+        const text = el.textContent.trim();
+
+        // Prevent deleting the element if it's already empty
+        if (text === "") {
+            e.preventDefault();
+        }
+    }
+});
 </script>
 </body>
 </html>
