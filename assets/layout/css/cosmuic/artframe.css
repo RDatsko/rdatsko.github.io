@@ -1,0 +1,68 @@
+.artframe {
+    display: inline-block;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.artframe > img {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    position: relative;
+    
+    /* .artframe styles */
+    border: 15px solid black;
+    padding: 28px;
+    background: white;
+    box-shadow: inset -1px 1px 6px 1px rgba(0, 0, 0, 0.24);
+
+    /* .artframe img styles */
+    box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+    background-size: cover;
+    background-position: center center;
+}
+
+.artframe::before {
+    content: attr(data-info);
+    position: absolute;
+    display: block;
+    width: 80%;
+    height: 1.75rem;
+    line-height: 1.75rem;
+    top: 10%;
+    right: -25%;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+    color: white;
+    z-index: 1;
+    text-align: center;
+    font-weight: 700;
+}
+
+.artframe.d3::before  { background-color: #BD1550; }
+.artframe.oil::before { background-color: #156cbd; }
+
+.artframe::after {
+    content: attr(data-title);
+    display: block;
+    position: relative;
+    bottom: 46px;
+    left: 50%;
+    width: calc(100% - 100px);
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    color: #000;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    text-align: center;
+}

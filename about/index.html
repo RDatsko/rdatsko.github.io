@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/assets/layout/css/cosmuic.css">
+<link rel="stylesheet" href="/assets/layout/css/styles.css">
+<link rel="stylesheet" href="/assets/layout/css/paper.css">
+<title>Mystic Web: HTML Tools</title>
+<style>@page { size: A4 }</style>
+<style>
+
+/* Grid for screens (default or explicitly defined) */
+@media screen {
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 20px;
+  }
+
+  .item {
+    background-color: lightblue;
+    padding: 10px;
+  }
+}
+
+/* Grid for printing */
+@media print {
+  body > *,
+  body > header,
+  body > footer
+  { display: none; }
+
+  body > main { display: block; }
+  body > main > * { display: none; }
+  body > main > section { display: block; }
+
+  body > header + main,
+  body > header ~ main {
+    margin: 0 !important;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 0;
+  }
+
+  .item {
+    background-color: white;
+    color: black;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
+</style>
+</head>
+<body class="A4">
+
+<header>
+<iframe src="/assets/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
+
+<main>
+    <h3><b>About Me</b></h3>
+    <p>
+        Some Text.
+    </p>
+
+    <!-- Each sheet element should have the class "sheet" -->
+    <!-- "padding-**mm" is optional: you can set 10, 15, 20 or 25 -->
+    <section class="sheet padding-10mm">
+
+        <!-- Write HTML just like a web page -->
+        <article>This is an A4 document.</article>
+
+    </section>
+</main>
+
+<footer>
+<iframe src="/assets/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</footer>
+
+</body>
+</html>
