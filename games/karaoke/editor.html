@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/layout/css/cosmuic.css">
+<link rel="stylesheet" href="/layout/css/styles.css">
+<title>Mystic's Web: Karaoke Editor</title>
+<style>
+
+body {
+    background-color: rgb(50, 50, 50);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif;
+}
+
+html, body {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+html, body, * {
+    /* margin: 0;
+    padding: 0; */
+    box-sizing: content-box;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+body > nav {
+    border-bottom: 2px solid rgb(29, 29, 29);
+    color: rgb(235, 235, 235);
+    font-size: 14px;
+    align-items: center;
+    display: flex;
+    height: 32px;
+    padding: 4px;
+
+    top: 64px;
+    position: absolute;
+    width: 100%;
+}
+
+body > nav.appicon {
+    /* margin: 4px; */
+    max-height: 32px;
+    max-width: 32px;
+}
+
+body > nav hr {
+    max-height: 32px;
+    /* margin: 4px; */
+    min-width: 1px;
+    border-color:rgb(158, 142, 142);
+    background-color: rgb(84, 84, 84);
+    align-self: stretch;
+    border-style: none;
+}
+
+body > nav * {
+    display: flex;
+    flex: 0 0 auto;
+    margin: 4px;
+}
+
+body > nav #tabs {
+    flex-grow: 1;
+}
+
+main {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    height: calc(100vh - 106px); /* calc(100vh - 42px); */
+    max-height: calc(100vh - 106px);
+    overflow: hidden;
+    padding: 0;
+}
+
+body > header ~ main {
+    top: 106px;
+    margin: 0;
+    max-width: 100vw;
+}
+
+/* 
+#toolbar {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 100%;
+    background-color: rgb(50, 50, 50);
+    border-right-color: rgb(29, 29, 29);
+    border-right-style: solid;
+    border-right-width: 2px;
+    pointer-events: none;
+    flex-direction: column;
+    row-gap: 8px;
+    margin-top: 8px;
+    align-items: center;
+    overflow: scroll;
+}
+
+#toolbar > .toolbarv {
+    max-height: 0;
+} */
+
+.toolbar {
+    /* border: 2px pink solid; */
+    flex: 0 0 40px;
+    overflow: scroll;
+    height: 100%;
+    width: 40px;
+}
+
+.toolbarv {
+    max-height: 0;
+}
+
+.toolbar button {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+    background-color: transparent;
+    border: 0;
+    margin: 4px;
+}
+
+.toolbar svg {
+    color: white;
+}
+
+#main {
+    display: block;
+    flex-grow: 1;
+    background-color: rgb(29, 29, 29);
+}
+
+#panel {
+    display: block;
+    width: 425px;
+    overflow: auto; /* Add overflow property for content */
+    /* resize: horizontal; Allow resizing horizontally */
+    /* height: 100%;*/ /* Make it fill the entire height */
+    height: calc(100% - 20px);
+    padding: 10px;
+}
+
+#resizer {
+    width: 5px;
+    height: 100%; /* Make it fill the entire height */
+    /* cursor: ew-resize; Set cursor for resizing */
+}
+
+menu {
+    /* background-color: rgb(50, 50, 50); */
+    /* border: 1px solid rgb(112, 112, 112); */
+    /* border-radius: 4px; */
+    /* color: rgb(255, 255, 255); */
+    color-scheme: dark;
+    /* direction: ltr; */
+    /* display: inline-flex; */
+    /* filter: drop-shadow(rgba(0, 0, 0, 0.5) 0px 1px 4px); */
+    /* flex-direction: column; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* height: 549.812px; */
+    /* max-height: 100%; */
+    /* max-width: none; */
+    /* min-width: min-content; */
+    /* opacity: 1; */
+    /* padding: 4px 0; */
+    /* pointer-events: auto; */
+    /* position: static; */
+    user-select: none;
+    /* visibility: visible; */
+    /* width: 240.734px; */
+}
+
+menu > ul {
+    /* background: #f0f0f0; */
+    /* border: 1px solid rgba(0,0,0,.4); */
+    /* box-shadow: 4px 4px 3px -2px rgba(0,0,0,.5); */
+    color: initial;
+    /* min-width: 150px; */
+    /* padding: 2px; */
+    position: relative;
+
+    display: flex;
+}
+
+menu li {
+    all: unset;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: block;
+    justify-content: space-between;
+    /* padding: 4px 10px 4px 32px; */
+    /* padding: 5px 10px 5px 32px; */
+    position: relative;
+    white-space: nowrap;
+    /* width: 100%; */
+}
+
+/* .chevron::after {
+    content: '\23F5';
+    position: absolute;
+    right: 10px;
+    font-weight: 100;
+} */
+
+menu hr {
+    /* box-shadow: inset 0 1px #00000026, inset 0 -1px #fff; */
+    background-color: rgb(84, 84, 84);
+    border-bottom-color: rgb(255, 255, 255);
+    content: "";
+    display: block;
+    height: 1px;
+    border: 0px;
+    margin: 3px 12px;
+    pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+menu ul {
+    cursor: default;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+menu > ul {
+/*    background: linear-gradient(#fff 20%, #f1f4fa 25%, #f1f4fa 43%, #d4dbee 48%, #e6eaf6);*/
+    background-color: var(--menubar-bg);
+    display: flex;
+}
+menu > ul > li {
+    padding: 2px 10px;
+    position: relative;
+}
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+    background: #666;
+    color: #fff;
+    outline: none;
+}
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+    background: transparent;
+    color: inherit;
+}
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+    background: transparent;
+    color: inherit;
+}
+menu ul ul,
+.menu ul {
+    background: var(--menu-bg);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+    color: var(--color);
+    min-width: 150px;
+    padding: 2px;
+    position: relative;
+}
+menu li ul {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 100%;
+    z-index: 99;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+    display: block;
+}
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+    background: transparent;
+    color: inherit;
+}
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.menubar > ul > li > ul{
+    margin-top: 8px;
+}
+
+/* menu > ul > li {
+    padding: 6px 10px;
+    position: relative;
+} */
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+    /* background: #39f; */
+    color: #fff;
+    outline: none;
+}
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+    background: transparent;
+    color: inherit;
+}
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+    background: transparent;
+    color: inherit;
+}
+menu ul ul,
+.menu ul {
+    /* background: var(--menu-bg); */
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+    /* color: var(--color); */
+    min-width: 150px;
+    padding: 2px;
+    /* margin-top: 8px; */
+    position: relative;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    background-color: rgb(50, 50, 50);
+    border: 1px solid rgb(112, 112, 112);
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    color-scheme: dark;
+    /* direction: ltr; */
+    /* display: inline-flex; */
+    /* filter: drop-shadow(rgba(0, 0, 0, 0.5) 0px 1px 4px); */
+    /* flex-direction: column; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* height: 549.812px; */
+    /* max-height: 100%; */
+    /* max-width: none; */
+    /* min-width: min-content; */
+    /* opacity: 1; */
+    /* padding: 4px 0; */
+    /* pointer-events: auto; */
+    /* position: static; */
+    user-select: none;
+    /* visibility: visible; */
+    /* width: 240.734px; */
+}
+
+menu li ul {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 100%;
+    z-index: 99;
+}
+
+menu > ul ul li > ul,
+.menu > ul ul li > ul {
+    left: 100%;
+    top: -4px;
+}
+menu ul ul > li > a,
+menu ul ul > li > button,
+menu ul ul > li > label,
+menu ul ul > li[aria-haspopup="true"],
+.menu ul > li > a,
+.menu ul > li > button,
+.menu ul > li > label,
+.menu ul > li[aria-haspopup="true"] {
+    all: unset;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px 4px 32px;
+    position: relative;
+    white-space: nowrap;
+    width: 100%;
+}
+menu ul ul > li > a:focus,
+menu ul ul > li > a:hover,
+menu ul ul > li > button:focus,
+menu ul ul > li > button:hover,
+menu ul ul > li > label:focus,
+menu ul ul > li > label:hover,
+menu ul ul > li[aria-haspopup="true"]:focus,
+menu ul ul > li[aria-haspopup="true"]:hover,
+.menu ul > li > a:focus,
+.menu ul > li > a:hover,
+.menu ul > li > button:focus,
+.menu ul > li > button:hover,
+.menu ul > li > label:focus,
+.menu ul > li > label:hover,
+.menu ul > li[aria-haspopup="true"]:focus,
+.menu ul > li[aria-haspopup="true"]:hover {
+    background-color: rgb(112, 112, 112);
+    color:rgb(255, 255, 255);
+}
+menu ul ul > li[aria-haspopup="true"]:after,
+.menu ul > li[aria-haspopup="true"]:after {
+    border: 4px solid transparent;
+    border-left-color: currentcolor;
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+menu ul li,
+.menu li {
+    position: relative;
+}
+menu ul li > input[type],
+.menu li > input[type] {
+    display: none;
+}
+menu ul li > input[type] + label,
+.menu li > input[type] + label {
+    display: block;
+    position: relative;
+}
+menu ul li > input[type] + label:before,
+.menu li > input[type] + label:before {
+    all: unset;
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.6), rgba(230, 236, 245, 0.8) 90%, hsla(0, 0%, 100%, 0.8));
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px #b3d3f9;
+    box-sizing: border-box;
+    height: 22px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 22px;
+}
+menu ul li > input[type]:checked + label:before,
+.menu li > input[type]:checked + label:before {
+    content: "";
+}
+menu ul li > input[type][type="radio"]:checked + label:after,
+.menu li > input[type][type="radio"]:checked + label:after {
+    background: radial-gradient(circle at 75% 25%, #d5d4ea, #333583);
+    border: 1px solid #1a1490;
+    box-shadow: none;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+menu ul li > input[type][type="checkbox"]:checked + label:after,
+.menu li > input[type][type="checkbox"]:checked + label:after {
+    color: #0c12a1;
+    font-size: 10pt;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-52%);
+}
+menu ul li:focus-within > ul,
+menu ul li:focus > ul,
+.menu li:focus-within > ul,
+.menu li:focus > ul {
+    display: block;
+}
+menu ul li:focus-within:has(~ li:hover) > ul,
+menu ul li:focus:has(~ li:hover) > ul,
+.menu li:focus-within:has(~ li:hover) > ul,
+.menu li:focus:has(~ li:hover) > ul {
+    display: none;
+}
+menu ul li[aria-disabled],
+.menu li[aria-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+menu ul li.has-divider:after,
+.menu li.has-divider:after {
+    box-shadow: inset 0 1px rgba(0, 0, 0, 0.15), inset 0 -1px #fff;
+    content: "";
+    display: block;
+    height: 2px;
+    margin: 3px 0 2px 30px;
+    pointer-events: none;
+}
+menu ul li img,
+.menu li img {
+    left: 2px;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+menu ul li span,
+.menu li span {
+    margin-left: 32px;
+}
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+    display: block;
+}
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+    background: transparent;
+    color: inherit;
+}
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.tag-row {
+    margin-bottom: 5px;
+}
+
+.tag-row input {
+    margin-left: 5px;
+}
+
+.removeBtn {
+    margin: 0;
+    min-width: 1rem;
+    height: auto;
+    line-height: 1.25rem;
+    padding: 0 0.5rem;
+}
+
+#cover {
+    max-width: 128px;
+    max-height: 128px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<header data-nav="left">
+<iframe src="/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
+</header>
+
+<nav>
+    <!-- <img src="ps-appicon.svg" class="appicon" style="width: 24px; height: 24px;"> -->
+    <!-- <svg id="android-menu" role="img" fill="currentColor" viewBox="0 0 18 18" id="SShowMenu18N-icon" width="18" height="18" aria-hidden="true" aria-label="" focusable="false">
+        <rect fill-rule="evenodd" x="2" y="8" width="14" height="2" rx="0.5"></rect>
+        <rect fill-rule="evenodd" x="2" y="3" width="14" height="2" rx="0.5"></rect>
+        <rect fill-rule="evenodd" x="2" y="13" width="14" height="2" rx="0.5"></rect>
+    </svg>
+    <hr> -->
+    <span id="tabs">
+        <menu class="menubar">
+            <ul class="can-hover">
+                <li tabindex="0" aria-haspopup="true">File
+                    <ul>
+                        <li><a onclick="OpenFile();">Open</a></li>
+                        <li><a onclick=""><s>Change Cover</s></a></li>
+                        <li><a onclick="SaveFile();">Save As…</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </menu>
+    </span>
+    <span>[ - ]</span>
+</nav>
+
+<main>
+    <span id="panel">
+        <div id="tagInfo" style="display:none;">
+            <div>
+                <strong>Cover Art:</strong><br>
+                <img id="cover" alt="No cover art">
+                <br>
+                <input type="file" id="coverInput" accept="image/*">
+                <button id="removeCoverBtn">Remove Cover</button>
+            </div><br><br>
+
+            <div id="tagList"></div>
+            <button id="addTagBtn">Add Tag</button>
+        </div>
+
+        <div id="loading" style="display:none; font-style:italic; color:gray; margin:10px 0;">
+            Loading MP3 metadata…
+        </div>
+    </span>
+    <span id="resizer"></span> <!-- Resizer handle -->
+    <span id="main">
+        <!-- <menu>
+            <ul>
+                <li>New...</li>
+                <li>Open...</li>
+                <li>Save</li>
+                <li>Save as...</li>
+                <hr>
+                <li class="chevron">Edit</li>
+                <li class="chevron">Image</li>
+                <li class="chevron">Layer</li>
+                <li class="chevron">Select</li>
+                <li class="chevron">View</li>
+                <li class="chevron">Filter</li>
+                <hr>
+                <li>Export as...</li>
+                <hr>
+                <li>Import...</li>
+                <hr>
+                <li>Settings</li>
+            </ul>
+        </menu> -->
+    </span>
+</main>
+
+<script>
+
+// JavaScript code for resizing
+// const resizer = document.getElementById('resizer');
+// const panel = document.getElementById('panel');
+
+// resizer.addEventListener('mousedown', initResize, false);
+
+// function initResize(e) {
+//     window.addEventListener('mousemove', resize, false);
+//     window.addEventListener('mouseup', stopResize, false);
+// }
+
+// function resize(e) {
+//     panel.style.width = (window.innerWidth - e.clientX) + 'px';
+// }
+
+// function stopResize() {
+//     window.removeEventListener('mousemove', resize, false);
+//     window.removeEventListener('mouseup', stopResize, false);
+// }
+
+// JavaScript code for Menus
+const menuItems = document.querySelectorAll('.can-hover > li');
+let focusedItem = null;
+
+function closeMainMenu() {
+    menuItems.forEach(item => {
+        item.addEventListener('blur', () => {
+            focusedItem = null;
+        });
+
+        item.blur();
+    });
+}
+
+menuItems.forEach(item => {
+    item.addEventListener('mouseover', () => {
+        if (focusedItem) {
+            focusedItem.blur();
+            item.focus();
+            focusedItem = item;
+        }
+    });
+
+    item.addEventListener('focus', () => {
+        focusedItem = item;
+// console.log(`${focusedItem}`);
+    });
+
+    item.addEventListener('blur', () => {
+        focusedItem = null;
+    });
+
+    item.addEventListener('mousedown', (event) => {
+        // Check if the clicked element is an li inside a .can-hover > li
+        const clickedLi = event.target.closest('.can-hover > li li');
+        if (!clickedLi && item === focusedItem) {
+            // Prevents the element from getting focus again
+            // closeMainMenu();
+            event.preventDefault();
+            item.blur();
+        }
+    });
+});
+
+
+
+
+
+
+function OpenFile() {
+    closeMainMenu();
+
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = _ => {
+        // you can use this method to get file and perform respective operations
+        // let files =   Array.from(input.files);
+        // console.log(files);
+
+        const file = input.files[0];
+        if (!file) return;
+
+        document.getElementById("loading").style.display = "block"; // show loading
+
+        mp3File = file;
+        newCover = null;
+        removeCover = false;
+        tagList.innerHTML = "";
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            arrayBuffer = ev.target.result;
+
+            jsmediatags.read(file, {
+                onSuccess: function(tag) {
+                    document.getElementById("loading").style.display = "none"; // hide loading
+                    const tags = tag.tags;
+
+                    // Render all found tags
+                    Object.keys(tags).forEach((key) => {
+                    if (key === "picture") return; // handled separately
+
+                    let value = tags[key];
+                    if (typeof value === "object" && value !== null) {
+                        if ("text" in value) {
+                            value = value.text; // handle comment-like objects
+                        } else {
+                            value = JSON.stringify(value); // fallback
+                        }
+                    }
+                    addTagRow(key, value);
+                    });
+
+                    // Cover art
+                    if (tags.picture) {
+                        const pic = tags.picture;
+                        let base64String = "";
+                        for (let i = 0; i < pic.data.length; i++) {
+                            base64String += String.fromCharCode(pic.data[i]);
+                        }
+                        const base64 = btoa(base64String);
+                        cover.src = `data:${pic.format};base64,${base64}`;
+                    } else {
+                        cover.src = "";
+                        cover.alt = "No cover art";
+                    }
+
+                    tagInfo.style.display = "block";
+                },
+                onError: function(err) {
+                    alert("Error reading tags: " + err.type);
+                }
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    };
+    input.click();
+}
+
+function SaveFile() {
+    closeMainMenu();
+
+        if (!arrayBuffer) return alert("No MP3 loaded.");
+
+    const writer = new ID3Writer(arrayBuffer);
+
+    // Collect all tags from UI
+    document.querySelectorAll(".tag-row").forEach(row => {
+        const key = row.querySelector(".tag-key").value.trim();
+        let value = row.querySelector(".tag-value").value.trim();
+        if (!key || !value) return;
+
+        const frame = keyToFrame[key.toLowerCase()] || key;
+
+        // Try parsing JSON if it looks like an object
+        try {
+            if (value.startsWith("{") || value.startsWith("[")) {
+                value = JSON.parse(value);
+            }
+        } catch (e) { /* ignore, keep as string */ }
+
+        if (frame === "COMM") {
+            writer.setFrame('COMM', { description: '', text: value });
+        } else if (frame === "TPE1") {
+            writer.setFrame(frame, [value]); // artist expects array
+        } else {
+            writer.setFrame(frame, value);
+        }
+    });
+
+    // Cover art logic
+    if (newCover) {
+        const byteString = atob(newCover.dataURL.split(',')[1]);
+        const byteArray = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+            byteArray[i] = byteString.charCodeAt(i);
+        }
+        writer.setFrame('APIC', {
+        type: 3,
+        data: byteArray,
+        description: "Cover",
+        mimeType: newCover.format
+        });
+    } else if (removeCover) {
+        // Skip APIC entirely
+    }
+
+    writer.addTag();
+
+    const blob = writer.getBlob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "updated_" + mp3File.name;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function SaveAsFile() {
+    closeMainMenu();
+}
+
+function Exit() {
+    closeMainMenu();
+}
+
+
+
+
+
+
+
+
+
+
+
+// JavaScript code for Context Menu
+
+// let contextMenu = null;
+let contextMenu = document.querySelector(".context-menu");
+
+document.addEventListener('contextmenu', event => {
+    event.preventDefault();
+});
+
+document.querySelector('main').addEventListener('contextmenu', e => {
+
+    e.preventDefault();
+
+    // Remove existing context menu
+    // if (contextMenu !== null) {
+    if (contextMenu.style.display !== "none") {
+        // document.body.removeChild(contextMenu);
+        contextMenu.style.display = "none";
+    }
+
+    // Create new context menu
+    // contextMenu = document.createElement('div');
+    // contextMenu.classList.add('context-menu');
+    // contextMenu.innerHTML = `
+    // <div class="menu">
+    //     <ul style="width: 200px">
+    //         <li>
+    //             <input type="radio" name="icon-size" id="example12">
+    //             <label for="example12">Large icons</label>
+    //         </li>
+    //         <li>
+    //             <input type="radio" name="icon-size" id="example13" checked>
+    //             <label for="example13">Medium icons</label>
+    //         </li>
+    //         <li class="has-divider">
+    //             <input type="radio" name="icon-size" id="example14">
+    //             <label for="example14">Small icons</label>
+    //         </li>
+    //         <li>
+    //             <input type="checkbox" id="example15">
+    //             <label for="example15">Auto arrange icons</label>
+    //         </li>
+    //         <li>
+    //             <input type="checkbox" id="example16" checked>
+    //             <label for="example16">Align icons to grid</label>
+    //         </li>
+    //     </ul>
+    // <div>
+    // `;
+    // document.body.appendChild(contextMenu);
+
+    contextMenu.style.display = "block";
+
+    // Set the position of the context menu
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    const menuWidth = contextMenu.offsetWidth;
+    const menuHeight = contextMenu.offsetHeight;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const x = Math.min(mouseX, screenWidth - menuWidth);
+    const y = Math.min(mouseY, screenHeight - menuHeight);
+    contextMenu.style.top = `${y}px`;
+    contextMenu.style.left = `${x}px`;
+
+    // Left click on current location
+    const evt = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y,
+    });
+    document.elementFromPoint(x, y).dispatchEvent(evt);
+});
+
+// Close context menu on click outside of it
+document.addEventListener('click', e => {
+    if (contextMenu !== null && !contextMenu.contains(e.target)) {
+    // document.body.removeChild(contextMenu);
+        contextMenu.style.display = "none";
+    // contextMenu = null;
+    }
+});
+</script>
+
+<script src="jsmediatags.min.js"></script>
+<script src="browser-id3-writer.js"></script>
+<script>
+const tagInfo        = document.getElementById("tagInfo");
+const tagList        = document.getElementById("tagList");
+const addTagBtn      = document.getElementById("addTagBtn");
+const cover          = document.getElementById("cover");
+const coverInput     = document.getElementById("coverInput");
+const removeCoverBtn = document.getElementById("removeCoverBtn");
+
+let mp3File;
+let arrayBuffer;
+let newCover = null;
+let removeCover = false;
+
+// Map between jsmediatags keys and ID3v2 frame IDs
+const keyToFrame = {
+    title: 'TIT2',
+    artist: 'TPE1',
+    album: 'TALB',
+    year: 'TYER',
+    genre: 'TCON',
+    comment: 'COMM',
+    track: 'TRCK'
+};
+
+function addTagRow(key = "", value = "") {
+    const row = document.createElement("div");
+    row.className = "tag-row";
+
+    // Decide whether to use input or textarea
+    let valueField;
+    if (typeof value === "string" && !value.startsWith("{") && !value.startsWith("[")) {
+        valueField = `<input class="tag-value" placeholder="Value" value="${value.replace(/"/g, '&quot;')}">`;
+    } else {
+        valueField = `<textarea class="tag-value" placeholder="Value" rows="2" cols="40" style="resize: none;">${value}</textarea>`;
+    }
+
+    row.innerHTML = `
+        <input class="tag-key" placeholder="Frame/Key" value="${key}">
+        ${valueField}
+        <button class="removeBtn">✖</button>
+    `;
+    row.querySelector(".removeBtn").onclick = () => row.remove();
+    tagList.appendChild(row);
+}
+
+addTagBtn.addEventListener("click", () => addTagRow());
+
+// Handle new cover upload
+coverInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const dataURL = ev.target.result;
+        cover.src = dataURL;
+        newCover = { dataURL, format: file.type };
+        removeCover = false;
+    };
+    reader.readAsDataURL(file);
+});
+
+// Handle remove cover
+removeCoverBtn.addEventListener("click", () => {
+    cover.src = "";
+    cover.alt = "No cover art";
+    newCover = null;
+    removeCover = true;
+});
+
+</script>
+</body>
+</html>
