@@ -1,0 +1,645 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="chikuma">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Description">
+
+<!-- og系記述 -->
+<meta property="og:title" content="[Title]" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="[Description]" />
+<meta property="og:url" content="http://localhost:81/" />
+<meta property="og:image" content="/kat/assets/image/share/share.jpg" />
+<meta property="og:site_name" content="[Site Name]" />
+<meta name="facebook-domain-verification" content="" />
+
+<!-- Twitter系記述 -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="[Title]" />
+<meta name="twitter:description" content="[Description]" />
+<meta name="keywords" content="[Keywords]">
+<meta name="twitter:image" content="/kat/assets/image/share/share.jpg" />
+<meta name="twitter:url" content="http://localhost:81/" />
+<meta name="twitter:creator" content="@NULLCreatorName" />
+<meta name="twitter:site" content="@NULLCreatorName" />
+
+<!-- BootstrapのCSS読み込み -->
+<link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" href="/kat/assets/layout/css/bootstrap.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+<link rel="stylesheet" href="/kat/assets/layout/css/common.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/style.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/code.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/events.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/buybutton.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/kat/assets/layout/css/prism.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/header.css">
+<title>Company: Artist 1</title>
+<style>
+.svgdisp figure img {
+    background: repeating-conic-gradient(#EEE 0 25%, #CCC 0 50%) 50% / 20px 20px
+}
+
+.svgdisp figure {
+    padding-right: 1rem;
+    display: inline-block;
+}
+
+.svgdisp figcaption {
+    font-size: .75rem;
+}
+</style>
+</head>
+<body>
+
+<header data-nav="right">
+    <span>
+        <input type="checkbox">
+        <div><a href="/kat/" class="clear"><img src="/kat/assets/layout/svg/logo.svg" style="width: 50px; height: 50px;"></a>Company Name</div>
+        <nav>
+            <ol>
+                <li><a href="/kat/discography/">ディスコグラフィー</a></li>
+                <li><a href="/kat/#">来歴</a></li>
+            </ol>
+        </nav>
+    </span>
+</header>
+
+<main>
+
+        <article>
+<style>
+#tracklist > tbody > tr > td {
+    height: 4rem;
+    vertical-align: middle !important;
+}
+
+.cd_header {
+    position: relative;
+    width: 100%;
+    margin: 2rem auto 5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+
+@media screen and (max-width: 480px) {
+    .cd_header {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cd_header > * {
+        text-align: center;
+    }
+}
+
+.cd_header > * {
+    padding: 1rem;
+}
+
+.cd_blurbg {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  
+  display: block;
+  width: 100%;
+  height: 100%;
+  
+  -webkit-filter: blur(8px) brightness(.65);
+  -moz-filter: blur(8px) brightness(.65);
+  -o-filter: blur(8px) brightness(.65);
+  -ms-filter: blur(8px) brightness(.65);
+  filter: blur(8px) brightness(.65);
+}
+</style>
+<!-- JSON data embedded in the HTML -->
+<script id="songData" type="application/json">
+{
+    "song": [
+        {
+            "title": "Party Tonight",
+            "japanese": "これからがパーティー<br>Let's Party Party<br>今 Go Crazy!<br>Party Party<br>We're where da party's at<br><br>気がつけばもう Friday night<br>今夜も TDC（テレビとデート中）<br><br>画面がいきなり消えて<br>僕に喋りかける<br>「You know you gotta party」<br><br>体温上がってく<br>飛び出して　街へ走る<br>魔法にかかっていく<br>急に踊り出す！<br>We're where da party's at<br><br>手を挙げ We're AMW<br>新しい世界へ連れてくよ<br>騒げ　We're AMW<br>考えられなくなるほど<br>We'll party tonight<br><br>Let's Party Party<br>今 go crazy<br>Party Party<br>We're where da party's at<br><br>Oh　みんなの笑顔で<br>今 go crazy!<br>Oh　しがらみを捨てて<br>Let's party tonight<br><br>気がつけば　見られている<br>イケてる？No! PKH<br>（パジャマ着ててハズイ）<br><br>どこかに隠れたいけど<br>まぁ、いいっか？イケるでしょう<br>「You know you gotta party」<br><br>ざわめく 心（Here）<br>ざわざわ　there<br>体中アツク everywhere<br>今夜　全てを忘れ　P・A・R・T・Y<br>So 声を上げろ　音楽に酔えよ<br>何度でも<br>We're where da party's at<br><br>手を挙げ We're AMW<br>新しい世界へ連れてくよ<br>騒げ　We're AMW<br>動けなくなるほど<br>We'll party tonight<br><br>Let's Party Party<br>今 go crazy!<br>Party Party<br>We're where da party's at<br><br>Oh　みんなの笑顔で<br>今 go crazy!<br>Oh　しがらみを捨てて<br>Let's party tonight<br><br>目を閉じれば今の魔法が<br>解けてくみたい　輝く世界<br>崩れ落ちることのないように<br>決して忘れない<br>みんなのその笑顔<br><br>手を挙げ We're AMW<br>爆音に体を託せよ<br>騒げ　We're AMW<br>もう誰にも止められない<br>We'll party tonight<br><br>Let's Party Party<br>今 go crazy!<br>Party Party<br>We're where da party's at<br><br>Oh　みんなの笑顔で<br>今 go crazy!<br>Oh　しがらみを捨てて<br>Let's party tonight",
+            "romaji": "Korekara ga pātī<br>Lets Party Party<br>ima Go Crazy!<br>Party Party<br>We're where da party's at<br><br>kigatsukeba mō Friday night<br>kon'ya mo TDC (terebi to dēto chū)<br><br>gamen ga ikinari kiete<br>boku ni shaberi kakeru<br>«You know you gotta party»<br><br>taion agatte ku<br>tobidashite machi e hashiru<br>mahō ni kakatte iku<br>kyū ni odori dasu!<br>We're where da party's at<br><br>te wo age We're AMW<br>atarashii sekai e tsurete ku yo<br>sawage We're AMW<br>kangae rare nakunaru hodo<br>We'll party tonight<br><br>Let's Party Party<br>ima go crazy<br>Party Party<br>We're where da party's at<br><br>Oh minna no egao de<br>ima go crazy!<br>Oh shigarami wo sutete<br>Let's party tonight<br><br>kigatsukeba mirarete iru<br>iketeru? No! PKH<br>(pajama kitete hazu i)<br><br>dokoka ni komoretai kedo<br>mā, īh ka? I keru deshō<br>«You know you gotta party»<br><br>zawameku kokoro (Here)<br>zawazawa there<br>karada naka Atsu ku everywhere<br>kon'ya subete wo wasure P - A - R - T - Y<br>So koe wo agero ongaku ni yoeyo<br>nani do demo<br>We're where da party's at<br><br>te wo age We're AMW<br>atarashii sekai e tsurete ku yo<br>sawage We're AMW<br>ugokenakunaru hodo<br>We'll party tonight<br><br>Let's Party Party<br>ima go crazy!<br>Party Party<br>We're where da party's at<br><br>Oh minna no egao de<br>ima go crazy!<br>Oh shigarami wo sutete<br>Let's party tonight<br><br>me wo tojireba ima no mahō ga<br>tokete ku mitai kagayaku sekai<br>kuzureochiru koto no nai yō ni<br>kesshite wasurenai<br>minna no sono egao<br><br>te wo age We're AMW<br>bakuon ni karada wo takuseyo<br>sawage We're AMW<br>mō dare ni mo tomerarenai<br>We'll party tonight<br><br>Let's Party Party<br>ima go crazy!<br>Party Party<br>We're where da party's at<br><br>Oh minna no egao de<br>ima go crazy!<br>Oh shigarami wo sutete<br>Let's party tonight"
+        },
+        {
+            "title": "ソノホシボシト",
+            "japanese": "星は色とりどりの　街のその時々を<br>照らす　月の夜に　駆けてく<br><br>もしかしたら　星の輝きは<br>太陽を照らしているのかも？<br>もしかしたら<br>それは忘れかけていた<br>希望のかけらか？<br>もう一回　足踏みをしたら<br>街を出よう<br>そうさ、乗り出す　漕ぎ出す<br>そうさ、飛び立とう！<br><br>星は色とりどりの（きらり）<br>街のその時々を（ピカリ）<br>飾るその折々を　<br>私は今、走り抜けてゆく<br>その星々を（じかに）　<br>過去や未来や今日を（みたい）<br>照らす　月の夜に　駆けてく　<br>駆けてく　駆けて<br><br>Yo（Yo!）<br>星々のきらめき（きらめき）<br>街の喧騒 も振り抜き<br>かけて かけて 夢の果てまで<br><br>1万年（と） 幾億光年（え〜！）<br>星座渡り惹かれる奇跡<br>星の旅人 月の恋人<br>輪になって今日も共に踊ろう<br>さあ一緒に dance tonight<br><br>いつか風になって<br>いつか雲になって<br>太陽と月と星と混ざり合うんだ<br><br>月を見上げる時も<br>街を見下ろす時も<br>まぶたに映る思いを<br>大切に抱きしめ続ける<br>瞳と瞳を　交わす　痛みと祈りを<br>胸に抱きしめて　旅立つ<br><br>星は色とりどりの（きらり）<br>街のその時々を（ピカリ）<br>飾るその折々を<br>私は今、走り抜けてゆく<br>その星々を（じかに）<br>愛や未来や夢を（みたい）<br>照らす　月の夜に　駆けてく<br><br>月は星の旅人　星は月の恋人<br>美しい夜空を超え<br>私は明日も走り抜けるのさ<br>その時々を かけがえのない時を<br>今日も胸に抱き　駆けてく<br>今この時を　駆けてく…<br>ここに虹を　架けてく…<br>夢の橋を　描けてく…<br>熱き思いを　掛けてく…<br>空　高く　翔けてく…<br>",
+            "romaji": "Hoshi wa irotoridori no machi no sono tokidoki wo<br>terasu tsuki no yoru ni kakete ku<br><br>moshika shitara hoshi no kagayaki wa<br>taiyō wo terashite iru no ka mo?<br>Moshika shitara<br>sore wa wasurekakete ita<br>kibō no kakera ka?<br>Mō ikkai ashibumi wo shitara<br>machi wo deyō<br>sō sa, noridasu kogi dasu<br>sō sa, tobitatō!<br><br>Hoshi wa irotoridori no (kirari)<br>machi no sono tokidoki wo (Pika ri)<br>kazaru sono oriori wo<br>watashi wa ima, hashirinukete yuku<br>sono hoshiboshi wo (jikani)<br>kako ya mirai ya kyō wo (mitai)<br>terasu tsuki no yoru ni kakete ku<br>kakete ku kakete<br><br>Yo (Yo!)<br>Hoshiboshi no kirameki (kirameki)<br>machi no kensō mo furi nuki<br>kakete kakete yume no hatemade<br><br>ichi man nen (to) iku oku kōnen (e 〜!)<br>Seiza watari hikareru kiseki<br>hoshi no tabibito tsuki no koibito<br>wa ninatte kyō mo tomoni odorō<br>sā issho ni dance tonight<br><br>itsukakaze ninatte<br>itsukakumo ninatte<br>taiyō to tsuki to hoshi to mazari au n da<br><br>tsuki wo miageru toki mo<br>machi wo miorosu toki mo<br>mabuta ni utsuru omoi wo<br>taisetsu ni dakishimetsuzukeru<br>hitomi to hitomi wo kawasu itami to inori wo<br>mune ni dakishimete tabidatsu<br><br>hoshi wa irotoridori no (kirari)<br>machi no sono tokidoki wo (Pika ri)<br>kazaru sono oriori wo<br>watashi wa ima, hashirinukete yuku<br>sono hoshiboshi wo (jikani)<br>ai ya mirai ya yume wo (mitai)<br>terasu tsuki no yoru ni kakete ku<br><br>tsuki wa hoshi no tabibito hoshi wa tsuki no koibito<br>utsukushii yozora wo koe<br>watashi wa ashita mo hashirinukeru no sa<br>sono tokidoki wo kakegae no nai toki wo<br>kyō mo mune ni idaki kakete ku<br>ima kono toki wo kakete ku...<br>Koko ni niji wo kakete ku...<br>Yume no hashi wo egakete ku...<br>Atsukiomoi wo kakete ku...<br>Sora takaku kakete ku..."
+        },
+        {
+            "title": "Party Tonight (Instrumental)",
+            "japanese": "",
+            "romaji": ""
+        },
+        {
+            "title": "ソノホシボシト (Instrumental)",
+            "japanese": "",
+            "romaji": ""
+        }
+    ]
+}
+</script>
+
+<script>
+// {
+//     "title": "Title",
+//     "japanese": "Line 1 lyrics<br>Line 2 lyrics<br><br>Line 3 Lyrics",
+//     "romaji": "Line 1 lyrics<br>Line 2 lyrics<br><br>Line 3 Lyrics"
+// },
+
+// Get the JSON from the script tag
+const jsonText = document.getElementById('songData').textContent;
+const songs = JSON.parse(jsonText);
+
+function makeLyrics(track) {
+    const selectedSong = songs.song[track-1];
+    document.getElementById('trackmodal').textContent = selectedSong.title;
+    document.getElementById('trackjapanese-pane').innerHTML = selectedSong.japanese;
+    document.getElementById('trackromaji-pane').innerHTML = selectedSong.romaji;
+}
+</script>
+
+            <div class="cd_header" style="color: white;">
+                <div class="cd_blurbg" style="background-color: black;"></div>
+                <img src="/kat/assets/image/cd/amw-party_tonight-cover.jpg" height="200" width="200">
+                <div>
+                    <h1>Party Tonight</h1>
+                    <h6>EP • 2023年</h6>
+                    <h6>4曲 • 15分</h6>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row flex-column flex-sm-row">
+                    <div class="col-sm-8 col-md-9 mb-5">
+                        <table class="table" id="tracklist">
+                            <thead>
+                                <tr>
+                                    <th class="col-1" scope="col">#</th>
+                                    <th class="col-7" scope="col">TITLE</th>
+                                    <th class="col-2 d-none d-sm-table-cell" scope="col">LYRICS</th>
+                                    <th class="col-2" scope="col"><i class="far fa-clock"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <td>1</td>
+                                    <td><a onclick="makeLyrics('1')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;">Party Tonight</a></td>
+                                    <td class="d-none d-sm-table-cell"><a onclick="makeLyrics('1')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;">LYRICS</a></td>
+                                    <td>4:04</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row">2</td>
+                                    <td><a onclick="makeLyrics('2')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;">ソノホシボシト</a></td>
+                                    <td class="d-none d-sm-table-cell"><a onclick="makeLyrics('2')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;">LYRICS</a></td>
+                                    <td>3:39</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row">3</td>
+                                    <td>Party Tonight (Instrumental)</td>
+                                    <td class="d-none d-sm-table-cell">-</td>
+                                    <td>4:04</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row">4</td>
+                                    <td>ソノホシボシト (Instrumental)</td>
+                                    <td class="d-none d-sm-table-cell">-</td>
+                                    <td>3:39</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-4 col-md-3 mb-3" style="position: relative;">
+
+                        <h6 class="mt-2">Buy CD</h6>
+                        <a class="btnlink" href="https://kat.shop-pro.jp/?pid=169075036" target="_blank">
+                            <img src="/kat/assets/svg/katshop.svg">
+                        </a>
+                        <h6 class="mt-5">Buy Digital</h6>
+                        <a class="btnlink itunes" href="https://music.apple.com/jp/album/party-tonight-ep/1695070282" target="_blank">
+                            <img src="/kat/assets//svg/itunes.svg">
+                        </a>
+                        <!-- <a class="btnlink google-play" href="" target="_blank"></a> -->
+                        <a class="btnlink amazon" href="https://www.amazon.co.jp/dp/B0C9T91MPX" target="_blank">
+                            <img src="/kat/assets//svg/amazon.svg">
+                        </a>
+                        <h6 class="mt-5">Listen</h6>
+                        <!-- <a class="btnlink apple-music" href="" target="_blank"></a> -->
+                        <a class="btnlink yt-music" href="https://music.youtube.com/playlist?list=OLAK5uy_mb2_zrvOlxBM8QJy5UKAupTi6OV1IFPwA" target="_blank">
+                            <img src="/kat/assets//svg/yt-music.svg">
+                        </a>
+                        <a class="btnlink spotify" href="https://open.spotify.com/album/6EWScWkHVBBQot1b0A55H5" target="_blank">
+                            <img src="/kat/assets//svg/spotify.svg">
+                        </a>
+                        <!-- <a class="btnlink youtube" href="" target="_blank"></a> -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 歌詞モーダル -->
+            <div class="modal fade" id="lyricsModal" tabindex="-1" aria-labelledby="trackmodal" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="trackmodal"></h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="trackjapanese" data-bs-toggle="tab" data-bs-target="#trackjapanese-pane" type="button" role="tab" aria-controls="trackjapanese-pane" aria-selected="true">日本語</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="trackromaji" data-bs-toggle="tab" data-bs-target="#trackromaji-pane" type="button" role="tab" aria-controls="track1romaji-pane" aria-selected="false">Romaji</button>
+                            </li>
+                        </ul>
+                        <div class="modal-body" style="height: 50vh; max-height: 50vh; overflow-y: auto;">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active lh-lg" id="trackjapanese-pane" role="tabpanel" aria-labelledby="trackjapanese" tabindex="0">
+                                </div>
+                                <div class="tab-pane fade lh-lg" id="trackromaji-pane" role="tabpanel" aria-labelledby="track1romaji" tabindex="0" translate="no">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 style="padding-top: 6rem;">コード </h5>
+            <hr>
+
+            <p>
+                CDジャケットの背景をぼかしたのは、シンプルなコントラストをつけるためだ。
+                このサンプルで黒が選ばれたのは、CDがほとんど黒っぽい色だからだ。
+            </p>
+            <p>
+                タイトルや歌詞のリンクがクリックされると、モーダルが開いて日本語とローマ字の歌詞が表示されます。
+                日本語が読めない人でも、歌詞を読みながら歌えるようにローマ字表記を追加しました。
+                これにより、より国際化できるようになります。
+                歌詞はJSONファイルでHTMLファイルに含まれている。
+            </p>
+            <p>
+                また、&lt;a&gt;タグの中に配置すると、ストリーミングなどの他のサービスや、アルバムや曲を購入できる場所にリンクできるSVG画像もいくつか作成した。
+            </p>
+
+            <div class="codebox html">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-html">&lt;div class="cd_header" style="color: white;"&gt;
+    &lt;div class="cd_blurbg" style="background-color: black;"&gt;&lt;/div&gt;
+    &lt;img src="/kat/assets/image/amw-part_tonight.png" height="200" width="200"&gt;
+    &lt;div&gt;
+        &lt;h1&gt;Party Tonight&lt;/h1&gt;
+        &lt;h6&gt;EP • 2023年&lt;/h6&gt;
+        &lt;h6&gt;4曲 • 15分&lt;/h6&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="container-fluid"&gt;
+    &lt;div class="row flex-column flex-sm-row"&gt;
+        &lt;div class="col-sm-8 col-md-9 mb-5"&gt;
+            &lt;table class="table" id="tracklist"&gt;
+                &lt;thead&gt;
+                    &lt;tr&gt;
+                        &lt;th class="col-1" scope="col"&gt;#&lt;/th&gt;
+                        &lt;th class="col-7" scope="col"&gt;TITLE&lt;/th&gt;
+                        &lt;th class="col-2 d-none d-sm-table-cell" scope="col"&gt;LYRICS&lt;/th&gt;
+                        &lt;th class="col-2" scope="col"&gt;&lt;i class="far fa-clock"&gt;&lt;/i&gt;&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody class="table-group-divider"&gt;
+                    &lt;tr&gt;
+                        &lt;td&gt;1&lt;/td&gt;
+                        &lt;td&gt;&lt;a onclick="makeLyrics('1')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;"&gt;Party Tonight&lt;/a&gt;&lt;/td&gt;
+                        &lt;td class="d-none d-sm-table-cell"&gt;&lt;a onclick="makeLyrics('1')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;"&gt;LYRICS&lt;/a&gt;&lt;/td&gt;
+                        &lt;td&gt;4:04&lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td scope="row"&gt;2&lt;/td&gt;
+                        &lt;td&gt;&lt;a onclick="makeLyrics('2')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;"&gt;ソノホシボシト&lt;/a&gt;&lt;/td&gt;
+                        &lt;td class="d-none d-sm-table-cell"&gt;&lt;a onclick="makeLyrics('2')" data-bs-toggle="modal" data-bs-target="#lyricsModal" style="cursor: pointer;"&gt;LYRICS&lt;/a&gt;&lt;/td&gt;
+                        &lt;td&gt;3:39&lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td scope="row"&gt;3&lt;/td&gt;
+                        &lt;td&gt;Party Tonight (Instrumental)&lt;/td&gt;
+                        &lt;td class="d-none d-sm-table-cell"&gt;-&lt;/td&gt;
+                        &lt;td&gt;4:04&lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td scope="row"&gt;4&lt;/td&gt;
+                        &lt;td&gt;ソノホシボシト (Instrumental)&lt;/td&gt;
+                        &lt;td class="d-none d-sm-table-cell"&gt;-&lt;/td&gt;
+                        &lt;td&gt;3:39&lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+        &lt;/div&gt;
+        &lt;div class="col-sm-4 col-md-3 mb-3" style="position: relative;"&gt;
+
+            &lt;h6 class="mt-2"&gt;Buy CD&lt;/h6&gt;
+            &lt;a class="btnlink" href="https://kat.shop-pro.jp/?pid=169075036" target="_blank"&gt;
+                &lt;img src="/kat/assets/svg/katshop.svg"&gt;
+            &lt;/a&gt;
+            &lt;h6 class="mt-5"&gt;Buy Digital&lt;/h6&gt;
+            &lt;a class="btnlink itunes" href="https://music.apple.com/jp/album/party-tonight-ep/1695070282" target="_blank"&gt;
+                &lt;img src="/kat/assets/svg/itunes.svg"&gt;
+            &lt;/a&gt;
+            &lt;a class="btnlink amazon" href="https://www.amazon.co.jp/dp/B0C9T91MPX" target="_blank"&gt;
+                &lt;img src="/kat/assets/svg/amazon.svg"&gt;
+            &lt;/a&gt;
+            &lt;h6 class="mt-5"&gt;Listen&lt;/h6&gt;
+            &lt;a class="btnlink yt-music" href="https://music.youtube.com/playlist?list=OLAK5uy_mb2_zrvOlxBM8QJy5UKAupTi6OV1IFPwA" target="_blank"&gt;
+                &lt;img src="/kat/assets/svg/yt-music.svg"&gt;
+            &lt;/a&gt;
+            &lt;a class="btnlink spotify" href="https://open.spotify.com/album/6EWScWkHVBBQot1b0A55H5" target="_blank"&gt;
+                &lt;img src="/kat/assets/svg/spotify.svg"&gt;
+            &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;!-- 歌詞モーダル --&gt;
+&lt;div class="modal fade" id="lyricsModal" tabindex="-1" aria-labelledby="trackmodal" style="display: none;" aria-hidden="true"&gt;
+    &lt;div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"&gt;
+        &lt;div class="modal-content"&gt;
+            &lt;div class="modal-header"&gt;
+                &lt;h1 class="modal-title fs-5" id="trackmodal"&gt;&lt;/h1&gt;
+                &lt;button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"&gt;&lt;/button&gt;
+            &lt;/div&gt;
+            &lt;ul class="nav nav-tabs" role="tablist"&gt;
+                &lt;li class="nav-item" role="presentation"&gt;
+                    &lt;button class="nav-link active" id="trackjapanese" data-bs-toggle="tab" data-bs-target="#trackjapanese-pane" type="button" role="tab" aria-controls="trackjapanese-pane" aria-selected="true"&gt;日本語&lt;/button&gt;
+                &lt;/li&gt;
+                &lt;li class="nav-item" role="presentation"&gt;
+                    &lt;button class="nav-link" id="trackromaji" data-bs-toggle="tab" data-bs-target="#trackromaji-pane" type="button" role="tab" aria-controls="track1romaji-pane" aria-selected="false"&gt;Romaji&lt;/button&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;div class="modal-body" style="height: 50vh; max-height: 50vh; overflow-y: auto;"&gt;
+                &lt;div class="tab-content"&gt;
+                    &lt;div class="tab-pane fade show active lh-lg" id="trackjapanese-pane" role="tabpanel" aria-labelledby="trackjapanese" tabindex="0"&gt;
+                    &lt;/div&gt;
+                    &lt;div class="tab-pane fade lh-lg" id="trackromaji-pane" role="tabpanel" aria-labelledby="track1romaji" tabindex="0" translate="no"&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="modal-footer"&gt;
+                &lt;button type="button" class="btn btn-primary" data-bs-dismiss="modal"&gt;Close&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                </main>
+                <footer data-ext="html"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <div class="codebox css">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-css">#tracklist > tbody > tr > td {
+    height: 4rem;
+    vertical-align: middle !important;
+}
+
+.cd_header {
+    position: relative;
+    width: 100%;
+    margin: 2rem auto 5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+
+@media screen and (max-width: 480px) {
+    .cd_header {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cd_header > * {
+        text-align: center;
+    }
+}
+
+.cd_header > * {
+    padding: 1rem;
+}
+
+.cd_blurbg {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  
+  display: block;
+  width: 100%;
+  height: 100%;
+  
+  -webkit-filter: blur(8px) brightness(.65);
+  -moz-filter: blur(8px) brightness(.65);
+  -o-filter: blur(8px) brightness(.65);
+  -ms-filter: blur(8px) brightness(.65);
+  filter: blur(8px) brightness(.65);
+}</code></pre>
+                </main>
+                <footer data-ext="css"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+
+            <div class="codebox js">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-html">&lt;script&gt;
+const jsonText = document.getElementById('songData').textContent;
+const songs = JSON.parse(jsonText);
+
+function makeLyrics(track) {
+    const selectedSong = songs.song[track-1];
+    document.getElementById('trackmodal').textContent = selectedSong.title;
+    document.getElementById('trackjapanese-pane').innerHTML = selectedSong.japanese;
+    document.getElementById('trackromaji-pane').innerHTML = selectedSong.romaji;
+}
+&lt;/script&gt;</code></pre>
+                </main>
+                <footer data-ext="js"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <div class="codebox json">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-json">&lt;script id="songData" type="application/json"&gt;
+{
+    "song": [
+        {
+            "title": "Song 1",
+            "japanese": "Line 1 lyrics&lt;br&gt;Line 2 lyrics&lt;br&gt;&lt;br&gt;Line 3 Lyrics",
+            "romaji": "Line 1 lyrics&lt;br&gt;Line 2 lyrics&lt;br&gt;&lt;br&gt;Line 3 Lyrics"
+        },
+        {
+            "title": "Song 2",
+            "japanese": "Line 1 lyrics&lt;br&gt;Line 2 lyrics&lt;br&gt;&lt;br&gt;Line 3 Lyrics",
+            "romaji": "Line 1 lyrics&lt;br&gt;Line 2 lyrics&lt;br&gt;&lt;br&gt;Line 3 Lyrics"
+        }
+    ]
+}
+&lt;/script&gt;</code></pre>
+                </main>
+                <footer data-ext="json"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <div class="codebox css">
+                <header>buttons.css</header>
+                <main>
+                    <pre><code class="language-css">a.btnlink {
+    display: inline-block;
+    position: relative;
+    width: 136px;
+    height: 44px;
+    border: 2px solid #e7e7e7;
+    background-color: #fff;
+    border-radius: .5rem;
+    margin: .25rem;
+}
+
+a.btnlink > img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}</code></pre>
+                </main>
+                <footer data-ext="css"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <h4>SVG</h4>
+
+            <span class="svgdisp">
+                <figure>
+                    <img src="/kat/assets/svg/katshop.svg" style="width: 136px; height: 44px;">
+                    <figcaption>katshop.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/amazon.svg" style="width: 136px; height: 44px;">
+                    <figcaption>amazon.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/apple-music.svg" style="width: 136px; height: 44px;">
+                    <figcaption>apple-music.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/itunes.svg" style="width: 136px; height: 44px;">
+                    <figcaption>itunes.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/google-play.svg" style="width: 136px; height: 44px;">
+                    <figcaption>google-play.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/spotify.svg" style="width: 136px; height: 44px;">
+                    <figcaption>spotify.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/youtube.svg" style="width: 136px; height: 44px;">
+                    <figcaption>youtube.svg</figcaption>
+                </figure>
+                <figure>
+                    <img src="/kat/assets/svg/yt-music.svg" style="width: 136px; height: 44px;">
+                    <figcaption>yt-music.svg</figcaption>
+                </figure>
+            </span>
+        </article>
+
+</main>
+
+<footer>
+    <span>
+        <div class="row1">
+                <div class="cols cols1">
+                    <h5>Company<br class="sp">Name</h5>
+                    <h6>Slogan</h6>
+                    <p class="oooh-baby-regular" style="font-size: 1.75rem;">Slogan!</p>
+                    <!-- <div class="mail">
+                        <span class="fa fa-envelope"></span>
+                        <p>customer.support@gmail.com</p>
+                    </div> -->
+                </div>
+                <div class="cols cols2">
+                    <h2>Company</h2>
+                    <a href="">About Us</a>
+                    <a href="">Lesson Class</a>
+                    <a href="">Studio</a>
+                    <a href="">Contact Us</a>
+                </div>
+                <div class="cols cols3">
+                    <h2>Hot Links</h2>
+                    <a href="">Shop</a>
+                    <a href="">Fan Club</a>
+                </div>
+                <div class="cols cols4">
+                    <h2>More from Us</h2>
+                    <a href="">Fashion XChange</a>
+                    <a href="">RECYCLE</a>
+                </div>
+        </div>
+<!-- 
+        <div class="row2">
+            <div class="cols cols1"></div>
+            <div class="cols cols5">
+                    <h2>傘下</h2>
+                    <a href="./akino/">AKINO from bless4</a>
+                    <a href="./amw/">AMW</a>
+                    <a href="./bless4/">bless4</a>
+                    <a href="./haru/">HARU</a>
+            </div>
+            <div class="cols cols6">
+                <h2>&nbsp;</h2>
+                <a href="./kakirizer/">KAKI RIZER</a>
+                <a href="./kanasa/">KANASA from bless4</a>
+                <a href="./seigi_no_mikata/">SEIGI NO MIKATA</a>
+            </div>
+            <div class="cols"></div>
+        </div>
+-->
+
+        <div class="row3">
+            <div class="cols" id="a">
+                Copyright © Company Co., Ltd.<br>All Rights Reserved.
+            </div>
+            <!-- <div class="cols" id="b"></div> -->
+            <div class="cols sns-icons-ww" id="c">
+                <a href="https://www.facebook.com/NULLCompanyName/"><img src="/kat/assets/svg/facebook-f-white.svg"></a>
+                <a href="https://www.instagram.com/NULLCompanyName/"><img src="/kat/assets/svg/instagram-white.svg"></a>
+                <a href="https://x.com/NULLCompanyName"><img src="/kat/assets/svg/twitter-x-logo-white.svg"></a>
+                <a href="https://www.threads.net/@NULLCompanyName"><img src="/kat/assets/svg/instagram-threads-white.svg"></a>
+                <a href="https://www.youtube.com/user/NULLCompanyName"><img src="/kat/assets/svg/youtube-line-white.svg"></a>
+            </div>
+        </div>
+    </span>
+</footer>
+
+<script>
+</script>
+
+<script src="/kat/assets/js/prism.js"></script>
+<script src="/kat/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="chikuma">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Description">
+
+<!-- og系記述 -->
+<meta property="og:title" content="[Title]" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="[Description]" />
+<meta property="og:url" content="http://localhost:81/" />
+<meta property="og:image" content="/kat/assets/image/share/share.jpg" />
+<meta property="og:site_name" content="[Site Name]" />
+<meta name="facebook-domain-verification" content="" />
+
+<!-- Twitter系記述 -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="[Title]" />
+<meta name="twitter:description" content="[Description]" />
+<meta name="keywords" content="[Keywords]">
+<meta name="twitter:image" content="/kat/assets/image/share/share.jpg" />
+<meta name="twitter:url" content="http://localhost:81/" />
+<meta name="twitter:creator" content="@NULLCreatorName" />
+<meta name="twitter:site" content="@NULLCreatorName" />
+
+<!-- BootstrapのCSS読み込み -->
+<link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" href="/kat/assets/layout/css/bootstrap.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+<link rel="stylesheet" href="/kat/assets/layout/css/common.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/style.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/code.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/events.css">
+
+<link rel="stylesheet" href="/kat/assets/layout/css/prism.css">
+<link rel="stylesheet" href="/kat/assets/layout/css/header.css">
+<title>Company: Artist 1</title>
+<style>
+
+</style>
+</head>
+<body>
+
+<header data-nav="right">
+    <span>
+        <input type="checkbox">
+        <div><a href="/kat/" class="clear"><img src="/kat/assets/layout/svg/logo.svg" style="width: 50px; height: 50px;"></a>Company Name</div>
+        <nav>
+            <ol>
+                <li><a href="/kat/discography/">ディスコグラフィー</a></li>
+                <li><a href="/kat/#">来歴</a></li>
+            </ol>
+        </nav>
+    </span>
+</header>
+
+<main>
+
+        <article>
+            <br>
+            <h1>ディスコグラフィー</h1>
+            <h4>CDs</h4>
+            <h5 style="padding-top: 6rem;">プレビュー </h5>
+            <hr>
+
+<style>
+
+.cdcase {
+    /* h * 1.1458 */
+    position: relative;
+    /* width: 550px; */
+    /* height: 480px; */
+    width: calc(120px * 1.1458);
+    height:     120px;
+    border: 1px solid #ccc;
+}
+
+.cdcase::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 10%;
+    height: 100%;
+    border-right: 1px solid #ccc;
+    background-color: #1e1e1e;
+    background: #222;
+    /* background: linear-gradient(90deg,
+        rgba(  0,   0,   0, 1)  0%, rgba(  0,   0,   0, 1) 10%,
+        rgba( 32,  32,  32, 1) 10%, rgba( 32,  32,  32, 1) 20%,
+        rgba(  0,   0,   0, 1) 20%, rgba(  0,   0,   0, 1) 30%,
+        rgba( 32,  32,  32, 1) 30%, rgba( 32,  32,  32, 1) 40%,
+        rgba(  0,   0,   0, 1) 40%, rgba(  0,   0,   0, 1) 50%,
+        rgba( 32,  32,  32, 1) 50%, rgba( 32,  32,  32, 1) 60%,
+        rgba(  0,   0,   0, 1) 60%, rgba(  0,   0,   0, 1) 70%,
+        rgba( 32,  32,  32, 1) 70%, rgba( 32,  32,  32, 1) 80%,
+        rgba(  0,   0,   0, 1) 80%, rgba(  0,   0,   0, 1) 90%,
+        rgba( 32,  32,  32, 1) 90%, rgba( 32,  32,  32, 1) 100%
+    ); */
+}
+
+.cdcase::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at 180% 110%,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.1) 74%,
+        rgba(255, 255, 255, 0.2) 75%,
+        rgba(255, 255, 255, 0.2) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cdcase > img {
+    position: relative;
+    width: 90%;
+    height: 100%;
+    float: right;
+}
+
+.cd1, .cd2, .cd3 {
+    position: absolute;
+    margin: auto;
+    background: white;
+    /* height: 100%; */
+    /* width: 100%; */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #dedede;
+    box-shadow: 5px 10px 30px 1px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+
+    width: 86.4%;
+    height: 96%;
+    top: 2%;
+
+}
+
+.cd1 { left: 50%; z-index: -1; }
+.cd2 { left: 70%; z-index: -2; }
+.cd3 { left: 90%; z-index: -3; }
+
+.cd1 > img, .cd2 > img, .cd3 > img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.cd1::before, .cd2::before, .cd3::before {
+    /* height: 15%; */
+    /* width: 15%; */
+    height: 17.5%;
+    width: 17.5%;
+    border-radius: 50%;
+    background: #dedede;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 1;
+    content: "";
+}
+
+.cd1::after, .cd2::after, .cd3::after {
+    position: absolute;
+    height: 12.5%;
+    width: 12.5%;
+    background: white;
+    border-radius: 50%;
+    box-shadow: inset 2px 4px 10px 0px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    content: "";
+}
+
+#cdcontent       
+{
+    font-size: .75em;
+    width: 100%;
+    text-align: left;
+    margin: 0px auto;
+
+    border: 1px solid #CCC;
+    border-radius: 8px;
+    padding: 1em;
+}
+
+.cdtracklist
+{
+    margin-top: 2em;
+    -moz-column-width: 20em;
+    -webkit-column-width: 20em;
+    column-width: 20em;
+}
+
+.cdtracklist ol
+{
+    margin: 0 2em;
+    padding: 0;
+}
+
+.cdtracklist ul li:first-child
+{
+    margin-top:0px;
+}
+</style>
+
+            <div id="cdcontent">
+                <div class="cdcase">
+                    <img src="/kat/assets/image/cd/amw-party_tonight-cover.jpg">
+                    <div class="cd1"><img src="/kat/assets/image/cd/amw-party_tonight-cd.jpg"></div>
+                </div>
+                <div class="cdtracklist">
+                    <ol>
+                        <li>Party Tonight</li>
+                        <li>ソノホシボシト</li>
+                        <li>Party Tonight (Instrumental)</li>
+                        <li>ソノホシボシト (Instrumental)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <br>
+
+            <div id="cdcontent">
+                <div class="cdcase">
+                    <img src="/kat/assets/image/cd/akino-cover.jpg">
+                    <div class="cd1"><img src="/kat/assets/image/cd/akino-disc1.jpg"></div>
+                    <div class="cd2"><img src="/kat/assets/image/cd/akino-disc2.jpg"></div>
+                    <div class="cd3"><img src="/kat/assets/image/cd/akino-disc3.jpg"></div>
+                </div>
+
+                <br>
+                <h6>CD 1</h6>
+                <div class="cdtracklist">
+                    <ol>
+                        <li>創聖のアクエリオン</li>
+                        <li>ニケ15歳</li>
+                        <li>荒野のヒース</li>
+                        <li>Go Tight!</li>
+                        <li>プライド～嘆きの旅</li>
+                        <li>Genesis of Aquarion</li>
+                        <li>Genesis of LOVE～愛の起源</li>
+                        <li>素足</li>
+                        <li>パラドキシカルZOO</li>
+                        <li>イヴの断片</li>
+                        <li>君の神話～アクエリオン第二章</li>
+                        <li>月光シンフォニア</li>
+                        <li>ZERO ゼロ</li>
+                    </ol>
+                </div>
+
+                <br>
+                <h6>CD 2</h6>
+                <div class="cdtracklist">
+                    <ol>
+                        <li>エクストラ・マジック・アワー</li>
+                        <li>Jet Coaster Ride</li>
+                        <li>海色</li>
+                        <li>The Ghost of You</li>
+                        <li>雪のように</li>
+                        <li>Let's Fly</li>
+                        <li>EXTRA MAGIC HOUR [International Edition]</li>
+                        <li>Golden Life</li>
+                        <li>ドキドキするから</li>
+                        <li>cross the line</li>
+                        <li>I Got This</li>
+                        <li>OVERNIGHT REVOLUTION</li>
+                        <li>月のもう半分</li>
+                        <li>月明かりのMonologue</li>
+                        <li>Etoile de priere</li>
+                    </ol>
+                </div>
+
+                <br>
+                <h6>CD 3</h6>
+                <div class="cdtracklist">
+                    <ol>
+                        <li>Chance To Shine</li>
+                        <li>運命の前奏曲</li>
+                        <li>愛と絶望のイデア</li>
+                        <li>Chase the WAVE</li>
+                        <li>What am I Fighting for</li>
+                        <li>シラカバの光</li>
+                        <li>運命のプロローグ</li>
+                        <li>The End begins</li>
+                        <li>Soccer Spirits</li>
+                        <li>your ears, our years</li>
+                    </ol>         
+                </div>
+            </div>
+
+            <h5 style="padding-top: 6rem;">コード </h5>
+            <hr>
+
+            <div class="codebox css">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-css">.cdcase {
+    position: relative;
+    width: calc(120px * 1.1458);
+    height:     120px;
+    border: 1px solid #ccc;
+}
+
+.cdcase::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 10%;
+    height: 100%;
+    border-right: 1px solid #ccc;
+    background-color: #1e1e1e;
+    background: #222;
+}
+
+.cdcase::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at 180% 110%,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.1) 74%,
+        rgba(255, 255, 255, 0.2) 75%,
+        rgba(255, 255, 255, 0.2) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cdcase > img {
+    position: relative;
+    width: 90%;
+    height: 100%;
+    float: right;
+}
+
+.cd1, .cd2, .cd3 {
+    position: absolute;
+    margin: auto;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #dedede;
+    box-shadow: 5px 10px 30px 1px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 86.4%;
+    height: 96%;
+    top: 2%;
+}
+
+.cd1 { left: 50%; z-index: -1; }
+.cd2 { left: 70%; z-index: -2; }
+.cd3 { left: 90%; z-index: -3; }
+
+.cd1 > img, .cd2 > img, .cd3 > img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.cd1::before, .cd2::before, .cd3::before {
+    height: 17.5%;
+    width: 17.5%;
+    border-radius: 50%;
+    background: #dedede;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 1;
+    content: "";
+}
+
+.cd1::after, .cd2::after, .cd3::after {
+    position: absolute;
+    height: 12.5%;
+    width: 12.5%;
+    background: white;
+    border-radius: 50%;
+    box-shadow: inset 2px 4px 10px 0px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    content: "";
+}
+
+#cdcontent       
+{
+    font-size: .75em;
+    width: 100%;
+    text-align: left;
+    margin: 0px auto;
+    border: 1px solid #CCC;
+    border-radius: 8px;
+    padding: 1em;
+}
+
+.cdtracklist
+{
+    margin-top: 2em;
+    -moz-column-width: 20em;
+    -webkit-column-width: 20em;
+    column-width: 20em;
+}
+
+.cdtracklist ol
+{
+    margin: 0 2em;
+    padding: 0;
+}
+
+.cdtracklist ul li:first-child
+{
+    margin-top:0px;
+}</code></pre>
+                </main>
+                <footer data-ext="css"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+            <div class="codebox php">
+                <header>index.html</header>
+                <main>
+                    <pre><code class="language-html">&lt;div id="cdcontent"&gt;
+    &lt;div class="cdcase"&gt;
+        &lt;img src="/kat/assets/image/cd/amw-party_tonight-cover.jpg"&gt;
+        &lt;div class="cd1"&gt;&lt;img src="/kat/assets/image/cd/amw-party_tonight-cd.jpg"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="cdtracklist"&gt;
+        &lt;ol&gt;
+            &lt;li&gt;Party Tonight&lt;/li&gt;
+            &lt;li&gt;ソノホシボシト&lt;/li&gt;
+            &lt;li&gt;Party Tonight (Instrumental)&lt;/li&gt;
+            &lt;li&gt;ソノホシボシト (Instrumental)&lt;/li&gt;
+        &lt;/ol&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                </main>
+                <footer data-ext="html"></footer>
+                <div class="copy-click-area"></div>
+            </div>
+
+        </article>
+
+
+</main>
+
+<footer>
+    <span>
+        <div class="row1">
+                <div class="cols cols1">
+                    <h5>Company<br class="sp">Name</h5>
+                    <h6>Slogan</h6>
+                    <p class="oooh-baby-regular" style="font-size: 1.75rem;">Slogan!</p>
+                    <!-- <div class="mail">
+                        <span class="fa fa-envelope"></span>
+                        <p>customer.support@gmail.com</p>
+                    </div> -->
+                </div>
+                <div class="cols cols2">
+                    <h2>Company</h2>
+                    <a href="">About Us</a>
+                    <a href="">Lesson Class</a>
+                    <a href="">Studio</a>
+                    <a href="">Contact Us</a>
+                </div>
+                <div class="cols cols3">
+                    <h2>Hot Links</h2>
+                    <a href="">Shop</a>
+                    <a href="">Fan Club</a>
+                </div>
+                <div class="cols cols4">
+                    <h2>More from Us</h2>
+                    <a href="">Fashion XChange</a>
+                    <a href="">RECYCLE</a>
+                </div>
+        </div>
+<!-- 
+        <div class="row2">
+            <div class="cols cols1"></div>
+            <div class="cols cols5">
+                    <h2>傘下</h2>
+                    <a href="./akino/">AKINO from bless4</a>
+                    <a href="./amw/">AMW</a>
+                    <a href="./bless4/">bless4</a>
+                    <a href="./haru/">HARU</a>
+            </div>
+            <div class="cols cols6">
+                <h2>&nbsp;</h2>
+                <a href="./kakirizer/">KAKI RIZER</a>
+                <a href="./kanasa/">KANASA from bless4</a>
+                <a href="./seigi_no_mikata/">SEIGI NO MIKATA</a>
+            </div>
+            <div class="cols"></div>
+        </div>
+-->
+
+        <div class="row3">
+            <div class="cols" id="a">
+                Copyright © Company Co., Ltd.<br>All Rights Reserved.
+            </div>
+            <!-- <div class="cols" id="b"></div> -->
+            <div class="cols sns-icons-ww" id="c">
+                <a href="https://www.facebook.com/NULLCompanyName/"><img src="/kat/assets/svg/facebook-f-white.svg"></a>
+                <a href="https://www.instagram.com/NULLCompanyName/"><img src="/kat/assets/svg/instagram-white.svg"></a>
+                <a href="https://x.com/NULLCompanyName"><img src="/kat/assets/svg/twitter-x-logo-white.svg"></a>
+                <a href="https://www.threads.net/@NULLCompanyName"><img src="/kat/assets/svg/instagram-threads-white.svg"></a>
+                <a href="https://www.youtube.com/user/NULLCompanyName"><img src="/kat/assets/svg/youtube-line-white.svg"></a>
+            </div>
+        </div>
+    </span>
+</footer>
+
+<script>
+</script>
+
+<script src="/kat/assets/js/prism.js"></script>
+</body>
+</html>
