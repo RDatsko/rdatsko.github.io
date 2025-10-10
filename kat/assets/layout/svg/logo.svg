@@ -1,5 +1,0 @@
-<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-    <polygon class="star" points="10,20 15,25 10,30 5,25"></polygon>
-    <polygon class="star" points="25,10 30,15 25,20 20,15"></polygon>
-    <polygon class="star" points="25,30 30,35 25,40 20,35"></polygon>
-</svg>
