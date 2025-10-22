@@ -1,0 +1,3067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAALHRFWHRDcmVhdGlvbiBUaW1lAFRodSAyMyBPY3QgMjAyNSAwNTo0ODozNSArMDkwMEpWW4kAAAAHdElNRQfpChYUMQuI/SWeAAAACXBIWXMAAAsSAAALEgHS3X78AAAABGdBTUEAALGPC/xhBQAAAGdJREFUeNpjUFdXr6urCwkJccUBSkpKent7XVxc9PT0hIWFGYCqgXxj3KC7uxuuAKiHoZc4AFQtLy8PJMnVcBw3oKMGCBjJTqJlTEMSnytu0NbWhpL4gMm7vr7eyckJV2qNi4tDTt4AxdV8mI45EC4AAAAASUVORK5CYII=">
+<script src="./html-binding.js"></script>
+<script src="./symbols-manual.js"></script>
+<script src="./symbols-generated.js"></script>
+<script src="./transpiled.js"></script>
+<script src="./rocky-extended.js"></script>
+<title>☁︎Pebble.js</title>
+<style>
+
+:root {
+    --pebble-red: #ff4700;
+    /* #303030 */
+    /*  */
+    --logo-width: 200px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font, "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
+}
+
+html {
+    font-size: 10px;
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #2a2a2a;
+    color: white;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+button {
+	display: inline-block;
+    margin: 0;
+    padding: 0.5rem 1rem;
+	border: 0;
+	border-radius: 0.317rem;
+	background-color: var(--pebble-red);
+	color: #fff;
+	text-decoration: none;
+    text-transform: uppercase;
+	font-weight: 700;
+	font-size: 1.25rem;
+    line-height: 1.5;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	cursor: pointer;
+	-webkit-appearance: none;
+	-webkit-font-smoothing: antialiased;
+    &:active {
+        box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2);
+    }
+    &:focus {
+        outline: thin dotted #444;
+        outline: 5px auto -webkit-focus-ring-color;
+        outline-offset: -2px;
+    }
+    &:hover {
+        opacity: 0.85;
+    }
+}
+
+header {
+    background-color: #1a1a1a;
+    padding: 10px 20px;
+    height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    label {
+        color: white;
+        margin-left: 20px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    svg {
+        width: var(--logo-width);
+        height: 50px;
+    }
+}
+
+main {
+    display: flex;
+    height: calc(100vh - 56px);
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    height: 100%;
+    /* background-color: #1e1e1e; */
+    background-color: #2a2a2a;
+    /* padding: 20px; */
+    /* overflow-y: auto; */
+    > div {
+        display: flex;
+        &:first-child {
+            display: flex;
+            flex: 0 0 auto;
+            padding: 20px;
+        }
+        &:last-child {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            overflow-y: scroll;
+            padding: 20px;
+        }
+        > div {
+            margin-bottom: 20px;
+            button {
+                float: right;
+                font-size: 1rem;
+                padding: 2.5px 5px;
+            }
+            > div {
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            ul {
+                padding: 0;
+            }
+            li {
+                margin: 5px 0;
+                padding: 3px 10px;
+                cursor: pointer;
+                list-style: none;
+                font-size: 1.2rem;
+                border-radius: .25rem;
+            }
+            li:hover {
+                background-color: #333;
+            }
+        }
+    }
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.file-item {
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.main {
+    flex: 1;
+    background-color: #2a2a2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex-direction: column;
+    > div > button {
+        width: 15rem;
+        margin: 0.5rem;
+    }
+    > input {
+        display: none;
+    }
+    > input + div {
+        display: none;
+    }
+    > input:checked + div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow: auto scroll;
+    }
+}
+
+.language-select {
+    margin-left: 10px;
+}
+
+.add-new {
+    color: var(--pebble-red);
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+#watch {
+    position: relative;
+    width: 100%;
+    height: auto;
+    outline: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    > #pebble {
+        display: block;
+        position: absolute;
+        /* height: 49%;
+        width: 158%;
+        left: 16%; */
+        height: 44%;
+        /* width: 134%; */
+        /* width: 57%; */
+        left: 21%;
+
+        display: inline-block;
+        vertical-align: baseline;
+        aspect-ratio: auto 432 / 504;
+        overflow-clip-margin: content-box;
+        overflow: clip;
+    }
+}
+
+.link {
+    text-decoration: underline;
+    color: var(--pebble-red);
+    cursor: pointer;
+    margin: .5rem;
+}
+
+.aplite  { width: 144px; height: 168px; } /* Pebble / Pebble Steel (B & W) */
+.basalt  { width: 144px; height: 168px; } /* Pebble Time / Pebble Time Steel */
+.diorite { width: 144px; height: 168px; }  /* Pebble 2 */
+.chalk   { width: 180px; height: 180px; border-radius: 100vw; } /* Pebble Time Round */
+.emery   { width: 200px; height: 228px; } /* Pebble Time 2 */
+
+
+[name="pbldocs"], [name="pbldocs"] + label {
+    display: none;
+}
+
+[name="pbldocs"] + label + article,
+[name="pbldocs"] + label + article + aside {
+    display: none;
+}
+
+[name="pbldocs"] + label + article {
+    width: 100%;
+    /* height: 100%;
+    overflow: scroll; */
+    /* padding: 10px 25px; */
+    padding-bottom: 10px;
+}
+
+[name="pbldocs"]:checked + label + article,
+[name="pbldocs"]:checked + label + article + aside {
+    display: block;
+    position: relative;
+    height: 100%;
+    overflow: hidden scroll;
+    padding: 2rem;
+}
+
+.docpage article pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    overflow: scroll;
+}
+
+.docpage article code {
+    font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace;
+}
+
+.docpage article h1,
+.docpage article h2,
+.docpage article h3,
+.docpage article h4,
+.docpage article h5,
+.docpage article h6 {
+    line-height: 1.3;
+    margin: 0 0 1rem 0;
+    text-rendering: optimizeLegibility;
+}
+
+.docpage article h1 {
+    text-transform: uppercase;
+    line-height: 1.1;
+    font-size: 3.4rem;
+}
+
+.docpage article h2 {
+    line-height: 1.3;
+    font-size: 3rem;
+    margin-top: 3rem;
+}
+
+.docpage article h4 {
+    border-bottom: 1px solid var(--pebble-red);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 1rem 0.5rem 0;
+}
+
+.docpage article p {
+    margin: 0 0 1rem;
+}
+
+.docpage article p.note {
+    border-top: 2px solid var(--pebble-red);
+    border-bottom: 2px solid var(--pebble-red);
+    background: #e5e4e4;
+    color: #484848;
+}
+
+.docpage article p.note::before {
+    font-size: 1.1em;
+    margin: 0;
+    content: "NOTE";
+    font-weight: 500;
+    display: block;
+}
+
+.docpage article div {
+    border: 1px solid #ccc;
+    margin: 1rem 0;
+}
+
+.docpage article div dl {
+    padding: 0.5rem;
+}
+
+.docpage article div dl dt {
+    font-weight: 500;
+}
+
+.docpage article div dl dd {
+    margin-left: 1.5rem;
+}
+
+.docpage article div span {
+    background-color: #ccc;
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    font-weight: 500;
+    padding: .5rem;
+}
+
+.docpage article div p {
+    padding: .5rem;
+}
+
+.sidebar-navigation {
+    webkit-box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    -moz-box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    box-shadow: 3px 5px 10px 0px rgba(0, 0, 0, 0.16);
+    position: fixed;
+    z-index: 400;
+    /* background-color: #fff; */
+    background-color: #555;
+    color: white;
+    width: 300px;
+    top: 75px;
+    bottom: 25px;
+    right: 25px;
+    overflow: hidden;
+    margin: 5px;
+    border-radius: 0.5rem;
+    border: 1px solid #222;
+}
+
+.sidebar-navigation > div {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden scroll;
+    display: block;
+}
+
+.sidebar-navigation .title {
+    display: block;
+    font-size: 14px;
+    line-height: 16px;
+    background-color: #fff;
+    align-items: center;
+    font-weight: 600;
+    padding: 16px;
+    border-bottom: 1px solid #ccc;
+}
+
+.sidebar-navigation ul {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-navigation ul li {
+    display: block;
+    cursor: pointer;
+}
+
+.sidebar-navigation ul li a {
+    position: relative;
+    display: block;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    /* color: #2e2e2e; */
+    color: #e2e2e2;
+    -webkit-transition: all 0.3s linear;
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    transition: all 0.3s linear;
+}
+
+.sidebar-navigation ul li a svg {
+    /* font-size: 24px; */
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+.sidebar-navigation ul li:hover > a, .sidebar-navigation ul li.selected > a {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-navigation ul li ul {
+    display: none;
+}
+
+.sidebar-navigation ul li ul li {
+    font-weight: 400;
+}
+
+.sidebar-navigation ul li ul.open {
+    display: block;
+}
+
+.sidebar-navigation ul li ul li a {
+    /* color: #495d62; */
+    border-color: rgba(255, 255, 255, 0.1);
+    /* font-weight: 400; */
+    padding-left: 46px;
+    font-weight: 300;
+
+}
+
+.sidebar-navigation ul li ul li:hover > a, .sidebar-navigation ul li ul li.selected > a {
+    background-color: #333333;
+}
+
+.sidebar-navigation ul li ul li:hover > a:before, .sidebar-navigation ul li ul li.selected > a:before {
+    margin-right: 10px;
+}
+
+.sidebar-navigation ul li ul li.selected--last > a {
+    padding-left: 31px;
+    font-weight: 500;
+}
+
+.sidebar-navigation ul li ul li.selected.selected--last > a {
+    /* background-color: #94aab0; */
+    background-color: #777;
+    color: #fff;
+}
+
+.sidebar-navigation ul li ul li.selected.selected--last > a:before {
+    /* background-color: #fff; */
+}
+
+.docpage {
+    position: absolute;
+    top: 35px;
+    right: 330px;
+    width: max(500px);
+    height: calc(100% - 75px);
+    background-color: rgb(244, 243, 244);
+    color: rgb(85, 85, 85);
+    border-radius: 1rem 0 0 1rem;;
+}
+
+.content {
+    margin-right: 325px;
+}
+
+
+/* === Scrollbar Styles (Webkit - Chrome, Safari, Edge) === */
+*::-webkit-scrollbar {
+    width: 6px; /* Thin scrollbar */
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent; /* Transparent track */
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #999; /* Black scroll button */
+    border-radius: 3px;
+}
+
+/* === Firefox === */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent; /* thumb color, track color */
+}
+
+
+
+/* Tabs
+   ======================================== */
+
+#details {
+    width: 275px;
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    height: 100%;
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap; 
+    /* background: linear-gradient(0deg, #fff 1rem, #f5f6f7 0%); */
+    /* border: 1px solid #d1d1d1; */
+    border-radius: 5px;
+    padding-bottom: 0.5em;
+    /* height: 100%; */
+    /* height: 350px; */
+    height: calc(100% - 3.5rem);
+}
+
+.tabs > label {
+    order: 1;
+    position: relative;
+    /* top: 1px; */
+    display: block;
+    cursor: pointer;
+    padding: .5rem .8rem;
+    margin: .5rem 0 -2px;
+    border-radius: 5px 5px 0 0;
+    color: rgb(178, 188, 195);
+    /* background: #f5f6f7;
+    border: 1px solid #e3e3e3; */
+    background: #0a0a0c;
+    border: 1px solid #1c1c1c;
+    border-bottom: 0;
+    /* height: auto; */
+    height: 3.5rem;
+}
+
+.tabs > label:first-of-type{ margin-left: 1rem; }
+.tabs > div {
+    order: 99; /*Put the tabs last*/
+    flex-grow: 1;
+    width: 100%;
+    display: none;
+    z-index: 10;
+    padding: 0 1rem;
+    /* background: #fff; */
+    background: #1a1a1a;
+    /* border-top: 1px solid #d1d1d1; */
+    /* border: 1px solid #d1d1d1; */
+    border: 1px solid #2e2e2e;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.tabs > input[type="radio"]:not(:checked) + label:hover { filter: brightness(90%); }
+.tabs > input[type="radio"] { display: none; }
+.tabs > input[type="radio"]:checked + label {   
+    /* border: 1px solid #d1d1d1; */
+    border: 1px solid #2e2e2e;
+    border-bottom: 0px;  
+    /* background: #fff; */
+    background: #1a1a1a;
+    z-index: 11; 
+}
+
+.tabs > input[type="radio"]:checked + label + .tab { display: block; }
+
+@media (max-width: 45em) {
+    .tabs > div,
+    .tabs > label { order: initial; }
+    .tabs > label { width: 100%; margin: 0 0 -1px !important; }
+}
+
+@media print {
+    .tabs > label + div {
+        display: block;
+    }
+    .tabs > label {
+        display: none;
+    }
+} 
+
+kbd {
+    border: 1px solid #ccc;
+    border-bottom: 3px solid #ccc;
+    border-radius: .5rem;
+    padding: .25rem .5rem;
+}
+
+
+
+
+
+
+
+
+
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: "Open Sans", sans-serif;
+/*  background-color: #FECA45; */
+}
+
+.demo__phone {
+  position: relative;
+  width: 305.25px;
+  height: 633px;
+  padding-top: 1px;
+  background-color: black;
+  border-radius: 40px;
+}
+.demo__notch {
+  position: absolute;
+  top: 12px;
+  left: 74.25px;
+  height: 22.5px;
+  width: 156.75px;
+  background-color: black;
+  border-radius: 0 0 15px 15px;
+}
+.demo__screen {
+  position: relative;
+  height: 609px;
+  width: 281.25px;
+  padding-top: 25px;
+  background: white;
+  border-radius: 30px;
+  cursor: -webkit-grab;
+  cursor: grab;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  perspective: 700px;
+}
+.demo__screen-wrapper {
+  position: relative;
+  height: 609px;
+  width: 281.25px;
+  margin-top: 11px;
+  margin-left: 12px;
+  overflow: hidden;
+  border-radius: 30px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- SVG Items will be placed here -->
+
+<svg style="display: none;">
+    <symbol id="cloudpebble-icon" style="width:var(--logo-width);height:50px;" viewBox="0 0 var(--logo-width) 50">
+        <style>
+            .cp-svg-cloud {
+                fill: #aaa;
+            }
+            .cp-svg-text {
+                font-family: Arial, sans-serif;
+                font-size: 2.2rem;
+                font-weight: 300;
+                fill: #fff;
+            }
+        </style>
+        <g transform="scale(2.2) translate(0, 5)">
+            <path class="cp-svg-cloud" d='M5 14a5 5 0 1 1 1.561-9.751A7.002 7.002 0 0 1 20 7a7 7 0 0 1-7 7H5zm0-2h8a5 5 0 1 0-4.6-6.965l-.72 1.686-1.742-.572A3 3 0 1 0 5 12z'/>
+        </g>
+        <path fill="#fff" transform="scale(1.5) translate(35, 8)" d="M17.1 12.4c.9 3 4.1 4.7 7.1 3.7 1.9-.6 3.2-1.8 3.8-3.8.2-.8.8-.7 1.4-.7-.6 4.4-4.5 6.4-7.9 5.9-4.3-.7-6.3-4.3-5.7-7.9.6-3.8 3.9-6.1 7.8-5.6 3.5.5 5.8 3.5 5.8 6.1-4.1.8-8.2 1.5-12.3 2.3zm10.8-3.2c-.8-2.9-3.6-4.4-6.4-4-2.9.5-5.1 3.4-4.6 6 3.8-.7 7.4-1.4 11-2zM69.2 11.9c1.2 3.8 5.8 5.2 8.9 2.8.9-.7 1.5-1.6 1.9-2.7.2-.7.6-1 1.4-.8.1 1-.4 1.8-.9 2.6-1.8 2.9-5.2 4-8.4 2.8-2.8-1.1-4.5-3.7-4.4-6.5.1-3.6 3.1-6.4 6.6-6.6 3.1-.1 6.2 2.1 6.9 5 .1.3.2.5.2.8 0 .1-.2.4-.3.4-2 .4-4.1.7-6.1 1.1-1.9.4-3.9.7-5.8 1.1zm-.3-1.2c3.7-.7 7.4-1.3 11.1-2-1-3.1-4.1-4.6-6.9-3.8-2.7.7-4.3 3.1-4.2 5.8zM1.2 15c0 2.3 0 4.4.1 6.5H.1v-.8c0-3.1 0-6.1-.1-9.2 0-2.4.8-4.4 2.6-5.9C4.7 4 7 3.7 9.5 4.7c2.8 1.2 4.4 4 4 6.9-.4 2.9-2.5 5.2-5.3 5.7-2.4.5-4.5-.2-6.3-2-.2.1-.3 0-.7-.3zm11.2-4c.1-3-2.7-5.5-5.6-5.5-3.3 0-5.7 2.6-5.6 5.6.1 3.1 2.4 5.4 5.6 5.4 3.3 0 5.6-2.7 5.6-5.5zM31.7.3h1.2c0 2.1 0 4.2.1 6.5.7-.6 1.3-1.3 2-1.7 3.2-2.2 7.9-1 9.6 2.4 1.3 2.6 1.1 5.1-.8 7.5-1.6 1.9-3.6 2.7-6 2.4-3-.4-4.9-2.2-5.8-5.1-.2-.5-.2-1.1-.2-1.7 0-3.1-.1-6.2-.1-9.4V.3zm12.4 10.3c.1-3-2.7-5.5-5.6-5.5-3.2.1-5.6 2.5-5.5 5.6.1 3.1 2.3 5.4 5.6 5.5 3.3 0 5.6-2.7 5.5-5.6zM48.8 6.5C50 5.2 51.4 4.4 53 4c2-.4 3.8 0 5.4 1.1 2 1.5 2.9 3.5 2.8 6-.2 2.9-2.6 5.4-5.4 6-3.2.6-5.9-.8-7.3-3.4-.5-.8-.8-1.8-.8-2.7-.1-3.5-.1-7-.1-10.5V.2h1.1c.1 2.1.1 4.2.1 6.3zm11.2 4C60 7.4 57.4 5 54.4 5c-3.1 0-5.6 2.5-5.6 5.5 0 3.2 2.5 5.5 5.6 5.5 3.2.1 5.6-2.4 5.6-5.5zM63.6 0h1.2v.8c0 3.9.1 7.9.1 11.8 0 .6.1 1.2.3 1.8.3.9.9 1.4 1.8 1.7-.1.4-.2.8-.3 1.1-2.2-.7-2.9-2.2-2.9-4.2-.1-4-.1-8.1-.2-12.2V0z"></path>
+        <g transform="scale(0.03) translate(6000, 750)">
+            <rect width="512" height="512" rx="15%" fill="#f7df1e"/>
+            <path d="M324 370c10 17 24 29 47 29c20 0 33-10 33 -24c0-16 -13 -22 -35 -32l-12-5c-35-15 -58 -33 -58 -72c0-36 27 -64 70 -64c31 0 53 11 68 39l-37 24c-8-15 -17 -21 -31 -21c-14 0-23 9 -23 21c0 14 9 20 30 29l12 5c41 18 64 35 64 76c0 43-34 67 -80 67c-45 0-74 -21 -88 -49zm-170 4c8 13 14 25 31 25c16 0 26-6 26 -30V203h48v164c0 50-29 72 -72 72c-39 0-61 -20 -72 -44z"/>
+        </g>
+    </symbol>
+</svg>
+
+<svg style="display: none;">
+    <symbol id="chevron" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
+    </symbol>
+</svg>
+
+
+
+
+
+
+
+
+
+
+
+<svg style="display: none;">
+  <symbol id="cloudpebble-icon" viewBox="0 0 200 50">
+    <style>
+      .cp-svg-cloud {
+        fill: #aaa;
+      }
+      .cp-svg-text {
+        font-family: Arial, sans-serif;
+        font-size: 2.2rem;
+        font-weight: 300;
+        fill: #fff;
+      }
+    </style>
+
+    <!-- Flattened cloud -->
+    <path class="cp-svg-cloud"
+      d="M11 36a11 11 0 1 1 3-21A15 15 0 0 1 44 22a15 15 0 0 1-15 15H11zm0-4h18a11 11 0 1 0-10-15l-2 4-4-1a6 6 0 1 0-2 12z"
+    />
+
+    <!-- Pebble logo group (flattened position) -->
+    <g style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1;">
+      <g style="fill:white">
+        <path d="M55 18h4v9c3-5 7-9 15-9 10 0 20 8 20 22v0c0 14-10 23-20 23-8 0-14-5-18-10v23h-4V18zm37 22v0c0-11-8-18-17-18s-17 7-17 18v0c0 11 8 18 17 18s17-7 17-18z"/>
+        <path d="M102 31v9h-4V2h4v28c3-6 9-10 17-10 10 0 20 8 20 22v0c0 14-10 23-20 23-8 0-14-5-17-10zm33-12v0c0-11-8-18-17-18s-17 7-17 18v0c0 11 8 18 17 18s17-7 17-18z"/>
+        <path d="M151 31v9h-4V2h4v28c3-6 9-10 17-10 10 0 20 8 20 22v0c0 14-10 23-20 23-8 0-14-5-17-10zm33-12v0c0-11-8-18-17-18s-17 7-17 18v0c0 11 8 18 17 18s17-7 17-18z"/>
+        <path d="M190 10h4v62h-4V10z"/>
+        <path d="M80 33c2 9 9 14 16 14 7 0 11-3 15-7l3 2c-5 5-10 8-18 8-11 0-21-9-21-22v0c0-12 9-22 20-22 10 0 16 6 19 15l1 2-34 9zM108 21c-2-6-7-11-14-11-8 0-14 7-15 16v2l29-7z"/>
+        <path d="M196 33c2 9 9 14 16 14 7 0 11-3 15-7l3 2c-5 5-10 8-18 8-11 0-21-9-21-22v0c0-12 9-22 20-22 10 0 16 6 19 15l1 2-34 9zM224 21c-2-6-7-11-14-11-8 0-14 7-15 16v2l29-7z"/>
+      </g>
+    </g>
+
+    <!-- JS logo (flattened) -->
+    <g>
+      <rect x="181" y="33" width="15" height="15" rx="2" fill="#f7df1e"/>
+      <path d="M186 44c0 3 2 5 5 5 3 0 4-1 4-3 0-2-2-2-4-3l-1-1c-3-1-5-2-5-6 0-3 2-5 7-5 3 0 5 1 6 4l-4 2c0-2-1-2-3-2s-2 1-2 2c0 2 1 2 4 3l1 1c4 2 6 3 6 8 0 4-3 7-8 7-4 0-7-2-8-5zm-6 1c0 2 1 3 3 3 1 0 2-1 2-3V33h4v12c0 3-2 5-5 5s-4-1-5-3z"/>
+    </g>
+  </symbol>
+</svg>
+
+
+
+
+
+
+<!-- END SVG items -->
+
+<header>
+    <svg><use href="#cloudpebble-icon"/></svg>
+    <nav>
+        <label for="tab1">DOCUMENTATION</label>
+        <label for="tab2">CODE</label>
+        <label for="tab3">COMPILER</label>
+        <label for="tab4">SETTINGS</label>
+    </nav>
+</header>
+
+<main>
+    <aside>
+
+        <div id="watch" tabindex="0">
+            <svg version="1.1" viewBox="0 0 172 288" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient id="topStrap" x2="0" y2="1">
+   <stop offset="0"/>
+   <stop offset=".11"/>
+   <stop stop-color="#474747" offset=".67"/>
+   <stop stop-color="#2c2c2c" offset=".82"/>
+   <stop offset=".83"/>
+   <stop stop-color="#111" offset="1"/>
+  </linearGradient>
+  <linearGradient id="bottomStrap" x2="0" y2="1">
+   <stop stop-color="#111" offset="0"/>
+   <stop offset=".17"/>
+   <stop stop-color="#2c2c2c" offset=".18"/>
+   <stop stop-color="#474747" offset=".33"/>
+   <stop offset=".89"/>
+   <stop offset="1"/>
+  </linearGradient>
+ </defs>
+ <rect id="faceplate" x="6" y="34" width="160" height="220" rx="6" ry="6" fill="#808080" stroke-width="1" />
+ <g>
+  <path id="back" d="m0 80h6v48h-6z"/>
+  <path id="up" d="m166 60h6v55h-6z"/>
+  <path id="select" d="m166 127h6v34h-6z"/>
+  <path id="down" d="m166 172h6v55h-6z"/>
+ </g>
+ <path id="topstrap" d="m34 0h104a8 8 0 0 1 8 8v40h-120v-40a8 8 0 0 1 8-8z" fill="url(#topStrap)"/>
+ <rect id="screen" x="20" y="66" width="131" height="155" rx="6" ry="6" stroke="#212121" stroke-width="13"/>
+ <use transform="scale(1 -1) translate(0 -288)" fill="url(#bottomStrap)" href="#topstrap"/>
+</svg>
+            <canvas id="pebble" class="rocky"></canvas> 
+        </div>
+
+        <div>
+            <div>
+                <div>SOURCE FILES <button>ADD NEW</button></div>
+                <ul>
+                    <li>main.js</li>
+                </ul>
+            </div>
+
+            <div>
+                <div>RESOURCES <button>ADD NEW</button></div>
+                <ul>
+                    <li>icon.png</li>
+                    <li>img1.png</li>
+                    <li>img2.png</li>
+                    <li>img3.png</li>
+                    <li>img4.png</li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main">
+        <input type="radio" name="tab" id="tab1">
+        <div>
+            <div class="docpage">
+
+                <!-- Foundation: App-->
+                <input type="radio" id="c1f1a1" name="pbldocs">
+                <label for="c1f1a1"></label>
+                <article>
+                    <h1>APP</h1>
+                    <p>App entry point and event loop.</p>
+                    <p>App is a module that provides you with an event loop for your Pebble app. All interaction between Pebble apps and the underlying Pebble OS takes place through an event loop. Before calling the app_event_loop() function, you subscribe to event services and implement event handlers. Each handler receives specific types of Events dispatched throughout the life of the Pebble watchapp.</p>
+                    <p>The app_event_loop() function takes care of both waiting for new events to become available on the watchapp event bus and routing new events to the appropriate handler. Event Service allows an app to directly register for different types of events. This function will block until the watchapp is ready to exit, and should be placed in the app's main() function.</p>
+                    <p>A watchapp typically configures and uses the app_event_loop() as follows:</p>
+                    <pre><code>int main(void) {
+  // do set up here
+
+  // Enter the main event loop. This will block until the app is ready to exit.
+  app_event_loop();
+
+  // do clean up here
+}</code></pre>
+                    <h2>Function Documentation</h2>
+                    <div>
+                        <span>void app_event_loop(void)</span>
+                        <p>The event loop for C apps, to be used in app's main(). Will block until the app is ready to exit.</p>
+                    </div>
+                </article>
+
+                <!-- Foundation: App Communication -->
+                <input type="radio" id="c1f1a2" name="pbldocs">
+                <label for="c1f1a2"></label>
+                <article>
+                    <h1>App Communication</h1>
+                    <p>API for interacting with the Pebble communication subsystem</p>
+                    <h2>Function Documentation</h2>
+                    <div>
+                        <span>void app_comm_set_sniff_interval(const SniffInterval interval)</span>
+                        <p>Set the Bluetooth module's sniff interval. The sniff interval will be restored to normal by the OS after the app's de-init handler is called. Set the sniff interval to normal whenever possible.</p>
+                    </div>
+                    <div>
+                        <span>SniffInterval app_comm_get_sniff_interval(void)</span>
+                        <p>Get the Bluetooth module's sniff interval.</p>
+                        <h4>Returns</h4>
+                        <p>The SniffInterval value corresponding to the current interva</p>
+                    </div>
+                    <h2>Enum Documentation</h2>
+                    <div>
+                        <span>enum SniffInterval</span>
+                        <p>Intervals during which the Bluetooth module may enter a low power mode. The sniff interval defines the period during which the Bluetooth module may not exchange (ACL) packets. The longer the sniff interval, the more time the Bluetooth module may spend in a low power mode. It may be necessary to reduce the sniff interval if an app requires reduced latency when sending messages.</p>
+                        <p>These settings have a dramatic effect on the Pebble's energy consumption. Use the normal sniff interval whenever possible. Note, however, that switching between modes increases power consumption during the process. Frequent switching between modes is thus discouraged. Ensure you do not drop to normal frequently. The Bluetooth module is a major consumer of the Pebble's energy.</p>
+                        <h4>Enumerators</h4>
+                        <dl>
+                            <dt>SNIFF_INTERVAL_NORMAL</dt>
+                            <dd>Set the sniff interval to normal (power-saving) mode.</dd>
+                            <dt>SNIFF_INTERVAL_REDUCED</dt>
+                            <dd>Reduce the sniff interval to increase the responsiveness of the radio at the expense of increasing Bluetooth energy consumption by a multiple of 2-5 (very significant)</dd>
+                        </dl>
+                    </div>
+                </article>
+
+                <!-- Foundation: App Glance -->
+                <input type="radio" id="c1f1a3" name="pbldocs">
+                <label for="c1f1a3"></label>
+                <article>
+                    <h1>App Glance</h1>
+                    <p>API for the application to modify its glance.</p>
+                    <h2>Function Documentation</h2>
+                    <div>
+                        <span>AppGlanceResult app_glance_add_slice(AppGlanceReloadSession * session, AppGlanceSlice slice)</span>
+                        <p>Add a slice to the app's glance. This function will only succeed if called with a valid AppGlanceReloadSession that is provided in an AppGlanceReloadCallback.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>session</dt>
+                            <dd>The session variable provided in an AppGlanceReloadCallback</dd>
+                            <dt>slice</dt>
+                            <dd>The slice to add to the app's glance</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The result of trying to add the slice to the app's glance</p>
+                    </div>
+                    <div>
+                        <span>void app_glance_reload(AppGlanceReloadCallback callback, void * context)</span>
+                        <p>Clear any existing slices in the app's glance and trigger a reload via the provided callback.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>callback</dt>
+                            <dd>A function that will be called to add new slices to the app's glance; even if the provided callback is NULL, any existing slices will still be cleared from the app's glance</dd>
+                            <dt>context</dt>
+                            <dd>User-provided context that will be passed to the callback</dd>
+                        </dl>
+                    </div>
+                    <h2>Data Structure Documentation</h2>
+                    <div>
+                        <span>struct AppGlanceSlice</span>
+                        <p>An app's glance can change over time as defined by zero or more app glance slices that each describe the state of the app glance at a particular point in time. Slices are displayed in the order they are added, and they are removed at the specified expiration time.</p>
+                        <h4>Data Fields</h4>
+                        <dl>
+                            <dt>struct AppGlanceSlice layout</dt>
+                            <dd>Describes how the slice should be visualized in the app's glance in the launcher.</dd>
+                            <dt>time_t expiration_time</dt>
+                            <dd>The UTC time after which this slice should no longer be shown in the app's glance. Use APP_GLANCE_SLICE_NO_EXPIRATION if the slice should never expire.</dd>
+                        </dl>
+                    </div>
+                    <h2>Enum Documentation</h2>
+                    <div>
+                        <span>enum AppGlanceResult</span>
+                        <p>Bitfield enum describing the result of trying to add an AppGlanceSlice to an app's glance.</p>
+                        <h4>Enumerators</h4>
+                        <dl>
+                            <dt>APP_GLANCE_RESULT_SUCCESS</dt>
+                            <dd>The slice was successfully added to the app's glance.</dd>
+                            <dt>APP_GLANCE_RESULT_INVALID_TEMPLATE_STRING</dt>
+                            <dd>The subtitle_template_string provided in the slice was invalid.</dd>
+                            <dt>APP_GLANCE_RESULT_TEMPLATE_STRING_TOO_LONG</dt>
+                            <dd>The subtitle_template_string provided in the slice was longer than 150 bytes.</dd>
+                            <dt>APP_GLANCE_RESULT_INVALID_ICON</dt>
+                            <dd>The icon provided in the slice was invalid.</dd>
+                            <dt>APP_GLANCE_RESULT_SLICE_CAPACITY_EXCEEDED</dt>
+                            <dd>The provided slice would exceed the app glance's slice capacity.</dd>
+                            <dt>APP_GLANCE_RESULT_EXPIRES_IN_THE_PAST</dt>
+                            <dd>The expiration_time provided in the slice expires in the past.</dd>
+                            <dt>APP_GLANCE_RESULT_INVALID_SESSION</dt>
+                            <dd>The AppGlanceReloadSession provided was invalid.</dd>
+                        </dl>
+                    </div>
+                    <h2>Typedef Documentation</h2>
+                    <div>
+                        <span>typedef uint32_t PublishedId</span>
+                        <p>The ID of a published app resource defined within the publishedMedia section of package.json.</p>
+                    </div>
+                    <div>
+                        <span>typedef struct AppGlanceReloadSession AppGlanceReloadSession</span>
+                    </div>
+                    <div>
+                        <span>typedef void(* AppGlanceReloadCallback)(AppGlanceReloadSession *session, size_t limit, void *context)</span>
+                        <p>User-provided callback for reloading the slices in the app's glance.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>session</dt>
+                            <dd>A session variable that must be passed to app_glance_add_slice when adding slices to the app's glance; it becomes invalid when the AppGlanceReloadCallback returns</dd>
+                            <dt>limit</dt>
+                            <dd>The number of entries that can be added to the app's glance</dd>
+                            <dt>context</dt>
+                            <dd>User-provided context provided when calling app_glance_reload()</dd>
+                        </dl>
+                    </div>
+                    <h2>Macro Definition Documentation</h2>
+                    <div>
+                        <span>#define APP_GLANCE_SLICE_NO_EXPIRATION ((time_t)0)</span>
+                        <p>Can be used for the expiration_time of an AppGlanceSlice so that the slice never expires.</p>
+                    </div>
+                    <div>
+                        <span>#define APP_GLANCE_SLICE_DEFAULT_ICON ((PublishedId)0)</span>
+                        <p>Can be used for the icon of an AppGlanceSlice so that the slice displays the app's default icon.</p>
+                    </div>
+                </article>
+
+                <!-- Foundation: App Message -->
+                <input type="radio" id="c1f1a4" name="pbldocs">
+                <label for="c1f14a"></label>
+                <article>
+                    <h1>AppMessage</h1>
+                    <p>Bi-directional communication between phone apps and Pebble watchapps</p>
+                    <p>AppMessage is a bi-directional messaging subsystem that enables communication between phone apps and Pebble watchapps. This is accomplished by allowing phone and watchapps to exchange arbitrary sets of key/value pairs. The key/value pairs are stored in the form of a Dictionary, the layout of which is left for the application developer to define.</p>
+                    <p>AppMessage implements a push-oriented messaging protocol, enabling your app to call functions and methods to push messages from Pebble to phone and vice versa. The protocol is symmetric: both Pebble and the phone can send messages. All messages are acknowledged. In this context, there is no client-server model, as such.</p>
+                    <p>During the sending phase, one side initiates the communication by transferring a dictionary over the air. The other side then receives this message and is given an opportunity to perform actions on that data. As soon as possible, the other side is expected to reply to the message with a simple acknowledgment that the message was received successfully.</p>
+                    <p>PebbleKit JavaScript provides you with a set of standard JavaScript APIs that let your app receive messages from the watch, make HTTP requests, and send new messages to the watch. AppMessage APIs are used to send and receive data. A Pebble watchapp can use the resources of the connected phone to fetch information from web services, send information to web APIs, or store login credentials. On the JavaScript side, you communicate with Pebble via a Pebble object exposed in the namespace.</p>
+                    <p>Messages always need to get either ACKnowledged or "NACK'ed," that is, not acknowledged. If not, messages will result in a time-out failure. The AppMessage subsystem takes care of this implicitly. In the phone libraries, this step is a bit more explicit.</p>
+                    <p>The Pebble watch interfaces make a distinction between the Inbox and the Outbox calls. The Inbox receives messages from the phone on the watch; the Outbox sends messages from the watch to the phone. These two buffers can be managed separately.</p>
+                    <h2>Warning</h2>
+                    <p>A critical constraint of AppMessage is that messages are limited in size. An ingoing (outgoing) message larger than the inbox (outbox) will not be transmitted and will generate an error. You can choose your inbox and outbox size when you call app_message_open().</p>
+                    <p>Pebble SDK provides a static minimum guaranteed size (APP_MESSAGE_INBOX_SIZE_MINIMUM and APP_MESSAGE_OUTBOX_SIZE_MINIMUM). Requesting a buffer of the minimum guaranteed size (or smaller) is always guaranteed to succeed on all Pebbles in this SDK version or higher, and with every phone.</p>
+                    <p>In some context, Pebble might be able to provide your application with larger inbox/outbox. You can call app_message_inbox_size_maximum() and app_message_outbox_size_maximum() in your code to get the largest possible value you can use.</p>
+                    <p>To always get the largest buffer available, follow this best practice:</p>
+                    <p>app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum())</p>
+                    <p>AppMessage uses your application heap space. That means that the sizes you pick for the AppMessage inbox and outbox buffers are important in optimizing your app’s performance. The more you use for AppMessage, the less space you’ll have for the rest of your app.</p>
+                    <p>
+                        To register callbacks, you should call<br>
+                        app_message_register_inbox_received(),<br>
+                        app_message_register_inbox_dropped(),<br>
+                        app_message_register_outbox_sent(),<br>
+                        app_message_register_outbox_failed().<br>
+                    </p>
+                    <p>Pebble recommends that you call them before app_message_open() to ensure you do not miss a message arriving between starting AppMessage and registering the callback. You can set a context that will be passed to all the callbacks with app_message_set_context().</p>
+                    <p>In circumstances that may not be ideal, when using AppMessage several types of errors may occur. For example:</p>
+                    <p>The send can’t start because the system state won't allow for a success. Several reasons you're unable to perform a send: A send() is already occurring (only one is possible at a time) or Bluetooth is not enabled or connected.</p>
+                    <p>The send and receive occur, but the receiver can’t accept the message. For instance, there is no app that receives such a message.</p>
+                    <p>The send occurs, but the receiver either does not actually receive the message or can’t handle it in a timely fashion.</p>
+                    <p>In the case of a dropped message, the phone sends a message to the watchapp, while there is still an unprocessed message in the Inbox.</p>
+                    <p>Other errors are possible and described by AppMessageResult. A client of the AppMessage interface should use the result codes to be more robust in the face of communication problems either in the field or while debugging.</p>
+                    <p>Refer to the App Communication in the Pebble Developer Guides for a conceptual overview and code usage.</p>
+                    <p>For code examples, refer to the SDK Examples that directly use App Message. These include:</p>
+                    <p>pebblekit-js-weather</p>
+                    <p>pebblekit-js-quotes</p>
+                    <h2>Function Documentation</h2>
+                    <div>
+                        <span>AppMessageResult app_message_open(const uint32_t size_inbound, const uint32_t size_outbound)</span>
+                        <p>Open AppMessage to transfers.</p>
+                        <p>Use dict_calc_buffer_size_from_tuplets() or dict_calc_buffer_size() to estimate the size you need.</p>
+                        <p class="note">It is recommended that if the Inbox will be used, that at least the Inbox callbacks should be registered before this call. Otherwise it is possible for an Inbox message to be NACK'ed without being seen by the application.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>size_inbound (in)</dt>
+                            <dd>The required size for the Inbox buffer</dd>
+                            <dt>size_outbound (in)</dt>
+                            <dd>The required size for the Outbox buffer</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>A result code such as APP_MSG_OK or APP_MSG_OUT_OF_MEMORY.</p>
+                    </div>
+                    <div>
+                        <span>void app_message_deregister_callbacks(void)</span>
+                        <p>Deregisters all callbacks and their context.</p>
+                    </div>
+                    <div>
+                        <span>void * app_message_get_context(void)</span>
+                        <p>Gets the context that will be passed to all AppMessage callbacks.</p>
+                        <h4>Returns</h4>
+                        <p>The current context on record.</p>
+                    </div>
+                    <div>
+                        <span>void * app_message_set_context(void * context)</span>
+                        <p>Sets the context that will be passed to all AppMessage callbacks.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>context (in)</dt>
+                            <dd>The context that will be passed to all AppMessage callbacks.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The previous context that was on record.</p>
+                    </div>
+                    <div>
+                        <span>AppMessageInboxReceived app_message_register_inbox_received(AppMessageInboxReceived received_callback)</span>
+                        <p>Registers a function that will be called after any Inbox message is received successfully.</p>
+                        <p>Only one callback may be registered at a time. Each subsequent call to this function will replace the previous callback. The callback is optional; setting it to NULL will deregister the current callback and no function will be called anymore.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>received_callback (in)</dt>
+                            <dd>The callback that will be called going forward; NULL to not have a callback.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The previous callback (or NULL) that was on record.</p>
+                    </div>
+                    <div>
+                        <span>AppMessageInboxDropped app_message_register_inbox_dropped(AppMessageInboxDropped dropped_callback)</span>
+                        <p>Registers a function that will be called after any Inbox message is received but dropped by the system.</p>
+                        <p>Only one callback may be registered at a time. Each subsequent call to this function will replace the previous callback. The callback is optional; setting it to NULL will deregister the current callback and no function will be called anymore.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>dropped_callback (in)</dt>
+                            <dd>The callback that will be called going forward; NULL to not have a callback.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The previous callback (or NULL) that was on record.</p>
+                    </div>
+                    <div>
+                        <span>AppMessageOutboxSent app_message_register_outbox_sent(AppMessageOutboxSent sent_callback)</span>
+                        <p>Registers a function that will be called after any Outbox message is sent and an ACK reply occurs in a timely fashion.</p>
+                        <p>Only one callback may be registered at a time. Each subsequent call to this function will replace the previous callback. The callback is optional; setting it to NULL will deregister the current callback and no function will be called anymore.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>sent_callback (in)</dt>
+                            <dd>The callback that will be called going forward; NULL to not have a callback.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The previous callback (or NULL) that was on record.</p>
+                    </div>
+                    <div>
+                        <span>AppMessageOutboxFailed app_message_register_outbox_failed(AppMessageOutboxFailed failed_callback)</span>
+                        <p>Registers a function that will be called after any Outbox message is not sent with a timely ACK reply. The call to app_message_outbox_send() must have succeeded.</p>
+                        <p>Only one callback may be registered at a time. Each subsequent call to this function will replace the previous callback. The callback is optional; setting it to NULL will deregister the current callback and no function will be called anymore.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>failed_callback (in)</dt>
+                            <dd>The callback that will be called going forward; NULL to not have a callback.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>The previous callback (or NULL) that was on record.</p>
+                    </div>
+                    <div>
+                        <span>uint32_t app_message_inbox_size_maximum(void)</span>
+                        <p>Programatically determine the inbox size maximum in the current configuration.</p>
+                        <h4>Returns</h4>
+                        <p>The inbox size maximum on this firmware.</p>
+                        <h4>See Also</h4>
+                        <p>
+                            APP_MESSAGE_INBOX_SIZE_MINIMUM<br>
+                            app_message_outbox_size_maximum()
+                        </p>
+                    </div>
+                    <div>
+                        <span>uint32_t app_message_outbox_size_maximum(void)</span>
+                        <p>Programatically determine the outbox size maximum in the current configuration.</p>
+                        <h4>Returns</h4>
+                        <p>The outbox size maximum on this firmware.</p>
+                        <h4>See Also</h4>
+                        <p>
+                            APP_MESSAGE_OUTBOX_SIZE_MINIMUMM<br>
+                            app_message_inbox_size_maximum()
+                        </p>
+                    </div>
+                    <div>
+                        <span>AppMessageResult app_message_outbox_begin(DictionaryIterator ** iterator)</span>
+                        <p>Begin writing to the Outbox's Dictionary buffer.</p>
+                        <p class="note">After a successful call, one can add values to the dictionary using functions like dict_write_data() and friends.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>iterator (out)</dt>
+                            <dd>Location to write the DictionaryIterator pointer. This will be NULL on failure.</dd>
+                        </dl>
+                        <h4>Returns</h4>
+                        <p>A result code, including but not limited to APP_MSG_OK, APP_MSG_INVALID_ARGS or APP_MSG_BUSY.</p>
+                        <h4>See Also</h4>
+                        <p>Dictionary</p>
+                    </div>
+                    <div>
+                        <span>AppMessageResult app_message_outbox_send(void)</span>
+                        <p>Sends the outbound dictionary.</p>
+                        <h4>Returns</h4>
+                        <p>A result code, including but not limited to APP_MSG_OK or APP_MSG_BUSY. The APP_MSG_OK code does not mean that the message was sent successfully, but only that the start of processing was successful. Since this call is asynchronous, callbacks provide the final result instead.</p>
+                        <h4>See Also</h4>
+                        <p>
+                            AppMessageOutboxSent<br>
+                            AppMessageOutboxFailed
+                        </p>
+                    </div>
+                    <h2>Enum Documentation</h2>
+                    <div>
+                        <span>enum AppMessageResult</span>
+                        <p>AppMessage result codes.</p>
+                        <dl>
+                            <dt>APP_MSG_OK</dt>
+                            <dd>(0) All good, operation was successful.</dd>
+                            <dt>APP_MSG_SEND_TIMEOUT</dt>
+                            <dd>(2) The other end did not confirm receiving the sent data with an (n)ack in time.</dd>
+                            <dt>APP_MSG_SEND_REJECTED</dt>
+                            <dd>(4) The other end rejected the sent data, with a "nack" reply.</dd>
+                            <dt>APP_MSG_NOT_CONNECTED</dt>
+                            <dd>(8) The other end was not connected.</dd>
+                            <dt>APP_MSG_APP_NOT_RUNNING</dt>
+                            <dd>(16) The local application was not running.</dd>
+                            <dt>APP_MSG_INVALID_ARGS</dt>
+                            <dd>(32) The function was called with invalid arguments.</dd>
+                            <dt>APP_MSG_BUSY</dt>
+                            <dd>(64) There are pending (in or outbound) messages that need to be processed first before new ones can be received or sent.</dd>
+                            <dt>APP_MSG_BUFFER_OVERFLOW</dt>
+                            <dd>(128) The buffer was too small to contain the incoming message.</dd>
+                            <dt>APP_MSG_ALREADY_RELEASED</dt>
+                            <dd>(512) The resource had already been released.</dd>
+                            <dt>APP_MSG_CALLBACK_ALREADY_REGISTERED</dt>
+                            <dd>(1024) The callback was already registered.</dd>
+                            <dt>APP_MSG_CALLBACK_NOT_REGISTERED</dt>
+                            <dd>(2048) The callback could not be deregistered, because it had not been registered before.</dd>
+                            <dt>APP_MSG_OUT_OF_MEMORY</dt>
+                            <dd>(4096) The system did not have sufficient application memory to perform the requested operation.</dd>
+                            <dt>APP_MSG_CLOSED</dt>
+                            <dd>(8192) App message was closed.</dd>
+                            <dt>APP_MSG_INTERNAL_ERROR</dt>
+                            <dd>(16384) An internal OS error prevented AppMessage from completing an operation.</dd>
+                            <dt>APP_MSG_INVALID_STATE</dt>
+                            <dd>(32768) The function was called while App Message was not in the appropriate state.</dd>
+                        </dl>
+                    </div>
+                    <h2>Typedef Documentation</h2>
+                    <div>
+                        <span>typedef void(* AppMessageInboxReceived)(DictionaryIterator *iterator, void *context)</span>
+                        <p>Called after an incoming message is received.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>iterator (in)</dt>
+                            <dd>The dictionary iterator to the received message. Never NULL. Note that the iterator cannot be modified or saved off. The library may need to re-use the buffered space where this message is supplied. Returning from the callback indicates to the library that the received message contents are no longer needed or have already been externalized outside its buffering space and iterator.</dd>
+                            <dt>context (in)</dt>
+                            <dd>Pointer to application data as specified when registering the callback.</dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <span>typedef void(* AppMessageInboxDropped)(AppMessageResult reason, void *context)</span>
+                        <p>Called after an incoming message is dropped.</p>
+                        <p>Note that you can call app_message_outbox_begin() from this handler to prepare a new message. This will invalidate the previous dictionary iterator; do not use it after calling app_message_outbox_begin().</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>result (in)</dt>
+                            <dd>The reason why the message was dropped. Some possibilities include APP_MSG_BUSY and APP_MSG_BUFFER_OVERFLOW.</dd>
+                            <dt>context (in)</dt>
+                            <dd>Pointer to application data as specified when registering the callback.</dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <span>typedef void(* AppMessageOutboxSent)(DictionaryIterator *iterator, void *context)</span>
+                        <p>Called after an outbound message has been sent and the reply has been received.</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>iterator (in)</dt>
+                            <dd>The dictionary iterator to the sent message. The iterator will be in the final state that was sent. Note that the iterator cannot be modified or saved off as the library will re-open the dictionary with dict_begin() after this callback returns.</dd>
+                            <dt>context (in)</dt>
+                            <dd>Pointer to application data as specified when registering the callback.</dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <span>typedef void(* AppMessageOutboxFailed)(DictionaryIterator *iterator, AppMessageResult reason, void *context)</span>
+                        <p>Called after an outbound message has not been sent successfully.</p>
+                        <p>Note that you can call app_message_outbox_begin() from this handler to prepare a new message. This will invalidate the previous dictionary iterator; do not use it after calling app_message_outbox_begin().</p>
+                        <h4>Parameters</h4>
+                        <dl>
+                            <dt>iterator (in)</dt>
+                            <dd>The dictionary iterator to the sent message. The iterator will be in the final state that was sent. Note that the iterator cannot be modified or saved off as the library will re-open the dictionary with dict_begin() after this callback returns.</dd>
+                            <dt>result (in)</dt>
+                            <dd>The result of the operation. Some possibilities for the value include APP_MSG_SEND_TIMEOUT, APP_MSG_SEND_REJECTED, APP_MSG_NOT_CONNECTED, APP_MSG_APP_NOT_RUNNING, and the combination (APP_MSG_NOT_CONNECTED | APP_MSG_APP_NOT_RUNNING).</dd>
+                            <dt>context</dt>
+                            <dd>Pointer to application data as specified when registering the callback.</dd>
+                        </dl>
+                    </div>
+                    <h2>Macro Definition Documentation</h2>
+                    <div>
+                        <span>#define APP_MESSAGE_INBOX_SIZE_MINIMUM 124</span>
+                        <p>As long as the firmware maintains its current major version, inboxes of this size or smaller will be allowed.</p>
+                        <h4>See Also</h4>
+                        <p>
+                            app_message_inbox_size_maximum()<br>
+                            APP_MESSAGE_OUTBOX_SIZE_MINIMUM
+                        </p>
+                    </div>
+                    <div>
+                        <span>#define APP_MESSAGE_OUTBOX_SIZE_MINIMUM 636</span>
+                        <p>As long as the firmware maintains its current major version, outboxes of this size or smaller will be allowed.</p>
+                        <h4>See Also</h4>
+                        <p>
+                            app_message_outbox_size_maximum()<br>
+                            APP_MESSAGE_INBOX_SIZE_MINIMUM
+                        </p>
+                    </div>
+                </article>
+
+                <input type="radio" id="c1f1a5" name="pbldocs">
+                <label for="c1f1a5"></label>
+                <article>
+                    <h4>Foundation: AppSync</h4>
+                </article>
+
+                <input type="radio" id="c1f1a6" name="pbldocs">
+                <label for="c1f1a6"></label>
+                <article>
+                    <h4>Foundation: AppWorker</h4>
+                </article>
+
+                <input type="radio" id="c1f1d1" name="pbldocs">
+                <label for="c1f1d1"></label>
+                <article>
+                    <h4>Foundation: DataLogging</h4>
+                </article>
+
+                <input type="radio" id="c1f1d2" name="pbldocs">
+                <label for="c1f1d2"></label>
+                <article>
+                    <h4>Foundation: DataStructures</h4>
+                </article>
+
+                <input type="radio" id="c1f1d3" name="pbldocs">
+                <label for="c1f1d3"></label>
+                <article>
+                    <h4>Foundation: Dictation</h4>
+                </article>
+
+                <input type="radio" id="c1f1d4" name="pbldocs">
+                <label for="c1f1d4"></label>
+                <article>
+                    <h4>Foundation: Dictionary</h4>
+                </article>
+
+                <input type="radio" id="c1f1e1" name="pbldocs">
+                <label for="c1f1e1"></label>
+                <article>
+                    <h4>Foundation: Event Service</h4>
+                </article>
+
+                <input type="radio" id="c1f1e2" name="pbldocs">
+                <label for="c1f1e2"></label>
+                <article>
+                    <h4>Foundation: Exit Reason</h4>
+                </article>
+
+                <input type="radio" id="c1f1i1" name="pbldocs">
+                <label for="c1f1i1"></label>
+                <article>
+                    <h4>Foundation: Internationalization</h4>
+                </article>
+
+                <input type="radio" id="c1f1l1" name="pbldocs">
+                <label for="c1f1l1"></label>
+                <article>
+                    <h4>Foundation: Launch Reason</h4>
+                </article>
+
+                <input type="radio" id="c1f1l2" name="pbldocs">
+                <label for="c1f1l2"></label>
+                <article>
+                    <h4>Foundation: Logging</h4>
+                </article>
+
+                <input type="radio" id="c1f1m1" name="pbldocs">
+                <label for="c1f1m1"></label>
+                <article>
+                    <h4>Foundation: Math</h4>
+                </article>
+
+                <input type="radio" id="c1f1m2" name="pbldocs">
+                <label for="c1f1m2"></label>
+                <article>
+                    <h4>Foundation: Memory Management</h4>
+                </article>
+
+                <input type="radio" id="c1f1p1" name="pbldocs">
+                <label for="c1f1p1"></label>
+                <article>
+                    <h4>Foundation: Platform</h4>
+                </article>
+
+                <input type="radio" id="c1f1r1" name="pbldocs">
+                <label for="c1f1r1"></label>
+                <article>
+                    <h4>Foundation: Resources</h4>
+                </article>
+
+                <input type="radio" id="c1f1r2" name="pbldocs">
+                <label for="c1f1r2"></label>
+                <article>
+                    <h4>Foundation: Rocky</h4>
+                </article>
+
+                <input type="radio" id="c1f1s1" name="pbldocs">
+                <label for="c1f1s1"></label>
+                <article>
+                    <h4>Foundation: Storage</h4>
+                </article>
+
+                <input type="radio" id="c1f1t1" name="pbldocs">
+                <label for="c1f1t1"></label>
+                <article>
+                    <h4>Foundation: Timer</h4>
+                </article>
+
+                <input type="radio" id="c1f1w1" name="pbldocs">
+                <label for="c1f1w1"></label>
+                <article>
+                    <h4>Foundation: Wakeup</h4>
+                </article>
+
+                <input type="radio" id="c1f1w2" name="pbldocs">
+                <label for="c1f1w2"></label>
+                <article>
+                    <h4>Foundation: Wall Time</h4>
+                </article>
+
+                <input type="radio" id="c1f1w3" name="pbldocs">
+                <label for="c1f1w3"></label>
+                <article>
+                    <h4>Foundation: WatchInfo</h4>
+                </article>
+
+                <input type="radio" id="c1g1d1" name="pbldocs">
+                <label for="c1g1d1"></label>
+                <article>
+                    <h4>Graphics: Draw Commands</h4>
+                </article>
+
+                <input type="radio" id="c1g1d2" name="pbldocs">
+                <label for="c1g1d2"></label>
+                <article>
+                    <h4>Graphics: Draw Paths</h4>
+                </article>
+
+                <input type="radio" id="c1g1d3" name="pbldocs">
+                <label for="c1g1d3"></label>
+                <article>
+                    <h4>Graphics: Draw Primitives</h4>
+                </article>
+
+                <input type="radio" id="c1g1d4" name="pbldocs">
+                <label for="c1g1d4"></label>
+                <article>
+                    <h4>Graphics: Draw Text</h4>
+                </article>
+
+                <input type="radio" id="c1g1f1" name="pbldocs">
+                <label for="c1g1f1"></label>
+                <article>
+                    <h4>Graphics: Fonts</h4>
+                </article>
+
+                <input type="radio" id="c1g1g1" name="pbldocs">
+                <label for="c1g1g1"></label>
+                <article>
+                    <h4>Graphics: Graphics Context</h4>
+                </article>
+
+                <input type="radio" id="c1g1g2" name="pbldocs">
+                <label for="c1g1g2"></label>
+                <article>
+                    <h4>Graphics: Graphics Types</h4>
+                </article>
+
+                <input type="radio" id="c1u1a1" name="pbldocs">
+                <label for="c1u1a1"></label>
+                <article>
+                    <h4>User Interface: Animation</h4>
+                </article>
+
+                <input type="radio" id="c1u1c1" name="pbldocs">
+                <label for="c1u1c1"></label>
+                <article>
+                    <h4>User Interface: Clicks</h4>
+                </article>
+
+                <input type="radio" id="c1u1l1" name="pbldocs">
+                <label for="c1u1l1"></label>
+                <article>
+                    <h4>User Interface: Layers</h4>
+                </article>
+
+                <input type="radio" id="c1u1l2" name="pbldocs">
+                <label for="c1u1l2"></label>
+                <article>
+                    <h4>User Interface: Light</h4>
+                </article>
+
+                <input type="radio" id="c1u1p1" name="pbldocs">
+                <label for="c1u1p1"></label>
+                <article>
+                    <h4>User Interface: Preferences</h4>
+                </article>
+
+                <input type="radio" id="c1u1u1" name="pbldocs">
+                <label for="c1u1u1"></label>
+                <article>
+                    <h4>User Interface: UnobstructedArea</h4>
+                </article>
+
+                <input type="radio" id="c1u1v1" name="pbldocs">
+                <label for="c1u1v1"></label>
+                <article>
+                    <h4>User Interface: Vibes</h4>
+                </article>
+
+                <input type="radio" id="c1u1w1" name="pbldocs">
+                <label for="c1u1w1"></label>
+                <article>
+                    <h4>User Interface: Window</h4>
+                </article>
+
+                <input type="radio" id="c1u1w2" name="pbldocs">
+                <label for="c1u1w2"></label>
+                <article>
+                    <h4>User Interface: Window Stack</h4>
+                </article>
+
+                <input type="radio" id="c1s1f1" name="pbldocs">
+                <label for="c1s1f1"></label>
+                <article>
+                    <h4>Standard C: Format</h4>
+                </article>
+
+                <input type="radio" id="c1s1l1" name="pbldocs">
+                <label for="c1s1l1"></label>
+                <article>
+                    <h4>Standard C: Locale</h4>
+                </article>
+
+                <input type="radio" id="c1s1m1" name="pbldocs">
+                <label for="c1s1m1"></label>
+                <article>
+                    <h4>Standard C: Math</h4>
+                </article>
+
+                <input type="radio" id="c1s1m2" name="pbldocs">
+                <label for="c1s1m2"></label>
+                <article>
+                    <h4>Standard C: Memory</h4>
+                </article>
+
+                <input type="radio" id="c1s1s1" name="pbldocs">
+                <label for="c1s1s1"></label>
+                <article>
+                    <h4>Standard C: String</h4>
+                </article>
+
+                <input type="radio" id="c1s1t1" name="pbldocs">
+                <label for="c1s1t1"></label>
+                <article>
+                    <h4>Standard C: Time</h4>
+                </article>
+
+                <input type="radio" id="c2p1t1" name="pbldocs">
+                <label for="c2p1t1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: TextMetrics</h4>
+                </article>
+
+                <input type="radio" id="c2c1f1" name="pbldocs">
+                <label for="c2c1f1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: fillStyle</h4>
+                </article>
+
+                <input type="radio" id="c2c1c1" name="pbldocs">
+                <label for="c2c1c1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: Canvas</h4>
+                </article>
+
+                <input type="radio" id="c2c1s1" name="pbldocs">
+                <label for="c2c1s1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: strokeStyle</h4>
+                </article>
+
+                <input type="radio" id="c2c1c2" name="pbldocs">
+                <label for="c2c1c2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: canvas</h4>
+                </article>
+
+                <input type="radio" id="c2c1l1" name="pbldocs">
+                <label for="c2c1l1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: lineWidth</h4>
+                </article>
+
+                <input type="radio" id="c2c1f2" name="pbldocs">
+                <label for="c2c1f2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: font</h4>
+                </article>
+
+                <input type="radio" id="c2c1t2" name="pbldocs">
+                <label for="c2c1t2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: textAlign</h4>
+                </article>
+
+                <input type="radio" id="c2c1c3" name="pbldocs">
+                <label for="c2c1c3"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: clearRect</h4>
+                </article>
+
+                <input type="radio" id="c2c1f3" name="pbldocs">
+                <label for="c2c1f3"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: fillRect</h4>
+                </article>
+
+                <input type="radio" id="c2c1s2" name="pbldocs">
+                <label for="c2c1s2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: strokeRect</h4>
+                </article>
+
+                <input type="radio" id="c2c1f4" name="pbldocs">
+                <label for="c2c1f4"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: fillText</h4>
+                </article>
+
+                <input type="radio" id="c2c1m1" name="pbldocs">
+                <label for="c2c1m1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: measureText</h4>
+                </article>
+
+                <input type="radio" id="c2c1b1" name="pbldocs">
+                <label for="c2c1b1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: beginPath</h4>
+                </article>
+
+                <input type="radio" id="c2c1c4" name="pbldocs">
+                <label for="c2c1c4"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: closePath</h4>
+                </article>
+
+                <input type="radio" id="c2c1m2" name="pbldocs">
+                <label for="c2c1m2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: moveTo</h4>
+                </article>
+
+                <input type="radio" id="c2c1l2" name="pbldocs">
+                <label for="c2c1l2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: lineTo</h4>
+                </article>
+
+                <input type="radio" id="c2c1a1" name="pbldocs">
+                <label for="c2c1a1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: arc</h4>
+                </article>
+
+                <input type="radio" id="c2c1r1" name="pbldocs">
+                <label for="c2c1r1"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: rect</h4>
+                </article>
+
+                <input type="radio" id="c2c1f5" name="pbldocs">
+                <label for="c2c1f5"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: fill</h4>
+                </article>
+
+                <input type="radio" id="c2c1s3" name="pbldocs">
+                <label for="c2c1s3"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: stroke</h4>
+                </article>
+
+                <input type="radio" id="c2c1s4" name="pbldocs">
+                <label for="c2c1s4"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: save</h4>
+                </article>
+
+                <input type="radio" id="c2c1r2" name="pbldocs">
+                <label for="c2c1r2"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: restore</h4>
+                </article>
+
+                <input type="radio" id="c2c1r3" name="pbldocs">
+                <label for="c2c1r3"></label>
+                <article>
+                    <h4>CanvasRenderingContext2D: rockyFillRadial</h4>
+                </article>
+
+                <input type="radio" id="c2c2l1" name="pbldocs">
+                <label for="c2c2l1"></label>
+                <article>
+                    <h4>console: log</h4>
+                </article>
+
+                <input type="radio" id="c2c2w1" name="pbldocs">
+                <label for="c2c2w1"></label>
+                <article>
+                    <h4>console: warn</h4>
+                </article>
+
+                <input type="radio" id="c2c2e1" name="pbldocs">
+                <label for="c2c2e1"></label>
+                <article>
+                    <h4>console: error</h4>
+                </article>
+
+                <input type="radio" id="c2d1t1" name="pbldocs">
+                <label for="c2d1t1"></label>
+                <article>
+                    <h4>Date: toLocaleString</h4>
+                </article>
+
+                <input type="radio" id="c2d1t2" name="pbldocs">
+                <label for="c2d1t2"></label>
+                <article>
+                    <h4>Date: toLocaleTimeString</h4>
+                </article>
+
+                <input type="radio" id="c2d1t3" name="pbldocs">
+                <label for="c2d1t3"></label>
+                <article>
+                    <h4>Date: toLocaleDateString</h4>
+                </article>
+
+                <input type="radio" id="c2r1r1" name="pbldocs">
+                <label for="c2r1r1"></label>
+                <article>
+                    <h4>rocky: RockyPostMessageErrorCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1r2" name="pbldocs">
+                <label for="c2r1r2"></label>
+                <article>
+                    <h4>rocky: RockyPostMessageConnectedCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1w1" name="pbldocs">
+                <label for="c2r1w1"></label>
+                <article>
+                    <h4>rocky: WatchInfo</h4>
+                </article>
+
+                <input type="radio" id="c2r1w2" name="pbldocs">
+                <label for="c2r1w2"></label>
+                <article>
+                    <h4>rocky: watchInfo</h4>
+                </article>
+
+                <input type="radio" id="c2r1r3" name="pbldocs">
+                <label for="c2r1r3"></label>
+                <article>
+                    <h4>rocky: RockyMemoryPressureCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1r4" name="pbldocs">
+                <label for="c2r1r4"></label>
+                <article>
+                    <h4>rocky: RockyPostMessageDisconnectedCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1u1" name="pbldocs">
+                <label for="c2r1u1"></label>
+                <article>
+                    <h4>rocky: UserPreferences</h4>
+                </article>
+
+                <input type="radio" id="c2r1r5" name="pbldocs">
+                <label for="c2r1r5"></label>
+                <article>
+                    <h4>rocky: RockyDrawCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1r6" name="pbldocs">
+                <label for="c2r1r6"></label>
+                <article>
+                    <h4>rocky: RockyMessageCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1r7" name="pbldocs">
+                <label for="c2r1r7"></label>
+                <article>
+                    <h4>rocky: RockyTickCallback</h4>
+                </article>
+
+                <input type="radio" id="c2r1u2" name="pbldocs">
+                <label for="c2r1u2"></label>
+                <article>
+                    <h4>rocky: userPreferences</h4>
+                </article>
+
+                <input type="radio" id="c2r1o1" name="pbldocs">
+                <label for="c2r1o1"></label>
+                <article>
+                    <h4>rocky: on</h4>
+                </article>
+
+                <input type="radio" id="c2r1a1" name="pbldocs">
+                <label for="c2r1a1"></label>
+                <article>
+                    <h4>rocky: addEventListener</h4>
+                </article>
+
+                <input type="radio" id="c2r1r8" name="pbldocs">
+                <label for="c2r1r8"></label>
+                <article>
+                    <h4>rocky: removeEventListener</h4>
+                </article>
+
+                <input type="radio" id="c2r1o2" name="pbldocs">
+                <label for="c2r1o2"></label>
+                <article>
+                    <h4>rocky: off</h4>
+                </article>
+
+                <input type="radio" id="c2r1p1" name="pbldocs">
+                <label for="c2r1p1"></label>
+                <article>
+                    <h4>rocky: postMessage</h4>
+                </article>
+
+                <input type="radio" id="c2r1r9" name="pbldocs">
+                <label for="c2r1r9"></label>
+                <article>
+                    <h4>rocky: requestDraw</h4>
+                </article>
+
+                <input type="radio" id="c3p1a1" name="pbldocs">
+                <label for="c3p1a1"></label>
+                <article>
+                    <h4>Pebble: addEventListener</h4>
+                </article>
+
+                <input type="radio" id="c3p1o1" name="pbldocs">
+                <label for="c3p1o1"></label>
+                <article>
+                    <h4>Pebble: on</h4>
+                </article>
+
+                <input type="radio" id="c3p1r1" name="pbldocs">
+                <label for="c3p1r1"></label>
+                <article>
+                    <h4>Pebble: removeEventListener</h4>
+                </article>
+
+                <input type="radio" id="c3p1o2" name="pbldocs">
+                <label for="c3p1o2"></label>
+                <article>
+                    <h4>Pebble: off</h4>
+                </article>
+
+                <input type="radio" id="c3p1s1" name="pbldocs">
+                <label for="c3p1s1"></label>
+                <article>
+                    <h4>Pebble: showSimpleNotificationOnPebble</h4>
+                </article>
+
+                <input type="radio" id="c3p1s2" name="pbldocs">
+                <label for="c3p1s2"></label>
+                <article>
+                    <h4>Pebble: sendAppMessage</h4>
+                </article>
+
+                <input type="radio" id="c3p1p1" name="pbldocs">
+                <label for="c3p1p1"></label>
+                <article>
+                    <h4>Pebble: postMessage</h4>
+                </article>
+
+                <input type="radio" id="c3p1g1" name="pbldocs">
+                <label for="c3p1g1"></label>
+                <article>
+                    <h4>Pebble: getTimelineToken</h4>
+                </article>
+
+                <input type="radio" id="c3p1t1" name="pbldocs">
+                <label for="c3p1t1c3"></label>
+                <article>
+                    <h4>Pebble: timelineSubscribe</h4>
+                </article>
+
+                <input type="radio" id="c3p1t2" name="pbldocs">
+                <label for="c3p1t2"></label>
+                <article>
+                    <h4>Pebble: timelineUnsubscribe</h4>
+                </article>
+
+                <input type="radio" id="c3p1t3" name="pbldocs">
+                <label for="c3p1t3"></label>
+                <article>
+                    <h4>Pebble: timelineSubscriptions</h4>
+                </article>
+
+                <input type="radio" id="c3p1g2" name="pbldocs">
+                <label for="c3p1g2"></label>
+                <article>
+                    <h4>Pebble: getActiveWatchInfo</h4>
+                </article>
+
+                <input type="radio" id="c3p1g3" name="pbldocs">
+                <label for="c3p1g3"></label>
+                <article>
+                    <h4>Pebble: getAccountToken</h4>
+                </article>
+
+                <input type="radio" id="c3p1g4" name="pbldocs">
+                <label for="c3p1g4"></label>
+                <article>
+                    <h4>Pebble: getWatchToken</h4>
+                </article>
+
+                <input type="radio" id="c3p1a2" name="pbldocs">
+                <label for="cc3p1a23"></label>
+                <article>
+                    <h4>Pebble: appGlanceReload</h4>
+                </article>
+
+                <input type="radio" id="c3p1t4" name="pbldocs">
+                <label for="c3p1t4"></label>
+                <article>
+                    <h4>Pebble: TimelineTopicsCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1o3" name="pbldocs">
+                <label for="c3p1o3"></label>
+                <article>
+                    <h4>Pebble: openURL</h4>
+                </article>
+
+                <input type="radio" id="c3p1a3" name="pbldocs">
+                <label for="c3p1a3"></label>
+                <article>
+                    <h4>Pebble: AppGlanceReloadFailureCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1a4" name="pbldocs">
+                <label for="c3p1a4"></label>
+                <article>
+                    <h4>Pebble: AppMessageAckCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1a5" name="pbldocs">
+                <label for="c3p1a5"></label>
+                <article>
+                    <h4>Pebble: AppMessageNackCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1e1" name="pbldocs">
+                <label for="c3p1e1"></label>
+                <article>
+                    <h4>Pebble: EventCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1t5" name="pbldocs">
+                <label for="c3p1t5"></label>
+                <article>
+                    <h4>Pebble: TimelineTokenCallbac</h4>
+                </article>
+
+                <input type="radio" id="c3p1a6" name="pbldocs">
+                <label for="c3p1a6"></label>
+                <article>
+                    <h4>Pebble: AppGlanceReloadSuccessCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1p2" name="pbldocs">
+                <label for="c3p1p2"></label>
+                <article>
+                    <h4>Pebble: PostMessageCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1p3" name="pbldocs">
+                <label for="c3p1p3"></label>
+                <article>
+                    <h4>Pebble: PostMessageErrorCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1p4" name="pbldocs">
+                <label for="c3p1p4"></label>
+                <article>
+                    <h4>Pebble: PostMessageConnectedCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1p5" name="pbldocs">
+                <label for="c3p1p5"></label>
+                <article>
+                    <h4>Pebble: PostMessageDisconnectedCallback</h4>
+                </article>
+
+                <input type="radio" id="c3p1w1" name="pbldocs">
+                <label for="c3p1w1"></label>
+                <article>
+                    <h4>Pebble: WatchInfo</h4>
+                </article>
+
+                <input type="radio" id="c3p1a7" name="pbldocs">
+                <label for="c3p1a7"></label>
+                <article>
+                    <h4>Pebble: AppGlanceSlice</h4>
+                </article>
+
+                <input type="radio" id="c4c1p1" name="pbldocs">
+                <label for="c4c1p1"></label>
+                <article>
+                    <h4>Class References: PBBitmap</h4>
+                </article>
+
+                <input type="radio" id="c4c1p2" name="pbldocs">
+                <label for="c4c1p2"></label>
+                <article>
+                    <h4>Class References: PBDataLoggingService</h4>
+                </article>
+
+                <input type="radio" id="c4c1p3" name="pbldocs">
+                <label for="c4c1p3"></label>
+                <article>
+                    <h4>Class References: PBDataLoggingSessionMetadata</h4>
+                </article>
+
+                <input type="radio" id="c4c1p4" name="pbldocs">
+                <label for="c4c1p4"></label>
+                <article>
+                    <h4>Class References: PBFirmwareMetadata</h4>
+                </article>
+
+                <input type="radio" id="c4c1p5" name="pbldocs">
+                <label for="c4c1p5"></label>
+                <article>
+                    <h4>Class References: PBFirmwareVersion</h4>
+                </article>
+
+                <input type="radio" id="c4c1p6" name="pbldocs">
+                <label for="c4c1p6"></label>
+                <article>
+                    <h4>Class References: PBPebbleCentral</h4>
+                </article>
+
+                <input type="radio" id="c4c1p7" name="pbldocs">
+                <label for="c4c1p7"></label>
+                <article>
+                    <h4>Class References: PBPebbleKitLogging</h4>
+                </article>
+
+                <input type="radio" id="c4c1p8" name="pbldocs">
+                <label for="c4c1p8"></label>
+                <article>
+                    <h4>Class References: PBResourceMetadata</h4>
+                </article>
+
+                <input type="radio" id="c4c1p9" name="pbldocs">
+                <label for="c4c1p9"></label>
+                <article>
+                    <h4>Class References: PBSemanticVersion</h4>
+                </article>
+
+                <input type="radio" id="c4c1pA" name="pbldocs">
+                <label for="c4c1pA"></label>
+                <article>
+                    <h4>Class References: PBSportsUpdate</h4>
+                </article>
+
+                <input type="radio" id="c4c1pB" name="pbldocs">
+                <label for="c4c1pB"></label>
+                <article>
+                    <h4>Class References: PBVersionInfo</h4>
+                </article>
+
+                <input type="radio" id="c4p1p1" name="pbldocs">
+                <label for="c4p1p1"></label>
+                <article>
+                    <h4>Protocol References: PBDataLoggingServiceDelegate</h4>
+                </article>
+
+                <input type="radio" id="c4p1p2" name="pbldocs">
+                <label for="c4p1p2"></label>
+                <article>
+                    <h4>Protocol References: PBPebbleCentralDelegate</h4>
+                </article>
+
+                <input type="radio" id="c4p1p3" name="pbldocs">
+                <label for="c4p1p3"></label>
+                <article>
+                    <h4>Protocol References: PBWatchDelegate</h4>
+                </article>
+
+                <input type="radio" id="c4c2f1" name="pbldocs">
+                <label for="c4c2f1"></label>
+                <article>
+                    <h4>Constant References: FirmwareMetadataPlatform</h4>
+                </article>
+
+                <input type="radio" id="c4c2g1" name="pbldocs">
+                <label for="c4c2g1"></label>
+                <article>
+                    <h4>Constant References: GolfAppCommand</h4>
+                </article>
+
+                <input type="radio" id="c4c2p1" name="pbldocs">
+                <label for="c4c2p1"></label>
+                <article>
+                    <h4>Constant References: PBDataLoggingType</h4>
+                </article>
+
+                <input type="radio" id="c4c2p2" name="pbldocs">
+                <label for="c4c2p2"></label>
+                <article>
+                    <h4>Constant References: PBErrorCode</h4>
+                </article>
+
+                <input type="radio" id="c4c2p3" name="pbldocs">
+                <label for="c4c2p3"></label>
+                <article>
+                    <h4>Constant References: PBPebbleKitLogFlag</h4>
+                </article>
+
+                <input type="radio" id="c4c2p4" name="pbldocs">
+                <label for="c4c2p4"></label>
+                <article>
+                    <h4>Constant References: PBPebbleKitLogLevel</h4>
+                </article>
+
+                <input type="radio" id="c4c2p5" name="pbldocs">
+                <label for="c4c2p5"></label>
+                <article>
+                    <h4>Constant References: PBRemoteProtocolCapabilitiesFlags</h4>
+                </article>
+
+                <input type="radio" id="c4c2p6" name="pbldocs">
+                <label for="c4c2p6"></label>
+                <article>
+                    <h4>Constant References: PBUnitSystem</h4>
+                </article>
+
+                <input type="radio" id="c4c2s1" name="pbldocs">
+                <label for="c4c2s1"></label>
+                <article>
+                    <h4>Constant References: SportsAppActivityState</h4>
+                </article>
+
+                <input type="radio" id="c4c3n1" name="pbldocs">
+                <label for="c4c3n1"></label>
+                <article>
+                    <h4>Category References: NSData(Pebble)</h4>
+                </article>
+
+                <input type="radio" id="c4c3n2" name="pbldocs">
+                <label for="c4c3n2"></label>
+                <article>
+                    <h4>Category References: NSDictionary(Pebble)</h4>
+                </article>
+
+                <input type="radio" id="c4c3n3" name="pbldocs">
+                <label for="c4c3n3"></label>
+                <article>
+                    <h4>Category References: NSError(Pebble)</h4>
+                </article>
+
+                <input type="radio" id="c4c3n4" name="pbldocs">
+                <label for="c4c3n4"></label>
+                <article>
+                    <h4>Category References: NSNumber(PBStandardIntegerExtensions)</h4>
+                </article>
+
+                <input type="radio" id="c5c1c1" name="pbldocs">
+                <label for="c5c1c1"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: Constants</h4>
+                </article>
+
+                <input type="radio" id="c5c1p1" name="pbldocs">
+                <label for="c5c1p1"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit</h4>
+                </article>
+
+                <input type="radio" id="c5c1p2" name="pbldocs">
+                <label for="c5c1p2"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit.FirmwareVersionInfo</h4>
+                </article>
+
+                <input type="radio" id="c5c1p3" name="pbldocs">
+                <label for="c5c1p3"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit.PebbleAckReceiver</h4>
+                </article>
+
+                <input type="radio" id="c5c1p4" name="pbldocs">
+                <label for="c5c1p4"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit.PebbleDataLogReceiver</h4>
+                </article>
+
+                <input type="radio" id="c5c1p5" name="pbldocs">
+                <label for="c5c1p5"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit.PebbleDataReceiver</h4>
+                </article>
+
+                <input type="radio" id="c5c1p6" name="pbldocs">
+                <label for="c5c1p6"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: PebbleKit.PebbleNackReceiver</h4>
+                </article>
+
+                <input type="radio" id="c5c1c2" name="pbldocs">
+                <label for="c5c1c2"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: Constants.PebbleAppType</h4>
+                </article>
+
+                <input type="radio" id="c5c1c3" name="pbldocs">
+                <label for="c5c1c3"></label>
+                <article>
+                    <h4>com.getpebble.android.kit: Constants.PebbleDataType</h4>
+                </article>
+
+                <input type="radio" id="c5c2p1" name="pbldocs">
+                <label for="c5c2p1"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: PebbleDictionary</h4>
+                </article>
+
+                <input type="radio" id="c5c2p2" name="pbldocs">
+                <label for="c5c2p2"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: PebbleTuple</h4>
+                </article>
+
+                <input type="radio" id="c5c2s1" name="pbldocs">
+                <label for="c5c2s1"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: SportsState</h4>
+                </article>
+
+                <input type="radio" id="c5c2p3" name="pbldocs">
+                <label for="c5c2p3"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: PebbleDictionary.PebbleDictTypeException</h4>
+                </article>
+
+                <input type="radio" id="c5c2p4" name="pbldocs">
+                <label for="c5c2p4"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: PebbleDictionary.TupleOverflowException</h4>
+                </article>
+
+                <input type="radio" id="c5c2p5" name="pbldocs">
+                <label for="c5c2p5"></label>
+                <article>
+                    <h4>com.getpebble.android.kit.util: PebbleTuple.ValueOverflowException</h4>
+                </article>
+
+            </div>
+            <div class="sidebar-navigation">
+                <!-- id="c1f1d" (c# = category + number), f1 (f = first letter + number), a1 (a = name + number) -->
+                <div>
+                    <ul class="open">
+                        <li>
+                            <a>PEBBLE C API<svg><use href="#chevron"></use></svg></a>
+                            <ul>
+                                <li class="selected--last">
+                                    <a>Foundation<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c1f1a1')">App</a></li>
+                                        <li><a onclick="jump('c1f1a2')">App Communication</a></li>
+                                        <li><a onclick="jump('c1f1a3')">App Glance</a></li>
+                                        <li><a onclick="jump('c1f1a4')">AppMessage</a></li>
+                                        <li><a onclick="jump('c1f1a5')">AppSync</a></li>
+                                        <li><a onclick="jump('c1f1a6')">AppWorker</a></li>
+                                        <li><a onclick="jump('c1f1d1')">DataLogging</a></li>
+                                        <li><a onclick="jump('c1f1d2')">DataStructures</a></li>
+                                        <li><a onclick="jump('c1f1d3')">Dictation</a></li>
+                                        <li><a onclick="jump('c1f1d4')">Dictionary</a></li>
+                                        <li><a onclick="jump('c1f1e1')">Event Service</a></li>
+                                        <li><a onclick="jump('c1f1e2')">Exit Reason</a></li>
+                                        <li><a onclick="jump('c1f1i1')">Internationalization</a></li>
+                                        <li><a onclick="jump('c1f1l1')">Launch Reason</a></li>
+                                        <li><a onclick="jump('c1f1l2')">Logging</a></li>
+                                        <li><a onclick="jump('c1f1m1')">Math</a></li>
+                                        <li><a onclick="jump('c1f1m2')">Memory Management</a></li>
+                                        <li><a onclick="jump('c1f1p1')">Platform</a></li>
+                                        <li><a onclick="jump('c1f1r1')">Resources</a></li>
+                                        <li><a onclick="jump('c1f1r2')">Rocky</a></li>
+                                        <li><a onclick="jump('c1f1s1')">Storage</a></li>
+                                        <li><a onclick="jump('c1f1t1')">Timer</a></li>
+                                        <li><a onclick="jump('c1f1w1')">Wakeup</a></li>
+                                        <li><a onclick="jump('c1f1w2')">Wall Time</a></li>
+                                        <li><a onclick="jump('c1f1w3')">WatchInfo</a></li>
+                                    </ul>
+                                </li>
+                                <li class="selected--last">
+                                    <a>Graphics<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c1g1d1')">Draw Commands</a></li>
+                                        <li><a onclick="jump('c1g1d2')">Drawing Paths</a></li>
+                                        <li><a onclick="jump('c1g1d3')">Drawing Primitives</a></li>
+                                        <li><a onclick="jump('c1g1d4')">Drawing Text</a></li>
+                                        <li><a onclick="jump('c1g1f1')">Fonts</a></li>
+                                        <li><a onclick="jump('c1g1g1')">Graphics Context</a></li>
+                                        <li><a onclick="jump('c1g1g2')">Graphics Types</a></li>
+                                    </ul>
+                                </li>
+                                <li class="selected--last">
+                                    <a>User Interface<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c1u1a1')">Animation</a></li>
+                                        <li><a onclick="jump('c1u1c1')">Clicks</a></li>
+                                        <li><a onclick="jump('c1u1l1')">Layers</a></li>
+                                        <li><a onclick="jump('c1u1l2')">Light</a></li>
+                                        <li><a onclick="jump('c1u1p1')">Preferences</a></li>
+                                        <li><a onclick="jump('c1u1u1')">UnobstructedArea</a></li>
+                                        <li><a onclick="jump('c1u1v1')">Vibes</a></li>
+                                        <li><a onclick="jump('c1u1w1')">Window</a></li>
+                                        <li><a onclick="jump('c1u1w2')">Window Stack</a></li>
+                                    </ul>
+                                </li>
+                                <li class="selected--last">
+                                    <a>Standard C<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c1s1f1')">Format</a></li>
+                                        <li><a onclick="jump('c1s1l1')">Locale</a></li>
+                                        <li><a onclick="jump('c1s1m1')">Math</a></li>
+                                        <li><a onclick="jump('c1s1m2')">Memory</a></li>
+                                        <li><a onclick="jump('c1s1s1')">String</a></li>
+                                        <li><a onclick="jump('c1s1t1')">Time</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="selected--last">
+                            <a>PEBBLE JAVASCRIPT API<svg><use href="#chevron"></use></svg></a>
+                            <ul>
+                                <li>
+                                    <a>CanvasRenderingContext2D<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c2p1t1')">TextMetrics</a></li>
+                                        <li><a onclick="jump('c2c1f1')">fillStyle</a></li>
+                                        <li><a onclick="jump('c2c1c1')">Canvas</a></li>
+                                        <li><a onclick="jump('c2c1s1')">strokeStyle</a></li>
+                                        <li><a onclick="jump('c2c1c2')">canvas</a></li>
+                                        <li><a onclick="jump('c2c1l1')">lineWidth</a></li>
+                                        <li><a onclick="jump('c2c1f2')">font</a></li>
+                                        <li><a onclick="jump('c2c1t2')">textAlign</a></li>
+                                        <li><a onclick="jump('c2c1c3')">clearRect</a></li>
+                                        <li><a onclick="jump('c2c1f3')">fillRect</a></li>
+                                        <li><a onclick="jump('c2c1s2')">strokeRect</a></li>
+                                        <li><a onclick="jump('c2c1f4')">fillText</a></li>
+                                        <li><a onclick="jump('c2c1m1')">measureText</a></li>
+                                        <li><a onclick="jump('c2c1b1')">beginPath</a></li>
+                                        <li><a onclick="jump('c2c1c4')">closePath</a></li>
+                                        <li><a onclick="jump('c2c1m2')">moveTo</a></li>
+                                        <li><a onclick="jump('c2c1l2')">lineTo</a></li>
+                                        <li><a onclick="jump('c2c1a1')">arc</a></li>
+                                        <li><a onclick="jump('c2c1r1')">rect</a></li>
+                                        <li><a onclick="jump('c2c1f5')">fill</a></li>
+                                        <li><a onclick="jump('c2c1s3')">stroke</a></li>
+                                        <li><a onclick="jump('c2c1s4')">save</a></li>
+                                        <li><a onclick="jump('c2c1r2')">restore</a></li>
+                                        <li><a onclick="jump('c2c1r3')">rockyFillRadial</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>console<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c2c2l1')">log</a></li>
+                                        <li><a onclick="jump('c2c2w1')">warn</a></li>
+                                        <li><a onclick="jump('c2c2e1')">error</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>Date<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c2d1t1')">toLocaleString</a></li>
+                                        <li><a onclick="jump('c2d1t2')">toLocaleTimeString</a></li>
+                                        <li><a onclick="jump('c2d1t3')">toLocaleDateString</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>rocky<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c2r1r1')">RockyPostMessageErrorCallback</a></li>
+                                        <li><a onclick="jump('c2r1r2')">RockyPostMessageConnectedCallback</a></li>
+                                        <li><a onclick="jump('c2r1w1')">WatchInfo</a></li>
+                                        <li><a onclick="jump('c2r1w2')">watchInfo</a></li>
+                                        <li><a onclick="jump('c2r1r3')">RockyMemoryPressureCallback</a></li>
+                                        <li><a onclick="jump('c2r1r4')">RockyPostMessageDisconnectedCallback</a></li>
+                                        <li><a onclick="jump('c2r1u1')">UserPreferences</a></li>
+                                        <li><a onclick="jump('c2r1r5')">RockyDrawCallback</a></li>
+                                        <li><a onclick="jump('c2r1r6')">RockyMessageCallback</a></li>
+                                        <li><a onclick="jump('c2r1r7')">RockyTickCallback</a></li>
+                                        <li><a onclick="jump('c2r1u2')">userPreferences</a></li>
+                                        <li><a onclick="jump('c2r1o1')">on</a></li>
+                                        <li><a onclick="jump('c2r1a1')">addEventListener</a></li>
+                                        <li><a onclick="jump('c2r1r8')">removeEventListener</a></li>
+                                        <li><a onclick="jump('c2r1o2')">off</a></li>
+                                        <li><a onclick="jump('c2r1p1')">postMessage</a></li>
+                                        <li><a onclick="jump('c2r1r9')">requestDraw</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="selected--last">
+                            <a>PEBBLEKIT JS<svg><use href="#chevron"></use></svg></a>
+                            <ul>
+                                <li>
+                                    <a>Pebble<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c3p1a1')">addEventListener</a></li>
+                                        <li><a onclick="jump('c3p1o1')">on</a></li>
+                                        <li><a onclick="jump('c3p1r1')">removeEventListener</a></li>
+                                        <li><a onclick="jump('c3p1o2')">off</a></li>
+                                        <li><a onclick="jump('c3p1s1')">showSimpleNotificationOnPebble</a></li>
+                                        <li><a onclick="jump('c3p1s2')">sendAppMessage</a></li>
+                                        <li><a onclick="jump('c3p1p1')">postMessage</a></li>
+                                        <li><a onclick="jump('c3p1g1')">getTimelineToken</a></li>
+                                        <li><a onclick="jump('c3p1t1')">timelineSubscribe</a></li>
+                                        <li><a onclick="jump('c3p1t2')">timelineUnsubscribe</a></li>
+                                        <li><a onclick="jump('c3p1t3')">timelineSubscriptions</a></li>
+                                        <li><a onclick="jump('c3p1g2')">getActiveWatchInfo</a></li>
+                                        <li><a onclick="jump('c3p1g3')">getAccountToken</a></li>
+                                        <li><a onclick="jump('c3p1g4')">getWatchToken</a></li>
+                                        <li><a onclick="jump('c3p1a2')">appGlanceReload</a></li>
+                                        <li><a onclick="jump('c3p1t4')">TimelineTopicsCallback</a></li>
+                                        <li><a onclick="jump('c3p1o3')">openURL</a></li>
+                                        <li><a onclick="jump('c3p1a3')">AppGlanceReloadFailureCallback</a></li>
+                                        <li><a onclick="jump('c3p1a4')">AppMessageAckCallback</a></li>
+                                        <li><a onclick="jump('c3p1a5')">AppMessageNackCallback</a></li>
+                                        <li><a onclick="jump('c3p1e1')">EventCallback</a></li>
+                                        <li><a onclick="jump('c3p1t5')">TimelineTokenCallbac</a></li>
+                                        <li><a onclick="jump('c3p1a6')">AppGlanceReloadSuccessCallback</a></li>
+                                        <li><a onclick="jump('c3p1p2')">PostMessageCallback</a></li>
+                                        <li><a onclick="jump('c3p1p3')">PostMessageErrorCallback</a></li>
+                                        <li><a onclick="jump('c3p1p4')">PostMessageConnectedCallback</a></li>
+                                        <li><a onclick="jump('c3p1p5')">PostMessageDisconnectedCallback</a></li>
+                                        <li><a onclick="jump('c3p1w1')">WatchInfo</a></li>
+                                        <li><a onclick="jump('c3p1a7')">AppGlanceSlice</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="selected--last">
+                            <a>PEBBLEKIT iOS<svg><use href="#chevron"></use></svg></a>
+                            <ul>
+                                <li>
+                                    <a>Class References<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c4c1p1')">PBBitmap</a></li>
+                                        <li><a onclick="jump('c4c1p2')">PBDataLoggingService</a></li>
+                                        <li><a onclick="jump('c4c1p3')">PBDataLoggingSessionMetadata</a></li>
+                                        <li><a onclick="jump('c4c1p4')">PBFirmwareMetadata</a></li>
+                                        <li><a onclick="jump('c4c1p5')">PBFirmwareVersion</a></li>
+                                        <li><a onclick="jump('c4c1p6')">PBPebbleCentral</a></li>
+                                        <li><a onclick="jump('c4c1p7')">PBPebbleKitLogging</a></li>
+                                        <li><a onclick="jump('c4c1p8')">PBResourceMetadata</a></li>
+                                        <li><a onclick="jump('c4c1p9')">PBSemanticVersion</a></li>
+                                        <li><a onclick="jump('c4c1pA')">PBSportsUpdate</a></li>
+                                        <li><a onclick="jump('c4c1pB')">PBVersionInfo</a></li>
+                                        <li><a onclick="jump('c4c1pC')">PBWatch</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>Protocol References<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c4p1p1')">PBDataLoggingServiceDelegate</a></li>
+                                        <li><a onclick="jump('c4p1p2')">PBPebbleCentralDelegate</a></li>
+                                        <li><a onclick="jump('c4p1p3')">PBWatchDelegate</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>Constant References<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c4c2f1')">FirmwareMetadataPlatform</a></li>
+                                        <li><a onclick="jump('c4c2g1')">GolfAppCommand</a></li>
+                                        <li><a onclick="jump('c4c2p1')">PBDataLoggingType</a></li>
+                                        <li><a onclick="jump('c4c2p2')">PBErrorCode</a></li>
+                                        <li><a onclick="jump('c4c2p3')">PBPebbleKitLogFlag</a></li>
+                                        <li><a onclick="jump('c4c2p4')">PBPebbleKitLogLevel</a></li>
+                                        <li><a onclick="jump('c4c2p5')">PBRemoteProtocolCapabilitiesFlags</a></li>
+                                        <li><a onclick="jump('c4c2p6')">PBUnitSystem</a></li>
+                                        <li><a onclick="jump('c4c2s1')">SportsAppActivityState</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>Category References<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c4c3n1')">NSData(Pebble)</a></li>
+                                        <li><a onclick="jump('c4c3n2')">NSDictionary(Pebble)</a></li>
+                                        <li><a onclick="jump('c4c3n3')">NSError(Pebble)</a></li>
+                                        <li><a onclick="jump('c4c3n4')">NSNumber(PBStandardIntegerExtensions)</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="selected--last">
+                            <a>PEBBLEKIT ANDROID<svg><use href="#chevron"></use></svg></a>
+                            <ul>
+                                <li>
+                                    <a>com.getpebble.android.kit<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c5c1c1')">Constants</a></li>
+                                        <li><a onclick="jump('c5c1p1')">PebbleKit</a></li>
+                                        <li><a onclick="jump('c5c1p2')">PebbleKit.FirmwareVersionInfo</a></li>
+                                        <li><a onclick="jump('c5c1p3')">PebbleKit.PebbleAckReceiver</a></li>
+                                        <li><a onclick="jump('c5c1p4')">PebbleKit.PebbleDataLogReceiver</a></li>
+                                        <li><a onclick="jump('c5c1p5')">PebbleKit.PebbleDataReceiver</a></li>
+                                        <li><a onclick="jump('c5c1p6')">PebbleKit.PebbleNackReceiver</a></li>
+                                        <li><a onclick="jump('c5c1c2')">Constants.PebbleAppType</a></li>
+                                        <li><a onclick="jump('c5c1c3')">Constants.PebbleDataType</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>com.getpebble.android.kit.util<svg><use href="#chevron"></use></svg></a>
+                                    <ul>
+                                        <li><a onclick="jump('c5c2p1')">PebbleDictionary</a></li>
+                                        <li><a onclick="jump('c5c2p2')">PebbleTuple</a></li>
+                                        <li><a onclick="jump('c5c2s1')">SportsState</a></li>
+                                        <li><a onclick="jump('c5c2p3')">PebbleDictionary.PebbleDictTypeException</a></li>
+                                        <li><a onclick="jump('c5c2p4')">PebbleDictionary.TupleOverflowException</a></li>
+                                        <li><a onclick="jump('c5c2p5')">PebbleTuple.ValueOverflowException</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <input type="radio" name="tab" id="tab2">
+        <div>
+            <div class="tabs">
+                <input type="radio" name="tabs" id="tabone" checked="checked">
+                <label for="tabone">main.js</label>
+                <div class="tab">
+                    <h4>Tab One Content</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <input type="radio" name="tabs" id="tabtwo">
+                <label for="tabtwo">icon.png</label>
+                <div class="tab">
+                    <h4>Tab Two Content</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                
+                <input type="radio" name="tabs" id="tabthree">
+                <label for="tabthree">img1.png</label>
+                <div class="tab">
+                    <h4>Tab Three Content</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </div>
+
+        <input type="radio" name="tab" id="tab3">
+        <div>
+            COMPILER
+        </div>
+
+        <input type="radio" name="tab" id="tab4">
+        <div>
+            <div class="tabs">
+                <input type="radio" name="settings-tabs" id="settings-tab1" checked="checked">
+                <label for="settings-tab1">PROJECT</label>
+                <div class="tab">
+                    <h4>Project Settings</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <input type="radio" name="settings-tabs" id="settings-tab2">
+                <label for="settings-tab2">APPLICATION</label>
+                <div class="tab" style="display: flex;">
+                    <div style="flex: 1 1 auto;">
+                        <h4>Application Settings</h4>
+                    </div>
+                    <div class="demo">  
+                        <div class="demo__phone">
+                            <div class="demo__screen-wrapper">
+                                <iframe class="demo__screen" src="app.html"></iframe>
+                            </div>
+                            <div class="demo__notch"></div>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="radio" name="tab" id="tab5" checked>
+        <div style="justify-content: center; align-items: center;">
+            <svg style="width: var(--logo-width); height: 50px; margin-bottom: 25px;"><use href="#cloudpebble-icon"/></svg>
+            <span style="color: #999; margin: 1rem;">Open Project</span>
+            <button>Open Folder</button>
+            <button>Open Archive</button>
+            <span class="link" onclick="alert('New Project1');" style="margin-top: 3rem;">New Project</span>
+            <!-- <div style="position: absolute; bottom: 1rem; font-size: 1.2rem;"><b>Note: </b> Click on the watch face and use the arrow keys ( <kbd>&uarr;</kbd> , <kbd>&darr;</kbd> , <kbd>&larr; or BACKSPACE</kbd> , <kbd>&rarr; or RETURN</kbd> ) to use the watch buttons.</div> -->
+            <div style="position: absolute; bottom: 1rem; font-size: 1.2rem;"><b>Note: </b>  Press <kbd>CTRL</kbd> + <kbd>/</kbd> to open the help dialog for shortcuts.</div>
+        </div>
+    </div>
+</main>
+
+<script>
+
+/* Keyboard Shortcuts */
+/* ================================================== */
+
+function CtrlD(e) {
+    e.preventDefault();
+    alert("Toggle Documentation");
+}
+
+function CtrlE(e) {
+    e.preventDefault();
+    alert("Export file to zip");
+}
+
+function CtrlI(e) {
+    e.preventDefault();
+    alert("Import Project");
+}
+
+function CtrlO(e) {
+    e.preventDefault();
+    alert("Open File");
+}
+
+function CtrlR(e) {
+    e.preventDefault();
+    alert("Run Program");
+}
+
+function CtrlS(e) {
+    e.preventDefault();
+    alert("Ctrl + S Pressed!");
+}
+
+function CtrlShiftF(e) {
+    e.preventDefault();
+    alert("New File");
+}
+
+function CtrlShiftP(e) {
+    e.preventDefault();
+    alert("New Project");
+}
+
+function CtrlHelp(e) {
+    e.preventDefault();
+    alert("Help Dialog");
+}
+
+function CtrlEnter(e) {
+    e.preventDefault();
+    alert("Compile");
+}
+
+function WatchUp(e) {
+    e.preventDefault();
+    alert("Watch Up Pressed!");
+}
+
+function WatchDown(e) {
+    e.preventDefault();
+    alert("Watch Down Pressed!");
+}
+
+function WatchLeft(e) {
+    e.preventDefault();
+    alert("Watch Left Pressed!");
+}
+
+function WatchRight(e) {
+    e.preventDefault();
+    alert("Watch Right Pressed!");
+}
+
+let awaitingSecondKey = false;
+document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyK') {
+        e.preventDefault();
+        awaitingSecondKey = true;
+        return;
+    }
+
+    if (awaitingSecondKey) {
+        e.preventDefault();
+        awaitingSecondKey = false;
+
+        if (e.code === 'KeyN' && !e.shiftKey) {
+            CtrlN(e);
+        } else if (e.code === 'KeyN' && e.shiftKey) {
+            ShiftCtrlN(e);
+        }
+
+        return;
+    }
+    // Build key combo string
+    const keyDectionCombo = ((e.ctrlKey || e.metaKey) ? 'ctrl+' : '') + (e.shiftKey ? 'shift+' : '') + e.key.toLowerCase();
+        // const keyDectionCombo =
+        // (e.ctrlKey ? 'ctrl+' : '') +
+        // (e.metaKey ? 'ctrl+' : '') +
+        // (e.shiftKey ? 'shift+' : '') +
+        // e.code.toLowerCase();
+
+    switch (keyDectionCombo) {
+        case 'ctrl+d': CtrlD(e); break; // Toggle Documentation Window
+        case 'ctrl+e': CtrlE(e); break; // Export project to zip file
+        case 'ctrl+i': CtrlI(e); break; // Import project zip
+        case 'ctrl+o': CtrlO(e); break; // Open Folder
+        case 'ctrl+r': CtrlR(e); break; // Run Program
+        case 'ctrl+s': CtrlS(e); break; // Save current file
+        case 'ctrl+shift+f': CtrlShiftF(e); break; // New File
+        case 'ctrl+shift+p': CtrlShiftP(e); break; // New Project
+        case 'ctrl+enter': CtrlEnter(e); break;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.code === 'Slash') { CtrlHelp(e); }
+
+    const watch = document.getElementById('watch');
+        if (document.activeElement === watch) {
+        switch (e.key) {
+            case 'ArrowUp': WatchUp(e); break;
+            case 'ArrowDown': WatchDown(e); break;
+            case 'ArrowLeft': 
+            case 'Backspace': WatchLeft(e); break;
+            case 'ArrowRight':
+            case 'Enter': WatchRight(e); break;
+        }
+    }
+});
+
+</script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const ul = document.querySelector('.sidebar-navigation > div > ul');
+
+    ul.addEventListener('click', function (e) {
+        if (e.target.tagName === 'A') {
+            const li = e.target.parentElement;
+
+            if (li.querySelector('ul')) {
+                e.preventDefault();
+
+                if (li.classList.contains('selected')) {
+                    li.classList.remove('selected');
+                    li.querySelectorAll('li').forEach(child => child.classList.remove('selected'));
+
+                    const childUl = Array.from(li.children).find(child => child.tagName === 'UL');
+                    if (childUl) childUl.style.display = 'none';
+
+                    const em = li.querySelector('a em');
+                    if (em) em.classList.remove('mdi-flip-v');
+                } else {
+                    if (!li.closest('li.selected')) {
+                        ul.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+                        ul.querySelectorAll('ul').forEach(subUl => subUl.style.display = 'none');
+                        ul.querySelectorAll('li a em').forEach(em => em.classList.remove('mdi-flip-v'));
+                    } else {
+                        li.parentElement.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+
+                        // Get direct children manually (simulate '> li ul')
+                        Array.from(li.parentElement.children).forEach(sibling => {
+                            const ul = Array.from(sibling.children).find(child => child.tagName === 'UL');
+                            if (ul) ul.style.display = 'none';
+
+                            const em = sibling.querySelector('a em');
+                            if (em) em.classList.remove('mdi-flip-v');
+                        });
+                    }
+
+                    li.classList.add('selected');
+                    const subUl = Array.from(li.children).find(child => child.tagName === 'UL');
+                    if (subUl) {
+                        subUl.style.display = 'block';
+                    }
+
+                    const em = li.querySelector('a em');
+                    if (em) em.classList.add('mdi-flip-v');
+                }
+            }
+        }
+    });
+
+    document.querySelectorAll('.sidebar-navigation > div > ul ul').forEach(function (subUl) {
+        const parent = subUl.parentElement?.parentElement;
+
+        if (!parent) return;
+
+        const firstLiA = parent.querySelector('li > a');
+        if (!firstLiA) return;
+
+        const paddingLeft = parseInt(window.getComputedStyle(firstLiA).paddingLeft, 10) || 0;
+
+        const hasNestedUl = subUl.querySelector('li > ul');
+        const links = subUl.querySelectorAll('li > a');
+
+        links.forEach(function (a) {
+            a.style.paddingLeft = `${paddingLeft + 15}px`;
+        });
+
+        if (!hasNestedUl) {
+            subUl.parentElement.classList.add('selected--last');
+        }
+    });
+
+    for (let i = 1; i <= 10; i++) {
+        let selector = 'li > ul';
+        for (let j = 1; j < i; j++) {
+            selector += ' > li > ul';
+        }
+
+        // const fullSelector = `.sidebar-navigation > ul > ${selector}`;
+        // document.querySelectorAll(fullSelector).forEach(function (ul) {
+        //     ul.classList.add(`subMenuColor${i}`);
+        // });
+    }
+
+    const activeLi = document.querySelector('li.selected');
+    if (activeLi) {
+        opener(activeLi);
+    }
+
+    function opener(li) {
+        const ul = li.closest('ul');
+        if (ul) {
+            li.classList.add('selected');
+            ul.classList.add('open');
+
+            const em = li.querySelector('a em');
+            if (em) em.classList.add('mdi-flip-v');
+
+            const parentLi = ul.closest('li');
+            if (parentLi) {
+                opener(parentLi);
+            }
+        }
+    }
+});
+
+</script>
+
+<script>
+
+function jump(id) {
+    window.scrollTo({ top: 0 });
+    document.getElementById(id).checked = true;
+    // document.getElementById('menu-btn').checked = false;
+}
+
+// Wait until the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the hash from the URL (e.g., #radio1)
+    var hash = window.location.hash;
+
+    // If there's a hash value, proceed
+    if (hash) {
+        // Remove the '#' from the hash to get the ID
+        var elementId = hash.substring(1);
+
+        // Get the radio button element with that ID
+        var radioButton = document.getElementById(elementId);
+
+        // If the element exists and is a radio button, click it
+        if (radioButton && radioButton.type === 'radio') {
+            radioButton.click();
+        }
+    }
+
+    document.querySelectorAll('code').forEach(el => el.setAttribute('translate', 'no'));
+});
+
+document.querySelectorAll('input[type="radio"].code').forEach(radio => {
+    radio.addEventListener('click', function () {
+        if (this.checked) {
+            this.checked = false;
+        }
+    });
+});
+    
+</script>
+
+<script>
+
+/* Simple Example
+ * ================================================== */
+
+// (function () {
+//     var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
+//     // puts all C-symbols from rocky onto window.* so they can be used almost
+//     // the same way you were using them in C
+//     rocky.export_global_c_symbols();
+
+//     // OSP-DIN at 10pt taken from https://github.com/pebble-examples/feature-custom-font
+//     var fontData = atob("AxCNAK8l/wIKAQAAAAABAAAAAgAAAAMAAAAEAAAABQAAAAYAAAAHAAAACAAAAAkAAAAKAAAACwAAAAwAAAANAAAADgAAAA8AAAAQAAAAEQAAABIAAAATAAAAFAAAABUAAAAWAAAAFwAAABgAAAAZAAAAGgAAABsAAAAcAAAAHQAAAB4AAAAfAAAAIAEAACEBBAAiAQgAIwAMACQADAAlAQwAJgAQACcBEAAoARQAKQEYACoAHAArARwALAEgAC0BJAAuASgALwEsADABMAAxATQAMgE4ADMBPAA0AUAANQFEADYBSAA3AUwAOAFQADkBVAA6AVgAOwFcADwBYAA9AWQAPgFoAD8BbABAAXAAQQF0AEIBeABDAXwARAGAAEUBhABGAYgARwGMAEgBkABJAZQASgGYAEsBnABMAaAATQGkAE4BqABPAawAUAGwAFEBtABSAbgAUwK8AFQCxABVAcwAVgHQAFcB1ABYAdgAWQHcAFoB4ABbAeQAXAHoAF0B7ABeAfAAXwD0AGAB9ABhAfgAYgH8AGMBAAFkAQQBZQEIAWYBDAFnARABaAEUAWkBGAFqARwBawEgAWwBJAFtASgBbgEsAW8BMAFwATQBcQE4AXIBPAFzAUABdAFEAXUBSAF2AUwBdwFQAXgBVAF5AVgBegFcAXsBYAF8AWQBfQFoAX4BbAF/AHABgABwAYEAcAGCAHABgwBwAYQAcAGFAHABhgBwAYcAcAGIAHABiQBwAYoAcAGLAHABjABwAY0AcAGOAHABjwBwAZAAcAGRAHABkgBwAZMAcAGUAHABlQBwAZYAcAGXAHABmABwAZkAcAGaAHABmwBwAZwAcAGdAHABngBwAZ8AcAGgAHABoQFwAaIAdAGjAHQBpAB0AaUAdAGmAHQBpwB0AagAdAGpAHQBqgB0AasBdAGsAHgBrQB4Aa4AeAGvAHgBsAB4AbEAeAGyAHgBswB4AbQAeAG1AHgBtgB4AbcAeAG4AXgBuQB8AboAfAG7AXwBvACAAb0AgAG+AIABvwGAAcABhAHBAYgBwgGMAcMAkAHEAZABxQCUAcYBlAHHAJgByAGYAckBnAHKAaABywGkAcwBqAHNAawBzgGwAc8BtAHQALgB0QC4AdIBuAHTAbwB1ALAAdUByAHWAcwB1wHQAdgA1AHZAdQB2gHYAdsB3AHcAeAB3QDkAd4A5AHfAOQB4AHkAeEB6AHiAewB4wDwAeQB8AHlAPQB5gH0AecB+AHoAfwB6QEAAuoBBALrAQgC7AEMAu0BEALuARQC7wEYAvAAHALxABwC8gEcAvMBIAL0ASQC9QAoAvYBKAL3ACwC+AAsAvkBLAL6ADAC+wEwAvwANAL9ADQC/gA0AiAACQAhAA4AIgAXACUAIAAnADEAKAA6ACkARwArAFQALABhAC0AagAuAHMALwB8ADAAiQAxAJYAMgCjADMAsAA0AL0ANQDKADYA1wA3AOQAOADxADkA/gA6AAsBOwAUATwAHQE9ACYBPgAvAT8AOAFAAEkBQQBOAUIAXwFDAGwBRAB5AUUAhgFGAJMBRwCgAUgArQFJALoBSgDDAUsA0AFMAN0BTQDqAU4A+wFPAAgCUAAVAlEAIgJSADMCUwBAAlIBKwdUAE0CUwFAB1UAWgJWAGcCVwB4AlgAjQJZAJ4CWgCvAlsAvAJcAMkCXQDWAl4A4wJgAOwCYQD1AmIAAgNjAA8DZAAcA2UAKQNmADYDZwBDA2gAUANpAF0DagBmA2sAcwNsAIADbQCNA24AmgNvAKcDcAC0A3EAwQNyAM4DcwDbA3QA6AN1APUDdgACBHcADwR4ABwEeQApBHoANgR7AEMEfABQBH0AWQR+AGYEoQBvBKsAeAS4AIUEuwCOBL8AmwTAAKwEwQC9BMIAzgTEAN8ExgDwBMgABQXJABYFygAnBcsAOAXMAEkFzQBWBc4AYwXPAHQF0gCFBdMAlgXUAKcFryUEANUAuAXWAMUF1wDSBdkA2wXaAOwF2wD9BdwADgbgAB8G4QAsBuIAOQbkAEYG5gBTBucAYAboAG0G6QB6BuoAhwbrAJQG7AChBu0ArgbuALsG7wDMBvIA3QbzAOoG9AD3BvYABAf5ABEH+wAeBwAAAAAAAAAQBgAAABADAQsBBQP/BQAAAwEBBQUHAAAABQ0BBQdzrUUIIULrnAEAAAACAQEFBAMAAAADDQEFBbS2bZtEAAAAAw0ABQSZbNu2FgAAAAYGAQkIDPMzDAMAAAACAwEOBB8AAAAEAQEKBg8AAAACAQEPBAMAAAAEDwADBIjMRERmJiIDBQsBBQdu77333ns7AAMLAQUGvm3btgEAAAAFCwEFB25jzJgxZnwABQsBBQdub4wZxns7AAULAQUHxBhjxN4fYwAFCwEFB2+M8TbGezsABQsBBQdu7/H23ns7AAULAQUHf2PGmDFmDAAFCwEFB27v7fbeezsABQsBBQdu7723x3s7AAIIAQgEA8AAAAIJAQgEA/ABAAMGBAkH9GYCAAQDAQoGDw8AAAMGBAkHmb0AAAYLAQUI3jzDMMYQBEAAAAAAAAAAEBAGCwAFBgzDcZZl+fI4AgAAAAULAQUHf++93957fwAFCwEFB27vMcYYezsABQsBBQd/77333nt/AAULAQUHf4wx3hhjfAAFCwEFB3+MMd4YYwwABQsBBQdujzH+3ns7AAULAQUHe++9/957bwACCwEFBP//PwADCwAFBLZt2/YBAAAABQsBBQZ7r3feW2tvAAULAQUHY4wxxhhjfAAHCwEFCePx/X6//9fr8RgAAAULAQUHe+////97bwAFCwEFB27vvffeezsABQsBBQd/773/GGMMAAYLAQUHzrZt27Zt2+YDAAAABQsBBQd/773/WntvAAULAQUHbu8xHMZ7OwAFCwAFBd8YY4wxxhgABQsBBQd777333ns7AAYLAAUGsyxblsdxHMMAAAAACgsABQozyyyTXf755x93zDDDDAAABgsABQaTpjkMwziaNgEAAAAGCwAFBvMseZ7HMAzDAAAAAAULAQUHHyPGiDFifAAEDgEEBT8zMzMzM/MABA8AAwQzIyJmRkTMDAQOAAQFz8zMzMzM/AAFAgAFBkwDAAACAgICBgsAAAAFCAEIB25jv/f/AAAABQsBBQdjjP/33vt/AAUIAQgHbo8xxnYAAAAFCwEFBxjj//fe+38ABQgBCAdu7z/GdgAAAAMLAQUFtG/btgEAAAAFCwEIB//vvff/eDsABQsBBQdjjP/33ntvAAILAQUEw/8/AAMNAAUEBmzbtj0AAAAFCwEFBmOMvd57a28AAwsBBQTbtm2bAQAAAAgIAQgK///b29vb29sFCAEIB//vvffeAAAABQgBCAdu7733dgAAAAULAQgH/++99/9jDAAFCwEIB//vvff/GGMABQgBCAZ/jDHGGAAAAAUIAQgHbg+H8XYAAAADCwEFBbZv2zYBAAAABQgBCAd77733/wAAAAUIAAgFey/nnDMAAAAICAAICNvb2np+fm5kBQgACATrOWPcWwAAAAYKAAgGs+R5nscwjAEFCAEIBx8zZsz4AAAABA4BAwVsZmZnZmbGAAIOAQQE////DwQOAQMFY2ZmbmZmNgAGAgEMCJ8FAAABCwEFA/0HAAAGBgEJCKS9bTYJAAAAAwMEDwOUAAAABgYBCQjJZttbAgAAAAYLAQUIBEAQhjEM8+wBAAAABg4AAgYEgzAMx1mW5cvjCAAGDgACBhhCMAzHWZbly+MIAAYOAAIGDCczDMdZluXL4wgABw0AAwc2AALBoVAoNp9JNAYKCwAFC/DDgQcaaLBHhh9iiDE+AAAFDgECB8OQP8YYb4wxPgAAAAUOAQIHiJg/xhhvjDE+AAAABQ4BAgfE7T/GGG+MMT4AAAAFDQEDBxv8McZ4Y4zxAQAAAAMOAAIEmW3btm0DAAADDgECBPS2bdu2AQAABg7/AgSMNzMMwzAMwzAMAwAGDQADBjNAEARBEARBEAQAAAUOAQIHghC39957770dAAAABQ4BAgeMCLf33nvvvR0AAAAFDgECB0Rtt/fee++9HQAAAAULAQUHbu+99957OwAFCwEFB27vvffeezsABQYBBwdgO7cjBQ4BAgfDkL333nvvvR0AAAAFDgECB5iRvffee++9HQAAAAUOAQIHRO299957770dAAAABQ0BAwcb7L333nvv7QAAAAAFCwEFB8IAt7Hf+38ABQsBBQeIALex3/t/AAULAQUHbgG3sd/7fwAFCwEFBxsAt7Hf+38ACAgBCAp+29jY/hvZdwUJAQgHbo8x9ncEAAAFCwEFB4IAt/cfYzsABQwBBAcYEeD2/mNsBwUMAQQHRG3g9v5jbAcFCwEFBxsAt/cfYzsAAwsABQQTbNu2AQAAAAMLAQUEHrZt2wAAAAAGDP8EBIw3AwzDMAzDMAAAAAYL/wUEMwAYhmEYhmEAAAAABQsBBQeCALf33ns7AAULAQUHiAC39957OwAFCwEFB24Dt/feezsABQsBBQcbALf33ns7AAULAQUHgoC99977fwAFCwEFB06Bvffe+38ACQsBBQr+N2zYsGHfhg0bNvgHAAAACAgBCAp+29v7Gxvbfg==");
+//     var font1 = fonts_load_custom_font_with_data(fontData);
+//     var font2 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
+//     var font3 = fonts_load_custom_font({height: 40, url:"https://github.com/pebble-examples/feature-custom-font/raw/master/resources/fonts/osp-din/OSP-DIN.ttf"});
+
+//     var value = 0;
+//     rocky.update_proc = function (ctx, bounds) {
+//         function calcX(phase) {
+//             return 30 + Math.sin(value / 10 + phase) * 30;
+//         }
+
+//         graphics_draw_text(ctx, "font from data", font1, [calcX(0.5), 0, bounds.w, 40], 0, 0);
+//         graphics_context_set_text_color(ctx, GColorRed);
+//         graphics_draw_text(ctx, "system font", font2, [calcX(1), 20, bounds.w, 40], 0, 0);
+//         graphics_context_set_text_color(ctx, GColorBlue);
+//         graphics_draw_text(ctx, "online font", font3, [calcX(1.5), 40, bounds.w, 80], 0, 0);
+//     };
+//     setInterval(function () {
+//         value += 1;
+//         rocky.mark_dirty();
+//     }, 1000 / 20);
+
+// })();
+
+
+
+
+
+/* tictok
+ * ================================================== */
+
+ /*eslint no-unused-vars: 0*/
+/* global TimerService:false, Window:false _timeout:true, _intervalId:true */
+
+(function(){
+    var binding = Rocky.bindCanvas(document.getElementById("pebble"));
+})();
+
+// some library code, could be extracted into some JS files
+var scheduleAnimation = function(options) {
+  options = options || {};
+  var msDelay = options.delay || 0;
+  var msDuration = options.duration || 0;
+  var updateHandler = options.update || function() {
+  };
+  var stopHandler = options.stop || function() {
+  };
+
+  // todo: remove these globals by fixing jswrap_interactive.c
+  _timeout = setTimeout(function() {
+    var msPassed = 0;
+    var msPerStep = 1000 / 30;
+
+    _intervalId = setInterval(function() {
+      msPassed += msPerStep;
+      var progress = Math.min(1, msPassed / msDuration);
+      updateHandler(progress);
+      if (progress >= 1) {
+        stopHandler();
+        clearInterval(_intervalId);
+      }
+    }, msPerStep);
+    updateHandler(0);
+  }, msDelay);
+};
+
+var interpolate = function(f, a, b) {
+  return a * (1 - f) + f * b;
+};
+
+var MINUTE_UNIT = 1 << 1;
+var win = new Window();
+var angle_funny = 0;
+
+win.setWindowHandlers({
+  load: function() {
+    var MINUTE_HAND_MARGIN = 7;
+    var HOUR_HAND_MARGIN = 7 * 4;
+    var GColorWhite = 255;
+    var GColorBlack = 192;
+    var GColorRed = 240;
+    var STROKE_WIDTH = 8;
+    var CLOCK_RADIUS = 65;
+    var DOT_Y = 8;
+
+    var canvasLayer = this.rootLayer;
+    var bounds = canvasLayer.bounds;
+
+    var data = {
+      clockRadius: 0,
+      center: {x: bounds.size.w / 2, y: bounds.size.h / 2},
+      dotY: bounds.size.h / 2,
+      dotY2: bounds.size.h / 2
+    };
+
+    TimerService.subscribe(MINUTE_UNIT, function(tick_time, changed) {
+      data.lastTime = {
+        hours: tick_time.hour % 12,
+        minutes: tick_time.min
+      };
+      canvasLayer.markDirty();
+    }, true);
+
+    var bgcolor = 0;
+    canvasLayer.setUpdateProc(function(ctx) {
+      ctx.setFillColor(192 | bgcolor);
+      ctx.setStrokeWidth(STROKE_WIDTH);
+      var bounds = this.bounds;
+      ctx.fillRect(bounds);
+
+      var modeTime = data.lastTime;
+      var minuteAngle = modeTime.minutes / 60;
+      var hourAngle = (modeTime.hours + minuteAngle) / 12;
+
+      var pt = function(ratioAngle, margin, funny) {
+        var radAngle = ratioAngle * 2 * Math.PI;
+        radAngle += funny;
+        var len = data.clockRadius - margin;
+        return {
+          x: Math.sin(radAngle) * len + data.center.x,
+          y: -Math.cos(radAngle) * len + data.center.y
+        };
+      };
+
+      var minuteHand = pt(minuteAngle, MINUTE_HAND_MARGIN, angle_funny);
+      var hourHand = pt(hourAngle, HOUR_HAND_MARGIN, -angle_funny);
+
+      if (data.clockRadius > MINUTE_HAND_MARGIN) {
+        ctx.setStrokeColor(GColorWhite);
+        ctx.drawLine(data.center, minuteHand);
+      }
+
+      if (data.clockRadius > HOUR_HAND_MARGIN) {
+        ctx.setStrokeColor(GColorRed);
+        ctx.drawLine(data.center, hourHand);
+        // fill a circle to make a cleaner center
+        ctx.setFillColor(GColorRed);
+        ctx.fillCircle(data.center, STROKE_WIDTH / 2);
+      }
+
+      // draw a 12 o clock indicator
+      ctx.setStrokeColor(GColorWhite);
+      ctx.drawLine({
+        x: bounds.size.w / 2,
+        y: data.dotY
+      }, {
+        x: bounds.size.w / 2,
+        y: data.dotY2
+      });
+    });
+
+    scheduleAnimation({
+      delay: 0,
+      duration: 1550,
+      update: function(progress) {
+        function f(prop, max) {
+          data[prop] = interpolate(progress, data[prop], max);
+        }
+
+        f('clockRadius', CLOCK_RADIUS + 1);
+        f('dotY', DOT_Y);
+        f('dotY2', DOT_Y);
+        canvasLayer.markDirty();
+      },
+      stop: function() {
+        data.dotY = DOT_Y;
+        data.dotY2 = DOT_Y;
+        canvasLayer.markDirty();
+
+        scheduleAnimation({
+          delay: 1000,
+          duration: 3000,
+          update: function(progress) {
+            angle_funny = progress * 2 * Math.PI;
+            canvasLayer.markDirty();
+          }
+        });
+
+      }
+    });
+
+  }
+});
+
+win.push();
+console.log('Hello, JSConf!');
+
+
+</script>
+</body>
+</html>
