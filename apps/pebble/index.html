@@ -9,6 +9,7 @@
 <script src="./symbols-generated.js"></script>
 <script src="./transpiled.js"></script>
 <script src="./rocky-extended.js"></script>
+<script src="./jszip.min.js"></script>
 <title>☁︎Pebble.js</title>
 <style>
 
@@ -56,6 +57,7 @@ button {
 	cursor: pointer;
 	-webkit-appearance: none;
 	-webkit-font-smoothing: antialiased;
+    outline: 0;
     &:active {
         box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2);
     }
@@ -84,7 +86,7 @@ header {
         cursor: pointer;
     }
     svg {
-        width: var(--logo-width);
+        width: 200px;
         height: 50px;
     }
 }
@@ -477,9 +479,9 @@ aside {
 .docpage {
     position: absolute;
     top: 35px;
-    right: 330px;
+    right: 455px;
     width: max(500px);
-    height: calc(100% - 75px);
+    height: calc(100% - 140px);
     background-color: rgb(244, 243, 244);
     color: rgb(85, 85, 85);
     border-radius: 1rem 0 0 1rem;;
@@ -674,6 +676,20 @@ kbd {
   border-radius: 30px;
 }
 
+input[name="doctab"] + div {
+    /* position: fixed;
+    top: 60px;
+    z-index: 100;
+    overflow: visible !important; */
+    position: fixed;
+    top: 60px;
+    z-index: 100;
+    overflow: visible !important;
+    user-select: none;
+    width: 460px !important;
+    right: -125px;
+}
+
 </style>
 </head>
 <body>
@@ -681,7 +697,7 @@ kbd {
 <!-- SVG Items will be placed here -->
 
 <svg style="display: none;">
-    <symbol id="cloudpebble-icon" style="width:var(--logo-width);height:50px;" viewBox="0 0 var(--logo-width) 50">
+    <symbol id="cloudpebble-icon" style="width:200px;height:50px;" viewBox="0 0 200 50">
         <style>
             .cp-svg-cloud {
                 fill: #aaa;
@@ -814,28 +830,22 @@ kbd {
         </div>
 
         <div>
-            <div>
+            <div id="sourcefiles">
                 <div>SOURCE FILES <button>ADD NEW</button></div>
                 <ul>
-                    <li>main.js</li>
                 </ul>
             </div>
 
-            <div>
+            <div id="resourcefiles">
                 <div>RESOURCES <button>ADD NEW</button></div>
                 <ul>
-                    <li>icon.png</li>
-                    <li>img1.png</li>
-                    <li>img2.png</li>
-                    <li>img3.png</li>
-                    <li>img4.png</li>
                 </ul>
             </div>
         </div>
     </aside>
 
     <div class="main">
-        <input type="radio" name="tab" id="tab1">
+        <input type="checkbox" name="doctab" id="tab1">
         <div>
             <div class="docpage">
 
@@ -2571,8 +2581,9 @@ kbd {
         <div style="justify-content: center; align-items: center;">
             <svg style="width: var(--logo-width); height: 50px; margin-bottom: 25px;"><use href="#cloudpebble-icon"/></svg>
             <span style="color: #999; margin: 1rem;">Open Project</span>
-            <button>Open Folder</button>
-            <button>Open Archive</button>
+            <button id="openFolder">Open Folder</button>
+            <button id="openZipBtn">Open Archive</button>
+            <input type="file" id="zipFile" accept=".zip" style="display: none;">
             <span class="link" onclick="alert('New Project1');" style="margin-top: 3rem;">New Project</span>
             <!-- <div style="position: absolute; bottom: 1rem; font-size: 1.2rem;"><b>Note: </b> Click on the watch face and use the arrow keys ( <kbd>&uarr;</kbd> , <kbd>&darr;</kbd> , <kbd>&larr; or BACKSPACE</kbd> , <kbd>&rarr; or RETURN</kbd> ) to use the watch buttons.</div> -->
             <div style="position: absolute; bottom: 1rem; font-size: 1.2rem;"><b>Note: </b>  Press <kbd>CTRL</kbd> + <kbd>/</kbd> to open the help dialog for shortcuts.</div>
@@ -2587,7 +2598,8 @@ kbd {
 
 function CtrlD(e) {
     e.preventDefault();
-    alert("Toggle Documentation");
+    const checkbox = document.getElementById("tab1");
+    checkbox.checked = !checkbox.checked;
 }
 
 function CtrlE(e) {
@@ -2860,6 +2872,130 @@ document.querySelectorAll('input[type="radio"].code').forEach(radio => {
     });
 });
     
+</script>
+
+<script>
+    const sourceList = document.querySelector('#sourcefiles ul');
+    const resourceList = document.querySelector('#resourcefiles ul');
+
+    // Recursive function to walk directories
+    async function readFilesRecursively(dirHandle, /*pathPrefix,*/ sourceFiles, resourceFiles) {
+      for await (const entry of dirHandle.values()) {
+        // Skip macOS "._" files
+        if (entry.name.startsWith('._')) continue;
+
+        // const fullPath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
+
+        if (entry.kind === 'file') {
+          const name = entry.name.toLowerCase();
+          if (name.endsWith('.js') || name.endsWith('.c')) {
+            // sourceFiles.push(fullPath);
+            sourceFiles.push(entry.name);
+          } else if (name.endsWith('.png')) {
+            // resourceFiles.push(fullPath);
+            resourceFiles.push(entry.name);
+          }
+        } else if (entry.kind === 'directory') {
+        //   await readFilesRecursively(entry, fullPath, sourceFiles, resourceFiles);
+        await readFilesRecursively(entry, sourceFiles, resourceFiles);
+        }
+      }
+    }
+
+    document.getElementById('openFolder').addEventListener('click', async () => {
+    //   try {
+    //     const dirHandle = await window.showDirectoryPicker();
+
+    //     const sourceFiles = [];
+    //     const resourceFiles = [];
+
+    //     await readFilesRecursively(dirHandle, '', sourceFiles, resourceFiles);
+
+    //     // Clear and display results
+    //     sourceList.innerHTML = sourceFiles.map(f => `<li>${f}</li>`).join('');
+    //     resourceList.innerHTML = resourceFiles.map(f => `<li>${f}</li>`).join('');
+
+    //   } catch (err) {
+    //     console.error('Folder selection cancelled or failed:', err);
+    //   }
+        try {
+        // Opens the native folder picker dialog
+        const dirHandle = await window.showDirectoryPicker();
+
+        const sourceFiles = [];
+        const resourceFiles = [];
+
+        await readFilesRecursively(dirHandle, sourceFiles, resourceFiles);
+
+        // Deduplicate and sort
+        const uniqueSource = [...new Set(sourceFiles)].sort();
+        const uniqueResources = [...new Set(resourceFiles)].sort();
+
+        // Show results
+        sourceList.innerHTML = uniqueSource.map(f => `<li>${f}</li>`).join('');
+        resourceList.innerHTML = uniqueResources.map(f => `<li>${f}</li>`).join('');
+
+        // ✅ Automatically select the "tab2" radio button AFTER loading files
+        const tab2 = document.getElementById('tab2');
+        if (tab2) tab2.checked = true;
+    
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Error selecting folder:', err);
+        }
+      }
+    });
+
+    document.getElementById('openZipBtn').addEventListener('click', () => {
+      document.getElementById('zipFile').click();
+    });
+
+    document.getElementById('zipFile').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const zip = await JSZip.loadAsync(arrayBuffer);
+
+        const sourceFiles = [];
+        const resourceFiles = [];
+
+        // Loop through all files in the ZIP
+        Object.keys(zip.files).forEach(filename => {
+          const lower = filename.toLowerCase();
+
+          // Skip folders and macOS metadata files
+          if (zip.files[filename].dir) return;
+          if (filename.startsWith('._') || filename.includes('/._')) return;
+
+          // Strip folder path → just the file name
+          const nameOnly = filename.split('/').pop();
+
+          if (lower.endsWith('.js') || lower.endsWith('.c')) {
+            sourceFiles.push(nameOnly);
+          } else if (lower.endsWith('.png')) {
+            resourceFiles.push(nameOnly);
+          }
+        });
+
+        // Sort alphabetically
+        sourceFiles.sort();
+        resourceFiles.sort();
+
+        // Display results
+        sourceList.innerHTML = sourceFiles.map(f => `<li>${f}</li>`).join('');
+        resourceList.innerHTML = resourceFiles.map(f => `<li>${f}</li>`).join('');
+
+        // ✅ Automatically select the "tab2" radio button AFTER loading files
+        const tab2 = document.getElementById('tab2');
+        if (tab2) tab2.checked = true;
+    
+    } catch (err) {
+        console.error('Error reading ZIP file:', err);
+        alert('Could not read ZIP file.');
+      }
+    });
 </script>
 
 <script>
