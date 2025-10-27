@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Fullscreen Viewer</title>
+<link rel="stylesheet" href="https://unpkg.com/paper-css/paper.css">
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ccc; /* light gray to show edges */
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3vh; /* spacing between pages */
+    padding: 3vh 0;
+  }
+
+  /* The "paper" wrapper */
+  .paper {
+    transform-origin: center center;
+    transition: transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media screen {
+    .page {
+      margin: 0 !important;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      background: white;
+    }
+  }
+</style>
+</head>
+<body class="A4">
+
+<main>
+  <div class="paper">
+    <section class="sheet page A4">
+      <h1>Page 1</h1>
+      <p>This is the first page.</p>
+    </section>
+  </div>
+
+  <div class="paper">
+    <section class="sheet page A4">
+      <h1>Page 2</h1>
+      <p>This is the second page.</p>
+    </section>
+  </div>
+
+  <div class="paper">
+    <section class="sheet page A4">
+      <h1>Page 3</h1>
+      <p>This is the third page.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+function scaleAllPages() {
+  const papers = document.querySelectorAll('.paper');
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  papers.forEach(paper => {
+    const page = paper.querySelector('.page');
+    if (!page) return;
+
+    // Reset scale to measure correctly
+    page.style.transform = 'scale(1)';
+    const paperWidth = page.offsetWidth;
+    const paperHeight = page.offsetHeight;
+
+    // Calculate scale so the page fits inside the viewport
+    const scale = Math.min(vw / paperWidth, vh / paperHeight);
+
+    // Apply scaling
+    page.style.transform = `scale(${scale})`;
+  });
+}
+
+window.addEventListener('resize', scaleAllPages);
+window.addEventListener('load', scaleAllPages);
+</script>
+
+</body>
+</html>
