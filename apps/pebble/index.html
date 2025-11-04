@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAALHRFWHRDcmVhdGlvbiBUaW1lAFRodSAyMyBPY3QgMjAyNSAwNTo0ODozNSArMDkwMEpWW4kAAAAHdElNRQfpChYUMQuI/SWeAAAACXBIWXMAAAsSAAALEgHS3X78AAAABGdBTUEAALGPC/xhBQAAAGdJREFUeNpjUFdXr6urCwkJccUBSkpKent7XVxc9PT0hIWFGYCqgXxj3KC7uxuuAKiHoZc4AFQtLy8PJMnVcBw3oKMGCBjJTqJlTEMSnytu0NbWhpL4gMm7vr7eyckJV2qNi4tDTt4AxdV8mI45EC4AAAAASUVORK5CYII=">
-<script src="./html-binding.js"></script>
-<script src="./symbols-manual.js"></script>
-<script src="./symbols-generated.js"></script>
-<script src="./transpiled.js"></script>
-<script src="./rocky-extended.js"></script>
-<script src="./jszip.min.js"></script>
 <title>☁︎Pebble.js</title>
 <style>
 
@@ -49,7 +43,7 @@ button {
 	background-color: var(--pebble-red);
 	color: #fff;
 	text-decoration: none;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 	font-weight: 700;
 	font-size: 1.25rem;
     line-height: 1.5;
@@ -58,14 +52,6 @@ button {
 	-webkit-appearance: none;
 	-webkit-font-smoothing: antialiased;
     outline: 0;
-    &:active {
-        box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2);
-    }
-    &:focus {
-        outline: thin dotted #444;
-        outline: 5px auto -webkit-focus-ring-color;
-        outline-offset: -2px;
-    }
     &:hover {
         opacity: 0.85;
     }
@@ -148,6 +134,18 @@ aside {
     }
 }
 
+dialog {
+    margin: auto;
+    padding: 1rem;
+    border: none;
+    border-radius: 1rem;
+    background-color: rgb(48, 48, 48);
+    color: white;
+    box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.75);
+}
+
 .section-title {
     font-weight: bold;
     margin-bottom: 10px;
@@ -181,7 +179,7 @@ aside {
         flex-direction: column;
         width: 100%;
         height: 100%;
-        overflow: auto scroll;
+        overflow: hidden;
     }
 }
 
@@ -538,7 +536,8 @@ aside {
     height: calc(100% - 3.5rem);
 }
 
-.tabs > label {
+.tabs > label,
+.tab {
     order: 1;
     position: relative;
     /* top: 1px; */
@@ -584,8 +583,8 @@ aside {
     background: #1a1a1a;
     z-index: 11; 
 }
-
-.tabs > input[type="radio"]:checked + label + .tab { display: block; }
+    
+/* .tabs > input[type="radio"]:checked + label + .tab { display: block; } */
 
 @media (max-width: 45em) {
     .tabs > div,
@@ -602,11 +601,89 @@ aside {
     }
 } 
 
+.tabs-bar {
+    display: flex;
+    /* background: #222; */
+    padding-top: 10px;
+    padding-left: 0.75rem;
+}
+.editor-tab {
+    border: 1px solid #555;
+    border-bottom: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 6px 30px 6px 10px;
+    border-radius: 6px 6px 0 0;
+    background: #333;
+    color: #ccc;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-size: 1.1rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.editor-tab:not(.active):hover {
+  background: #2a2a2a;
+  color: #eee;
+}
+.editor-tab.active {
+    background: #111;
+    color: white;
+}
+.editor-tab::after {
+  content: "×";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #ccc;
+  cursor: pointer;
+  pointer-events: auto;
+  font-weight: 500;
+}
+
+.editor-tab:hover::after {
+  color: white;
+}
+
+.editor-tab::after:active {
+  color: white;
+}
+.editor-area {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 90px);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+.editor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    color: #eee;
+    font-family: monospace;
+    border: none;
+    outline: none;
+    resize: none;
+    display: block;
+}
+
+
 kbd {
     border: 1px solid #ccc;
     border-bottom: 3px solid #ccc;
     border-radius: .5rem;
     padding: .25rem .5rem;
+    min-width: 2.5rem;
+    position: relative;
+    display: inline-block;
+    text-align: center;
 }
 
 
@@ -690,6 +767,109 @@ input[name="doctab"] + div {
     right: -125px;
 }
 
+
+
+  /* Floating preview box */
+  #imagePreview {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 10;
+    left: 250px;
+  }
+
+  #imagePreview img {
+    max-width: 200px;
+    max-height: 200px;
+    display: block;
+  }
+
+  .file-item {
+  position: relative;
+  padding-right: 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.file-close-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  font-weight: 500;
+}
+
+.file-item:hover .file-close-btn {
+  color: #ccc;
+}
+
+.add-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.add-buttons button {
+  background: #2b2b2b;
+  color: #ddd;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.add-buttons button:hover {
+  background: #3c3c3c;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.file-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+}
+
+.file-item img.file-thumb {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: #222;
+}
+
+.file-close-btn {
+    margin-left: auto;
+    color: #ccc;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.file-close-btn:hover {
+    color: #f66;
+}
+
 </style>
 </head>
 <body>
@@ -698,19 +878,8 @@ input[name="doctab"] + div {
 
 <svg style="display: none;">
     <symbol id="cloudpebble-icon" style="width:200px;height:50px;" viewBox="0 0 200 50">
-        <style>
-            .cp-svg-cloud {
-                fill: #aaa;
-            }
-            .cp-svg-text {
-                font-family: Arial, sans-serif;
-                font-size: 2.2rem;
-                font-weight: 300;
-                fill: #fff;
-            }
-        </style>
         <g transform="scale(2.2) translate(0, 5)">
-            <path class="cp-svg-cloud" d='M5 14a5 5 0 1 1 1.561-9.751A7.002 7.002 0 0 1 20 7a7 7 0 0 1-7 7H5zm0-2h8a5 5 0 1 0-4.6-6.965l-.72 1.686-1.742-.572A3 3 0 1 0 5 12z'/>
+            <path class="cp-svg-cloud" fill="#aaa" d='M5 14a5 5 0 1 1 1.561-9.751A7.002 7.002 0 0 1 20 7a7 7 0 0 1-7 7H5zm0-2h8a5 5 0 1 0-4.6-6.965l-.72 1.686-1.742-.572A3 3 0 1 0 5 12z'/>
         </g>
         <path fill="#fff" transform="scale(1.5) translate(35, 8)" d="M17.1 12.4c.9 3 4.1 4.7 7.1 3.7 1.9-.6 3.2-1.8 3.8-3.8.2-.8.8-.7 1.4-.7-.6 4.4-4.5 6.4-7.9 5.9-4.3-.7-6.3-4.3-5.7-7.9.6-3.8 3.9-6.1 7.8-5.6 3.5.5 5.8 3.5 5.8 6.1-4.1.8-8.2 1.5-12.3 2.3zm10.8-3.2c-.8-2.9-3.6-4.4-6.4-4-2.9.5-5.1 3.4-4.6 6 3.8-.7 7.4-1.4 11-2zM69.2 11.9c1.2 3.8 5.8 5.2 8.9 2.8.9-.7 1.5-1.6 1.9-2.7.2-.7.6-1 1.4-.8.1 1-.4 1.8-.9 2.6-1.8 2.9-5.2 4-8.4 2.8-2.8-1.1-4.5-3.7-4.4-6.5.1-3.6 3.1-6.4 6.6-6.6 3.1-.1 6.2 2.1 6.9 5 .1.3.2.5.2.8 0 .1-.2.4-.3.4-2 .4-4.1.7-6.1 1.1-1.9.4-3.9.7-5.8 1.1zm-.3-1.2c3.7-.7 7.4-1.3 11.1-2-1-3.1-4.1-4.6-6.9-3.8-2.7.7-4.3 3.1-4.2 5.8zM1.2 15c0 2.3 0 4.4.1 6.5H.1v-.8c0-3.1 0-6.1-.1-9.2 0-2.4.8-4.4 2.6-5.9C4.7 4 7 3.7 9.5 4.7c2.8 1.2 4.4 4 4 6.9-.4 2.9-2.5 5.2-5.3 5.7-2.4.5-4.5-.2-6.3-2-.2.1-.3 0-.7-.3zm11.2-4c.1-3-2.7-5.5-5.6-5.5-3.3 0-5.7 2.6-5.6 5.6.1 3.1 2.4 5.4 5.6 5.4 3.3 0 5.6-2.7 5.6-5.5zM31.7.3h1.2c0 2.1 0 4.2.1 6.5.7-.6 1.3-1.3 2-1.7 3.2-2.2 7.9-1 9.6 2.4 1.3 2.6 1.1 5.1-.8 7.5-1.6 1.9-3.6 2.7-6 2.4-3-.4-4.9-2.2-5.8-5.1-.2-.5-.2-1.1-.2-1.7 0-3.1-.1-6.2-.1-9.4V.3zm12.4 10.3c.1-3-2.7-5.5-5.6-5.5-3.2.1-5.6 2.5-5.5 5.6.1 3.1 2.3 5.4 5.6 5.5 3.3 0 5.6-2.7 5.5-5.6zM48.8 6.5C50 5.2 51.4 4.4 53 4c2-.4 3.8 0 5.4 1.1 2 1.5 2.9 3.5 2.8 6-.2 2.9-2.6 5.4-5.4 6-3.2.6-5.9-.8-7.3-3.4-.5-.8-.8-1.8-.8-2.7-.1-3.5-.1-7-.1-10.5V.2h1.1c.1 2.1.1 4.2.1 6.3zm11.2 4C60 7.4 57.4 5 54.4 5c-3.1 0-5.6 2.5-5.6 5.5 0 3.2 2.5 5.5 5.6 5.5 3.2.1 5.6-2.4 5.6-5.5zM63.6 0h1.2v.8c0 3.9.1 7.9.1 11.8 0 .6.1 1.2.3 1.8.3.9.9 1.4 1.8 1.7-.1.4-.2.8-.3 1.1-2.2-.7-2.9-2.2-2.9-4.2-.1-4-.1-8.1-.2-12.2V0z"></path>
         <g transform="scale(0.03) translate(6000, 750)">
@@ -830,16 +999,14 @@ input[name="doctab"] + div {
         </div>
 
         <div>
-            <div id="sourcefiles">
-                <div>SOURCE FILES <button>ADD NEW</button></div>
-                <ul>
-                </ul>
+            <div>
+                <div>SOURCE FILES <button id="addSourceBtn">ADD NEW</button></div>
+                <ul id="sourceList"></ul>
             </div>
 
-            <div id="resourcefiles">
-                <div>RESOURCES <button>ADD NEW</button></div>
-                <ul>
-                </ul>
+            <div>
+                <div>RESOURCES <button id="addResourceBtn">ADD NEW</button></div>
+                <ul id="resourceList"></ul>
             </div>
         </div>
     </aside>
@@ -2521,27 +2688,10 @@ input[name="doctab"] + div {
         </div>
 
         <input type="radio" name="tab" id="tab2">
-        <div>
-            <div class="tabs">
-                <input type="radio" name="tabs" id="tabone" checked="checked">
-                <label for="tabone">main.js</label>
-                <div class="tab">
-                    <h4>Tab One Content</h4>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-                <input type="radio" name="tabs" id="tabtwo">
-                <label for="tabtwo">icon.png</label>
-                <div class="tab">
-                    <h4>Tab Two Content</h4>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-                
-                <input type="radio" name="tabs" id="tabthree">
-                <label for="tabthree">img1.png</label>
-                <div class="tab">
-                    <h4>Tab Three Content</h4>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                </div>
+        <div id="Tab2">
+            <div style="height: 50px; display: flex; justify-content: flex-end; align-items: center; gap: 1.5rem; padding-right: 1rem;">
+                <button style="width: 8rem;">COMPILE</button>
+                <button style="width: 8rem;">RUN</button>
             </div>
         </div>
 
@@ -2581,8 +2731,8 @@ input[name="doctab"] + div {
         <div style="justify-content: center; align-items: center;">
             <svg style="width: var(--logo-width); height: 50px; margin-bottom: 25px;"><use href="#cloudpebble-icon"/></svg>
             <span style="color: #999; margin: 1rem;">Open Project</span>
-            <button id="openFolder">Open Folder</button>
-            <button id="openZipBtn">Open Archive</button>
+            <button id="openFolder">OPEN FOLDER</button>
+            <button id="openZipBtn">OPEN ARCHIVE</button>
             <input type="file" id="zipFile" accept=".zip" style="display: none;">
             <span class="link" onclick="alert('New Project1');" style="margin-top: 3rem;">New Project</span>
             <!-- <div style="position: absolute; bottom: 1rem; font-size: 1.2rem;"><b>Note: </b> Click on the watch face and use the arrow keys ( <kbd>&uarr;</kbd> , <kbd>&darr;</kbd> , <kbd>&larr; or BACKSPACE</kbd> , <kbd>&rarr; or RETURN</kbd> ) to use the watch buttons.</div> -->
@@ -2590,6 +2740,70 @@ input[name="doctab"] + div {
         </div>
     </div>
 </main>
+
+<!-- Hover preview element -->
+<div id="imagePreview"><img id="previewImg" src="" alt=""></div>
+
+<!-- Hover preview element -->
+<div id="HelpDiv" style="display: none; position: absolute; width: 75%; height: 75%; top: 12.5%; left: 12.5%; margin: auto; background-color: #303030; color: #e3e3e3; border-radius: 2rem; padding: 5rem; box-shadow: 0px 0px 400px 200px rgba(0,0,0,1); -webkit-box-shadow: 0px 0px 400px 200px rgba(0,0,0,1); -moz-box-shadow: 0px 0px 400px 200px rgba(0,0,0,1);">
+    <h1 style="margin-bottom: 4rem;">KEYBOARD SHORTCUTS</h2>
+    <kbd>CTRL</kbd> + <kbd>D</kbd> : Show hide Pebble Documentation<br><br>
+    <kbd>CTRL</kbd> + <kbd>E</kbd> : Export to ZIP<br><br>
+    <kbd>CTRL</kbd> + <kbd>I</kbd> : Import ZIPped Project<br><br>
+    <kbd>CTRL</kbd> + <kbd>O</kbd> : Open File<br><br>
+    <kbd>CTRL</kbd> + <kbd>R</kbd> : Run in Pebble Simulator<br><br>
+    <kbd>CTRL</kbd> + <kbd>S</kbd> : Save Current File<br><br>
+    <kbd>CTRL</kbd> + <kbd>/</kbd> : Show / Hide Keyboard Shortcuts<br><br>
+</div>
+
+<dialog id="confirmDeleteDialog">
+  <form method="dialog" style="text-align:center; padding:1em;">
+    <p>Are you sure you want to delete this file?</p>
+    <p style="margin-top: 1rem; font-size: 1.1rem;">
+    <menu style="margin-top: 2em;">
+      <button value="cancel" style="margin-right: 2rem;">CANCEL</button>
+      <button value="confirm" style="background:#ef4444; color:white;">DELETE</button>
+    </menu>
+  </form>
+</dialog>
+
+<!-- === Dialog for New Source File === -->
+<dialog id="newSourceDialog">
+  <form method="dialog" style="display:flex;flex-direction:column;gap:10px;min-width:250px;">
+    <div style="margin: 1rem 0 3rem;">
+        <label>
+            File name:
+            <input type="text" id="newSourceName" placeholder="example.c or example.js" style="margin-right: 1.35rem;">
+        </label>
+
+        <label>
+            Type:
+            <select id="newSourceType">
+                <option value=".c">.c</option>
+                <option value=".cpp">.c</option>
+                <option value=".h">.c</option>
+                <option value=".js">.js</option>
+            </select>
+        </label>
+    </div>
+
+    <menu style="display:flex;justify-content:flex-end;gap:10px;">
+      <button value="cancel">CANCEL</button>
+      <button id="confirmAddSource" value="confirm">ADD</button>
+    </menu>
+  </form>
+</dialog>
+
+<script src="./html-binding.js"></script>
+<script src="./symbols-manual.js"></script>
+<script src="./symbols-generated.js"></script>
+<script src="./transpiled.js"></script>
+<script src="./rocky-extended.js"></script>
+<script src="./jszip.min.js"></script>
+
+
+
+
 
 <script>
 
@@ -2622,9 +2836,16 @@ function CtrlR(e) {
     alert("Run Program");
 }
 
-function CtrlS(e) {
+async function CtrlS(e) {
     e.preventDefault();
-    alert("Ctrl + S Pressed!");
+    const active = document.activeElement;
+    // Don’t block text editing shortcuts inside inputs/textareas unless in editor
+    if (active.tagName === "TEXTAREA" || active.tagName === "INPUT") {
+        e.preventDefault();
+    }
+    if (!currentActiveFile) return;
+    const tab = openTabs.get(currentActiveFile);
+    if (tab) await saveFile(tab);
 }
 
 function CtrlShiftF(e) {
@@ -2639,7 +2860,8 @@ function CtrlShiftP(e) {
 
 function CtrlHelp(e) {
     e.preventDefault();
-    alert("Help Dialog");
+    const div = document.getElementById('HelpDiv');
+    div.style.display = div.style.display === 'none' ? 'block' : 'none';
 }
 
 function CtrlEnter(e) {
@@ -2689,11 +2911,6 @@ document.addEventListener('keydown', function (e) {
     }
     // Build key combo string
     const keyDectionCombo = ((e.ctrlKey || e.metaKey) ? 'ctrl+' : '') + (e.shiftKey ? 'shift+' : '') + e.key.toLowerCase();
-        // const keyDectionCombo =
-        // (e.ctrlKey ? 'ctrl+' : '') +
-        // (e.metaKey ? 'ctrl+' : '') +
-        // (e.shiftKey ? 'shift+' : '') +
-        // e.code.toLowerCase();
 
     switch (keyDectionCombo) {
         case 'ctrl+d': CtrlD(e); break; // Toggle Documentation Window
@@ -2803,11 +3020,6 @@ document.addEventListener('DOMContentLoaded', function () {
         for (let j = 1; j < i; j++) {
             selector += ' > li > ul';
         }
-
-        // const fullSelector = `.sidebar-navigation > ul > ${selector}`;
-        // document.querySelectorAll(fullSelector).forEach(function (ul) {
-        //     ul.classList.add(`subMenuColor${i}`);
-        // });
     }
 
     const activeLi = document.querySelector('li.selected');
@@ -2839,7 +3051,6 @@ document.addEventListener('DOMContentLoaded', function () {
 function jump(id) {
     window.scrollTo({ top: 0 });
     document.getElementById(id).checked = true;
-    // document.getElementById('menu-btn').checked = false;
 }
 
 // Wait until the DOM is fully loaded
@@ -2875,130 +3086,624 @@ document.querySelectorAll('input[type="radio"].code').forEach(radio => {
 </script>
 
 <script>
-    const sourceList = document.querySelector('#sourcefiles ul');
-    const resourceList = document.querySelector('#resourcefiles ul');
+const openFolderBtn = document.getElementById('openFolder');
+const openArchiveBtn = document.getElementById('openZipBtn');
+const sourceList = document.getElementById('sourceList');
+const resourceList = document.getElementById('resourceList');
+const previewImg = document.getElementById('previewImg');
+const imagePreview = document.getElementById('imagePreview');
 
-    // Recursive function to walk directories
-    async function readFilesRecursively(dirHandle, /*pathPrefix,*/ sourceFiles, resourceFiles) {
-      for await (const entry of dirHandle.values()) {
-        // Skip macOS "._" files
-        if (entry.name.startsWith('._')) continue;
+// === Add New Source File ===
+const addSourceBtn = document.getElementById("addSourceBtn");
+const newSourceDialog = document.getElementById("newSourceDialog");
+const newSourceNameInput = document.getElementById("newSourceName");
+const newSourceTypeSelect = document.getElementById("newSourceType");
 
-        // const fullPath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
+const sourceExtensions = ['.js', '.c', '.h', '.cpp'];
+const resourceExtensions = ['.png', '.svg', '.pdc'];
 
-        if (entry.kind === 'file') {
-          const name = entry.name.toLowerCase();
-          if (name.endsWith('.js') || name.endsWith('.c')) {
-            // sourceFiles.push(fullPath);
-            sourceFiles.push(entry.name);
-          } else if (name.endsWith('.png')) {
-            // resourceFiles.push(fullPath);
-            resourceFiles.push(entry.name);
-          }
-        } else if (entry.kind === 'directory') {
-        //   await readFilesRecursively(entry, fullPath, sourceFiles, resourceFiles);
-        await readFilesRecursively(entry, sourceFiles, resourceFiles);
-        }
-      }
-    }
+let currentFiles = [];
+let archiveFiles = new Map();
+let currentSourceType = null; // "folder" or "archive"
 
-    document.getElementById('openFolder').addEventListener('click', async () => {
-    //   try {
-    //     const dirHandle = await window.showDirectoryPicker();
+addSourceBtn.addEventListener("click", () => {
+  if (currentSourceType !== "folder" || !window.currentFolderHandle) {
+    alert("You can only add new source files when a folder is open.");
+    return;
+  }
+  newSourceNameInput.value = "";
+  newSourceDialog.showModal();
+});
 
-    //     const sourceFiles = [];
-    //     const resourceFiles = [];
+newSourceDialog.addEventListener("close", async () => {
+  if (newSourceDialog.returnValue !== "confirm") return;
 
-    //     await readFilesRecursively(dirHandle, '', sourceFiles, resourceFiles);
+  let filename = newSourceNameInput.value.trim();
+  const ext = newSourceTypeSelect.value;
 
-    //     // Clear and display results
-    //     sourceList.innerHTML = sourceFiles.map(f => `<li>${f}</li>`).join('');
-    //     resourceList.innerHTML = resourceFiles.map(f => `<li>${f}</li>`).join('');
+  if (!filename.endsWith(ext)) filename += ext;
+  if (!filename) return;
 
-    //   } catch (err) {
-    //     console.error('Folder selection cancelled or failed:', err);
-    //   }
-        try {
-        // Opens the native folder picker dialog
-        const dirHandle = await window.showDirectoryPicker();
+  try {
+    const srcDir = await window.currentFolderHandle.getDirectoryHandle("src", { create: true });
+    const subDir = await srcDir.getDirectoryHandle(ext === ".c" ? "c" : "js", { create: true });
 
-        const sourceFiles = [];
-        const resourceFiles = [];
+    const fileHandle = await subDir.getFileHandle(filename, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(""); // Empty file
+    await writable.close();
 
-        await readFilesRecursively(dirHandle, sourceFiles, resourceFiles);
+    const relativePath = `src/${ext === ".c" ? "c" : "js"}/${filename}`;
+    const newFile = { name: filename, fullPath: relativePath, handle: fileHandle };
 
-        // Deduplicate and sort
-        const uniqueSource = [...new Set(sourceFiles)].sort();
-        const uniqueResources = [...new Set(resourceFiles)].sort();
+    // Append to list visually
+    populateFileLists([newFile], [], "folder");
 
-        // Show results
-        sourceList.innerHTML = uniqueSource.map(f => `<li>${f}</li>`).join('');
-        resourceList.innerHTML = uniqueResources.map(f => `<li>${f}</li>`).join('');
+    console.log(`Created new source file: ${relativePath}`);
+  } catch (err) {
+    console.error("Failed to create new source file:", err);
+    alert("Failed to create file: " + err.message);
+  }
+});
 
-        // ✅ Automatically select the "tab2" radio button AFTER loading files
-        const tab2 = document.getElementById('tab2');
-        if (tab2) tab2.checked = true;
-    
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error selecting folder:', err);
-        }
-      }
+// === Add New Resource File ===
+const addResourceBtn = document.getElementById("addResourceBtn");
+// const newResourceDialog = document.getElementById("newResourceDialog");
+const confirmAddResource = document.getElementById("confirmAddResource");
+
+addResourceBtn.addEventListener("click", async () => {
+  if (currentSourceType !== "folder" || !window.currentFolderHandle) {
+    alert("You can only add new resources when a folder is open.");
+    return;
+  }
+//   newResourceDialog.showModal();
+// });
+
+// confirmAddResource.addEventListener("click", async () => {
+//   newResourceDialog.close("confirm");
+// });
+
+// newResourceDialog.addEventListener("close", async () => {
+//   if (newResourceDialog.returnValue !== "confirm") return;
+
+  try {
+    // Let user pick a resource file
+    const [pickedFileHandle] = await window.showOpenFilePicker({
+        multiple: true, // ✅ allow selecting multiple files
+        types: [
+            {
+            description: "Resource Files",
+            accept: {
+                "image/png": [".png"],
+                "image/svg+xml": [".svg"],
+                "application/x-pdc": [".pdc"], // custom MIME for .pdc
+            },
+            },
+        ],
     });
+    const pickedFile = await pickedFileHandle.getFile();
 
-    document.getElementById('openZipBtn').addEventListener('click', () => {
-      document.getElementById('zipFile').click();
-    });
+    // Create /resources folder if needed
+    const resDir = await window.currentFolderHandle.getDirectoryHandle("resources", { create: true });
+    const destHandle = await resDir.getFileHandle(pickedFile.name, { create: true });
+    const writable = await destHandle.createWritable();
+    await writable.write(await pickedFile.arrayBuffer());
+    await writable.close();
 
-    document.getElementById('zipFile').addEventListener('change', async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+    const newFile = { name: pickedFile.name, fullPath: `resources/${pickedFile.name}`, handle: destHandle };
+    populateFileLists([], [newFile], "folder");
 
-      try {
+    console.log(`Copied resource to: resources/${pickedFile.name}`);
+  } catch (err) {
+    console.warn("Resource add canceled or failed:", err);
+  }
+});
+
+// ======== Folder/Open Directory ========
+openFolderBtn.addEventListener('click', async () => {
+    const folderHandle = await window.showDirectoryPicker();
+    window.currentFolderHandle = folderHandle;
+    currentFiles = [];
+    currentSourceType = "folder";
+    archiveFiles.clear();
+    sourceList.innerHTML = "";
+    resourceList.innerHTML = "";
+
+    const { sources, resources } = await getAllFiles(folderHandle);
+    populateFileLists(sources, resources, "folder");
+});
+
+// ======== Archive/Open ZIP ========
+openArchiveBtn.addEventListener("click", async () => {
+    try {
+        const [fileHandle] = await window.showOpenFilePicker({
+            types: [{ description: "ZIP Archive", accept: { "application/zip": [".zip"] } }],
+        });
+        currentArchiveHandle = fileHandle;
+        const file = await fileHandle.getFile();
         const arrayBuffer = await file.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
 
-        const sourceFiles = [];
-        const resourceFiles = [];
+        currentSourceType = "archive";
+        archiveFiles.clear();
+        currentFiles = [];
+        sourceList.innerHTML = "";
+        resourceList.innerHTML = "";
 
-        // Loop through all files in the ZIP
-        Object.keys(zip.files).forEach(filename => {
-          const lower = filename.toLowerCase();
+        const sources = [];
+        const resources = [];
 
-          // Skip folders and macOS metadata files
-          if (zip.files[filename].dir) return;
-          if (filename.startsWith('._') || filename.includes('/._')) return;
+        for (const [path, entry] of Object.entries(zip.files)) {
+            if (entry.dir) continue;
+            const ext = '.' + path.split('.').pop().toLowerCase();
+            const name = path.split("/").pop();
+            const blob = await entry.async("blob");
+            archiveFiles.set(path, blob); // use full path as key
 
-          // Strip folder path → just the file name
-          const nameOnly = filename.split('/').pop();
+            if (sourceExtensions.includes(ext))
+                sources.push({ name, fullPath: path, blob });
+            else if (resourceExtensions.includes(ext))
+                resources.push({ name, fullPath: path, blob });
+        }
 
-          if (lower.endsWith('.js') || lower.endsWith('.c')) {
-            sourceFiles.push(nameOnly);
-          } else if (lower.endsWith('.png')) {
-            resourceFiles.push(nameOnly);
-          }
+        populateFileLists(sources, resources, "archive");
+    } catch (err) {
+        console.warn("Archive open canceled or failed:", err);
+    }
+});
+
+async function deleteFileRecursively(dirHandle, relativePath) {
+    const parts = relativePath.split("/").filter(Boolean);
+    const name = parts.pop();
+    let currentDir = dirHandle;
+
+    // Navigate through subfolders if any
+    for (const part of parts) {
+        currentDir = await currentDir.getDirectoryHandle(part, { create: false });
+    }
+
+    await currentDir.removeEntry(name);
+}
+
+
+
+// ======== Populate Lists ========
+function populateFileLists(sources, resources, type) {
+    sources.sort((a, b) => a.fullPath.localeCompare(b.fullPath));
+    resources.sort((a, b) => a.fullPath.localeCompare(b.fullPath));
+
+    const dialog = document.getElementById("confirmDeleteDialog");
+
+    function createListItem(name, fullPath, handle, blob, listContainer) {
+        const li = document.createElement("li");
+        li.classList.add("file-item");
+        li.dataset.fullPath = fullPath;
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = name;
+
+        // If it's an image, show preview thumbnail
+        const ext = name.toLowerCase().split('.').pop();
+        const isImage = ["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(ext);
+        if (isImage && blob) {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(blob);
+            img.alt = name;
+            img.className = "file-thumb";
+            li.appendChild(img);
+        }
+
+        li.appendChild(nameSpan);
+
+        // Close button (×)
+        const closeBtn = document.createElement("span");
+        closeBtn.textContent = "×";
+        closeBtn.className = "file-close-btn";
+        li.appendChild(closeBtn);
+
+        // Open file tab on click
+        li.addEventListener("click", async (e) => {
+            if (e.target === closeBtn) return; // prevent accidental tab open
+            await openFileTab(type === "folder" ? handle : null, fullPath);
         });
 
-        // Sort alphabetically
-        sourceFiles.sort();
-        resourceFiles.sort();
+        // Confirm delete on close click
+        closeBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            dialog.querySelector("p").textContent = `Delete "${name}"?`;
+            dialog.showModal();
 
-        // Display results
-        sourceList.innerHTML = sourceFiles.map(f => `<li>${f}</li>`).join('');
-        resourceList.innerHTML = resourceFiles.map(f => `<li>${f}</li>`).join('');
+            dialog.returnValue = ""; // reset
+            dialog.addEventListener("close", async function onClose() {
+                if (dialog.returnValue === "confirm") {
+                    // Remove from DOM and internal list
+                    li.remove();
+                    const idx = currentFiles.findIndex(f => f.fullPath === fullPath);
+                    if (idx !== -1) currentFiles.splice(idx, 1);
 
-        // ✅ Automatically select the "tab2" radio button AFTER loading files
-        const tab2 = document.getElementById('tab2');
-        if (tab2) tab2.checked = true;
-    
-    } catch (err) {
-        console.error('Error reading ZIP file:', err);
-        alert('Could not read ZIP file.');
-      }
+                    try {
+                        if (currentSourceType === "folder" && window.currentFolderHandle) {
+                            // Find relative path to delete
+                            const relativePath = fullPath.replace(window.currentFolderHandle.name + "/", "");
+                            await deleteFileRecursively(window.currentFolderHandle, relativePath);
+                            console.log(`Deleted ${relativePath} from folder`);
+                        } else if (currentSourceType === "archive" && currentArchive?.file) {
+                            currentArchive.remove(fullPath);
+                            console.log(`Removed ${fullPath} from archive`);
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to delete ${name}:`, err);
+                    }
+                }
+                dialog.removeEventListener("close", onClose);
+            });
+        });
+
+        listContainer.appendChild(li);
+        currentFiles.push({ name, fullPath, handle, blob });
+    }
+
+    for (const file of sources) {
+        createListItem(file.name, file.fullPath, file.handle, file.blob, sourceList);
+    }
+
+    for (const file of resources) {
+        createListItem(file.name, file.fullPath, file.handle, file.blob, resourceList);
+    }
+
+    const tab2 = document.getElementById('tab2');
+    if (tab2) tab2.checked = true;
+}
+
+
+// ======== File Tabs ========
+const openTabs = new Map();
+const tab2Div = document.getElementById("Tab2");
+
+let tabsBar = tab2Div.querySelector(".tabs-bar");
+if (!tabsBar) {
+    tabsBar = document.createElement("div");
+    tabsBar.className = "tabs-bar";
+    tab2Div.appendChild(tabsBar);
+}
+
+let editorArea = tab2Div.querySelector(".editor-area");
+if (!editorArea) {
+    editorArea = document.createElement("div");
+    editorArea.className = "editor-area";
+    tab2Div.appendChild(editorArea);
+}
+
+// let currentActiveFile = null;
+let currentArchiveHandle = null;
+
+window.openFileTab = async function(fileHandle = null, fullPath = null) {
+    if (!fileHandle && !fullPath) return;
+
+    // Use full path as the unique tab key
+    const tabKey = fileHandle ? fileHandle.name : fullPath;
+    const displayName = tabKey.split("/").pop(); // only the file name (no folders)
+
+    if (openTabs.has(fullPath || fileHandle.name)) {
+        activateTab(fullPath || fileHandle.name);
+        return;
+    }
+
+    // --- Create tab button ---
+    const tabBtn = document.createElement("div");
+    tabBtn.setAttribute("role", "button");
+    tabBtn.tabIndex = 0;
+    tabBtn.className = "editor-tab";
+
+    // --- Label (only file name) ---
+    const label = document.createElement("span");
+    label.textContent = displayName;
+    tabBtn.append(label);
+
+    tabsBar.appendChild(tabBtn);
+
+    // --- Load file content ---
+    let text = "";
+    if (currentSourceType === "folder" && fileHandle) {
+        text = await (await fileHandle.getFile()).text();
+    } else if (currentSourceType === "archive") {
+        const blob = archiveFiles.get(fullPath);
+        if (!blob) {
+            console.warn(`No blob found for ${fullPath}`);
+            return;
+        }
+        text = await blob.text();
+    }
+
+    // --- Create editor ---
+    const editor = document.createElement("textarea");
+    editor.value = text;
+    editor.className = "editor";
+    editorArea.appendChild(editor);
+
+    const tab = {
+        button: tabBtn,
+        editor,
+        handle: fileHandle,
+        label,
+        savedText: text,
+        fullPath
+    };
+
+    // use fullPath (or handle.name) as the key
+    openTabs.set(fullPath || fileHandle.name, tab);
+
+    // --- Track modifications ---
+    editor.addEventListener("input", () => {
+        const modified = editor.value !== tab.savedText;
+        label.textContent = modified ? `* ${displayName}` : displayName;
     });
+
+    // --- Activate tab ---
+    tabBtn.addEventListener("click", (e) => {
+        const rect = tabBtn.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        // If click is within last 20px of tab width → treat as close click
+        if (clickX > rect.width - 20) {
+            e.stopPropagation();
+            tryCloseTab(fullPath || fileHandle.name);
+            return;
+        }
+
+        activateTab(fullPath || fileHandle.name);
+    });
+
+    tabBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activateTab(fullPath || fileHandle.name);
+        }
+    });
+
+    activateTab(fullPath || fileHandle.name);
+};
+
+
+let currentActiveFile = null;
+
+// ======== Close Logic ========
+async function tryCloseTab(fileName) {
+    const tab = openTabs.get(fileName);
+    if (!tab) return;
+    const { editor, savedText } = tab;
+
+    if (editor.value !== savedText) {
+        const choice = confirm("File has unsaved changes.\nPress OK to save, Cancel to discard.");
+        if (choice) {
+            await saveFile(tab);
+        } else {
+            const discard = confirm("Discard changes and close?");
+            if (!discard) return;
+        }
+    }
+
+    closeTab(fileName);
+}
+
+// Actually close tab
+function closeTab(fileName) {
+    const tabInfo = openTabs.get(fileName);
+    if (!tabInfo) return;
+    tabInfo.button.remove();
+    tabInfo.editor.remove();
+    openTabs.delete(fileName);
+
+    // Switch to next tab if any remain
+    if (openTabs.size > 0) {
+        activateTab(Array.from(openTabs.keys())[0]);
+    } else {
+        currentActiveFile = null;
+    }
+}
+
+// ======== Save File (Ctrl+S) ========
+async function saveFile(tab) {
+    const { handle, editor, label } = tab;
+
+    // Save to folder
+    if (currentSourceType === "folder" && handle) {
+        const writable = await handle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        tab.savedText = editor.value;
+        label.textContent = handle.name;
+        console.log(`Saved to folder: ${handle.name}`);
+    }
+
+    // Save to ZIP archive
+    else if (currentSourceType === "archive" && currentArchiveHandle) {
+        const newZip = new JSZip();
+        for (const [name, blob] of archiveFiles.entries()) {
+            if (name === tab.fullPath) {
+                newZip.file(name, editor.value);
+            } else {
+                newZip.file(name, blob);
+            }
+        }
+
+        const newBlob = await newZip.generateAsync({ type: "blob" });
+        const writable = await currentArchiveHandle.createWritable();
+        await writable.write(newBlob);
+        await writable.close();
+
+        archiveFiles.set(tab.fullPath, new Blob([editor.value]));
+        tab.savedText = editor.value;
+        label.textContent = tab.fullPath.split("/").pop();
+        console.log(`Saved to archive: ${currentArchiveHandle.name}`);
+    }
+
+
+    // Fallback
+    else {
+        console.warn("No valid save target found for:", tab);
+    }
+}
+
+function activateTab(fileName) {
+    for (const [name, { button, editor }] of openTabs) {
+        const active = name === fileName;
+        button.classList.toggle("active", active);
+        editor.style.display = active ? "block" : "none";
+    }
+    currentActiveFile = fileName;
+}
+
+// ======== Move Preview ========
+function movePreview(event) {
+    const offsetY = 10;
+    const finalHeight = previewImg.offsetHeight || 100;
+    const top = event.pageY - finalHeight - offsetY;
+    imagePreview.style.top = top + 'px';
+}
+
+// ======== Recursive Folder Scan ========
+async function getAllFiles(dirHandle, pathPrefix = "") {
+    const sources = [];
+    const resources = [];
+
+    for await (const entry of dirHandle.values()) {
+        const relativePath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
+
+        if (entry.kind === 'file') {
+            const lower = entry.name.toLowerCase();
+            if (sourceExtensions.some(ext => lower.endsWith(ext)))
+                sources.push({ name: entry.name, fullPath: relativePath, handle: entry });
+            else if (resourceExtensions.some(ext => lower.endsWith(ext)))
+                resources.push({ name: entry.name, fullPath: relativePath, handle: entry });
+        } else if (entry.kind === 'directory') {
+            const { sources: subS, resources: subR } = await getAllFiles(entry, relativePath);
+            sources.push(...subS);
+            resources.push(...subR);
+        }
+    }
+
+    return { sources, resources };
+}
 </script>
 
+
+
+
+
+
+
+
 <script>
+
+// /* Simply Square
+//  * ================================================== */
+
+/*
+var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
+rocky.export_global_c_symbols();
+
+// Array that describes how to draw the 3x5 digits
+// 1 means draw a square - 0 means don't
+var digits = ["111101101101111",  // 0
+              "001001001001001",  // 1
+              "111001111100111",  // 2
+              "111001111001111",  // 3
+              "101101111001001",  // 4
+              "111100111001111",  // 5
+              "111100111101111",  // 6
+              "111001001001001",  // 7 
+              "111101111101111",  // 8
+              "111101111001111"]; //9
+
+var timetilesize = 14;
+var timetilegap = 0;
+var timetilexoffset = 0;
+var timetileyoffset = 0;
+
+
+
+
+// Function to draw a digit in the graphics context at a given co-ordinate
+function draw_digit (ctx, d, s, x, y){
+
+    // Set the drawing fill colour
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    
+    // loop through the 5 rows
+    for (var ii=0; ii<5; ii++)
+    {
+        // loop through the 3 columns
+        for (var jj=0; jj<3; jj++)
+        {
+            // use the 1 or 0 to decide if we need to draw a square or not
+            if(digits[d].substring((ii*3)+jj, (ii*3)+jj+1) == "1")
+            {
+                graphics_fill_rect(ctx, GRect((jj*s)+x,(ii*s)+y, s-1, s-1));
+            }
+        }
+    }    
+    
+}
+
+
+
+
+
+rocky.update_proc = function (ctx, bounds) {
+
+  // set fill color to black and draw a rectangle to clear the screen
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, GRect(0, 0,bounds.w, bounds.h), 0, 0);
+
+  // get the current date/time
+  var d = new Date();
+
+  // get the hours
+  var tm_hour = d.getHours();
+
+  // get the minutes
+  var tm_min = d.getMinutes();
+
+  // get the center of the screen co-ordinates
+  s_main_window_center = grect_center_point(bounds);
+  
+    // DRAW THE HOURS
+    // divide by 10 to get first hour digit and draw it
+    //draw_digit(ctx, Math.floor(tm_hour/10), s_main_window_center.x - 52, s_main_window_center.y - 82);
+    draw_digit(ctx, Math.floor(tm_hour/10), timetilesize, s_main_window_center.x - ((timetilesize*7)/2)-(timetilegap*2), s_main_window_center.y - ((timetilesize*11)/2) - (timetilegap*4));    
+
+    // get the remainder of dividing by 10 to get second hour digit and draw it
+    draw_digit(ctx, Math.floor(tm_hour%10), timetilesize, s_main_window_center.x + (timetilesize/2), s_main_window_center.y - ((timetilesize*11)/2) - (timetilegap*4));
+
+
+    // DRAW THE MINUTES
+    // divide by 10 to get first minute digit and draw it
+    draw_digit(ctx, Math.floor(tm_min/10), timetilesize, s_main_window_center.x - ((timetilesize*7)/2)-(timetilegap*2), s_main_window_center.y + (timetilesize/2));
+
+    // get the remainder of dividing by 10 to get second minute digit and draw it
+    draw_digit(ctx, Math.floor(tm_min%10), timetilesize, s_main_window_center.x + (timetilesize/2), s_main_window_center.y + (timetilesize/2));
+
+
+};
+
+
+// Set how often the screen needs to update
+setInterval(function () {rocky.mark_dirty();}, 60 * 1000);
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Simple Example
  * ================================================== */
@@ -3044,6 +3749,7 @@ document.querySelectorAll('input[type="radio"].code').forEach(radio => {
  /*eslint no-unused-vars: 0*/
 /* global TimerService:false, Window:false _timeout:true, _intervalId:true */
 
+/*
 (function(){
     var binding = Rocky.bindCanvas(document.getElementById("pebble"));
 })();
@@ -3196,7 +3902,340 @@ win.setWindowHandlers({
 
 win.push();
 console.log('Hello, JSConf!');
+*/
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 91 Dub
+ * ================================================== */
+
+// var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
+// rocky.export_global_c_symbols();
+
+// // Create a JS GRect object
+// function GRect(x, y, w, h) {
+//     return {
+//         origin : {x:x, y:y },
+//         size   : {w:w, h:h }
+//     };
+
+// }
+
+// // Convenience function to draw a filled rounded rect
+// // Draws 4 circles at each corner
+// // Then fills the 3 spaces with rectangles
+// function fill_round_rect(ctx, rect, corner_radius){
+ 
+//   // Draw top left corner
+//   ctx.rockyFillRadial(rect.origin.x + corner_radius, rect.origin.y + corner_radius, corner_radius, 0.1, 0, 2 * Math.PI);
+  
+//   // Draw top middle rect
+//   ctx.fillRect(rect.origin.x + corner_radius, rect.origin.y, rect.size.w - (corner_radius*2), corner_radius*2);
+ 
+//   // Draw top right corner
+//   ctx.rockyFillRadial(rect.origin.x + rect.size.w - corner_radius, rect.origin.y + corner_radius, corner_radius, 0.1, 0, 2 * Math.PI);
+  
+//   // Draw middle rect
+//   ctx.fillRect(rect.origin.x, rect.origin.y + corner_radius, rect.size.w, rect.size.h - (corner_radius*2));
+  
+//   // Draw bottom left corner
+//   ctx.rockyFillRadial(rect.origin.x + corner_radius, rect.origin.y + rect.size.h - corner_radius, corner_radius, 0.1, 0, 2 * Math.PI);
+  
+//   // Draw bottom middle rect
+//   ctx.fillRect(rect.origin.x + corner_radius, rect.origin.y + rect.size.h - (corner_radius*2), rect.size.w - (corner_radius*2), corner_radius*2);
+  
+//   // Draw bottom right corner
+//   ctx.rockyFillRadial(rect.origin.x + rect.size.w - corner_radius, rect.origin.y + rect.size.h - corner_radius, corner_radius, 0.1, 0, 2 * Math.PI);
+  
+// }
+
+
+// // Bitmask for the 7 segment LCD digits to make describing the shapes easier
+// var segTop = 1;
+// var segTopRight = 2;
+// var segBottomRight = 4;
+// var segBottom = 8;
+// var segBottomLeft = 16;
+// var segTopLeft = 32;
+// var segMiddle = 64;
+
+// // Array describing which LCD segments should be 'lit' for each number
+// var lcdDigits = [
+//   segTop + segTopLeft + segTopRight + segBottomLeft + segBottomRight + segBottom,
+//   segTopRight + segBottomRight,
+//   segTop + segTopRight + segMiddle + segBottomLeft + segBottom,
+//   segTop + segTopRight + segMiddle + segBottomRight + segBottom,
+//   segTopLeft + segMiddle + segTopRight + segBottomRight,
+//   segTop + segTopLeft + segMiddle + segBottomRight + segBottom,
+//   segTop + segTopLeft + segMiddle + segBottomLeft + segBottomRight + segBottom,
+//   segTop + segTopRight + segBottomRight,
+//   segTop + segTopLeft + segTopRight + segMiddle + segBottomLeft + segBottomRight + segBottom,
+//   segTop + segTopLeft + segTopRight + segMiddle + segBottomRight + segBottom
+// ]; 
+
+
+
+// function draw_lcd_digit(ctx, d, x, y, w, h, sw){
+  
+//   // Top segment
+//   if (lcdDigits[d] & segTop){
+//     ctx.beginPath();
+//     ctx.moveTo(x+1, y);
+//     ctx.lineTo(x+w-2, y);
+//     ctx.lineTo(x+w-sw-1, y+sw-1);
+//     ctx.lineTo(x+sw, y+sw-1);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+  
+//   // Top Right
+//   if (lcdDigits[d] & segTopRight){
+//     ctx.beginPath();
+//     ctx.moveTo(x+w-1, y+1);
+//     ctx.lineTo(x+w-1, y+(h/2)-2);
+//     ctx.lineTo(x+w-sw, y+(h/2)-sw-1);
+//     ctx.lineTo(x+w-sw, y+sw);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+  
+  
+//   // Bottom Right
+//   if (lcdDigits[d] & segBottomRight){
+//     ctx.beginPath();
+//     ctx.moveTo(x+w-1, y+(h/2)+1);
+//     ctx.lineTo(x+w-1, y+h-2);
+//     ctx.lineTo(x+w-sw, y+h-sw-1);
+//     ctx.lineTo(x+w-sw, y+(h/2)+sw);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+  
+  
+//   // Bottom
+//   if (lcdDigits[d] & segBottom){
+//     ctx.beginPath();
+//     ctx.moveTo(x+1, y+h-1);
+//     ctx.lineTo(x+sw, y+h-sw);
+//     ctx.lineTo(x+w-sw-1, y+h-sw);
+//     ctx.lineTo(x+w-2, y+h-1);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+  
+  
+//   // Bottom Left
+//   if (lcdDigits[d] & segBottomLeft){
+//     ctx.beginPath();
+//     ctx.moveTo(x, y+(h/2)+1);
+//     ctx.lineTo(x+sw-1, y+(h/2)+sw);
+//     ctx.lineTo(x+sw-1, y+h-sw-1);
+//     ctx.lineTo(x, y+h-2);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+  
+  
+//   // Top Left
+//   if (lcdDigits[d] & segTopLeft){
+//     ctx.beginPath();
+//     ctx.moveTo(x, y+1);
+//     ctx.lineTo(x+sw-1, y+sw);
+//     ctx.lineTo(x+sw-1, y+(h/2)-sw-1);
+//     ctx.lineTo(x, y+(h/2)-2);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();  
+//   }
+
+//   // Middle
+//   if (lcdDigits[d] & segMiddle){
+//     ctx.beginPath();
+//     ctx.moveTo(x+1, y+(h/2));
+//     ctx.lineTo(x+(sw/2), y+(h/2)-(sw/2));
+//     ctx.lineTo(x+w-sw+1, y+(h/2)-(sw/2));
+//     ctx.lineTo(x+w-2, y+(h/2));
+//     ctx.lineTo(x+w-sw+1, y+(h/2)+(sw/2)-1);
+//     ctx.lineTo(x+(sw/2), y+(h/2)+(sw/2)-1);
+//     ctx.closePath();
+//     ctx.fill();
+//     ctx.stroke();
+//   }
+// }
+
+
+
+// // Main update/draw
+// rocky.on('draw', function(event) {
+  
+//   // Get the canvas context
+//   var ctx = event.context;
+  
+//   // Get screen width & height
+//   var width  = ctx.canvas.clientWidth;
+//   var height = ctx.canvas.clientHeight;
+  
+//   // Sorry Heiko
+//   var is_round = false;
+//   if (width == 180){ is_round = true;}
+  
+//   // Get the center of the screen
+//   var center = GPoint(width/2, height/2);
+  
+//   // Clear the screen
+//   ctx.clearRect(0, 0, width, height);
+  
+//   // Draw the circles or round rects to make up the outer border and LCD background
+//   ctx.fillStyle = '#ffffff';
+//   if (is_round){
+//     ctx.rockyFillRadial(center.x, center.y, 78, 0.1, 0, 2 * Math.PI);
+//   }
+//   else{
+//     fill_round_rect(ctx, GRect(center.x-67, center.y-50, 133, 102), 10);
+//   }
+
+//   ctx.fillStyle = '#000000';
+//   if (is_round){
+//     ctx.rockyFillRadial(center.x, center.y, 76, 0.1, 0, 2 * Math.PI);
+//   }
+//   else{
+//     fill_round_rect(ctx, GRect(center.x-65, center.y-48, 129, 98), 8);
+//   }
+  
+//   ctx.fillStyle = '#ffffff';
+//   if (is_round){
+//     ctx.rockyFillRadial(center.x, center.y, 74, 0.1, 0, 2 * Math.PI);
+//   }
+//   else{
+//     fill_round_rect(ctx, GRect(center.x-63, center.y-46, 125, 94), 6);
+//   }
+  
+//   // Set the fill and stroke color for the LCD digits
+//   ctx.fillStyle = '#000000';
+//   ctx.strokeStyle = '#000000';
+  
+//   // Get the date & time
+//   var d = new Date();
+//   var tm_hour = d.getHours();
+//   var tm_min = d.getMinutes();
+//   var tm_sec = d.getSeconds();
+  
+  
+//   // HOURS
+//   draw_lcd_digit(ctx, Math.floor(tm_hour/10), center.x-61, center.y-8, 20, 32, 5);
+//   draw_lcd_digit(ctx, Math.floor(tm_hour%10), center.x-37, center.y-8, 20, 32, 5);
+  
+//   // Separator
+//   ctx.fillRect(center.x-15, center.y-3, 5, 5);
+//   ctx.fillRect(center.x-15, center.y+18, 5, 5);
+  
+//   // MINUTES
+//   draw_lcd_digit(ctx, Math.floor(tm_min/10), center.x-7, center.y-8, 20, 32, 5);
+//   draw_lcd_digit(ctx, Math.floor(tm_min%10), center.x+15, center.y-8, 20, 32, 5);
+  
+//   // SECONDS
+//   draw_lcd_digit(ctx, Math.floor(tm_sec/10), center.x+37, center.y+8, 10, 16, 2);
+//   draw_lcd_digit(ctx, Math.floor(tm_sec%10), center.x+49, center.y+8, 10, 16, 2);
+  
+// });
+
+
+// rocky.on('secondchange', function(event) {
+    
+//   // Request the screen to be redrawn on next pass
+//   rocky.requestDraw();
+  
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 91 Dub
+ * ================================================== */
+
+var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
+rocky.export_global_c_symbols();
+
+var imageRoot = "https://rdatsko.github.io/apps/pebble/91dub/";
+
+function createBitmaps(prefix, relativeNames) {
+    return relativeNames.map(function(relativeName) {
+        var fullName = imageRoot + prefix + relativeName + '.png';
+        return gbitmap_create(fullName);
+    });
+}
+
+var assets = {
+    dateNum: createBitmaps('datenum_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
+    dayImages: createBitmaps('day_', ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']),
+    numImages: createBitmaps('num_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
+    background: gbitmap_create(imageRoot + 'background.png'),
+    iconMeter: gbitmap_create(imageRoot + 'icon_meter.png'),
+    timeFormat: gbitmap_create(imageRoot + 'time_format_24H.png')
+};
+
+rocky.update_proc = function (ctx, bounds) {
+    function drawBitmap(bmp, rect) {
+        graphics_draw_bitmap_in_rect(ctx, bmp, rect);
+    }
+    function drawTwoDigits(bmpList, number, rect, width) {
+        rect = GRect(rect); // make a copy to avoid side effects
+        drawBitmap(bmpList[Math.floor(number / 10)], rect);
+        rect.x += width;
+        drawBitmap(bmpList[Math.floor(number % 10)], rect);
+    }
+
+    drawBitmap(assets.background, [0, 0, 144, 168]);
+    drawBitmap(assets.iconMeter, [17, 43, 12, 9]);
+    drawBitmap(assets.timeFormat, [17, 68, 19, 8]);
+
+    // get the current date/time
+    var d = new Date();
+    drawBitmap(assets.dayImages[d.getDay()], [69, 61, 34, 15]);
+    drawTwoDigits(assets.dateNum, d.getDate(), [108, 61, 10, 15], 13);
+    drawTwoDigits(assets.numImages, d.getHours(), [11, 84, 26, 41], 29);
+    drawTwoDigits(assets.numImages, d.getMinutes(), [77, 84, 26, 41], 29);
+
+    if (d.getSeconds() % 2) {
+        graphics_context_set_fill_color(ctx, rocky.GColorWhite);
+        graphics_fill_rect(ctx, [69, 85, 6, 40]);
+    }
+};
+
+
+// Set how often the screen needs to update
+setInterval(function () {rocky.mark_dirty();}, 1000);
 
 </script>
 </body>
