@@ -3599,7 +3599,6 @@ async function getAllFiles(dirHandle, pathPrefix = "") {
 // /* Simply Square
 //  * ================================================== */
 
-/*
 var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
 rocky.export_global_c_symbols();
 
@@ -3690,7 +3689,6 @@ rocky.update_proc = function (ctx, bounds) {
 
 // Set how often the screen needs to update
 setInterval(function () {rocky.mark_dirty();}, 60 * 1000);
-*/
 
 
 
@@ -4184,58 +4182,58 @@ console.log('Hello, JSConf!');
 /* 91 Dub
  * ================================================== */
 
-var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
-rocky.export_global_c_symbols();
+// var rocky = Rocky.bindCanvas(document.getElementById("pebble"));
+// rocky.export_global_c_symbols();
 
-var imageRoot = "https://rdatsko.github.io/apps/pebble/91dub/";
+// var imageRoot = "https://rdatsko.github.io/apps/pebble/91dub/";
 
-function createBitmaps(prefix, relativeNames) {
-    return relativeNames.map(function(relativeName) {
-        var fullName = imageRoot + prefix + relativeName + '.png';
-        return gbitmap_create(fullName);
-    });
-}
+// function createBitmaps(prefix, relativeNames) {
+//     return relativeNames.map(function(relativeName) {
+//         var fullName = imageRoot + prefix + relativeName + '.png';
+//         return gbitmap_create(fullName);
+//     });
+// }
 
-var assets = {
-    dateNum: createBitmaps('datenum_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
-    dayImages: createBitmaps('day_', ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']),
-    numImages: createBitmaps('num_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
-    background: gbitmap_create(imageRoot + 'background.png'),
-    iconMeter: gbitmap_create(imageRoot + 'icon_meter.png'),
-    timeFormat: gbitmap_create(imageRoot + 'time_format_24H.png')
-};
+// var assets = {
+//     dateNum: createBitmaps('datenum_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
+//     dayImages: createBitmaps('day_', ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']),
+//     numImages: createBitmaps('num_', ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']),
+//     background: gbitmap_create(imageRoot + 'background.png'),
+//     iconMeter: gbitmap_create(imageRoot + 'icon_meter.png'),
+//     timeFormat: gbitmap_create(imageRoot + 'time_format_24H.png')
+// };
 
-rocky.update_proc = function (ctx, bounds) {
-    function drawBitmap(bmp, rect) {
-        graphics_draw_bitmap_in_rect(ctx, bmp, rect);
-    }
-    function drawTwoDigits(bmpList, number, rect, width) {
-        rect = GRect(rect); // make a copy to avoid side effects
-        drawBitmap(bmpList[Math.floor(number / 10)], rect);
-        rect.x += width;
-        drawBitmap(bmpList[Math.floor(number % 10)], rect);
-    }
+// rocky.update_proc = function (ctx, bounds) {
+//     function drawBitmap(bmp, rect) {
+//         graphics_draw_bitmap_in_rect(ctx, bmp, rect);
+//     }
+//     function drawTwoDigits(bmpList, number, rect, width) {
+//         rect = GRect(rect); // make a copy to avoid side effects
+//         drawBitmap(bmpList[Math.floor(number / 10)], rect);
+//         rect.x += width;
+//         drawBitmap(bmpList[Math.floor(number % 10)], rect);
+//     }
 
-    drawBitmap(assets.background, [0, 0, 144, 168]);
-    drawBitmap(assets.iconMeter, [17, 43, 12, 9]);
-    drawBitmap(assets.timeFormat, [17, 68, 19, 8]);
+//     drawBitmap(assets.background, [0, 0, 144, 168]);
+//     drawBitmap(assets.iconMeter, [17, 43, 12, 9]);
+//     drawBitmap(assets.timeFormat, [17, 68, 19, 8]);
 
-    // get the current date/time
-    var d = new Date();
-    drawBitmap(assets.dayImages[d.getDay()], [69, 61, 34, 15]);
-    drawTwoDigits(assets.dateNum, d.getDate(), [108, 61, 10, 15], 13);
-    drawTwoDigits(assets.numImages, d.getHours(), [11, 84, 26, 41], 29);
-    drawTwoDigits(assets.numImages, d.getMinutes(), [77, 84, 26, 41], 29);
+//     // get the current date/time
+//     var d = new Date();
+//     drawBitmap(assets.dayImages[d.getDay()], [69, 61, 34, 15]);
+//     drawTwoDigits(assets.dateNum, d.getDate(), [108, 61, 10, 15], 13);
+//     drawTwoDigits(assets.numImages, d.getHours(), [11, 84, 26, 41], 29);
+//     drawTwoDigits(assets.numImages, d.getMinutes(), [77, 84, 26, 41], 29);
 
-    if (d.getSeconds() % 2) {
-        graphics_context_set_fill_color(ctx, rocky.GColorWhite);
-        graphics_fill_rect(ctx, [69, 85, 6, 40]);
-    }
-};
+//     if (d.getSeconds() % 2) {
+//         graphics_context_set_fill_color(ctx, rocky.GColorWhite);
+//         graphics_fill_rect(ctx, [69, 85, 6, 40]);
+//     }
+// };
 
 
-// Set how often the screen needs to update
-setInterval(function () {rocky.mark_dirty();}, 1000);
+// // Set how often the screen needs to update
+// setInterval(function () {rocky.mark_dirty();}, 1000);
 
 </script>
 </body>
