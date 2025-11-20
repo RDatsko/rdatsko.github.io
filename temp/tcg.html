@@ -31,6 +31,7 @@ body{
     margin: 6px 0;
     justify-content: center;
     flex: 1 1 auto;
+    flex-direction: column;
 }
 
 .field-row {
@@ -53,10 +54,10 @@ body{
 /* ---------- Life & Mana ---------- */
 .life-mana{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-weight:700; width:50px; text-align:center;
+  font-weight:700; width:50px; text-align:center; position: relative; width: 100%;;
 }
 .mana{margin-top:4px; font-size:14px; color: var(--accent);}
-#end-turn{position:fixed; bottom:12px; right:12px; padding:10px 16px; background:var(--accent); border:none; border-radius:6px; color:#fff; font-weight:700; cursor:pointer;}
+#end-turn{position:absolute; right:0; padding:10px 16px;  width: 6rem; background:var(--accent); border:none; border-radius:6px; color:#fff; font-weight:700; cursor:pointer;}
 
 
   /* ---------- Notification ---------- */
@@ -219,18 +220,18 @@ body{
 
   <!-- Player -->
   <div id="p1-container" class="field-container">
+    <div id="p1-field" class="field-row"></div>
     <div class="life-mana">
       <div id="p1-life">20</div>
       <div class="mana" id="p1-mana">1</div>
+      <button id="end-turn">End Turn</button>
     </div>
-    <div id="p1-field" class="field-row"></div>
   </div>
 
   <!-- Hand -->
   <div id="hand-area"></div>
 </div>
 
-<button id="end-turn">End Turn</button>
 
 <div id="notif" aria-hidden="true"></div>
 
