@@ -38,13 +38,13 @@ body {
     /* transform: perspective(100vw) rotateX(30deg); */
     /* transform-origin: top center;  */
 
-    transform: perspective(100vh) rotateX(50deg);
+    /* transform: perspective(100vh) rotateX(50deg);
     transform-origin: center center;
-    width: 78vw;
+    width: 60vw;
     margin: auto;
     position: absolute;
-    top: 17vh;
-    left: 9vw;
+    top: -10vh;
+    left: 20vw; */
 }
 #battlefield {
     flex: 1;
@@ -490,12 +490,10 @@ body {
     Player 1's Turn
 </div>
 
-    <!-- Opponent hand (top) -->
-    <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg); position: absolute; top: 0; width: 100%;"></div>
-
-
-
 <div id="game-area">
+    <!-- Opponent hand (top) -->
+    <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg);"></div>
+
     <!-- Opponent -->
     <div id="p2-container" class="field-container">
         <div class="life-mana">
@@ -515,10 +513,9 @@ body {
         </div>
     </div>
 
-</div>
-
     <!-- Hand -->
-    <div id="p1-hand-area" class="hand-area" style="position: absolute; bottom: 0; width: 100%;"></div>
+    <div id="p1-hand-area" class="hand-area"></div>
+</div>
 
 <div id="notif" aria-hidden="true"></div>
 
