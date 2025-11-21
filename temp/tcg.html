@@ -1,27 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>TCG Prototype — Turn-Based Gameplay (Fixed Borders)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TCG Prototype</title>
 
 <style>
-  :root{
-    --bg:#121212; --panel:#1a1a1a; --accent:#49a6ff; --muted:#6b6b6b;
-    --card-w:140px; --card-h:200px;
-  }
-
-/* ---------- Base layout ---------- */
-*{box-sizing:border-box}
-body{
-  margin:0; font-family:Inter,system-ui,Arial,sans-serif;
-  background:var(--bg); color:#fff; height:100vh; display:flex; flex-direction:column;
+:root {
+    --bg: #121212;
+    --panel: #1a1a1a;
+    --accent: #49a6ff;
+    --muted: #6b6b6b;
+    --card-w: 140px;
+    --card-h: 200px;
 }
 
-#game-area{flex:1;display:flex;flex-direction:column;padding:6px;}
+/* ---------- Base layout ---------- */
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    font-family: Inter, system-ui, Arial, sans-serif;
+    background: var(--bg);
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+}
 #battlefield {
-  flex:1; display:flex; flex-direction:column; justify-content:space-between;
-  perspective:800px; transform: rotateX(12deg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    perspective: 800px;
+    transform: rotateX(12deg);
 }
 
 .field-container {
@@ -32,6 +52,7 @@ body{
     justify-content: center;
     flex: 1 1 auto;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .field-row {
@@ -47,660 +68,955 @@ body{
     width: 100%;
     height: 100%;
 }
-#hand-area{
-  padding:10px; background: var(--panel); border-radius:8px; display:flex; gap:12px; overflow-x:auto; justify-content:center;
+.hand-area {
+    padding: 10px;
+    background: var(--panel);
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    justify-content: center;
+    margin: 6px 0;
+    overflow: hidden;
 }
 
 /* ---------- Life & Mana ---------- */
-.life-mana{
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-weight:700; width:50px; text-align:center; position: relative; width: 100%;;
+.life-mana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    width: 50px;
+    text-align: center;
+    position: relative;
+    width: 100%;
 }
-.mana{margin-top:4px; font-size:14px; color: var(--accent);}
-#end-turn{position:absolute; right:0; padding:10px 16px;  width: 6rem; background:var(--accent); border:none; border-radius:6px; color:#fff; font-weight:700; cursor:pointer;}
+.mana {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--accent);
+}
+#end-turn {
+    position: absolute;
+    right: 0;
+    padding: 10px 16px;
+    width: 6rem;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
 
-
-  /* ---------- Notification ---------- */
-  #notif {
+/* ---------- Notification ---------- */
+#notif {
     position: fixed;
     right: 18px;
     bottom: 18px;
     z-index: 12000;
     pointer-events: none;
-    font-weight:700;
-    color:#fff;
-    background: rgba(0,0,0,0.5);
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
     padding: 8px 12px;
     border-radius: 10px;
     backdrop-filter: blur(4px);
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity .28s ease, transform .28s ease;
-  }
-  #notif.show { opacity: 1; transform: translateY(0); }
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
+}
+#notif.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-  /* ---------- Card base (visual border on card wrapper) ---------- */
-  .card {
-    width:var(--card-w); height:var(--card-h); background:#222;
+/* ---------- Card base (visual border on card wrapper) ---------- */
+.card {
+    width: var(--card-w);
+    height: var(--card-h);
+    background: #222;
     /* FORCE a visible border so cards always show a frame */
-    border: 2px solid rgba(255,255,255,0.82) !important;
-    border-radius:10px; padding:8px; display:flex; flex-direction:column; justify-content:space-between;
-    transform-origin:center; transition:transform .16s ease,box-shadow .16s ease; position:relative; user-select:none;
-    opacity:0; transform:translateY(14px) scale(.98);
-    animation:cardDrop .26s ease forwards;
+    border: 2px solid rgba(255, 255, 255, 0.82) !important;
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform-origin: center;
+    transition:
+        transform 0.16s ease,
+        box-shadow 0.16s ease;
+    position: relative;
+    user-select: none;
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+    animation: cardDrop 0.26s ease forwards;
     box-sizing: border-box;
-  }
-  @keyframes cardDrop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-  .card:hover{transform:translateY(-6px) scale(1.02); box-shadow:0 10px 30px rgba(0,0,0,.45)}
+}
+@keyframes cardDrop {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+.card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
 
-  .card-image{width:100%;height:90px;border-radius:6px;background:#333;background-size:cover;background-position:center}
-  .card-name{font-weight:700;font-size:14px}
-  .card-text{font-size:12px;opacity:.85;min-height:30px;margin-top:6px}
-  .card-stats{display:flex;justify-content:space-between;font-size:13px;margin-top:6px}
+.card-image {
+    width: 100%;
+    height: 90px;
+    border-radius: 6px;
+    background: #333;
+    background-size: cover;
+    background-position: center;
+}
+#p2-field .card-image {
+    transform: rotateX(0deg);
+}
+.card-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+.card-text {
+    font-size: 12px;
+    opacity: 0.85;
+    min-height: 30px;
+    margin-top: 6px;
+}
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 6px;
+}
 
-  /* field drop (slower more dramatic) */
-  .card.field-drop{animation:cardFieldDrop .36s cubic-bezier(.2,.9,.2,1) forwards}
-  @keyframes cardFieldDrop{from{opacity:0;transform:translateY(28px) scale(.9) rotate(-2deg)}60%{transform:translateY(-8px) scale(1.02) rotate(0)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* field drop (slower more dramatic) */
+.card.field-drop {
+    animation: cardFieldDrop 0.36s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+@keyframes cardFieldDrop {
+    from {
+        opacity: 0;
+        transform: translateY(28px) scale(0.9) rotate(-2deg);
+    }
+    60% {
+        transform: translateY(-8px) scale(1.02) rotate(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-  /* draw-in (hand) */
-  .card.draw-in{animation:cardDrawIn .36s cubic-bezier(.2,.9,.2,1) forwards}
-  @keyframes cardDrawIn{from{opacity:0;transform:translateY(20px) scale(.88) rotate(-3deg)}60%{transform:translateY(-6px) scale(1.02)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* draw-in (hand) */
+.card.draw-in {
+    animation: cardDrawIn 0.36s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+@keyframes cardDrawIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.88) rotate(-3deg);
+    }
+    60% {
+        transform: translateY(-6px) scale(1.02);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-  /* attack wiggle (soft) */
-  .card.attack-animation{animation:attackAnim .34s ease}
-  @keyframes attackAnim{0%{transform:translateX(0)}40%{transform:translateX(-10px)}70%{transform:translateX(4px)}100%{transform:translateX(0)}}
+/* attack wiggle (soft) */
+.card.attack-animation {
+    animation: attackAnim 0.34s ease;
+}
+@keyframes attackAnim {
+    0% {
+        transform: translateX(0);
+    }
+    40% {
+        transform: translateX(-10px);
+    }
+    70% {
+        transform: translateX(4px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
 
-  /* hit flash */
-  .card.hit-flash{animation:hitFlash .28s ease}
-  @keyframes hitFlash{0%{box-shadow:0 0 0 rgba(255,255,255,0)}30%{box-shadow:0 0 14px rgba(255,220,120,.9)}100%{box-shadow:0 0 0 rgba(255,220,120,0)}}
+/* hit flash */
+.card.hit-flash {
+    animation: hitFlash 0.28s ease;
+}
+@keyframes hitFlash {
+    0% {
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+    30% {
+        box-shadow: 0 0 14px rgba(255, 220, 120, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 0 rgba(255, 220, 120, 0);
+    }
+}
 
 /* Card destroy effect (fix for opponent cards with rotateY) */
 .card.destroying {
-  animation: destroyAnim 0.5s forwards;
-  position: relative;
-  z-index: 100;
+    animation: destroyAnim 0.5s forwards;
+    position: relative;
+    z-index: 100;
 }
 
 @keyframes destroyAnim {
-  0% {
-    filter: drop-shadow(0 0 0 rgba(255,255,255,0));
-    opacity: 1;
-    transform: rotateY(var(--card-rotateY, 0deg)) scale(1) rotate(0deg);
-  }
-  30% {
-    filter: drop-shadow(0 0 15px rgba(255,255,200,0.8));
-    transform: rotateY(var(--card-rotateY, 0deg)) scale(1.1) rotate(5deg);
-  }
-  60% {
-    filter: drop-shadow(0 0 30px rgba(255,255,200,1));
-    transform: rotateY(var(--card-rotateY, 0deg)) scale(0.95) rotate(-5deg);
-    opacity: 0.6;
-  }
-  100% {
-    filter: drop-shadow(0 0 0 rgba(255,255,200,0));
-    opacity: 0;
-    transform: rotateY(var(--card-rotateY, 0deg)) scale(0.5) rotate(15deg);
-  }
+    0% {
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        opacity: 1;
+        transform: rotateY(var(--card-rotateY, 0deg)) scale(1) rotate(0deg);
+    }
+    30% {
+        filter: drop-shadow(0 0 15px rgba(255, 255, 200, 0.8));
+        transform: rotateY(var(--card-rotateY, 0deg)) scale(1.1) rotate(5deg);
+    }
+    60% {
+        filter: drop-shadow(0 0 30px rgba(255, 255, 200, 1));
+        transform: rotateY(var(--card-rotateY, 0deg)) scale(0.95) rotate(-5deg);
+        opacity: 0.6;
+    }
+    100% {
+        filter: drop-shadow(0 0 0 rgba(255, 255, 200, 0));
+        opacity: 0;
+        transform: rotateY(var(--card-rotateY, 0deg)) scale(0.5) rotate(15deg);
+    }
 }
 
+/* tapped */
+.tapped {
+    opacity: 0.5 !important;
+    transform: rotate(5deg) !important;
+}
 
-  /* tapped */
-  .tapped{opacity:.5 !important;transform:rotate(5deg) !important}
+/* attacker outline */
+.attacker {
+    outline: 3px solid rgba(255, 220, 80, 0.95);
+    box-shadow: 0 10px 30px rgba(255, 220, 80, 0.06);
+}
 
-  /* attacker outline */
-  .attacker{outline:3px solid rgba(255,220,80,.95); box-shadow:0 10px 30px rgba(255,220,80,.06)}
-
-  /* ---------- Flip (reveal) wrappers (NO visual border/padding) ---------- */
-  .flip-wrapper,
-  .flip {
+/* ---------- Flip (reveal) wrappers (NO visual border/padding) ---------- */
+.flip-wrapper,
+.flip {
     border: none !important;
     padding: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-  }
-  .flip-wrapper{perspective:900px; width:var(--card-w); height:var(--card-h); position:relative; display:inline-block;}
-  .flip{transform-style:preserve-3d; transition:transform .42s cubic-bezier(.2,.9,.2,1); width:100%; height:100%; position:relative; outline: 1px solid rgba(192, 192, 192, .95); border-radius: 8px;}
-  .flip.show-back{transform:rotateY(180deg)}
-  .face{backface-visibility:hidden; position:absolute; left:0;right:0;top:0;bottom:0; padding:8px; box-sizing:border-box; border-radius:8px;}
-  .face.front{position:relative}
-  .face.back{transform:rotateY(180deg); display:flex;align-items:center;justify-content:center;font-weight:700;background:linear-gradient(120deg,#2b2b2b,#222)}
-
-  /* tooltip */
-  .tooltip{position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(6px); background:rgba(18,18,18,.98); padding:8px 10px;border-radius:6px;font-size:12px;opacity:0; pointer-events:none; transition:transform .18s ease,opacity .18s ease; box-shadow:0 6px 18px rgba(0,0,0,.6); z-index:40}
-  .card:hover .tooltip{opacity:1; transform:translateX(-50%) translateY(0)}
-
-  /* projectile */
-  .proj{position:fixed;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#ffd9a3 0%, #ff8a00 60%);pointer-events:none;z-index:9999;transform:translate3d(0,0,0);transition:transform .42s linear,opacity .42s linear}
-
-  /* hp pop */
-  .hp-pop{position:fixed;font-weight:800;color:#ffdddd;text-shadow:0 2px 6px rgba(0,0,0,.7);z-index:10000;pointer-events:none;transform:translateY(0);opacity:1;transition:transform .7s cubic-bezier(.2,.9,.2,1),opacity .7s ease}
-  .hp-pop.heal{color:#d8ffd8}
-  .hp-pop.hide{opacity:0; transform:translateY(-40px)}
-
-  /* Opponent's row (top) upside-down */
-#p2-field {
-  transform: rotateX(180deg);
 }
+.flip-wrapper {
+    perspective: 900px;
+    width: var(--card-w);
+    height: var(--card-h);
+    position: relative;
+    display: inline-block;
+}
+.flip {
+    transform-style: preserve-3d;
+    transition: transform 0.42s cubic-bezier(0.2, 0.9, 0.2, 1);
+    width: 100%;
+    height: 100%;
+    position: relative;
+    outline: 1px solid rgba(192, 192, 192, 0.95);
+    border-radius: 8px;
+}
+/* #p2-field .flip {
+    transform-style: unset;
+    transform: rotateY(180deg);
+} */
+
+#p1-field .flip.show-back {
+    transform: rotateY(180deg);
+}
+.face {
+    backface-visibility: hidden;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+.face.front {
+    position: relative;
+}
+.face.back {
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    background: linear-gradient(120deg, #2b2b2b, #222);
+}
+
+/* tooltip */
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: rgba(18, 18, 18, 0.98);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        transform 0.18s ease,
+        opacity 0.18s ease;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    z-index: 40;
+}
+.card:hover .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* projectile */
+.proj {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffd9a3 0%, #ff8a00 60%);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate3d(0, 0, 0);
+    transition:
+        transform 0.42s linear,
+        opacity 0.42s linear;
+}
+
+/* hp pop */
+.hp-pop {
+    position: fixed;
+    font-weight: 800;
+    color: #ffdddd;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    pointer-events: none;
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+        transform 0.7s cubic-bezier(0.2, 0.9, 0.2, 1),
+        opacity 0.7s ease;
+}
+.hp-pop.heal {
+    color: #d8ffd8;
+}
+.hp-pop.hide {
+    opacity: 0;
+    transform: translateY(-40px);
+}
+
+/* Opponent's row (top) upside-down */
+/* #p2-field {
+    transform: rotateX(180deg);
+} */
 
 /* Mirror text/tooltip for opponent */
-#p2-field .card {
-  transform: rotateX(180deg);
+/* #p2-field .card {
+    transform: rotateX(180deg);
+} */
+
+#p2-field {
+    transform: rotate(180deg); /* rotate the entire row */
 }
 
-/* Keep opponent's text readable despite row flip */
-#p2-field .card .face.front,
-#p2-field .card .card-name,
-#p2-field .card .card-text,
-#p2-field .card .card-stats {
-  transform: rotateY(180deg);
+#p2-field .card {
+    transform: rotate(180deg); /* rotate cards back so they look upright */
 }
 
 #p2-field .tooltip {
-  transform: rotateX(180deg);
+    transform: rotateX(180deg);
 }
 
-  /* small responsive tweaks */
-  @media (max-width:800px){
-    :root{--card-w:120px;--card-h:170px}
-    .field-row{min-height:140px}
-  }
+#p2-field .flip.show-back {
+  transform: rotateY(-180deg);
+}
 
+/* small responsive tweaks */
+@media (max-width: 800px) {
+    :root {
+        --card-w: 120px;
+        --card-h: 170px;
+    }
+    .field-row {
+        min-height: 140px;
+        overflow: hidden;
+    }
+}
 </style>
 </head>
 <body>
+
 <div id="game-area">
-  <!-- Opponent -->
-  <div id="p2-container" class="field-container">
-    <div class="life-mana">
-      <div id="p2-life">20</div>
-      <div class="mana" id="p2-mana">1</div>
-    </div>
-    <div id="p2-field" class="field-row"></div>
-  </div>
+    <!-- Opponent hand (top) -->
+    <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg);"></div>
 
-  <!-- Player -->
-  <div id="p1-container" class="field-container">
-    <div id="p1-field" class="field-row"></div>
-    <div class="life-mana">
-      <div id="p1-life">20</div>
-      <div class="mana" id="p1-mana">1</div>
-      <button id="end-turn">End Turn</button>
+    <!-- Opponent -->
+    <div id="p2-container" class="field-container">
+        <div class="life-mana">
+            <div id="p2-life">20</div>
+            <div class="mana" id="p2-mana">1</div>
+        </div>
+        <div id="p2-field" class="field-row"></div>
     </div>
-  </div>
 
-  <!-- Hand -->
-  <div id="hand-area"></div>
+    <!-- Player -->
+    <div id="p1-container" class="field-container">
+        <div id="p1-field" class="field-row"></div>
+        <div class="life-mana">
+            <div id="p1-life">20</div>
+            <div class="mana" id="p1-mana">1</div>
+            <button id="end-turn">End Turn</button>
+        </div>
+    </div>
+
+    <!-- Hand -->
+    <div id="p1-hand-area" class="hand-area"></div>
 </div>
-
 
 <div id="notif" aria-hidden="true"></div>
 
-  <script>
+<script>
 /* ============================
-   Core Data & Helpers
-   ============================ */
+Core Data & Helpers
+============================ */
 const MASTER_CARDS = [
-  { id:"fire-dragon", name:"Fire Dragon", attack:7, health:5, cost:4, text:"Breathes fire for +2 damage.", image:"https://via.placeholder.com/150x100/aa0000/ffffff?text=Dragon" },
-  { id:"forest-wolf", name:"Forest Wolf", attack:3, health:2, cost:1, text:"Fast and agile.", image:"https://via.placeholder.com/150x100/006600/ffffff?text=Wolf" },
-  { id:"guardian-golem", name:"Guardian Golem", attack:1, health:8, cost:3, text:"Takes reduced damage.", image:"https://via.placeholder.com/150x100/555555/ffffff?text=Golem" },
-  { id:"light-mage", name:"Light Mage", attack:2, health:3, cost:2, text:"Can heal allies.", image:"https://via.placeholder.com/150x100/ffff99/000000?text=Mage" },
-  { id:"shadow-assassin", name:"Shadow Assassin", attack:5, health:1, cost:2, text:"Strikes first.", image:"https://via.placeholder.com/150x100/111111/ffffff?text=Assassin" }
+    {
+        id: "fire-dragon",
+        name: "Fire Dragon",
+        attack: 7,
+        health: 5,
+        cost: 4,
+        text: "Breathes fire for +2 damage.",
+        image: "https://via.placeholder.com/150x100/aa0000/ffffff?text=Dragon",
+    },
+    {
+        id: "forest-wolf",
+        name: "Forest Wolf",
+        attack: 3,
+        health: 2,
+        cost: 1,
+        text: "Fast and agile.",
+        image: "https://via.placeholder.com/150x100/006600/ffffff?text=Wolf",
+    },
+    {
+        id: "guardian-golem",
+        name: "Guardian Golem",
+        attack: 1,
+        health: 8,
+        cost: 3,
+        text: "Takes reduced damage.",
+        image: "https://via.placeholder.com/150x100/555555/ffffff?text=Golem",
+    },
+    {
+        id: "light-mage",
+        name: "Light Mage",
+        attack: 2,
+        health: 3,
+        cost: 2,
+        text: "Can heal allies.",
+        image: "https://via.placeholder.com/150x100/ffff99/000000?text=Mage",
+    },
+    {
+        id: "shadow-assassin",
+        name: "Shadow Assassin",
+        attack: 5,
+        health: 1,
+        cost: 2,
+        text: "Strikes first.",
+        image: "https://via.placeholder.com/150x100/111111/ffffff?text=Assassin",
+    },
 ];
 
 const players = [
-  { name:"Player 1", deck:[], hand:[], field:[], mana:1, maxMana:1, life:20 },
-  { name:"Player 2", deck:[], hand:[], field:[], mana:1, maxMana:1, life:20 }
+    { name: "Player 1", deck: [], hand: [], field: [], mana: 1, maxMana: 1, life: 20 },
+    { name: "Player 2", deck: [], hand: [], field: [], mana: 1, maxMana: 1, life: 20 },
 ];
-
-
 
 let currentPlayer = 0;
 let selectedAttacker = null;
 
 /* uid generator */
-function uid(prefix='c'){ return prefix + '-' + Math.floor(Math.random()*1e9).toString(36) + '-' + Date.now().toString(36); }
+function uid(prefix = "c") {
+    return prefix + "-" + Math.floor(Math.random() * 1e9).toString(36) + "-" + Date.now().toString(36);
+}
 
 /* clone base card + assign uid */
-function cloneCard(id){
-  const base = MASTER_CARDS.find(c=>c.id===id);
-  const copy = JSON.parse(JSON.stringify(base));
-  copy.uid = uid('card');
-  return copy;
+function cloneCard(id) {
+    const base = MASTER_CARDS.find((c) => c.id === id);
+    const copy = JSON.parse(JSON.stringify(base));
+    copy.uid = uid("card");
+    return copy;
 }
 
 /* shuffle */
-function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
 
 /* build decks */
-function buildDeck(){
-  const ids = MASTER_CARDS.map(c=>c.id);
-  players.forEach(p=>{
-    p.deck = [];
-    for(let i=0;i<10;i++){ p.deck.push(cloneCard(ids[i % ids.length])); }
-    shuffle(p.deck);
-  });
+function buildDeck() {
+    const ids = MASTER_CARDS.map((c) => c.id);
+    players.forEach((p) => {
+        p.deck = [];
+        for (let i = 0; i < 10; i++) {
+            p.deck.push(cloneCard(ids[i % ids.length]));
+        }
+        shuffle(p.deck);
+    });
 }
 
 /* notification helper */
-function showNotif(text, time=1400){
-  const n = document.getElementById('notif');
-  n.textContent = text;
-  n.classList.add('show');
-  setTimeout(()=> n.classList.remove('show'), time);
-  console.info('[NOTIF]', text);
+function showNotif(text, time = 1400) {
+    const n = document.getElementById("notif");
+    n.textContent = text;
+    n.classList.add("show");
+    setTimeout(() => n.classList.remove("show"), time);
+    console.info("[NOTIF]", text);
 }
 
 /* ============================
-   Rendering
-   ============================ */
+Rendering
+============================ */
 
-function renderGame(){
-  renderHand();
-  renderField();
-  updateTopBar();
-  updateLifeDisplay();
-}
-
-function updateTopBar(){
-  const p = players[currentPlayer];
-  const o = players[currentPlayer === 0 ? 1 : 0];
-  document.getElementById('turn-info').textContent = `${p.name}'s Turn`;
-  document.getElementById('mana-info').textContent = `Mana: ${p.mana} / ${p.maxMana}`;
-  document.getElementById('life-info').textContent = `Life: ${p.life} / ${o.life}`;
+function renderGame() {
+    renderHand(0); // P1
+    renderHand(1); // P2
+    renderField();
+    updateLifeDisplay();
 }
 
 function updateLifeDisplay() {
-  document.getElementById('p1-life').textContent = players[0].life;
-  document.getElementById('p2-life').textContent = players[1].life;
+    document.getElementById("p1-life").textContent = players[0].life;
+    document.getElementById("p2-life").textContent = players[1].life;
 }
-
-
 
 /* create card element (wrapper with flip support & tooltip)
-   wrapper has .card class so visual border stays on wrapper.
+wrapper has .card class so visual border stays on wrapper.
 */
-function createCardElement(card, inField=false){
-  // wrapper (visual border is on this element)
-  const wrapper = document.createElement('div');
-  wrapper.className = 'card flip-wrapper';
-  wrapper.dataset.uid = card.uid || '';
 
-  // inner flip element (borderless)
-  const innerFlip = document.createElement('div');
-  innerFlip.className = 'flip'; // borderless inner element
+function createCardElement(card, inField = false) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "card flip-wrapper";
+    wrapper.dataset.uid = card.uid || "";
+    wrapper.dataset.owner = card.owner ?? 0;
 
-  // front face
-  const front = document.createElement('div');
-  front.className = 'face front';
-  front.innerHTML = `
-    <div class="card-image" style="background-image:url(${card.image})"></div>
-    <div class="card-name">${card.name}</div>
-    <div class="card-text">${card.text}</div>
-    <div class="card-stats"><span>ATK: ${card.attack}</span><span>HP: ${card.health}</span></div>
-  `;
+    const innerFlip = document.createElement("div");
+    innerFlip.className = "flip";
 
-  // back face
-  const back = document.createElement('div');
-  back.className = 'face back';
-  back.textContent = card.name;
+    const front = document.createElement("div");
+    front.className = "face front";
+    front.innerHTML = `
+<div class="card-image" style="background-image:url(${card.image})"></div>
+<div class="card-name">${card.name}</div>
+<div class="card-text">${card.text}</div>
+<div class="card-stats"><span>ATK:${card.attack}</span><span>HP:${card.health}</span></div>
+`;
 
-  // tooltip
-  const tip = document.createElement('div');
-  tip.className = 'tooltip';
-  tip.textContent = `${card.name} — Cost ${card.cost} • ATK ${card.attack} / HP ${card.health}`;
+    const back = document.createElement("div");
+    back.className = "face back";
+    back.textContent = card.name;
 
-  innerFlip.appendChild(front);
-  innerFlip.appendChild(back);
-  wrapper.appendChild(innerFlip);
-  wrapper.appendChild(tip);
+    innerFlip.append(front, back);
+    wrapper.appendChild(innerFlip);
 
-  // visual states on wrapper
-  if(card.tapped) wrapper.classList.add('tapped');
-  if(selectedAttacker === card) wrapper.classList.add('attacker');
+    // Opponent cards are face-down in hand
+    if (!inField && card.owner === 1) {
+        innerFlip.classList.add("show-back");
+        wrapper.style.transform = "rotateX(180deg)";
+    }
 
-  if(inField) wrapper.classList.add('field-drop');
+    if (inField) wrapper.classList.add("field-drop");
+    if (card.tapped) wrapper.classList.add("tapped");
+    if (selectedAttacker === card) wrapper.classList.add("attacker");
 
-  return wrapper;
+    // Make sure wrapper is clickable
+    wrapper.style.pointerEvents = "auto";
+
+    return wrapper;
 }
 
-function renderHand(){
-  const hand = document.getElementById('hand-area');
-  hand.innerHTML = '';
-  players[currentPlayer].hand.forEach((card, idx)=>{
-    const el = createCardElement(card, false);
-    if(card._justDrawn){
-      el.classList.add('draw-in');
-      // A2: flip on draw
-      requestAnimationFrame(()=>{
-        const flipInner = el.querySelector('.flip');
-        if(flipInner){
-          flipInner.classList.add('show-back');
-          setTimeout(()=> flipInner.classList.remove('show-back'), 420);
+// --- Hand rendering ---
+function renderP1Hand() {
+    const hand = document.getElementById("p1-hand-area");
+    hand.innerHTML = "";
+    players[0].hand.forEach((card, idx) => {
+        card.owner = 0;
+        const el = createCardElement(card);
+        el.onclick = () => playCard(idx);
+        hand.appendChild(el);
+    });
+}
+
+function renderP2Hand() {
+    const hand = document.getElementById("p2-hand-area");
+    hand.innerHTML = "";
+    players[1].hand.forEach((card) => {
+        card.owner = 1;
+        const el = createCardElement(card);
+        hand.appendChild(el); // no click for opponent cards
+    });
+}
+
+function renderField() {
+    const p1 = document.getElementById("p1-field");
+    const p2 = document.getElementById("p2-field");
+    p1.innerHTML = "";
+    p2.innerHTML = "";
+
+    // Player 1 field
+    players[0].field.forEach((c, i) => {
+        const el = createCardElement(c, true);
+        el.dataset.owner = 0;
+        el.dataset.index = i;
+        el.onclick = () => fieldCardClicked(0, i);
+        p1.appendChild(el);
+    });
+
+    // Player 2 field
+    players[1].field.forEach((c, i) => {
+        const el = createCardElement(c, true);
+        el.dataset.owner = 1;
+        el.dataset.index = i;
+        el.onclick = () => fieldCardClicked(1, i);
+        p2.appendChild(el);
+    });
+
+    // Direct attack: click on empty space
+    p2.parentElement.onclick = (e) => {
+        if (!selectedAttacker) return;
+        if (e.target === p2.parentElement) {
+            attackPlayer(selectedAttacker, players[1]);
+            selectedAttacker = null;
         }
-      });
-      el.addEventListener('animationend', ()=>{ delete card._justDrawn; }, { once:true });
-    }
-    el.onclick = ()=> playCard(idx);
-    hand.appendChild(el);
-  });
+    };
+    p1.parentElement.onclick = (e) => {
+        if (!selectedAttacker) return;
+        if (e.target === p1.parentElement) {
+            attackPlayer(selectedAttacker, players[0]);
+            selectedAttacker = null;
+        }
+    };
 }
 
-function renderField(){
-  const p1 = document.getElementById('p1-field');
-  const p2 = document.getElementById('p2-field');
-  p1.innerHTML = ''; p2.innerHTML = '';
-
-  // Player 1 field
-  players[0].field.forEach((c,i)=>{
-    const el = createCardElement(c,true);
-    el.dataset.owner = 0; el.dataset.index = i;
-    el.onclick = ()=> fieldCardClicked(0,i);
-    p1.appendChild(el);
-  });
-
-  // Player 2 field
-  players[1].field.forEach((c,i)=>{
-    const el = createCardElement(c,true);
-    el.dataset.owner = 1; el.dataset.index = i;
-    el.onclick = ()=> fieldCardClicked(1,i);
-    p2.appendChild(el);
-  });
-
-  // Direct attack: click on empty space
-  p2.parentElement.onclick = (e) => {
-    if(!selectedAttacker) return;
-    if(e.target === p2.parentElement) {
-      attackPlayer(selectedAttacker, players[1]);
-      selectedAttacker = null;
-    }
-  };
-  p1.parentElement.onclick = (e) => {
-    if(!selectedAttacker) return;
-    if(e.target === p1.parentElement) {
-      attackPlayer(selectedAttacker, players[0]);
-      selectedAttacker = null;
-    }
-  };
-}
-
-
-
-function findCardElement(card){
-  if(!card || !card.uid) return null;
-  return document.querySelector(`[data-uid="${card.uid}"]`);
+function findCardElement(card) {
+    if (!card || !card.uid) return null;
+    return document.querySelector(`[data-uid="${card.uid}"]`);
 }
 </script>
 
 <script>
 /* Game logic (functions defined BEFORE event wiring) */
-function renderGame(){
-  renderHand();
-  renderField();
-  updateTopBar();
+function updateTopBar() {
+    document.getElementById("turn-info").textContent = players[currentPlayer].name + "'s Turn";
+    document.getElementById("mana-info").textContent =
+        `Mana: ${players[currentPlayer].mana} / ${players[currentPlayer].maxMana}`;
 }
 
-function updateTopBar(){
-  document.getElementById('turn-info').textContent = players[currentPlayer].name + "'s Turn";
-  document.getElementById('mana-info').textContent = `Mana: ${players[currentPlayer].mana} / ${players[currentPlayer].maxMana}`;
-}
+// function createCardElement(card, inField=false){
+//   const wrapper = document.createElement('div');
+//   wrapper.className = 'card';
+//   wrapper.dataset.uid = card.uid || '';
 
-function createCardElement(card, inField=false){
-  const wrapper = document.createElement('div');
-  wrapper.className = 'card';
-  wrapper.dataset.uid = card.uid || '';
+//   const front = document.createElement('div');
+//   front.className = 'card-image';
+//   front.style.backgroundImage = `url(${card.image})`;
 
-  const front = document.createElement('div');
-  front.className = 'card-image';
-  front.style.backgroundImage = `url(${card.image})`;
+//   const nameEl = document.createElement('div');
+//   nameEl.className = 'card-name';
+//   nameEl.textContent = card.name;
 
-  const nameEl = document.createElement('div');
-  nameEl.className = 'card-name';
-  nameEl.textContent = card.name;
+//   const textEl = document.createElement('div');
+//   textEl.className = 'card-text';
+//   textEl.textContent = card.text;
 
-  const textEl = document.createElement('div');
-  textEl.className = 'card-text';
-  textEl.textContent = card.text;
+//   const statsEl = document.createElement('div');
+//   statsEl.className = 'card-stats';
+//   statsEl.innerHTML = `<span>ATK: ${card.attack}</span><span>HP: ${card.health}</span>`;
 
-  const statsEl = document.createElement('div');
-  statsEl.className = 'card-stats';
-  statsEl.innerHTML = `<span>ATK: ${card.attack}</span><span>HP: ${card.health}</span>`;
+//   wrapper.append(front, nameEl, textEl, statsEl);
 
-  wrapper.append(front, nameEl, textEl, statsEl);
+//   if(card.tapped) wrapper.classList.add('tapped');
+//   if(selectedAttacker === card) wrapper.classList.add('attacker');
+//   if(inField) wrapper.classList.add('field-drop');
 
-  if(card.tapped) wrapper.classList.add('tapped');
-  if(selectedAttacker === card) wrapper.classList.add('attacker');
-  if(inField) wrapper.classList.add('field-drop');
+//   return wrapper;
+// }
 
-  return wrapper;
-}
-
-function renderHand(){
-  const hand = document.getElementById('hand-area');
-  hand.innerHTML = '';
-  players[currentPlayer].hand.forEach((card, idx)=>{
-    const el = createCardElement(card);
-    el.onclick = ()=> playCard(idx);
-    hand.appendChild(el);
-  });
-}
-
-function renderField(){
-  const p1 = document.getElementById('p1-field');
-  const p2 = document.getElementById('p2-field');
-  p1.innerHTML = '';
-  p2.innerHTML = '';
-
-  players[0].field.forEach((c,i)=>{
-    const el = createCardElement(c,true);
-    el.dataset.owner = 0;
-    el.dataset.index = i;
-    el.onclick = ()=> fieldCardClicked(0,i);
-    p1.appendChild(el);
-  });
-  players[1].field.forEach((c,i)=>{
-    const el = createCardElement(c,true);
-    el.dataset.owner = 1;
-    el.dataset.index = i;
-    el.onclick = ()=> fieldCardClicked(1,i);
-    p2.appendChild(el);
-  });
-}
-
-
-function drawCard(player){
-  if(player.deck.length>0){
-    const card = player.deck.pop();
-    card._justDrawn = true; // A2: mark so draw triggers flip and draw-in animations
-    player.hand.push(card);
-    return card;
-  }
-  return null;
-}
-
-function playCard(handIndex){
-  const p = players[currentPlayer];
-  const card = p.hand[handIndex];
-  if(!card) return;
-  if(card.cost > p.mana){
-    showNotif("Not enough mana!");
-    return;
-  }
-  p.mana -= card.cost;
-  card.owner = currentPlayer;
-  p.field.push(card);
-  p.hand.splice(handIndex,1);
-  renderGame();
-
-  // A2: flip when entering battlefield (soft reveal)
-  requestAnimationFrame(()=>{
-    const el = findCardElement(card);
-    if(el){
-      const flipInner = el.querySelector('.flip');
-      if(flipInner){
-        flipInner.classList.add('show-back');
-        setTimeout(()=> flipInner.classList.remove('show-back'), 420);
-      }
-    }
-  });
-}
-
-function attackCard(attacker, defender){
-  showNotif(`${attacker.name} attacks ${defender.name}!`, 900);
-
-  const attackerDom = findCardElement(attacker);
-  const defenderDom = findCardElement(defender);
-
-  if(attackerDom){
-    const inner = attackerDom.querySelector('.flip') || attackerDom;
-    inner.classList.add('attack-animation');
-    inner.addEventListener('animationend', ()=> inner.classList.remove('attack-animation'), { once:true });
-  }
-
-  if(attackerDom && defenderDom){
-    const aRect = attackerDom.getBoundingClientRect();
-    const dRect = defenderDom.getBoundingClientRect();
-    const startX = aRect.left + aRect.width/2;
-    const startY = aRect.top + aRect.height/2;
-    const endX = dRect.left + dRect.width/2;
-    const endY = dRect.top + dRect.height/2;
-
-    const proj = document.createElement('div');
-    proj.className = 'proj';
-    document.body.appendChild(proj);
-    proj.style.left = (startX - 9) + 'px';
-    proj.style.top  = (startY - 9) + 'px';
-    proj.style.opacity = '1';
-
-    requestAnimationFrame(()=> {
-      proj.style.transform = `translate(${endX - startX}px, ${endY - startY}px)`;
-      proj.style.opacity = '0.95';
+function renderHand(playerIndex) {
+    const hand =
+        playerIndex === 0
+            ? document.getElementById("p1-hand-area")
+            : document.getElementById("p2-hand-area");
+    hand.innerHTML = "";
+    players[playerIndex].hand.forEach((card, idx) => {
+        const el = createCardElement(card);
+        if (playerIndex === currentPlayer) {
+            el.onclick = () => playCard(idx);
+        }
+        hand.appendChild(el);
     });
-
-    setTimeout(()=>{
-      proj.remove();
-      const dInner = defenderDom.querySelector('.flip') || defenderDom;
-      if(dInner){ dInner.classList.add('hit-flash'); setTimeout(()=> dInner.classList.remove('hit-flash'),300); }
-
-      showHpPop(defender, endX, endY, -attacker.attack);
-
-      defender.health -= attacker.attack;
-      attacker.health -= defender.attack;
-      attacker.tapped = true;
-
-      // remove dead cards
-// handle destroyed cards with effect
-players.forEach(p=>{
-  p.field.forEach(c=>{
-    if(c.health <= 0){
-      const el = findCardElement(c);
-      if(el){
-  if(el.closest('#p2-field')){
-    el.style.setProperty('--card-rotateY', '180deg');
-  } else {
-    el.style.setProperty('--card-rotateY', '0deg');
-  }
-  el.classList.add('destroying');
-  setTimeout(()=> {
-    p.field = p.field.filter(f => f.uid !== c.uid);
-    renderGame();
-  }, 500);
 }
-      if(el){
-        el.classList.add('destroying');
-        setTimeout(()=> {
-          p.field = p.field.filter(f => f.uid !== c.uid);
-          renderGame();
-        }, 500); // match animation duration
-      } else {
-        p.field = p.field.filter(f => f.uid !== c.uid);
-      }
+
+function renderField() {
+    const p1 = document.getElementById("p1-field");
+    const p2 = document.getElementById("p2-field");
+    p1.innerHTML = "";
+    p2.innerHTML = "";
+
+    players[0].field.forEach((c, i) => {
+        const el = createCardElement(c, true);
+        el.dataset.owner = 0;
+        el.dataset.index = i;
+        el.onclick = () => fieldCardClicked(0, i);
+        p1.appendChild(el);
+    });
+    players[1].field.forEach((c, i) => {
+        const el = createCardElement(c, true);
+        el.dataset.owner = 1;
+        el.dataset.index = i;
+        el.onclick = () => fieldCardClicked(1, i);
+        p2.appendChild(el);
+    });
+}
+
+function drawCard(player) {
+    if (player.deck.length > 0) {
+        const card = player.deck.pop();
+        card._justDrawn = true; // A2: mark so draw triggers flip and draw-in animations
+        player.hand.push(card);
+        return card;
     }
-  });
-});
-
-    }, 420);
-  } else {
-    defender.health -= attacker.attack;
-    attacker.health -= defender.attack;
-    attacker.tapped = true;
-    players.forEach(p=> p.field = p.field.filter(c => c.health > 0));
-    renderGame();
-  }
+    return null;
 }
 
-function fieldCardClicked(ownerIndex, fieldIndex){
-  const card = players[ownerIndex].field[fieldIndex];
-
-  if(ownerIndex === currentPlayer){
-    if(card.tapped){ showNotif("Card is tapped!"); return; }
-    selectedAttacker = card;
+function playCard(handIndex) {
+    const p = players[currentPlayer];
+    const card = p.hand[handIndex];
+    if (!card) return;
+    if (card.cost > p.mana) {
+        showNotif("Not enough mana!");
+        return;
+    }
+    p.mana -= card.cost;
+    card.owner = currentPlayer;
+    p.field.push(card);
+    p.hand.splice(handIndex, 1);
     renderGame();
-    return;
-  }
 
-  // If an attacker is selected
-  if(!selectedAttacker) return;
+    // A2: flip when entering battlefield (soft reveal)
+    requestAnimationFrame(() => {
+        const el = findCardElement(card);
+        if (el) {
+            const flipInner = el.querySelector(".flip");
+            if (flipInner) {
+                flipInner.classList.add("show-back");
+                setTimeout(() => flipInner.classList.remove("show-back"), 420);
+            }
+        }
+    });
+}
 
-  if(ownerIndex === (currentPlayer === 0 ? 1 : 0)){
-    // Defender card exists: normal attack
-    attackCard(selectedAttacker, card);
-  } else {
-    // No card? Attack opponent directly
-    attackPlayer(selectedAttacker, players[ownerIndex]);
-  }
+function attackCard(attacker, defender) {
+    showNotif(`${attacker.name} attacks ${defender.name}!`, 900);
 
-  selectedAttacker = null;
-  renderGame();
+    const attackerDom = findCardElement(attacker);
+    const defenderDom = findCardElement(defender);
+
+    if (attackerDom) {
+        const inner = attackerDom.querySelector(".flip") || attackerDom;
+        inner.classList.add("attack-animation");
+        inner.addEventListener("animationend", () => inner.classList.remove("attack-animation"), {
+            once: true,
+        });
+    }
+
+    if (attackerDom && defenderDom) {
+        const aRect = attackerDom.getBoundingClientRect();
+        const dRect = defenderDom.getBoundingClientRect();
+        const startX = aRect.left + aRect.width / 2;
+        const startY = aRect.top + aRect.height / 2;
+        const endX = dRect.left + dRect.width / 2;
+        const endY = dRect.top + dRect.height / 2;
+
+        const proj = document.createElement("div");
+        proj.className = "proj";
+        document.body.appendChild(proj);
+        proj.style.left = startX - 9 + "px";
+        proj.style.top = startY - 9 + "px";
+        proj.style.opacity = "1";
+
+        requestAnimationFrame(() => {
+            proj.style.transform = `translate(${endX - startX}px, ${endY - startY}px)`;
+            proj.style.opacity = "0.95";
+        });
+
+        setTimeout(() => {
+            proj.remove();
+            const dInner = defenderDom.querySelector(".flip") || defenderDom;
+            if (dInner) {
+                dInner.classList.add("hit-flash");
+                setTimeout(() => dInner.classList.remove("hit-flash"), 300);
+            }
+
+            showHpPop(defender, endX, endY, -attacker.attack);
+
+            defender.health -= attacker.attack;
+            attacker.health -= defender.attack;
+            attacker.tapped = true;
+
+            // remove dead cards
+            // handle destroyed cards with effect
+            players.forEach((p) => {
+                p.field.forEach((c) => {
+                    if (c.health <= 0) {
+                        const el = findCardElement(c);
+                        if (el) {
+                            if (el.closest("#p2-field")) {
+                                el.style.setProperty("--card-rotateY", "180deg");
+                            } else {
+                                el.style.setProperty("--card-rotateY", "0deg");
+                            }
+                            el.classList.add("destroying");
+                            setTimeout(() => {
+                                p.field = p.field.filter((f) => f.uid !== c.uid);
+                                renderGame();
+                            }, 500);
+                        }
+                        if (el) {
+                            el.classList.add("destroying");
+                            setTimeout(() => {
+                                p.field = p.field.filter((f) => f.uid !== c.uid);
+                                renderGame();
+                            }, 500); // match animation duration
+                        } else {
+                            p.field = p.field.filter((f) => f.uid !== c.uid);
+                        }
+                    }
+                });
+            });
+        }, 420);
+    } else {
+        defender.health -= attacker.attack;
+        attacker.health -= defender.attack;
+        attacker.tapped = true;
+        players.forEach((p) => (p.field = p.field.filter((c) => c.health > 0)));
+        renderGame();
+    }
+}
+
+function fieldCardClicked(ownerIndex, fieldIndex) {
+    const card = players[ownerIndex].field[fieldIndex];
+
+    if (ownerIndex === currentPlayer) {
+        if (card.tapped) {
+            showNotif("Card is tapped!");
+            return;
+        }
+        selectedAttacker = card;
+        renderGame();
+        return;
+    }
+
+    // If an attacker is selected
+    if (!selectedAttacker) return;
+
+    if (ownerIndex === (currentPlayer === 0 ? 1 : 0)) {
+        // Defender card exists: normal attack
+        attackCard(selectedAttacker, card);
+    } else {
+        // No card? Attack opponent directly
+        attackPlayer(selectedAttacker, players[ownerIndex]);
+    }
+
+    selectedAttacker = null;
+    renderGame();
 }
 
 function attackPlayer(attacker, targetPlayer) {
-  showNotif(`${attacker.name} attacks ${targetPlayer.name}!`, 900);
+    showNotif(`${attacker.name} attacks ${targetPlayer.name}!`, 900);
 
-  // Reduce life
-  targetPlayer.life -= attacker.attack;
-  attacker.tapped = true;
+    // Reduce life
+    targetPlayer.life -= attacker.attack;
+    attacker.tapped = true;
 
-  // Show HP pop near opponent row
-  const field = targetPlayer === players[0] ? document.getElementById('p1-field') : document.getElementById('p2-field');
-  const rect = field.getBoundingClientRect();
-  showHpPop({name: targetPlayer.name}, rect.left + rect.width/2, rect.top + rect.height/2, -attacker.attack);
+    // Show HP pop near opponent row
+    const field =
+        targetPlayer === players[0]
+            ? document.getElementById("p1-field")
+            : document.getElementById("p2-field");
+    const rect = field.getBoundingClientRect();
+    showHpPop(
+        { name: targetPlayer.name },
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2,
+        -attacker.attack
+    );
 
-  renderGame();
+    renderGame();
 }
 
-
-
-function endTurn(){
-  selectedAttacker = null;
-  const p = players[currentPlayer];
-  p.maxMana = Math.min(10, p.maxMana + 1);
-  p.mana = p.maxMana;
-  p.field.forEach(c => c.tapped = false);
-  currentPlayer = currentPlayer === 0 ? 1 : 0;
-  drawCard(players[currentPlayer]);
-  renderGame();
+function endTurn() {
+    selectedAttacker = null;
+    const p = players[currentPlayer];
+    p.maxMana = Math.min(10, p.maxMana + 1);
+    p.mana = p.maxMana;
+    p.field.forEach((c) => (c.tapped = false));
+    currentPlayer = currentPlayer === 0 ? 1 : 0;
+    drawCard(players[currentPlayer]);
+    renderGame();
 }
 
 /* HP pop visual */
-function showHpPop(card, x, y, delta){
-  const pop = document.createElement('div');
-  pop.className = 'hp-pop' + (delta>0 ? ' heal' : '');
-  pop.textContent = (delta>0 ? '+'+delta : delta.toString());
-  pop.style.left = (x - 12) + 'px';
-  pop.style.top  = (y - 40) + 'px';
-  document.body.appendChild(pop);
-  requestAnimationFrame(()=> pop.classList.add('hide'));
-  setTimeout(()=> pop.remove(), 750);
+function showHpPop(card, x, y, delta) {
+    const pop = document.createElement("div");
+    pop.className = "hp-pop" + (delta > 0 ? " heal" : "");
+    pop.textContent = delta > 0 ? "+" + delta : delta.toString();
+    pop.style.left = x - 12 + "px";
+    pop.style.top = y - 40 + "px";
+    document.body.appendChild(pop);
+    requestAnimationFrame(() => pop.classList.add("hide"));
+    setTimeout(() => pop.remove(), 750);
 }
 
-
 /* Wiring & start */
-document.getElementById('end-turn').addEventListener('click', ()=> endTurn());
-document.addEventListener('keydown', (e)=>{ if(e.key === 'd'){ drawCard(players[currentPlayer]); renderGame(); } });
+document.getElementById("end-turn").addEventListener("click", () => endTurn());
+document.addEventListener("keydown", (e) => {
+    if (e.key === "d") {
+        drawCard(players[currentPlayer]);
+        renderGame();
+    }
+});
 
 buildDeck();
-drawCard(players[0]); drawCard(players[0]);
-drawCard(players[1]); drawCard(players[1]);
+drawCard(players[0]);
+drawCard(players[0]);
+drawCard(players[1]);
+drawCard(players[1]);
 renderGame();
 </script>
 </body>
