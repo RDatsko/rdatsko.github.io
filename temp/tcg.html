@@ -468,6 +468,17 @@ body {
 </head>
 <body>
 
+    <div id="turn-display" style="
+    width:100%;
+    text-align:center;
+    font-size:20px;
+    font-weight:700;
+    padding:8px 0;
+    color:white;
+">
+    Player 1's Turn
+</div>
+
 <div id="game-area">
     <!-- Opponent hand (top) -->
     <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg);"></div>
@@ -680,6 +691,11 @@ function renderP2Hand() {
         const el = createCardElement(card);
         hand.appendChild(el); // no click for opponent cards
     });
+}
+
+function updateTurnDisplay() {
+    const turnDiv = document.getElementById("turn-display");
+    turnDiv.textContent = (currentPlayer === 0 ? "Player 1's Turn" : "Player 2's Turn");
 }
 
 function renderField() {
@@ -982,14 +998,26 @@ function attackPlayer(attacker, targetPlayer) {
 
 function endTurn() {
     selectedAttacker = null;
+    currentPlayer = currentPlayer === 0 ? 1 : 0;
+
     const p = players[currentPlayer];
     p.maxMana = Math.min(10, p.maxMana + 1);
     p.mana = p.maxMana;
-    p.field.forEach((c) => (c.tapped = false));
-    currentPlayer = currentPlayer === 0 ? 1 : 0;
-    drawCard(players[currentPlayer]);
+    p.field.forEach(c => c.tapped = false);
+
+    drawCard(p); // <--- must pass player object, not index
+
+    // Update mana display
+    document.getElementById("p1-mana").textContent = players[0].mana;
+    document.getElementById("p2-mana").textContent = players[1].mana;
+
+    // Update turn display
+    updateTurnDisplay();
+
     renderGame();
 }
+
+
 
 /* HP pop visual */
 function showHpPop(card, x, y, delta) {
