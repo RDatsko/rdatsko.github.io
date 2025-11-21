@@ -34,6 +34,18 @@ body {
     display: flex;
     flex-direction: column;
     padding: 6px;
+
+    /* transform: perspective(100vw) rotateX(30deg); */
+    /* transform-origin: top center;  */
+
+    transform: perspective(100vh) rotateX(50deg);
+    transform-origin: center center;
+    /* height: 20vh; */
+    width: 60vw;
+    margin: auto;
+    position: absolute;
+    top: -10vh;
+    left: 20vw;
 }
 #battlefield {
     flex: 1;
@@ -795,28 +807,6 @@ function renderHand(playerIndex) {
             el.onclick = () => playCard(idx);
         }
         hand.appendChild(el);
-    });
-}
-
-function renderField() {
-    const p1 = document.getElementById("p1-field");
-    const p2 = document.getElementById("p2-field");
-    p1.innerHTML = "";
-    p2.innerHTML = "";
-
-    players[0].field.forEach((c, i) => {
-        const el = createCardElement(c, true);
-        el.dataset.owner = 0;
-        el.dataset.index = i;
-        el.onclick = () => fieldCardClicked(0, i);
-        p1.appendChild(el);
-    });
-    players[1].field.forEach((c, i) => {
-        const el = createCardElement(c, true);
-        el.dataset.owner = 1;
-        el.dataset.index = i;
-        el.onclick = () => fieldCardClicked(1, i);
-        p2.appendChild(el);
     });
 }
 
