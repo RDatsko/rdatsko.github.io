@@ -103,24 +103,34 @@ body {
 
 #game-play {
     position: relative;
-    width: 180%;
-    height: 180%;
-    left: -40%;
+    width: 180vw;
+    height: 180vh;
+    left: -40vw;
+    top: -40vh;
     transform: scale(0.40) perspective(100vh) rotateX(20deg);
 }
 
-.field-container {
+/* .field-container {
     position: relative;
     display: block;
     gap: 8px;
     margin: 6px 0;
     overflow: hidden;
 
-    height: 115%;
+    height: 50vh;
     top: -60vh;
+} */
+
+.field-container {
+    height: 65vh;      /* each player gets half the screen */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
 }
 
-.field-row {
+/* .field-row {
     position: relative;
     width: calc(100% - 20px);
     height: calc(100% - 20px);
@@ -130,6 +140,21 @@ body {
     overflow-x: auto;
     border-radius: 8px;
     transition: background 0.25s ease;
+} */
+
+.field-row {
+    width: calc(100% - 20px);
+    background: var(--panel);
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.25s ease;
+
+    height: 100%;
+    position: relative;
+    display: inline-block;
+    justify-content: center;
+    gap: 8px;
+    /* top: -50vh; */
 }
 
 #end-turn {
@@ -335,7 +360,8 @@ body {
 /* Card destroy effect (fix for opponent cards with rotateY) */
 .card.destroying {
     animation: destroyAnim 0.5s forwards;
-    position: relative;
+    position: absolute !important;
+    left: 0; top: 0;
     z-index: 100;
 }
 
