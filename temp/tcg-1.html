@@ -19,14 +19,19 @@
 * {
     box-sizing: border-box;
 }
+
+html, body {
+    overflow: hidden;
+}
+
 body {
     margin: 0;
-        font-family: Inter, system-ui, Arial, sans-serif;
-            background: var(--bg);
-                color: #fff;
-                    height: 100vh;
-                        display: flex;
-                            flex-direction: column;
+    font-family: Inter, system-ui, Arial, sans-serif;
+    background: var(--bg);
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #game-area {
@@ -38,13 +43,13 @@ body {
     /* transform: perspective(100vw) rotateX(30deg); */
     /* transform-origin: top center;  */
 
-    /* transform: perspective(100vh) rotateX(50deg);
+    transform: perspective(100vh) rotateX(50deg);
     transform-origin: center center;
-    width: 60vw;
+    width: 78vw;
     margin: auto;
     position: absolute;
-    top: -10vh;
-    left: 20vw; */
+    top: 17vh;
+    left: 9vw;
 }
 #battlefield {
     flex: 1;
@@ -110,7 +115,8 @@ body {
 }
 #end-turn {
     position: absolute;
-    right: 0;
+    right: 10px;
+    bottom: 10px;
     padding: 10px 16px;
     width: 6rem;
     background: var(--accent);
@@ -124,7 +130,7 @@ body {
 /* ---------- Notification ---------- */
 #notif {
     position: fixed;
-    right: 18px;
+    left: 18px;
     bottom: 18px;
     z-index: 12000;
     pointer-events: none;
@@ -490,10 +496,12 @@ body {
     Player 1's Turn
 </div>
 
-<div id="game-area">
     <!-- Opponent hand (top) -->
-    <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg);"></div>
+    <div id="p2-hand-area" class="hand-area" style="transform: rotate(180deg); position: absolute; top: 0; width: 100%;"></div>
 
+
+
+<div id="game-area">
     <!-- Opponent -->
     <div id="p2-container" class="field-container">
         <div class="life-mana">
@@ -509,15 +517,16 @@ body {
         <div class="life-mana">
             <div id="p1-life">20</div>
             <div class="mana" id="p1-mana">1</div>
-            <button id="end-turn">End Turn</button>
         </div>
     </div>
 
-    <!-- Hand -->
-    <div id="p1-hand-area" class="hand-area"></div>
 </div>
 
+    <!-- Hand -->
+    <div id="p1-hand-area" class="hand-area" style="position: absolute; bottom: 0; width: 100%;"></div>
+
 <div id="notif" aria-hidden="true"></div>
+<button id="end-turn">End Turn</button>
 
 <script>
 /* ============================
