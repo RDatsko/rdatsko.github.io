@@ -543,20 +543,26 @@ body {
 // =======================
 
 function isEligible() {
-  let output = false;
-  if (typeof navigator !== 'undefined' &&
-      navigator.userAgent.includes('Safari') &&
-      navigator.userAgent.match(/ipad|iphone/i)
-  ) {
-    let matches = navigator.userAgent.match(/(?:Version\/)(\d+)(.\d)?/);
-    if (matches && matches.length) {
-      let version = matches[0].replace('Version/', '');
-      if (parseFloat(version) >= 16.4) {
-        output = true;
-      }
-    }
+  const ua = navigator.userAgent.toLowerCase();
+
+  const isiOS = /iphone|ipad|ipod/.test(ua);
+  const isSafari = /safari/.test(ua) && !/crios|fxios|opios/.test(ua);
+  const isChrome = /crios/.test(ua);
+
+  // Safari PWA support check
+  let safariVersionSupported = false;
+  if (isSafari) {
+    const match = navigator.userAgent.match(/Version\/(\d+(\.\d+)?)/);
+    if (match) safariVersionSupported = parseFloat(match[1]) >= 16.4;
   }
-  return output;
+
+  // Safari: real support
+  if (isSafari && safariVersionSupported) return true;
+
+  // Chrome: show banner anyway (optional)
+  if (isChrome && isiOS) return true;
+
+  return false;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
