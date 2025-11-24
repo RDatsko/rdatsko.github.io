@@ -14,9 +14,11 @@
 
 <style>
 :root {
-    --cards-visible: 3.25;
-    --card-w: calc((100vw / var(--cards-visible)) - 4vw);
-    --card-h: calc(var(--card-w) * (88.9 / 63.5));
+    /* --cards-visible: 3.25; */
+    /* --card-w: calc((100vw / var(--cards-visible)) - 4vw); */
+    --card-h: calc(30vh - 4vh);
+    /* --card-h: calc(var(--card-w) * (88.9 / 63.5)); */
+    --card-w: calc(var(--card-h) * (63.5 / 88.9));
     --color: #fff;
 
     --bg: #121212;
