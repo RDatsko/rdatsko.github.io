@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+
 <title>Minimal Card Hand (PWA)</title>
 
 <!-- PWA meta tags -->
@@ -66,7 +67,7 @@ body {
     /* min-height: calc(var(--card-h) + 3vh); */
     /* max-height: calc(var(--card-h) + 3vh); */
     height: 30vh;
-    position: relative;
+    position: absolute;
     /* margin: 1.5vh 0; */
     /* top: -3vh; */
     bottom: 0;
@@ -284,6 +285,7 @@ body {
 .card {
     width: var(--card-w);
     height: var(--card-h);
+    max-height: 100%;
     background: #222;
     /* FORCE a visible border so cards always show a frame */
     border: 2px solid rgba(255, 255, 255, 0.82) !important;
