@@ -108,20 +108,31 @@ body {
 
 /* ===== GamePlay ===== */
 #game-wrapper {
-    position: relative;
+    /* position: relative;
     margin: auto;
     width: 100%;
     height: 65vh;
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 1 1 auto; */
+    margin: auto;
+    width: 100%;
+    top: 3vh;
+    height: 67vh;
+    position: absolute;
 }
 
 #game-play {
-    position: relative;
+    /* position: relative;
     width: 180vw;
     height: 180vh;
     left: -40vw;
+    top: -40vh;
+    transform: scale(0.40) perspective(100vh) rotateX(20deg); */
+    position: relative;
+    width: 210vw;
+    height: 130vh;
+    left: -55vw;
     top: -40vh;
     transform: scale(0.40) perspective(100vh) rotateX(20deg);
 }
@@ -651,6 +662,19 @@ body {
 
 <button id="end-turn">End Turn</button>
 <div id="notif" aria-hidden="true"></div>
+
+<script>
+
+// =======================
+// Game Settings
+// =======================
+
+const life        = 20;
+const startCards  = 4;
+const maxCards    = 7;
+const maxDeckSize = 30;
+
+</script>
 
 <script>
 // =======================
