@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#121212">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TCG">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgo=">
 
@@ -600,41 +601,41 @@ const maxDeckSize = 30;
 // =======================
 // PWA Manifest (Blob)
 // =======================
-const manifest = {
-    name: "Minimal Card Hand",
-    short_name: "TCG",
-    start_url: ".",
-    display: "standalone",
-    background_color: "#121212",
-    theme_color: "#121212",
-    icons: [{
-        src: "data:image/png;base64,iVBORw0KGgo=",
-        sizes: "192x192",
-        type: "image/png"
-    }]
-};
-const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
-const url = URL.createObjectURL(blob);
-const link = document.createElement("link");
-link.rel = "manifest";
-link.href = url;
-document.head.appendChild(link);
+// const manifest = {
+//     name: "Minimal Card Hand",
+//     short_name: "TCG",
+//     start_url: ".",
+//     display: "standalone",
+//     background_color: "#121212",
+//     theme_color: "#121212",
+//     icons: [{
+//         src: "data:image/png;base64,iVBORw0KGgo=",
+//         sizes: "192x192",
+//         type: "image/png"
+//     }]
+// };
+// const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
+// const url = URL.createObjectURL(blob);
+// const link = document.createElement("link");
+// link.rel = "manifest";
+// link.href = url;
+// document.head.appendChild(link);
 
 // =======================
 // Service Worker
 // =======================
-if ('serviceWorker' in navigator) {
-    const swCode = `
-        self.addEventListener('install', e => self.skipWaiting());
-        self.addEventListener('activate', e => clients.claim());
-        self.addEventListener('fetch', e => {
-            e.respondWith(fetch(e.request).catch(() => new Response('', {status:200})));
-        });
-    `;
-    const swBlob = new Blob([swCode], {type: "text/javascript"});
-    const swURL = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swURL);
-}
+// if ('serviceWorker' in navigator) {
+//     const swCode = `
+//         self.addEventListener('install', e => self.skipWaiting());
+//         self.addEventListener('activate', e => clients.claim());
+//         self.addEventListener('fetch', e => {
+//             e.respondWith(fetch(e.request).catch(() => new Response('', {status:200})));
+//         });
+//     `;
+//     const swBlob = new Blob([swCode], {type: "text/javascript"});
+//     const swURL = URL.createObjectURL(swBlob);
+//     navigator.serviceWorker.register(swURL);
+// }
 
 </script>
 
