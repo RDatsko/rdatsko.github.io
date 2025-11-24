@@ -662,6 +662,53 @@ body {
 
 <button id="end-turn">End Turn</button>
 <div id="notif" aria-hidden="true"></div>
+  <div id="addToHomeBanner" class="add-to-home" style="display:none; position: absolute; width: calc(90vw - 40px); height: auto; bottom: 4vh; background: black; border-radius: 8px; margin: 0 5vw; text-align: center; padding: 20px; font-size: 12px;">
+    <div class="banner shadow">
+      <a href="" id="closeButton" class="close-button" style="position: absolute; top: 3px; right: 8px;">&times;</a>
+      <div class="text">
+        You can install this app on your device, simply tap<br>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="position: relative; top: 6px;" viewBox="0 0 50 50" fill="currentColor">
+          <path fill="currentColor" d="M30.3 13.7L25 8.4l-5.3 5.3-1.4-1.4L25 5.6l6.7 6.7z"/>
+          <path fill="currentColor" d="M24 7h2v21h-2z"/>
+          <path fill="currentColor" d="M35 40H15c-1.7 0-3-1.3-3-3V19c0-1.7 1.3-3 3-3h7v2h-7c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h20c.6 0 1-.4 1-1V19c0-.6-.4-1-1-1h-7v-2h7c1.7 0 3 1.3 3 3v18c0 1.7-1.3 3-3 3z"/>
+        </svg>
+        and then 'Add to Home Screen'.
+      </div>
+    </div>
+  </div>
+
+<script>
+// =======================
+// Add to Home Screen
+// =======================
+
+function isEligible() {
+  let output = false;
+  if (typeof navigator !== 'undefined' &&
+      navigator.userAgent.includes('Safari') &&
+      navigator.userAgent.match(/ipad|iphone/i)
+  ) {
+    let matches = navigator.userAgent.match(/(?:Version\/)(\d+)(.\d)?/);
+    if (matches && matches.length) {
+      let version = matches[0].replace('Version/', '');
+      if (parseFloat(version) >= 16.4) {
+        output = true;
+      }
+    }
+  }
+  return output;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (isEligible()) {
+    document.getElementById('addToHomeBanner').style.display = 'block';
+    document.getElementById('closeButton').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('addToHomeBanner').style.display = 'none';
+    });
+  }
+});
+</script>
 
 <script>
 
