@@ -1166,15 +1166,10 @@ function updateTurnHighlight() {
 
 // Call it once on load:
 updateTurnHighlight();
-
 buildDeck();
-
-for(i = 0; i < startCards; i++)
-{
-    drawCard(players[0]);
-    drawCard(players[1]);
-}
+for(i = 0; i < startCards; i++) { drawCard(players[0]); drawCard(players[1]); }
 renderGame();
+
 </script>
 
 </body>
