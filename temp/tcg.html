@@ -728,7 +728,7 @@ function buildDeck() {
     const ids = MASTER_CARDS.map((c) => c.id);
     players.forEach((p) => {
         p.deck = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < maxDeckSize; i++) {
             p.deck.push(cloneCard(ids[i % ids.length]));
         }
         shuffle(p.deck);
@@ -1168,10 +1168,12 @@ function updateTurnHighlight() {
 updateTurnHighlight();
 
 buildDeck();
-drawCard(players[0]);
-drawCard(players[0]);
-drawCard(players[1]);
-drawCard(players[1]);
+
+for(i = 0; i < startCards; i++)
+{
+    drawCard(players[0]);
+    drawCard(players[1]);
+}
 renderGame();
 </script>
 
