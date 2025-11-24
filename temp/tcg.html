@@ -496,6 +496,12 @@ body {
   transform: rotateY(-180deg);
 }
 
+.current-turn {
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 0 12px rgba(255,255,255,0.6);
+    border-radius: 12px;
+}
+
 </style>
 </head>
 <body>
@@ -1104,6 +1110,7 @@ function attackPlayer(attacker, targetPlayer) {
 function endTurn() {
     selectedAttacker = null;
     currentPlayer = currentPlayer === 0 ? 1 : 0;
+    updateTurnHighlight();
 
     const p = players[currentPlayer];
     p.maxMana = Math.min(10, p.maxMana + 1);
@@ -1144,6 +1151,20 @@ document.addEventListener("keydown", (e) => {
         renderGame();
     }
 });
+
+function updateTurnHighlight() {
+    document.getElementById("p1-field").classList.remove("current-turn");
+    document.getElementById("p2-field").classList.remove("current-turn");
+
+    if (currentPlayer === 0) {
+        document.getElementById("p1-field").classList.add("current-turn");
+    } else {
+        document.getElementById("p2-field").classList.add("current-turn");
+    }
+}
+
+// Call it once on load:
+updateTurnHighlight();
 
 buildDeck();
 drawCard(players[0]);
