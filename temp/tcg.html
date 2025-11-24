@@ -159,7 +159,11 @@ body {
     transition: background 0.25s ease;
 } */
 
-.field-row {
+
+
+
+
+/* .field-row {
     width: calc(100% - 20px);
     background: var(--panel);
     padding: 10px;
@@ -171,13 +175,51 @@ body {
     display: inline-block;
     justify-content: center;
     gap: 8px;
-    /* top: -50vh; */
 }
 
 .field-row .card {
     width: min(var(--card-w), calc(140vw / 5 ));
     height: min(var(--card-w), calc((140vw / 5) * (88.9 / 63.5)));
+} */
+
+
+
+
+/* make the battlefield a stable 5-column grid */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);   /* always 5 columns */
+  gap: 3vw;                              /* spacing between cards */
+  align-items: start;
+  padding: 8vw;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  background: var(--panel);
 }
+
+/* inside the battlefield, cards take full grid cell,
+   keep aspect ratio so they don't squish */
+.field-row .card,
+.field-row .flip-wrapper {
+  margin: 0;                    /* important: remove outer card margin */
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 63.5 / 88.9;    /* lock proportion */
+  max-height: calc( (100vh - 120px) / 2 ); /* optional safety cap */
+  box-sizing: border-box;
+  display: block;
+}
+
+/* if you want the cards slightly smaller in tight heights */
+@media (max-height: 640px) {
+  .field-row .card { max-height: 20vh; }
+}
+
+
+
+
+
 
 #end-turn {
     position: absolute;
