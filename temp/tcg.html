@@ -15,10 +15,7 @@
 
 <style>
 :root {
-    /* --cards-visible: 3.25; */
-    /* --card-w: calc((100vw / var(--cards-visible)) - 4vw); */
     --card-h: calc(30vh - 4vh);
-    /* --card-h: calc(var(--card-w) * (88.9 / 63.5)); */
     --card-w: calc(var(--card-h) * (63.5 / 88.9));
     --color: #fff;
 
@@ -26,8 +23,6 @@
     --panel: #1a1a1a;
     --accent: #49a6ff;
     --muted: #6b6b6b;
-    /* --card-w: 140px; */
-    /* --card-h: 200px; */
 }
 
 html, body {
@@ -49,7 +44,6 @@ body {
 /* ===== HAND AREA ===== */
 .hand-area {
     width: 100vw;
-    /* padding: 1vw; */
     display: flex;
     gap: 1vw;
     align-items: center;
@@ -63,13 +57,8 @@ body {
 .hand-area::-webkit-scrollbar { display: none; }
 
 #p1-hand-area {
-    /* height:     calc(var(--card-h) + 3vh); */
-    /* min-height: calc(var(--card-h) + 3vh); */
-    /* max-height: calc(var(--card-h) + 3vh); */
     height: 30vh;
     position: absolute;
-    /* margin: 1.5vh 0; */
-    /* top: -3vh; */
     bottom: 0;
 }
 
@@ -80,11 +69,6 @@ body {
     min-height: 3vh;
     max-height: 3vh;
     position: relative;
-}
-
-#p2-hand-area .card {
-    /* position: absolute; */
-    /* top: 0; */
 }
 
 /* ===== Cards ===== */
@@ -108,13 +92,6 @@ body {
 
 /* ===== GamePlay ===== */
 #game-wrapper {
-    /* position: relative;
-    margin: auto;
-    width: 100%;
-    height: 65vh;
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto; */
     margin: auto;
     width: 100%;
     top: 3vh;
@@ -123,12 +100,6 @@ body {
 }
 
 #game-play {
-    /* position: relative;
-    width: 180vw;
-    height: 180vh;
-    left: -40vw;
-    top: -40vh;
-    transform: scale(0.40) perspective(100vh) rotateX(20deg); */
     position: relative;
     width: 210vw;
     height: 130vh;
@@ -136,17 +107,6 @@ body {
     top: -40vh;
     transform: scale(0.40) perspective(100vh) rotateX(20deg);
 }
-
-/* .field-container {
-    position: relative;
-    display: block;
-    gap: 8px;
-    margin: 6px 0;
-    overflow: hidden;
-
-    height: 50vh;
-    top: -60vh;
-} */
 
 .field-container {
     height: 60vh;
@@ -159,49 +119,11 @@ body {
     padding: 2vh;
 }
 
-/* .field-row {
-    position: relative;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-    background: var(--panel);
-    padding: 10px;
-    display: inline-block;
-    overflow-x: auto;
-    border-radius: 8px;
-    transition: background 0.25s ease;
-} */
-
-
-
-
-
-/* .field-row {
-    width: calc(100% - 20px);
-    background: var(--panel);
-    padding: 10px;
-    border-radius: 8px;
-    transition: background 0.25s ease;
-
-    height: 100%;
-    position: relative;
-    display: inline-block;
-    justify-content: center;
-    gap: 8px;
-}
-
-.field-row .card {
-    width: min(var(--card-w), calc(140vw / 5 ));
-    height: min(var(--card-w), calc((140vw / 5) * (88.9 / 63.5)));
-} */
-
-
-
-
 /* make the battlefield a stable 5-column grid */
 .field-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);   /* always 5 columns */
-  gap: 3vw;                              /* spacing between cards */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3vw;
   align-items: start;
   padding: 8vw;
   box-sizing: border-box;
@@ -214,11 +136,11 @@ body {
    keep aspect ratio so they don't squish */
 .field-row .card,
 .field-row .flip-wrapper {
-  margin: 0;                    /* important: remove outer card margin */
+  margin: 0;
   width: 100% !important;
   height: auto !important;
-  aspect-ratio: 63.5 / 88.9;    /* lock proportion */
-  max-height: calc( (100vh - 120px) / 2 ); /* optional safety cap */
+  aspect-ratio: 63.5 / 88.9;
+  max-height: calc( (100vh - 120px) / 2 );
   box-sizing: border-box;
   display: block;
 }
@@ -227,11 +149,6 @@ body {
 @media (max-height: 640px) {
   .field-row .card { max-height: 20vh; }
 }
-
-
-
-
-
 
 #end-turn {
     position: absolute;
@@ -246,27 +163,6 @@ body {
     font-weight: 700;
     cursor: pointer;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ---------- Notification ---------- */
 #notif {
@@ -486,8 +382,6 @@ body {
 }
 .flip-wrapper {
     perspective: 900px;
-    /* width: var(--card-w); */
-    /* height: var(--card-h); */
     position: relative;
     display: inline-block;
 }
@@ -500,10 +394,6 @@ body {
     outline: 1px solid rgba(192, 192, 192, 0.95);
     border-radius: 8px;
 }
-/* #p2-field .flip {
-    transform-style: unset;
-    transform: rotateY(180deg);
-} */
 
 #p1-field .flip.show-back {
     transform: rotateY(180deg);
@@ -590,22 +480,12 @@ body {
     transform: translateY(-40px);
 }
 
-/* Opponent's row (top) upside-down */
-/* #p2-field {
-    transform: rotateX(180deg);
-} */
-
-/* Mirror text/tooltip for opponent */
-/* #p2-field .card {
-    transform: rotateX(180deg);
-} */
-
 #p2-field {
-    transform: rotate(180deg); /* rotate the entire row */
+    transform: rotate(180deg);
 }
 
 #p2-field .card {
-    transform: rotate(180deg); /* rotate cards back so they look upright */
+    transform: rotate(180deg);
 }
 
 #p2-field .tooltip {
@@ -616,17 +496,6 @@ body {
   transform: rotateY(-180deg);
 }
 
-/* small responsive tweaks */
-/* @media (max-width: 800px) {
-    :root {
-        --card-w: 120px;
-        --card-h: 170px;
-    }
-    .field-row {
-        min-height: 140px;
-        overflow: hidden;
-    }
-} */
 </style>
 </head>
 <body>
@@ -639,32 +508,23 @@ body {
     <div id="game-play">
         <div id="p2-container" class="field-container">
             <div id="p2-field" class="field-row" style="transform: rotateZ(180deg);">
-                <!-- <div class="card">1</div> -->
             </div>
         </div>
 
         <div id="p1-container" class="field-container">
             <div id="p1-field" class="field-row">
-                <!-- <div class="card">1</div> -->
             </div>
         </div>
     </div>
 </div>
 
-<div id="p1-hand-area" class="hand-area">
-    <!-- <div class="card">1</div>
-    <div class="card">2</div>
-    <div class="card">3</div>
-    <div class="card">4</div>
-    <div class="card">5</div>
-    <div class="card">6</div> -->
-</div>
+<div id="p1-hand-area" class="hand-area"></div>
 
 <button id="end-turn">End Turn</button>
 <div id="notif" aria-hidden="true"></div>
   <div id="addToHomeBanner" class="add-to-home" style="display:none; position: absolute; width: calc(90vw - 40px); height: auto; bottom: 4vh; background: black; border-radius: 8px; margin: 0 5vw; text-align: center; padding: 20px; font-size: 12px;">
     <div class="banner shadow">
-      <a href="" id="closeButton" class="close-button" style="position: absolute; top: 3px; right: 8px;">&times;</a>
+      <a href="" id="closeButton" class="close-button" style="position: absolute; top: 3px; right: 8px; text-decoration: none; color: white;">&times;</a>
       <div class="text">
         You can install this app on your device, simply tap<br>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="position: relative; top: 6px;" viewBox="0 0 50 50" fill="currentColor">
@@ -1285,11 +1145,6 @@ drawCard(players[1]);
 drawCard(players[1]);
 renderGame();
 </script>
-
-
-
-
-
 
 </body>
 </html>
