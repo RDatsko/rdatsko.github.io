@@ -45,8 +45,8 @@ body {
 
 /* ===== HAND AREA ===== */
 .hand-area {
-    width: 96vw;
-    padding: 1vh;
+    width: 100vw;
+    /* padding: 1vw; */
     display: flex;
     gap: 1vw;
     align-items: center;
@@ -59,12 +59,23 @@ body {
 }
 .hand-area::-webkit-scrollbar { display: none; }
 
-#p1-hand { height: calc(var(--card-h) + 3vh); }
-#p2-hand { height: 3vh; }
+#p1-hand-area {
+    /* height:     calc(var(--card-h) + 3vh); */
+    /* min-height: calc(var(--card-h) + 3vh); */
+    /* max-height: calc(var(--card-h) + 3vh); */
+    height: 30vh;
+    position: relative;
+    /* margin: 1.5vh 0; */
+    /* top: -3vh; */
+    bottom: 0;
+}
+
 #p2-hand-area {
     transform: rotateZ(180deg);
     overflow: hidden;
-    height: 3vh;
+    height:     3vh;
+    min-height: 3vh;
+    max-height: 3vh;
     position: relative;
 }
 
@@ -78,6 +89,7 @@ body {
     flex: 0 0 auto;
     width: var(--card-w);
     height: var(--card-h);
+    max-height: 28vh;
     background: #222;
     color: #fff;
     border-radius: 10px;
@@ -88,6 +100,7 @@ body {
     font-size: 2.3vh;
     transition: transform 0.18s ease;
     transform-origin: bottom center;
+    position: relative;
 }
 
 /* ===== GamePlay ===== */
@@ -122,12 +135,14 @@ body {
 } */
 
 .field-container {
-    height: 65vh;      /* each player gets half the screen */
+    height: 60vh;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: visible;
+    margin: 2vh;
+    padding: 2vh;
 }
 
 /* .field-row {
@@ -160,7 +175,7 @@ body {
 #end-turn {
     position: absolute;
     right: 10px;
-    bottom: 10px;
+    bottom: 32vh;
     padding: 10px 16px;
     width: 6rem;
     background: var(--accent);
@@ -409,8 +424,8 @@ body {
 }
 .flip-wrapper {
     perspective: 900px;
-    width: var(--card-w);
-    height: var(--card-h);
+    /* width: var(--card-w); */
+    /* height: var(--card-h); */
     position: relative;
     display: inline-block;
 }
