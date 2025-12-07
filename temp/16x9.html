@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>16:9 Game Screen</title>
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  --game-width:  1920px;
+  --game-height: 1080px;
+  --scale: min(
+    calc(100vw / var(--game-width)),
+    calc(100vh / var(--game-height))
+  );
+}
+
+#wrapper {
+  width: calc(var(--game-width) * var(--scale));
+  height: calc(var(--game-height) * var(--scale));
+  position: relative;
+  overflow: hidden;
+}
+
+#screen {
+  width: var(--game-width);
+  height: var(--game-height);
+  background: #242424;
+  border: 4px solid #fff;
+  box-sizing: border-box;
+
+  transform: scale(var(--scale));
+  transform-origin: top left;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  image-rendering: pixelated;
+}
+
+#screen #entity {
+  width: 200px;
+  height: 200px;
+  background: hotpink;
+  position: absolute;
+  left: 700px;
+  top: 350px;
+}
+</style>
+
+</head>
+<body>
+
+<div id="wrapper">
+  <div id="screen">
+    <div id="entity">
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
