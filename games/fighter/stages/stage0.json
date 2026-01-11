@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "Training Room"
+  },
+  "sprite": {
+    "0-0": [[ 0, 25 ], [ 2, 24, 50, 240 ], "0-0" ],
+    "0-1": [[ 0, 0 ], [ 54, 24, 35, 57 ], "0-1" ]
+  },
+  "camera": {
+    "startx": 0,
+    "starty": 0,
+    "boundleft": -95,
+    "boundright": 95,
+    "boundhigh": -25,
+    "boundlow": 0,
+    "verticalfollow": 0.2,
+    "floortension": 0,
+    "tension": 50
+  },
+  "playerinfo": {
+    "p1startx": -70,
+    "p1starty": 0,
+    "p1startz": 0,
+    "p1facing": 1,
+    "p2startx": 70,
+    "p2starty": 0,
+    "p2startz": 0,
+    "p2facing": -1,
+    "leftbound": -1000,
+    "rightbound": 1000,
+    "topbound": 0,
+    "botbound": 0
+  },
+  "scaling": {
+    "topz": 0,
+    "botz": 50,
+    "topscale": 1,
+    "botscale": 1.2
+  },
+  "bound": {
+    "screenleft": 15,
+    "screenright": 15
+  },
+  "stageinfo": {
+    "zoffset": 190,
+    "autoturn": 1,
+    "resetbg": 1
+  },
+  "shadow": {
+    "color": [ 128, 128, 128 ],
+    "yscale": 0.3,
+    "reflect": 0
+  },
+  "music": {
+    "bgvolume": 0
+  },
+  "bgdef": {
+    "spr": "stages/stage0.sff",
+    "debugbg": 0
+  },
+  "bg": {
+    "0": {
+      "type": "normal",
+      "spriteno": [ 0, 0 ],
+      "layerno": 0,
+      "start": [ 0, 0 ],
+      "delta": [ 1, 1 ],
+      "trans": "none",
+      "mask": 0,
+      "tile": [ 1, 0 ],
+      "tilespacing": [ 0, 0 ],
+      "window": [ 0, 0, 319, 239 ]
+    },
+    "1": {
+      "type": "normal",
+      "spriteno": [ 0, 1 ],
+      "start": [ 0, 185 ],
+      "delta": [ 1, 1 ],
+      "mask": 0,
+      "velocity": [ 0, 0 ],
+      "tile": [ 1, 0 ],
+      "tilespacing": [ 0, 0 ]
+    }
+  }
+}

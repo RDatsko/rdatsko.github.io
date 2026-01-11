@@ -1,0 +1,1252 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<link rel="stylesheet" href="../../assets/layout/css/cosmuic.css">
+<link rel="stylesheet" href="../../assets/layout/css/styles.css">
+<script src="../../assets/layout/layout.js"></script>
+<script>
+document.addEventListener('keydown', e => e.code === 'Backquote' && location.reload());
+</script>
+<title>FighterZ</title>
+
+<style>
+:root {
+  --header-h: 64px;
+  --game-width:  1920px;
+  --game-height: 1080px;
+}
+
+html,body { margin: 0; height: 100%; background: #111; display: flex; justify-content: center; align-items: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif; font-size: 10px; }
+body { --scale: min(calc(100vw / var(--game-width)), calc((100vh - var(--header-h)) / var(--game-height))); overflow: hidden; }
+body > header ~ main { position: absolute; display: flex; padding: 0; height: calc(100vh - var(--header-h)); max-width: 100vw; top: var(--header-h); margin: 0 !important; }
+.game-wrapper { width: calc(var(--game-width) * var(--scale)); height: calc(var(--game-height) * var(--scale)); position: relative; overflow: hidden; margin: auto; }
+#game-screen { width: var(--game-width); height: var(--game-height); background: #242424; box-sizing: border-box; transform: scale(var(--scale)); transform-origin: top left; position: absolute; top: 0; left: 0; image-rendering: pixelated; image-rendering: -moz-crisp-edges; }
+canvas { width: 100%; position: absolute; top: 0; left: 0; object-fit: contain; image-rendering: crisp-edges; image-rendering: pixelated; }
+#start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: black; }
+#start * { font-size: 36px; color: white; } 
+#start svg { display: block; pointer-events: auto; }
+#btnLinkFolder {  background: #4a90e2; color: white; border: none; padding: 20px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 24px; bottom: 50px; margin: auto; position: absolute; display: block; }
+#btnLinkFolder, #folderStatus { position: absolute; left: 0; right: 0; width: fit-content; margin: auto; text-align: center; }
+#folderStatus { bottom: 150px; }
+#btnLinkFolder { bottom: 50px; }
+#playButton { cursor: pointer; pointer-events: none; opacity: 0.4; transition: opacity 0.2s, transform 0.2s; background-color: transparent; }
+#playButton.enabled { pointer-events: auto; opacity: 1; }
+#playButton:hover { transform: scale(1.15); }
+iframe { display: none; }
+</style>
+
+</head>
+<body>
+
+<header data-nav="right">
+  <span>
+    <input type="checkbox">
+    <div style="font-size: 24px; font-weight: 700;">FighterZ</div>
+    <nav>
+      <ol>
+        <li><a href="">HOME</a></li>
+        <li><a href="./editor/editor.html">EDITOR</a></li>
+        <li><a href="">ABOUT</a></li>
+      </ol>
+    </nav>
+  </span>
+</header>
+
+<main>
+  <div class="game-wrapper">
+    <div id="game-screen">
+      <canvas id="game"></canvas>
+      <div id="start">
+        <button id="playButton" >
+          <svg width="350px" height="350px" x="0px" y="0px" viewBox="0 0 487.622 487.622" style="enable-background:new 0 0 487.622 487.622;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+          <g>
+            <circle style="fill:#535353;" cx="243.811" cy="243.811" r="243.811"/>
+            <polygon style="fill:#b8b8b8;" points="375.699,243.811 169.686,368.19 169.686,119.431"/>
+          </g>
+          </svg>
+        </button>
+        <div id="folderStatus">No folder linked. Please select the game folder.</div><br>
+        <button id="btnLinkFolder">📁 SELECT MAIN GAME FOLDER</button>
+        <input type="file" id="firefoxFolderPicker" webkitdirectory multiple style="display:none"/>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+
+/* ================================
+   Browser Capability Detection
+================================ */
+
+const supportsDirectoryPicker = "showDirectoryPicker" in window;
+const isFirefox = navigator.userAgent.includes("Firefox");
+
+/* ================================
+   IndexedDB Setup
+================================ */
+
+const dbName = "FighterZ";
+const storeName = "FighterZ";
+
+let gameDirHandle = null;
+let firefoxFiles = null;
+
+const playButton = document.getElementById("playButton");
+const folderStatus = document.getElementById("folderStatus");
+const btnLinkFolder = document.getElementById("btnLinkFolder");
+
+/* ================================
+   IndexedDB Helpers
+================================ */
+
+async function openDB() {
+  return new Promise(resolve => {
+    const req = indexedDB.open(dbName, 1);
+
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(storeName);
+    };
+
+    req.onsuccess = () => resolve(req.result);
+  });
+}
+
+async function saveHandle(handle) {
+  if (!supportsDirectoryPicker) return;
+
+  const db = await openDB();
+  db.transaction(storeName, "readwrite")
+    .objectStore(storeName)
+    .put(handle, "root");
+}
+
+async function getHandle() {
+  if (!supportsDirectoryPicker) return null;
+
+  const db = await openDB();
+  return new Promise(resolve => {
+    const req = db.transaction(storeName)
+      .objectStore(storeName)
+      .get("root");
+
+    req.onsuccess = () => resolve(req.result);
+  });
+}
+
+/* ================================
+   Folder Picker (Unified)
+================================ */
+
+async function pickGameFolder() {
+  // Chrome / Edge
+  if (supportsDirectoryPicker) {
+    return await window.showDirectoryPicker();
+  }
+
+  // Firefox fallback
+  return new Promise(resolve => {
+    const input = document.getElementById("firefoxFolderPicker");
+    input.value = ""; // allow re-pick
+    input.onchange = () => resolve([...input.files]);
+    input.click();
+  });
+}
+
+/* ================================
+   Permission Handling (Chrome only)
+================================ */
+
+async function verifyPermission(handle) {
+  if (!supportsDirectoryPicker) return true;
+
+  const options = { mode: "read" };
+
+  if ((await handle.queryPermission(options)) === "granted") return true;
+  if ((await handle.requestPermission(options)) === "granted") return true;
+
+  return false;
+}
+
+/* ================================
+   Unified File Access Helper
+================================ */
+
+async function getGameFile(path) {
+  // Chrome / Edge (File System Access API)
+  if (supportsDirectoryPicker && gameDirHandle) {
+    try {
+      const parts = path.split('/');
+      let currentHandle = gameDirHandle;
+      
+      // Navigate through subdirectories
+      for (let i = 0; i < parts.length - 1; i++) {
+        currentHandle = await currentHandle.getDirectoryHandle(parts[i]);
+      }
+      
+      // Get the final file handle
+      const fileHandle = await currentHandle.getFileHandle(parts[parts.length - 1]);
+      return await fileHandle.getFile();
+    } catch (e) {
+      console.warn(`File not found in FS: ${path}`, e);
+      return null;
+    }
+  }
+
+  // Firefox Fallback
+  if (firefoxFiles) {
+    const searchPath = path.toLowerCase();
+    return firefoxFiles.find(f => f.webkitRelativePath.toLowerCase().endsWith(searchPath));
+  }
+
+  return null;
+}
+
+/* ================================
+   Folder Button Click
+================================ */
+
+btnLinkFolder.addEventListener("click", async () => {
+  try {
+    const result = await pickGameFolder();
+    if (!result) return;
+
+    if (supportsDirectoryPicker) {
+      gameDirHandle = result;
+      await saveHandle(gameDirHandle);
+
+      folderStatus.innerText =
+        "✓ Folder Linked - PRESS PLAY BUTTON";
+    } else {
+      firefoxFiles = result;
+
+      folderStatus.innerText =
+        `✓ ${firefoxFiles.length} files loaded (Firefox mode)`;
+    }
+
+    playButton.classList.add("enabled");
+
+  } catch (err) {
+    console.error("Folder selection failed:", err);
+  }
+});
+
+/* ================================
+   Restore Folder on Load (Chrome)
+================================ */
+
+window.addEventListener("load", async () => {
+
+
+  // If the button isn't enabled and we aren't on a website, stop.
+  const isWebMode = window.location.protocol.startsWith('http');
+  if (isWebMode) {
+    try {
+      // 1. Load the config (Fetch if on web, FileSystem if folder linked)
+      const config = await Game.setupConfig();
+      
+      // 2. Create the ACTUAL game instance
+      const game = new Game(config);
+      
+      // 3. Start the loop
+      game.init();
+
+      // 4. UI: Hide the overlay/menu
+      document.getElementById('start').style.display = 'none';
+      
+    } catch (err) {
+      console.error("Game failed to start:", err);
+      return;
+    }
+  }
+
+  if (!supportsDirectoryPicker) return;
+
+  gameDirHandle = await getHandle();
+
+  if (gameDirHandle) {
+    folderStatus.innerText =
+      "✓ Folder Found (re-verify if needed)";
+    playButton.classList.add("enabled");
+  }
+});
+
+/* ================================
+   Play Button
+================================ */
+
+// playButton.addEventListener("click", async () => {
+//   if (!playButton.classList.contains("enabled")) return;
+
+//   if (supportsDirectoryPicker) {
+//     const ok = await verifyPermission(gameDirHandle);
+//     if (!ok) {
+//       alert("Please re-link the folder to grant access.");
+//       return;
+//     }
+//   }
+
+//   document.getElementById("start").style.display = "none";
+
+//   // Start your game here
+//   new Game().start();
+//   // const game = new Game();
+//   // await game.start();
+//   // await Game().start();
+
+// // const config = await Game.setupConfig();
+// // const game = new Game(config);
+// // game.init();
+// });
+
+
+
+
+
+
+
+
+
+
+
+// playButton.addEventListener("click", async () => {
+//   if (!playButton.classList.contains("enabled")) return;
+
+//   if (supportsDirectoryPicker) {
+//     const ok = await verifyPermission(gameDirHandle);
+//     if (!ok) {
+//       alert("Please re-link the folder to grant access.");
+//       return;
+//     }
+//   }
+
+//   document.getElementById("start").style.display = "none";
+
+//   // LOAD CONFIG FIRST, THEN NEW GAME
+//   const config = await Game.setupConfig();
+//   const game = new Game(config); 
+//   game.init(); // This starts the loop on the correct instance
+// });
+
+playButton.addEventListener("click", async () => {
+  // If the button isn't enabled and we aren't on a website, stop.
+  const isWebMode = window.location.protocol.startsWith('http');
+  if (!playButton.classList.contains("enabled") && !isWebMode) return;
+
+  try {
+    // 1. Load the config (Fetch if on web, FileSystem if folder linked)
+    const config = await Game.setupConfig();
+    
+    // 2. Create the ACTUAL game instance
+    const game = new Game(config);
+    
+    // 3. Start the loop
+    game.init();
+
+    // 4. UI: Hide the overlay/menu
+    document.getElementById('start').style.display = 'none';
+    
+  } catch (err) {
+    console.error("Game failed to start:", err);
+  }
+});
+
+</script>
+
+<script>
+(function () {
+  if (!navigator.userAgent.includes("Firefox")) return;
+
+  async function updateScale() {
+    const headerHeight = 64;
+    // Get the actual config values so we match the canvas resolution
+    const config = await Game.setupConfig(); 
+    
+    const gameWidth = config.GameWidth;
+    const gameHeight = config.GameHeight;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight - headerHeight;
+
+    const scaleX = vw / gameWidth;
+    const scaleY = vh / gameHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    console.log(`--- Firefox Fix: Scaling to ${scale} ---`);
+
+    // Update CSS Variable
+    document.body.style.setProperty("--scale", scale);
+    document.documentElement.style.setProperty("--game-width", gameWidth + "px");
+    document.documentElement.style.setProperty("--game-height", gameHeight + "px");
+    
+    const screen = document.getElementById('game-screen');
+    const wrapper = document.querySelector('.game-wrapper');
+
+    if (screen) {
+      screen.style.transform = `scale(${scale})`;
+    }
+    if (wrapper) {
+      wrapper.style.width = (gameWidth * scale) + "px";
+      wrapper.style.height = (gameHeight * scale) + "px";
+    }
+  }
+
+  window.addEventListener("resize", updateScale);
+  // Run after a slight delay to ensure the config/DOM is ready
+  setTimeout(updateScale, 100);
+})();
+</script>
+
+
+
+<script>
+
+  /*
+  ============================================================
+  GLOBALS
+  ============================================================
+  */
+  
+  const ENABLE_DEBUG = true;
+  
+  const FPS = 60;
+  const FRAME_TIME = 1000 / 60;
+  
+  let air = null;
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  CANVAS / CAMERA
+  ============================================================
+  */
+  
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const camera = { ground: 200 };
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  INPUT
+  ============================================================
+  */
+  
+  const keys = {};
+  addEventListener("keydown", e => keys[e.code] = true);
+  addEventListener("keyup", e => keys[e.code] = false);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  AIR ANIMATIONS
+  ============================================================
+  */
+  
+  class AIR { constructor(){ this.actions = new Map(); } }
+  
+  class AIRAnim {
+    constructor(action){ this.action = action; this.i=0; this.t=0; }
+    update(){
+      if(!this.action || !this.action.frames.length) return;
+      if(++this.t>=this.action.frames[this.i][2]){
+        this.t=0; this.i++;
+        if(this.i>=this.action.frames.length) this.i=this.action.loopStart||0;
+      }
+    }
+    get frame(){ return this.action.frames[this.i]; }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  CAMERA
+  ============================================================
+  */
+  
+  class Camera {
+    constructor(x, y, width = 640, height = 480) {
+  // Temp
+      this.startPosition = { x, y };
+      this.dimensions = { width, height };
+  
+  // IKEMEN
+      this.stageCamera = new StageCamera();
+  
+      this.Pos = { x: 0, y: 0};
+    }
+  
+    setDimensions(width, height) {
+      this.dimensions = { width, height };
+    }
+  
+    Update(scl, x, y, config) {
+      if (this.Pos.x < 0) this.Pos.x = 0;
+      if (this.Pos.y < 0) this.Pos.y = 0;
+      if (this.Pos.x > this.dimensions.width - config.GameWidth) {
+        this.Pos.x = this.dimensions.width - config.GameWidth;
+      }
+  
+      if (this.Pos.y > this.dimensions.height - config.GameHeight) {
+        this.Pos.y = this.dimensions.height - config.GameHeight;
+      }
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  CHAR (with palette support)
+  ============================================================
+  */
+  
+  class Char {
+    constructor() {
+      this.pos = [0, 200];
+      this.vel = [0,0];
+      this.facing = 1;
+      this.state = 0;
+  
+      this.anim = null;
+      this.spriteData = null;
+      this.pal = null;
+      this.image = null;  // palette-swapped spritesheet
+    }
+  
+    trackableByCamera(){ return true; }
+  
+    changeState(st){
+      this.state = st;
+      const act = air?.actions.get(st);
+      if(act) this.anim = new AIRAnim(act);
+    }
+  
+    update(isPlayer=false, time, context, config){
+      // Player controls only for first character (P1)
+      if(isPlayer){
+        switch(this.state){
+          case 0:
+            if(keys.ArrowRight){ this.facing=1; this.changeState(20); }
+            else if(keys.ArrowLeft){ this.facing=1; this.changeState(21); }
+            break;
+          case 20: if(!keys.ArrowRight)
+            this.changeState(0);
+            break;
+          case 21: if(!keys.ArrowLeft)
+            this.changeState(0);
+            break;
+        }
+      }
+  
+      if(this.state===20) this.pos[0]+=1.8;
+      if(this.state===21) this.pos[0]-=1.2;
+  
+      this.anim?.update();
+    }
+  
+    cueDraw(context, config, renderScale) {
+      if (!this.anim || !this.spriteData || !this.image) return;
+      const f = this.anim.frame;
+      if (!f) return;
+      const id = f[0];
+      if (!id || id.startsWith("-")) return;
+  
+      const spr = this.spriteData[id];
+      if (!spr) return;
+      
+      const off = f[1] || [0,0];
+      const [ax, ay] = spr[0]; // Axis/Anchor
+      const [sx, sy, sw, sh] = spr[1]; // Source Rect
+  
+      context.save();
+      // Use raw character positions
+      context.translate(this.pos[0] * renderScale, this.pos[1] * renderScale);
+      context.scale(this.facing * renderScale, renderScale);
+  
+      // Draw 1:1. The CSS will scale this whole canvas to fit the screen.
+      context.drawImage(
+        this.image,
+        sx, sy, sw, sh,      // Source from palette-swapped sheet
+        -ax + off[0],       // Destination X
+        -ay + off[1],       // Destination Y
+        sw, sh               // Destination Width/Height
+      );
+      context.restore();
+    }
+  
+    draw(context, config, renderScale) {
+      this.cueDraw(context, config, renderScale);
+    }
+  
+    async loadFromFiles(charname, paletteKey = "1-1") {
+      const name = charname.toLowerCase();
+      let data;
+      let imgBitmap;
+
+      // 1. TRY LOCAL FILES FIRST
+      const jsonFile = await getGameFile(`chars/${name}/${name}.json`);
+      const imgFile = await getGameFile(`chars/${name}/${name}.png`);
+
+      if (jsonFile && imgFile) {
+        console.log(`Loading ${name} from local files...`);
+        data = JSON.parse(await jsonFile.text());
+        imgBitmap = await createImageBitmap(imgFile);
+      } 
+      // 2. FALLBACK TO FETCH ONLY IF LOCAL FILES WEREN'T FOUND AND WE ARE ON A SERVER
+      else if (window.location.protocol.startsWith('http')) {
+        console.log(`Loading ${name} via fetch...`);
+        const res = await fetch(`./chars/${name}/${name}.json`);
+        if (!res.ok) throw new Error("Failed to load JSON");
+        data = await res.json();
+
+        const img = new Image();
+        img.src = `./chars/${name}/${name}.png`;
+        await img.decode();
+        imgBitmap = img;
+      } 
+      // 3. FINAL ERROR: No local files and not on a server
+      else {
+        console.error(`Files for ${name} not found locally, and fetch is unavailable on file:// protocol.`);
+        return;
+      }
+
+      // === STORE DATA ===
+      this.spriteData = data.sprite;
+      this.pal = data.pal;
+
+      if (!air) air = new AIR();
+      for (const [id, a] of Object.entries(data.anim)) {
+        air.actions.set(+id, a);
+      }
+
+      this.image = this.#createScaledSpritesheet(imgBitmap, paletteKey);
+      this.changeState(0);
+    }
+  
+    #hexToRgb(hex){
+      const bigint = parseInt(hex.replace("#",""),16);
+      return { r:(bigint>>16)&255, g:(bigint>>8)&255, b:bigint&255 };
+    }
+  
+    #applyPaletteSwap(ctx, paletteKey, w,h){
+      if(!this.pal||paletteKey==="1-1") return;
+      const imgData = ctx.getImageData(0,0,w,h);
+      const pixels = imgData.data;
+      const master = this.pal["1-1"];
+      const target = this.pal[paletteKey];
+      if(!master||!target) return;
+      const map = new Map();
+      master.forEach((hex,i)=> map.set(`${this.#hexToRgb(hex).r},${this.#hexToRgb(hex).g},${this.#hexToRgb(hex).b}`, i));
+      const tRgb = target.map(hex=>this.#hexToRgb(hex));
+      for(let i=0;i<pixels.length;i+=4){
+        if(pixels[i+3]===0) continue;
+        const key = `${pixels[i]},${pixels[i+1]},${pixels[i+2]}`;
+        const idx = map.get(key);
+        if(idx!==undefined){ const c=tRgb[idx]; pixels[i]=c.r; pixels[i+1]=c.g; pixels[i+2]=c.b; }
+      }
+      ctx.putImageData(imgData,0,0);
+    }
+  
+    #createScaledSpritesheet(img, paletteKey) {
+      const srcCanvas = document.createElement("canvas");
+      srcCanvas.width = img.width;
+      srcCanvas.height = img.height;
+  
+      const srcCtx = srcCanvas.getContext("2d", { willReadFrequently: true });
+      srcCtx.drawImage(img, 0, 0);
+      this.#applyPaletteSwap(srcCtx, paletteKey, img.width, img.height);
+  
+      const dstCanvas = document.createElement("canvas");
+      dstCanvas.width = img.width;
+      dstCanvas.height = img.height;
+  
+      const dstCtx = dstCanvas.getContext("2d");
+      dstCtx.imageSmoothingEnabled = false;
+  
+      dstCtx.drawImage(
+        srcCanvas,
+        0, 0, img.width, img.height,
+        0, 0,
+        dstCanvas.width,
+        dstCanvas.height
+      );
+  
+      return dstCanvas;
+    }
+  }
+  
+  /*
+  ============================================================
+  CHAR LIST
+  ============================================================
+  */
+  
+  class CharList {
+    constructor(){ this.list=[]; }
+    add(c){ this.list.push(c); }
+    update(time, context, config){ this.list.forEach((c,i)=>c.update(i===0, time, context, config)); } // first char is player
+    cueDraw(context, config){ this.list.forEach(c=>c.cueDraw(context, config)); }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  CONFIG
+  ============================================================
+  */
+  
+  const defaultConfig = {
+    AIRamping: true,
+    AIRandomColor: true,
+    AISurvivalColor: true,
+    AudioDucking: false,
+    AudioSampleRate: 44100,
+    AutoGuard: false,
+    BarGuard: false,
+    BarRedLife: true,
+    BarStun: false,
+    Borderless: false,
+    ComboExtraFrameWindow: 1,
+    CommonAir: ["data/common.air"],
+    CommonCmd: ["data/common.cmd"],
+    CommonConst: ["data/common.const"],
+    CommonFx: ["data/common.fx"],
+    CommonLua: [],
+    CommonStates: ["data/common.states"],
+    ControllerStickSensitivity: 0.4,
+    Credits: 10,
+    DebugClipboardRows: 20,
+    DebugClsnDarken: true,
+    DebugConsoleRows: 15,
+    DebugFont: "font/f-4x6.fnt",
+    DebugFontScale: 1.0,
+    DebugKeys: true,
+    DebugMode: false,
+    Difficulty: 8,
+    EscOpensMenu: true,
+    ExternalShaders: [],
+    FirstRun: true,
+    FontShaderVer: 0,
+    ForceStageZoomin: 1.0,
+    ForceStageZoomout: 1.0,
+    Framerate: 60,
+    Fullscreen: false,
+    FullscreenRefreshRate: 60,
+    FullscreenWidth: 1280,
+    FullscreenHeight: 720,
+    GameWidth: 1280,
+    GameHeight: 720,
+    GameFramerate: 60,
+    IP: {},
+    LifeMul: 100,
+    ListenPort: "7500",
+    LoseSimul: true,
+    LoseTag: false,
+    MaxAfterImage: 128,
+    MaxBgmVolume: 100,
+    MaxDrawGames: 1,
+    MaxExplod: 512,
+    MaxHelper: 56,
+    MaxPlayerProjectile: 256,
+    Modules: [],
+    Motif: "data/system.def",
+    MSAA: false,
+    NumSimul: [2, 4],
+    NumTag: [2, 4],
+    NumTurns: [2, 4],
+    PanningRange: 100,
+    Players: 2,
+    PngSpriteFilter: false,
+    PostProcessingShader: 0,
+    QuickContinue: false,
+    RatioAttack: [0.82, 1.0, 1.17, 1.3],
+    RatioLife: [0.8, 1.0, 1.15, 1.3],
+    RatioRecoveryBase: 0,
+    RatioRecoveryBonus: 0,
+    RoundsNumSimul: 2,
+    RoundsNumSingle: 2,
+    RoundsNumTag: 2,
+    RoundTime: 99,
+    ScreenshotFolder: "ss",
+    StartStage: "stages/stage0.def",
+    StereoEffects: true,
+    System: "script/main.lua", // This will point to our JS entry logic later
+    Team1VS2Life: 100,
+    TeamDuplicates: false,
+    TeamLifeShare: false,
+    TeamPowerShare: true,
+    TrainingChar: "chars/kfm/kfm.def",
+    TurnsRecoveryBase: 0,
+    TurnsRecoveryBonus: 0,
+    VolumeBgm: 80,
+    VolumeMaster: 80,
+    VolumeSfx: 80,
+    VRetrace: 1,
+    WavChannels: 128,
+    WindowCentered: true,
+    WindowIcon: [],
+    WindowTitle: "FighterZ",
+    XinputTriggerSensitivity: 0.1,
+    ZoomActive: true,
+    ZoomDelay: false,
+    ZoomSpeed: 1.0,
+    KeyConfig: [
+      { Joystick: -1, Buttons: ["UP", "DOWN", "LEFT", "RIGHT", "a", "b", "c", "x", "y", "z", "s", "d", "w", "m"] }
+    ],
+    JoystickConfig: []
+  };
+  
+  async function saveConfig(configObj) {
+    try {
+      const saveDir = await gameDirHandle.getDirectoryHandle("save", {
+        create: true
+      });
+  
+      const fileHandle = await saveDir.getFileHandle("config.json", {
+        create: true
+      });
+  
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(configObj, null, 2));
+      await writable.close();
+    } catch (err) {
+      console.error("Config save failed:", err);
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  FPS COUNTER
+  ============================================================
+  */
+  
+  class FpsCounter {
+    constructor() {
+      this.accumulator = 0;
+      this.frames = 0;
+      this.fps = 0;
+      this.interval = 0.25; // 250 ms
+    }
+  
+    // update(secondsPassed) {
+    //   this.fps = Math.trunc(1 / secondsPassed);
+    // }
+  
+    update(deltaTime) {
+      this.accumulator += deltaTime;
+      this.frames++;
+  
+      if (this.accumulator >= this.interval) {
+        this.fps = Math.round(this.frames / this.accumulator);
+        this.accumulator = 0;
+        this.frames = 0;
+      }
+    }
+  
+    draw(context, config, renderScale) {
+      const fontSize = Math.round(10 * renderScale);
+      context.font = `${fontSize}px monospace`;
+      context.textAlign = 'right';
+      context.textBaseline = 'top';
+  
+      const text = `${this.fps}`;
+      const padding = 2 * renderScale;
+      const metrics = context.measureText(text);
+
+      // 2. Calculate dimensions based on scaled metrics
+      const textWidth = metrics.width;
+      // Approximation for height based on font size
+      const textHeight = fontSize;
+
+      const boxWidth = textWidth + padding * 2;
+      const boxHeight = textHeight + padding * 2;
+
+      // 3. Position in the bottom right, scaled away from the edges
+      const margin = 5 * renderScale;
+      const x = context.canvas.width - margin;
+      const y = context.canvas.height - margin - boxHeight;
+      
+      // Draw Background
+      context.fillStyle = 'rgba(0, 0, 0, 0.65)';
+      context.fillRect(x - boxWidth, y, boxWidth, boxHeight);
+
+      // Draw Text
+      context.fillStyle = 'white';
+      context.fillText(text, x - padding, y + padding);
+    }
+  }
+  
+  /*
+  ============================================================
+  STAGE CAMERA
+  ============================================================
+  */
+  
+  class StageCamera {
+    constructor() {
+      this.startx = 0;
+      this.boundleft = 0;
+      this.boundright = 0;
+      this.boundhigh = 0;
+      this.boundlow = 0;
+  
+      this.verticalfollow = 0;
+  
+      this.floortension = 0;
+      this.tensionhigh = 0;
+      this.tensionlow = 0;
+      this.tension = 0;
+      this.tensionvel = 0;
+  
+      this.overdrawhigh = 0; // TODO: not implemented
+      this.overdrawlow = 0;
+  
+      this.cuthigh = 0;
+      this.cutlow = 0;
+  
+      this.localcoord = [0, 0];
+      this.localscl = 0;
+  
+      this.zoffset = 0;
+      this.ztopscale = 0;
+      this.drawOffsetY = 0;
+  
+      this.startzoom = 0;
+      this.zoomin = 0;
+      this.zoomout = 0;
+  
+      this.ytensionenable = false;
+      this.zoomanchor = false;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ============================================================
+  GAME CLASS
+  ============================================================ */
+  
+  class Game {
+    scene = null; // new Scene();
+    camera = new Camera(0, 0);
+    frameTime = { previous: 0, secondsPassed: 0 };
+    fpsCounter = new FpsCounter();
+    renderScale = 1;
+  
+    constructor(config) {
+      this.config = config || defaultConfig;
+      this.context = document.querySelector('#game').getContext('2d');
+      const canvasElement = this.context.canvas;
+  
+      // 1. Get dimensions from CSS :root
+      const rootStyle = getComputedStyle(document.documentElement);
+      const cssWidth = parseInt(rootStyle.getPropertyValue('--game-width')) || 1920;
+      const cssHeight = parseInt(rootStyle.getPropertyValue('--game-height')) || 1080;
+  
+      // 2. Set the CANVAS resolution to the large size
+      canvasElement.width = cssWidth;
+      canvasElement.height = cssHeight;
+  
+      // 3. Calculate Scale based on the config internal width
+      this.renderScale = cssWidth / this.config.GameWidth;
+  
+      // 4. IMPORTANT: Remove the lines that set canvas width/height to config
+      // This allows the canvas to stay at the high resolution.
+      this.context.imageSmoothingEnabled = false;
+      
+      this.camera = new Camera(0, 0, this.config.GameWidth, this.config.GameHeight);
+      this.scene = new Scene();
+      
+      console.log(`Resolution: ${cssWidth}x${cssHeight} | Internal: ${this.config.GameWidth}x${this.config.GameHeight} | Scale: ${this.renderScale}`);
+    }
+  
+    frame = (time) => {
+      if (!this.frameTime.previous) {
+        this.frameTime.previous = time;
+        requestAnimationFrame(this.frame);
+        return;
+      }
+      window.requestAnimationFrame(this.frame);
+  
+      this.frameTime.secondsPassed = (time - this.frameTime.previous) / 1000;
+      this.frameTime.previous = time;
+  
+      this.fpsCounter.update(this.frameTime.secondsPassed);
+      this.scene.update(this.frameTime, this.context, this.camera, this.config);
+      
+      // Crucial: pass the scale to the scene draw
+      this.scene.draw(this.context, this.camera, this.config, this.renderScale);
+  
+      if (this.config.DebugMode || ENABLE_DEBUG) {
+        this.fpsCounter.draw(this.context, this.config, this.renderScale);
+      }
+    };
+  
+    async start() {
+      const config = await Game.setupConfig();
+      const game = new Game(config);
+  
+      this.camera.setDimensions(config.GameWidth, config.GameHeight)
+  
+  //     RENDER_SCALE =
+  //         Math.min(
+  //           window.innerWidth / config.GameWidth,
+  //           window.innerHeight / config.GameHeight
+  //         )
+  
+  // RENDER_SCALE = 1;
+  // console.log(`RENDER_SCALE: ${RENDER_SCALE}`);
+  
+      game.init();
+    }
+  
+    init() {
+      // registerKeyEvents();
+      // registerGamepadEvents();
+  
+      window.requestAnimationFrame(this.frame);
+    }
+
+  static async setupConfig() {
+  let config = { ...defaultConfig };
+
+  // Only try getGameFile if a folder has been selected
+  if (gameDirHandle || firefoxFiles) {
+    try {
+      const file = await getGameFile("save/config.json");
+
+      if (file) {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        console.log("✅ CONFIG: Loaded from selected folder (" + (supportsDirectoryPicker ? "Chrome" : "Firefox") + " mode)");
+        return { ...config, ...parsed };
+      }
+    } catch (err) {
+      console.warn("⚠️ CONFIG: config.json not found in selected folder's 'save/' directory.");
+    }
+  }
+
+  // Web Server Fallback (Only if running on http/https)
+  if (window.location.protocol.startsWith('http')) {
+    try {
+      const response = await fetch('./save/config.json');
+      if (response.ok) {
+        const parsed = await response.json();
+        console.log("✅ CONFIG: Loaded from web server.");
+        return { ...config, ...parsed };
+      }
+    } catch (e) { 
+      console.warn("⚠️ CONFIG: config.json not found on web server.");
+    }
+  } else {
+    console.info("ℹ️ Running on file:// protocol - folder selection required for local files.");
+  }
+
+  console.log("ℹ️ CONFIG: Using hardcoded defaults.");
+  return config;
+}
+  
+    // async saveConfig(configObj) {
+    //   try {
+    //     const saveDir = await gameDirHandle.getDirectoryHandle("save", {
+    //       create: true
+    //     });
+  
+    //     const fileHandle = await saveDir.getFileHandle("config.json", {
+    //       create: true
+    //     });
+  
+    //     const writable = await fileHandle.createWritable();
+    //     await writable.write(JSON.stringify(configObj, null, 2));
+    //     await writable.close();
+    //   } catch (err) {
+    //     console.error("Config save failed:", err);
+    //   }
+    // }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  SCENE - TEMP ???
+  ============================================================
+  */
+  
+  class Scene {
+    constructor () {
+      let entities = [];
+      let imageP1 = new Image();
+      let imageP2 = new Image();
+      let imageBackground = new Image();
+  
+      this.chars = new CharList();
+      this.P1 = new Char();
+      this.P2 = new Char();
+      this.stage = new Stage();
+  
+  //     let battleSelItems = ['background', 'subzero', '1-1', 'scorpion', '1-1'];
+      let battleSelItems = ['background', 'ryu', '1-4', 'ken', '1-4'];
+  
+      this.entities = [
+        new Stage(`./stages/${battleSelItems[0]}.png`),
+        this.P1,
+        this.P2,
+      ];
+  
+      Promise.all([
+        this.P1.loadFromFiles(battleSelItems[1], battleSelItems[2]),
+        this.P2.loadFromFiles(battleSelItems[3], battleSelItems[4]),
+      ]).then(() => {
+        // Ryu, Ken
+        this.P1.frame = [166, 24, 59, 90];
+        this.P2.frame = [166, 24, 55, 93];
+    
+        this.P1.pos = [80, 190];
+        this.P2.pos = [280, 190];
+  
+        // this.P1.vel.x = 150;
+        // this.P2.vel.x = -150;
+      });
+    }
+  
+    update(time, context, camera, config) {
+      camera.Update(time, 0, 0, config);
+  
+      for (const entity of this.entities) {
+        entity.update(time.secondsPassed, context, config);
+      }
+    }
+  
+    draw(context, camera, config, renderScale) {
+  //     context.clearRect(0, 0, config.GameWidth, config.GameHeight);
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  
+      for (const entity of this.entities) {
+        entity.draw(context, config, renderScale);
+      }
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
+  ============================================================
+  STAGE - TEMP ???
+  ============================================================
+  */
+  
+  class Stage {
+    constructor(imageBackground) {
+      this.image = new Image();
+  
+      if (imageBackground) {
+        this.image.src = imageBackground;
+      }
+    }
+  
+    update() {}
+  
+    draw(context, config, renderScale) {
+      if (this.image.complete && this.image.naturalWidth > 0) {
+        context.drawImage(
+          this.image, 
+          0, 0, 
+          this.image.width * renderScale, 
+          this.image.height * renderScale
+        );
+      }
+    }
+  }
+  
+  </script>
+  
+
+</body>
+</html>

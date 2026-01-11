@@ -1,0 +1,147 @@
+{
+  "AIRamping": true,
+  "AIRandomColor": true,
+  "AISurvivalColor": true,
+  "AudioDucking": false,
+  "AudioSampleRate": 44100,
+  "AutoGuard": false,
+  "BarGuard": false,
+  "BarRedLife": true,
+  "BarStun": false,
+  "Borderless": false,
+  "ComboExtraFrameWindow": 1,
+  "CommonAir": [
+    "data/common.air"
+  ],
+  "CommonCmd": [
+    "data/common.cmd"
+  ],
+  "CommonConst": [
+    "data/common.const"
+  ],
+  "CommonFx": [
+    "data/common.fx"
+  ],
+  "CommonLua": [],
+  "CommonStates": [
+    "data/common.states"
+  ],
+  "ControllerStickSensitivity": 0.4,
+  "Credits": 10,
+  "DebugClipboardRows": 20,
+  "DebugClsnDarken": true,
+  "DebugConsoleRows": 15,
+  "DebugFont": "font/f-4x6.fnt",
+  "DebugFontScale": 1,
+  "DebugKeys": true,
+  "DebugMode": true,
+  "Difficulty": 8,
+  "EscOpensMenu": true,
+  "ExternalShaders": [],
+  "FirstRun": true,
+  "FontShaderVer": 0,
+  "ForceStageZoomin": 1,
+  "ForceStageZoomout": 1,
+  "Framerate": 60,
+  "Fullscreen": false,
+  "FullscreenRefreshRate": 60,
+  "FullscreenWidth": 384,
+  "FullscreenHeight": 224,
+  "GameWidth": 384,
+  "GameHeight": 224,
+  "GameFramerate": 60,
+  "IP": {},
+  "LifeMul": 100,
+  "ListenPort": "7500",
+  "LoseSimul": true,
+  "LoseTag": false,
+  "MaxAfterImage": 128,
+  "MaxBgmVolume": 100,
+  "MaxDrawGames": 1,
+  "MaxExplod": 512,
+  "MaxHelper": 56,
+  "MaxPlayerProjectile": 256,
+  "Modules": [],
+  "Motif": "data/system.def",
+  "MSAA": false,
+  "NumSimul": [
+    2,
+    4
+  ],
+  "NumTag": [
+    2,
+    4
+  ],
+  "NumTurns": [
+    2,
+    4
+  ],
+  "PanningRange": 100,
+  "Players": 2,
+  "PngSpriteFilter": false,
+  "PostProcessingShader": 0,
+  "QuickContinue": false,
+  "RatioAttack": [
+    0.82,
+    1,
+    1.17,
+    1.3
+  ],
+  "RatioLife": [
+    0.8,
+    1,
+    1.15,
+    1.3
+  ],
+  "RatioRecoveryBase": 0,
+  "RatioRecoveryBonus": 0,
+  "RoundsNumSimul": 2,
+  "RoundsNumSingle": 2,
+  "RoundsNumTag": 2,
+  "RoundTime": 99,
+  "ScreenshotFolder": "ss",
+  "StartStage": "stages/stage0.def",
+  "StereoEffects": true,
+  "System": "script/main.lua",
+  "Team1VS2Life": 100,
+  "TeamDuplicates": false,
+  "TeamLifeShare": false,
+  "TeamPowerShare": true,
+  "TrainingChar": "chars/kfm/kfm.def",
+  "TurnsRecoveryBase": 0,
+  "TurnsRecoveryBonus": 0,
+  "VolumeBgm": 80,
+  "VolumeMaster": 80,
+  "VolumeSfx": 80,
+  "VRetrace": 1,
+  "WavChannels": 128,
+  "WindowCentered": true,
+  "WindowIcon": [],
+  "WindowTitle": "FighterZ",
+  "XinputTriggerSensitivity": 0.1,
+  "ZoomActive": true,
+  "ZoomDelay": false,
+  "ZoomSpeed": 1,
+  "KeyConfig": [
+    {
+      "Joystick": -1,
+      "Buttons": [
+        "UP",
+        "DOWN",
+        "LEFT",
+        "RIGHT",
+        "a",
+        "b",
+        "c",
+        "x",
+        "y",
+        "z",
+        "s",
+        "d",
+        "w",
+        "m"
+      ]
+    }
+  ],
+  "JoystickConfig": []
+}

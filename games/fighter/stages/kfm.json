@@ -1,0 +1,131 @@
+{
+  "info": {
+    "name": "Mountainside Temple"
+  },
+  "sprite": {
+     "0-0": [[ 240, -17 ], [ 2, 24, 480, 130 ],  "0-0" ],
+     "1-0": [[ 141, 0 ], [ 2, 203, 282, 170 ],  "1-0" ],
+     "1-1": [[ 141, 59 ], [ 286, 203, 282, 60 ],  "1-1" ],
+    "10-0": [[ 370, 0 ], [ 2, 422, 740, 60 ], "10-0" ],
+    "11-0": [[ 325, 33 ], [ 2, 531, 650, 34 ], "11-0" ],
+    "15-0": [[ 141, 0 ], [ 2, 614, 282, 8 ], "15-0" ]
+  },
+  "camera": {
+    "startx": 0,
+    "starty": 0,
+    "boundleft": -150,
+    "boundright": 150,
+    "boundhigh": -22,
+    "boundlow": 0,
+    "verticalfollow": 0.2,
+    "floortension": 0,
+    "tension": 60
+  },
+  "playerinfo": {
+    "p1startx": -70,
+    "p1starty": 0,
+    "p1startz": 0,
+    "p1facing": 1,
+    "p2startx": 70,
+    "p2starty": 0,
+    "p2startz": 0,
+    "p2facing": -1,
+    "leftbound": -1000,
+    "rightbound": 1000,
+    "topbound": 0,
+    "botbound": 0
+  },
+  "scaling": {
+    "topz": 0,
+    "botz": 50,
+    "topscale": 1,
+    "botscale": 1.2
+  },
+  "bound": {
+    "screenleft": 15,
+    "screenright": 15
+  },
+  "stageinfo": {
+    "zoffset": 200,
+    "autoturn": 1,
+    "resetbg": 1
+  },
+  "shadow": {
+    "color": [ 32, 32, 32 ],
+    "yscale": -0.1,
+    "reflect": 1
+  },
+  "music": {
+    "bgvolume": 0
+  },
+  "bgdef": {
+    "spr": "stages/kfm.sff",
+    "debugbg": 0
+  },
+  "bg": {
+    "0": {
+      "type": "normal",
+      "spriteno": [ 0, 0 ],
+      "layerno": 0,
+      "start": [ 0, 0 ],
+      "delta": [ 0.5, 0.5 ],
+      "trans": "none",
+      "mask": 0,
+      "tile": [ 0, 0 ],
+      "tilespacing": [ 0, 0 ],
+      "window": [ 0, 0, 319, 239 ],
+      "windowdelta": [ 0, 0 ]
+    },
+    "floor": {
+      "type": "parallax",
+      "spriteno": [ 10, 0 ],
+      "start": [ 0, 181 ],
+      "delta": [ 0.78, 0.75 ],
+      "xscale": [ 1, 1.75 ],
+      "yscalestart": 100,
+      "yscaledelta": 1.2
+    },
+    "ceiling": {
+      "type": "parallax",
+      "spriteno": [ 11, 0 ],
+      "start": [ 0, 10 ],
+      "delta": [ 1.1115, 0.75 ],
+      "xscale": [ 1.425, 1 ],
+      "yscalestart": 100,
+      "yscaledelta": -1
+    },
+    "wall reflection on floor": {
+      "type": "normal",
+      "spriteno": [ 1, 1 ],
+      "trans": "add1",
+      "start": [ 0, 239 ],
+      "delta": [ 0.8, 0.75 ],
+      "mask": 1,
+      "tile": [ 1, 0 ]
+    },
+    "wall": {
+      "type": "normal",
+      "spriteno": [ 1, 0 ],
+      "start": [ 0, 11 ],
+      "delta": [ 0.8, 0.75 ],
+      "mask": 1,
+      "tile": [ 1, 0 ]
+    },
+    "pillar bottom": {
+      "type": "normal",
+      "spriteno": [ 15, 0 ],
+      "start": [ 0, 180 ],
+      "delta": [ 0.8, 0.75 ],
+      "mask": 1,
+      "tile": [ 1, 0 ]
+    },
+    "pillar top": {
+      "type": "normal",
+      "spriteno": [ 15, 1 ],
+      "start": [ 0, 11 ],
+      "delta": [ 0.8, 0.75 ],
+      "mask": 1,
+      "tile": [ 1, 0 ]
+    }
+  }
+}

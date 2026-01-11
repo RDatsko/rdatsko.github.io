@@ -1,0 +1,3584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- <link rel="stylesheet" href="editor.css"> -->
+<title>FighterZ Studio</title>
+<style>
+:root {
+  --sidebar-w: 220px;
+  --ui-bg: #252526;
+  --main-bg: #323232;
+  --accent: #0e639c;
+  --tab-bg: #2d2d2d;
+  --border: #444;
+  --accent: #317696;
+  --text: #d4d4d4;
+  --hover: #666666;
+}
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--main-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif;
+  font-size: 10px;
+  overflow: hidden;
+}
+
+body {
+  font-size: 12px;
+}
+
+::selection {
+  background: transparent;
+}
+
+textarea::selection {
+  background: Highlight;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+textarea:focus-visible {
+  outline: auto;
+}
+
+select {
+  border: 1px solid var(--border);
+  background-color: var(--ui-bg);
+  color: var(--text);
+  border-radius: 4px;
+  outline: 0;
+}
+
+option {
+  padding: .25rem;
+  background-color: var(--ui-bg);
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+option:hover {
+  background-color: var(--hover);
+}
+
+select:focus option:checked {
+  background: var(--accent) linear-gradient(0deg, var(--accent) 0%, var(--accent) 100%);
+}
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 41px 41px 1fr; /* Menu, Toolbar, Main content */
+  overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+/* Menus amd Toolbar */
+/* ================================================== */
+
+.mainmenu {
+  width: 100vw;
+}
+
+/* The container for the panels and center view */
+main { 
+  display: flex; 
+  flex-direction: row;
+  overflow: hidden; /* Prevents the whole app from scrolling */
+  height: 100%; /* Fills the remaining grid row */
+}
+
+/* The center area where the canvas/code lives */
+.main { 
+  position: relative; 
+  flex-grow: 1; /* This makes it fill the middle */
+  background-color: var(--ui-bg); 
+  overflow: hidden;
+}
+
+/* Side panels should fill the height of the main container */
+.leftpanel, .rightpanel { 
+  min-width: 0; 
+  height: 100%;
+  flex: 0 0 auto; 
+  background-color: var(--tab-bg);
+  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Scrollbar lives inside the panel only */
+}
+
+nav, #toolbar {
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  align-items: center;
+  display: flex;
+  height: 32px;
+  padding: 4px;
+}
+
+nav.appicon {
+  /* margin: 4px; */
+  max-height: 32px;
+  max-width: 32px;
+}
+
+nav hr, #toolbar hr {
+  max-height: 32px;
+  /* margin: 4px; */
+  min-width: 1px;
+  border-color:var(--border);
+  background-color: var(--border);
+  align-self: stretch;
+  border-style: none;
+}
+
+nav * {
+  display: flex;
+  flex: 0 0 auto;
+  margin: 4px;
+}
+
+nav #tabs {
+  flex-grow: 1;
+}
+
+menu {
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu > ul {
+  color: initial;
+  position: relative;
+  display: flex;
+}
+
+menu li {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: block;
+  justify-content: space-between;
+  position: relative;
+  white-space: nowrap;
+}
+
+menu hr {
+  background-color: var(--border);
+  border-bottom-color: var(--border);
+  content: "";
+  display: block;
+  height: 1px;
+  border: 0px;
+  margin: 3px 12px;
+  pointer-events: none;
+}
+
+menu ul {
+  cursor: default;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+menu > ul {
+  background-color: var(--menubar-bg);
+  display: flex;
+}
+
+menu > ul > li {
+  padding: 2px 10px;
+  position: relative;
+  color: var(--text);
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  background: var(--hover);
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  background: var(--menu-bg);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  color: var(--color);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+}
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+.menubar {
+  padding: 0;
+}
+
+.menubar > ul > li > ul{
+    margin-top: 8px;
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+  background-color: var(--tab-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu > ul ul li > ul,
+.menu > ul ul li > ul {
+  left: 100%;
+  top: -4px;
+}
+
+menu ul ul > li > a,
+menu ul ul > li > button,
+menu ul ul > li > label,
+menu ul ul > li[aria-haspopup="true"],
+.menu ul > li > a,
+.menu ul > li > button,
+.menu ul > li > label,
+.menu ul > li[aria-haspopup="true"] {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 10px 4px 32px;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+}
+
+menu ul ul > li > a:focus,
+menu ul ul > li > a:hover,
+menu ul ul > li > button:focus,
+menu ul ul > li > button:hover,
+menu ul ul > li > label:focus,
+menu ul ul > li > label:hover,
+menu ul ul > li[aria-haspopup="true"]:focus,
+menu ul ul > li[aria-haspopup="true"]:hover,
+.menu ul > li > a:focus,
+.menu ul > li > a:hover,
+.menu ul > li > button:focus,
+.menu ul > li > button:hover,
+.menu ul > li > label:focus,
+.menu ul > li > label:hover,
+.menu ul > li[aria-haspopup="true"]:focus,
+.menu ul > li[aria-haspopup="true"]:hover {
+  background-color: var(--hover);
+  color:var(--text);
+}
+
+menu ul ul > li[aria-haspopup="true"]:after,
+.menu ul > li[aria-haspopup="true"]:after {
+  border: 4px solid transparent;
+  border-left-color: currentcolor;
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li,
+.menu li {
+  position: relative;
+  font-size: 1.2rem;
+}
+
+menu ul li > input[type],
+.menu li > input[type] {
+  /* display: none; */
+  position: absolute;
+  z-index: 2;
+  margin: 7px 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+menu ul li > input[type] + label,
+.menu li > input[type] + label {
+  display: block;
+  position: relative;
+}
+
+menu ul li > input[type] + label:before,
+.menu li > input[type] + label:before {
+  all: unset;
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.6), rgba(230, 236, 245, 0.8) 90%, hsla(0, 0%, 100%, 0.8));
+  border-radius: inherit;
+  box-sizing: border-box;
+  height: 22px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 22px;
+}
+
+menu ul li > input[type]:checked + label:before,
+.menu li > input[type]:checked + label:before {
+  content: "";
+}
+
+menu ul li > input[type][type="radio"]:checked + label:after,
+.menu li > input[type][type="radio"]:checked + label:after {
+  box-shadow: none;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li > input[type][type="checkbox"]:checked + label:after,
+.menu li > input[type][type="checkbox"]:checked + label:after {
+  font-size: 10pt;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-52%);
+}
+
+menu ul li:focus-within > ul,
+menu ul li:focus > ul,
+.menu li:focus-within > ul,
+.menu li:focus > ul {
+  display: block;
+}
+
+menu ul li:focus-within:has(~ li:hover) > ul,
+menu ul li:focus:has(~ li:hover) > ul,
+.menu li:focus-within:has(~ li:hover) > ul,
+.menu li:focus:has(~ li:hover) > ul {
+  display: none;
+}
+
+menu ul li[aria-disabled],
+.menu li[aria-disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+menu ul li.has-divider:after,
+.menu li.has-divider:after {
+  box-shadow: inset 0 1px rgba(0, 0, 0, 0.15), inset 0 -1px var(--text);
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 3px 0 2px 30px;
+  pointer-events: none;
+}
+
+menu ul li img,
+.menu li img {
+  left: 2px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+menu ul li span,
+.menu li span {
+  margin-left: 32px;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+#toolbar > ul {
+  margin: 0;
+  padding: 0 11px 0 12px;
+  display: flex;
+}
+
+#toolbar > ul > li {
+  display: inline-block;
+}
+
+#toolbar button {
+  display: inline-block;
+  position: relative;
+  min-width: 28px;
+  height: 28px;
+  margin: 5px 2px;
+  border: 0;
+  padding: 2px;
+  background-color: transparent;
+  color: var(--text);
+  border-radius: 4px;
+}
+
+#toolbar hr {
+  margin: 4px;
+}
+
+#toolbar button:hover {
+  background-color: var(--hover);
+}
+
+
+
+
+
+
+
+
+
+
+/* Views */
+/* ================================================== */
+
+.view[data-view="character-sprites"],
+.view[data-view="animation"] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+.view, .rightsidepanel, .leftsidepanel {
+  display: none;
+  position: relative;
+  height: 100%;
+  inset: 0;
+  overflow: auto;
+}
+
+.view {
+  overflow: hidden;
+}
+
+.view.active, .rightsidepanel.active, .leftsidepanel.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.rightsidepanel.active, .leftsidepanel.active {
+  padding: 10px;
+}
+
+.leftsidepanel {
+  width: 0;
+  padding: 0;
+}
+
+.rightsidepanel, .leftsidepanel { 
+  display: none;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.panel, .rightsidepanel {
+  width: 256px;
+}
+
+.nopanel {
+  width: 0px;
+  padding: 0 !important;
+}
+
+textarea#sff-out {
+  position: relative;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  background: #1e1e1e;
+  color: #dddddd;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 5px;
+  border: none;
+  resize: none;
+  outline: none;
+  border-right: 1px solid var(--border);
+  white-space: pre;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 15px;
+  height: 25px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--hover);
+  text-transform: uppercase;
+}
+
+.action-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  gap: 5px;
+}
+
+.sound-container {
+  padding: 12px 0;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+canvas#spritesheet-canvas {
+  width: 100%;
+  border: 1px solid var(--border);
+  background-image: linear-gradient(45deg, #1a1a1a 25%, transparent 25%), linear-gradient(-45deg, #1a1a1a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1a1a1a 75%), linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+  background-size: 16px 16px;
+  image-rendering: pixelated;
+}
+
+audio {
+  width: 100%;
+  height: 30px;
+  filter: invert(90%);
+}
+
+.importer-container {
+  padding: 20px;
+}
+
+#spritesheet-view { 
+  display: inline-block; 
+  background: transparent !important; 
+  position: relative; 
+  margin-top: 20px; 
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.group-block {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 15px;
+  margin-bottom: 25px;
+  /* background: rgba(0, 0, 0, 0.4); */
+}
+
+.group-title {
+  display: block;
+  background: var(--border);
+  color: var(--text);
+  font-size: 10px;
+  padding: 3px 8px;
+  margin-bottom: 4px;
+  width: fit-content;
+  font-family: monospace;
+}
+
+.sprite-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ct {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 1px;
+}
+
+.ct img {
+  display: block;
+  image-rendering: pixelated;
+}
+
+#stage-bg-canvas,
+#anim-bg-canvas {
+  display: block;
+  margin: 20px auto; /* Centers the stage in the view */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background-color: #1a2634;
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  /* transform: scale(0.333); */
+}
+
+.scrollbar-container {
+  width: 100%;
+  font-family: Arial, sans-serif;
+  user-select: none;
+  margin: 25px 0;
+}
+
+.scrollbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow-btn {
+  background: var(--tab-bg);
+  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.arrow-btn:hover {
+  background: var(--border);
+}
+
+.arrow-btn:active {
+  background: var(--hover);
+}
+
+input[type="range"] {
+  flex: 1;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #d0d0d0;
+  border-radius: 3px;
+}
+
+input[type="range"]::-moz-range-progress {
+  background: var(--accent);
+  height: 8px;
+  border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-top: -5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+}
+
+input[type="number"] {
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--ui-bg);
+  font-size: 1.2rem;
+  border-radius: 4px;
+  outline: 0;
+  padding: 6px;
+}
+
+/* Spin Buttons modified */
+input[type="number"]::-webkit-outer-spin-button, 
+input[type="number"]::-webkit-inner-spin-button {
+  color: var(--text);
+	appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--text);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='7 16 12 20 17 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpolyline points='7 8 12 4 17 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+  width: 24px;
+  height: 100%;
+  opacity: .5; /* shows Spin Buttons per default (Chrome >= 39) */
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.value-text {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+/* .debug > div { border: 1px solid magenta; } */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#movelist {
+  position: relative;
+  margin: 10px auto;
+  max-width: 500px;
+  width: 500px;
+  border-collapse: collapse;
+  outline: 0;
+}
+
+#movelist th {
+  text-align: left;
+  border-top: 1px solid var(--border);
+  background-color: var(--main-bg);
+}
+
+#movelist th:nth-child(3), #movelist th:nth-child(4),
+#movelist td:nth-child(3), #movelist td:nth-child(4) {
+  width: 10%;
+  text-align: center;
+}
+
+#movelist th:nth-child(1), #movelist td:nth-child(1) {
+  position: relative;
+  width: 30%;
+  border-left: 1px solid var(--border);
+}
+
+#movelist th:nth-child(2), #movelist td:nth-child(2) {
+  position: relative;
+  width: 50%;
+}
+
+#movelist th, #movelist td {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 0.35rem;
+}
+
+#movelist td {
+  font-family: monospace;
+}
+
+iframe { display: none; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="mainmenu">
+    <nav>
+      <svg id="android-menu" role="img" fill="currentColor" viewBox="0 0 18 18" id="SShowMenu18N-icon" width="18" height="18" aria-hidden="true" aria-label="" focusable="false"><rect fill-rule="evenodd" x="2" y="8" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="3" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="13" width="14" height="2" rx="0.5"></rect></svg>
+      <hr>
+      <span id="tabs">
+        <menu class="menubar">
+          <ul class="can-hover">
+            <li tabindex="0" aria-haspopup="true">Main
+              <ul>
+                <!-- <li><a onclick="">New…</a></li> -->
+                <!-- <li><a onclick="">Open…</a></li> -->
+                <!-- <hr> -->
+                <li><a onclick="view('character-code')">Show Code</a></li>
+                <li><a onclick="view('character-sprites')">Show Sprites</a></li>
+                <li><a onclick="view('animation')">Show Animations</a></li>
+                <li><a onclick="view('states')">Show States</a></li>
+                <li><a onclick="view('commands')">Show Commands</a></li>
+                <li><a onclick="view('sounds')">Show Sounds</a></li>
+                <hr>
+                <li><input type="checkbox"/><a onclick="togglePanel('.leftpanel')">Left Panel</a></li>
+                <li><input type="checkbox"/><a onclick="togglePanel('.rightpanel')">Right Panel</a></li>
+                <!-- <li><a onclick="">Organizer</a></li> -->
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Characters
+              <ul>
+                <!-- <li><a onclick="">New</a></li> -->
+                <!-- <li><a onclick="">Open</a></li> -->
+                <!-- <li><a onclick="">Save</a></li> -->
+                <!-- <li><a onclick="">Save As…</a></li> -->
+                <!-- <hr> -->
+                <li><a onclick="importMugenChar()">M.U.G.E.N Character Importer</a></li>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Stages
+              <ul>
+                <!-- <li><a onclick="">New</a></li> -->
+                <!-- <li><a onclick="">Open</a></li> -->
+                <!-- <li><a onclick="">Save</a></li> -->
+                <!-- <li><a onclick="">Save As…</a></li> -->
+                <!-- <hr> -->
+                <li><a onclick="importMugenStage()">M.U.G.E.N Stage Importer</a></li>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Animations
+            </li>
+            <li tabindex="0" aria-haspopup="true">Commands
+            </li>
+            <!-- <li tabindex="0" aria-haspopup="true">States -->
+              <!-- <ul> -->
+                <!-- <li><a onclick="">View variable usage list</a></li> -->
+              <!-- </ul> -->
+            <!-- </li> -->
+            <li tabindex="0" aria-haspopup="true">Sounds
+              <!-- <ul> -->
+                <!-- <li><a onclick="">New</a></li> -->
+                <!-- <li><a onclick="">Open</a></li> -->
+                <!-- <li><a onclick="">Save</a></li> -->
+                <!-- <li><a onclick="">Save as…</a></li> -->
+              <!-- </ul> -->
+            </li>
+            <li tabindex="0" aria-haspopup="true">Help
+              <ul>
+                <!-- <li><a onclick="">Reference documentation</a></li> -->
+                <li><a onclick="closeMainMenu(); document.getElementById('aboutDialog').showModal()">About…</a></li>
+              </ul>
+            </li>
+          </ul>
+        </menu>
+      </span>
+    </nav>
+  </div>
+  <div id="toolbar">
+    <ul>
+      <li><button onclick="view('character-code')" title="Code">
+        <svg width="24" height="24" viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20,40h-.5a2,2,0,0,1-1.4-2.5l8-27.9a2,2,0,0,1,3.8,1l-8,28A1.9,1.9,0,0,1,20,40Z"/>
+          <path d="M14,35a2,2,0,0,0,1.3-3.5L7,24l8.3-7.5a2,2,0,0,0-2.6-3l-10,9a2,2,0,0,0,0,3l10,9A1.9,1.9,0,0,0,14,35Z"/>
+          <path d="M34,35a2,2,0,0,1-1.3-3.5L41,24l-8.3-7.5a2,2,0,1,1,2.6-3l10,9a2,2,0,0,1,0,3l-10,9A1.9,1.9,0,0,1,34,35Z"/>
+        </svg>
+      </button></li>
+      <li><button onclick="view('character-sprites')" title="Character & Stage Sprites">
+        <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" 
+          width="24" height="24" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+        <path d="M69.5,59c-3.6-1.5-4.2-2.9-4.2-4.4c0-1.5,1-2.9,2.2-4c2.1-1.9,3.3-4.6,3.3-7.8c0-5.8-3.7-10.9-10.2-10.9
+          s-10.2,5-10.2,10.9c0,3.2,1.2,5.8,3.3,7.8c1.2,1.1,2.2,2.5,2.2,4c0,1.5-0.6,2.9-4.2,4.4c-5.3,2.2-10.4,5-10.5,9.8
+          c0,3.1,2.4,6.2,5.4,6.2h13.9h13.9c3.1,0,5.4-3.1,5.4-6.2C79.9,64.1,74.8,61.3,69.5,59z"/>
+        <path d="M45.5,63.6"/>
+        <path d="M46.6,51.4c-0.4-0.5-2.4-3-2.2-9.7c0.1-6.6,3-8.3,3-8.3c0-3.9,0-6.2,0-6.5c0-1.1-1.1-1.9-1.9-1.9
+          c-0.8,0-22.7,0-23.6,0S20,25.9,20,27v43.6h13.5c0.3-11.1,13-15.6,13-15.6C48.4,54,47,51.9,46.6,51.4z M30.7,65.1c0,1.1-0.9,2-2,2h-2
+          c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2V65.1z M30.7,55.2c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2
+          h2c1.1,0,2,0.9,2,2V55.2z M30.7,45.3c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2V45.3z M30.7,35.4
+          c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2V35.4z M41.9,55.2c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2
+          v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2V55.2z M41.9,45.3c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2
+          V45.3z M41.9,35.4c0,1.1-0.9,2-2,2h-2c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h2c1.1,0,2,0.9,2,2V35.4z"/>
+        </svg>
+      </button></li>
+      <li><button onclick="view('animation')" title="Animations">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22,11H12a1,1,0,0,0-1,1V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V12A1,1,0,0,0,22,11ZM21,21H13V13h8ZM2,13a1,1,0,0,1-1-1V2A1,1,0,0,1,2,1H12a1,1,0,0,1,0,2H3v9A1,1,0,0,1,2,13ZM17,6a1,1,0,0,1,0,2H8v9a1,1,0,0,1-2,0V7A1,1,0,0,1,7,6Z"/></svg>
+      </button></li>
+      <li><button onclick="view('states')" title="States">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><path d="M23,2.42a1.37,1.37,0,0,1,2,0l10.77,10.4a1.3,1.3,0,0,1,0,1.94L25,25.16a1.37,1.37,0,0,1-2,0l-2-1.94a1.28,1.28,0,0,1,0-1.94L24.37,18a.9.9,0,0,0-.66-1.53H5.46A1.47,1.47,0,0,1,4,15.11V12.33A1.53,1.53,0,0,1,5.46,11H23.71a.89.89,0,0,0,.66-1.53L21,6.16a1.28,1.28,0,0,1,0-1.94Zm-5.8,24.42a1.38,1.38,0,0,0-2,0L4.44,37.24a1.28,1.28,0,0,0,0,1.94L15.2,49.58a1.38,1.38,0,0,0,2,0l2-1.94a1.3,1.3,0,0,0,0-1.94l-3.37-3.26a.89.89,0,0,1,.66-1.52h8.68A13.4,13.4,0,0,1,24.8,38a12.68,12.68,0,0,1,.27-2.63H16.45a.88.88,0,0,1-.66-1.53l3.37-3.26a1.3,1.3,0,0,0,0-1.94ZM28,38a9.6,9.6,0,1,1,9.6,9.6A9.6,9.6,0,0,1,28,38Zm15.62-2.24-6.46,6.45a1.15,1.15,0,0,1-.86.38,1.14,1.14,0,0,1-.86-.38l-3.12-3.12a.56.56,0,0,1,0-.86l.86-.86a.56.56,0,0,1,.86,0l2.26,2.26,5.54-5.54a.56.56,0,0,1,.86,0l.86.86A.55.55,0,0,1,43.62,35.76Z" fill-rule="evenodd"/></svg>
+      </button></li>
+      <li><button onclick="view('commands')" title="Commands">
+        <svg width="16" height="16" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.81672 11.1334L9.3695 11.357L9.3695 11.357L9.81672 11.1334ZM9.5 10.5L9.94721 10.2764C9.86252 10.107 9.68939 10 9.5 10V10.5ZM5.5 10.5V10C5.31061 10 5.13748 10.107 5.05279 10.2764L5.5 10.5ZM14 5.5V10.0279H15V5.5H14ZM10.2639 10.9098L9.94721 10.2764L9.05279 10.7236L9.3695 11.357L10.2639 10.9098ZM9.5 10H5.5V11H9.5V10ZM5.05279 10.2764L4.73607 10.9098L5.6305 11.357L5.94721 10.7236L5.05279 10.2764ZM1 10.0279V5.5H0V10.0279H1ZM3.5 3H11.5V2H3.5V3ZM2.97214 12C1.88296 12 1 11.117 1 10.0279H0C0 11.6693 1.33067 13 2.97214 13V12ZM12.0279 12C11.2809 12 10.598 11.578 10.2639 10.9098L9.3695 11.357C9.87296 12.364 10.9021 13 12.0279 13V12ZM14 10.0279C14 11.117 13.117 12 12.0279 12V13C13.6693 13 15 11.6693 15 10.0279H14ZM4.73607 10.9098C4.402 11.578 3.71913 12 2.97214 12V13C4.0979 13 5.12704 12.364 5.6305 11.357L4.73607 10.9098ZM15 5.5C15 3.567 13.433 2 11.5 2V3C12.8807 3 14 4.11929 14 5.5H15ZM1 5.5C1 4.11929 2.11929 3 3.5 3V2C1.567 2 0 3.567 0 5.5H1ZM3 7H6V6H3V7ZM4 5V8H5V5H4ZM11 6H12V5H11V6ZM9 8H10V7H9V8Z" fill="currentColor"/>
+        </svg>
+      </button></li>
+      <li><button onclick="view('sounds')" title="Sounds">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          width="16" height="16" viewBox="0 0 32 32" xml:space="preserve">
+          <path fill="currentColor" d="M4,11v10h5l10,6V5L9,11H4z M17,8.532v14.935L9.554,19H6v-6h3.554L17,8.532z M21.657,21.657
+            l-1.414-1.414c2.339-2.34,2.339-6.146,0-8.486l1.414-1.414C24.775,13.462,24.775,18.538,21.657,21.657z M24.485,24.485l-1.414-1.414
+            c3.899-3.899,3.899-10.243,0-14.143l1.414-1.414C29.164,12.193,29.164,19.807,24.485,24.485z"/>
+        </svg>
+      </button></li>
+      <!-- <li><button title="Organizer">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19,6.5H16v-1a3,3,0,0,0-3-3H11a3,3,0,0,0-3,3v1H5a3,3,0,0,0-3,3v9a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3v-9A3,3,0,0,0,19,6.5Zm-9-1a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1v1H10Zm10,13a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V13a21.27,21.27,0,0,0,3,.94v.59a1,1,0,0,0,2,0v-.21a23,23,0,0,0,3,.21,23,23,0,0,0,3-.21v.21a1,1,0,0,0,2,0v-.59A21.27,21.27,0,0,0,20,13Zm0-7.69a20.39,20.39,0,0,1-3,1V11.5a1,1,0,0,0-2,0v.74a20.11,20.11,0,0,1-6,0V11.5a1,1,0,0,0-2,0v.33a20.39,20.39,0,0,1-3-1V9.5a1,1,0,0,1,1-1H19a1,1,0,0,1,1,1Z"/>
+        </svg>
+      </button></li> -->
+      <hr>
+      <li><button title="Palette Editor">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="13.5" cy="6.5" r=".5" />
+          <circle cx="17.5" cy="10.5" r=".5" />
+          <circle cx="8.5" cy="7.5" r=".5" />
+          <circle cx="6.5" cy="12.5" r=".5" />
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+        </svg>
+      </button></li>
+      <hr>
+      <li><button title="Calculator">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M18,7 L18,3 L6,3 L6,7 L18,7 Z M18,9 L6,9 L6,21 L18,21 L18,9 Z M14,15 L14,14 L16,14 L16,15 L16,19 L14,19 L14,15 Z M6,1 L18,1 C19.1045695,1 20,1.8954305 20,3 L20,21 C20,22.1045695 19.1045695,23 18,23 L6,23 C4.8954305,23 4,22.1045695 4,21 L4,3 C4,1.8954305 4.8954305,1 6,1 Z M10,19 L8,19 L8,17 L10,17 L10,19 Z M13,19 L11,19 L11,17 L13,17 L13,19 Z M10,16 L8,16 L8,14 L10,14 L10,16 Z M13,16 L11,16 L11,14 L13,14 L13,16 Z M10,13 L8,13 L8,11 L10,11 L10,13 Z M13,13 L11,13 L11,11 L13,11 L13,13 Z M16,13 L14,13 L14,11 L16,11 L16,13 Z"/>
+        </svg>
+      </button></li>
+      <hr>
+      <li><button title="Actual Size">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 35 35" data-name="Layer 2" id="e37b3a33-67a4-43e9-ab68-4fc9ee55441c" xmlns="http://www.w3.org/2000/svg"><path d="M13.739,26.47a13.11,13.11,0,1,1,13.11-13.11A13.124,13.124,0,0,1,13.739,26.47Zm0-23.72a10.61,10.61,0,1,0,10.61,10.61A10.622,10.622,0,0,0,13.739,2.75Z"/><path d="M33.121,34.75a1.246,1.246,0,0,1-.884-.366L20.858,23.005a1.25,1.25,0,0,1,1.768-1.768L34.005,32.616a1.25,1.25,0,0,1-.884,2.134Z"/></svg>
+      </button></li>
+      <li><button title="Zoom Out">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 35 35" data-name="Layer 2" id="a87383aa-ce93-4fa9-a039-07a2cfd83b2e" xmlns="http://www.w3.org/2000/svg"><path d="M13.739,26.47a13.11,13.11,0,1,1,13.11-13.11A13.125,13.125,0,0,1,13.739,26.47Zm0-23.72a10.61,10.61,0,1,0,10.61,10.61A10.622,10.622,0,0,0,13.739,2.75Z"/><path d="M33.121,34.75a1.246,1.246,0,0,1-.884-.366L20.858,23.005a1.25,1.25,0,0,1,1.768-1.768L34,32.616a1.25,1.25,0,0,1-.883,2.134Z"/><path d="M18.313,15.061H9.424a1.25,1.25,0,0,1,0-2.5h8.889a1.25,1.25,0,0,1,0,2.5Z"/></svg>
+      </button></li>
+      <li><button title="Zoom In">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 35 35" data-name="Layer 2" id="b6acf553-b0b0-4683-aad1-76e9caed4f07" xmlns="http://www.w3.org/2000/svg"><path d="M13.739,26.47a13.11,13.11,0,1,1,13.11-13.11A13.125,13.125,0,0,1,13.739,26.47Zm0-23.72a10.61,10.61,0,1,0,10.61,10.61A10.622,10.622,0,0,0,13.739,2.75Z"/><path d="M33.121,34.75a1.246,1.246,0,0,1-.884-.366L20.858,23.005a1.25,1.25,0,0,1,1.767-1.768L34,32.616a1.25,1.25,0,0,1-.883,2.134Z"/><path d="M18.312,15.061H9.424a1.25,1.25,0,0,1,0-2.5h8.888a1.25,1.25,0,1,1,0,2.5Z"/><path d="M13.868,19.506a1.25,1.25,0,0,1-1.25-1.25V9.367a1.25,1.25,0,0,1,2.5,0v8.889A1.25,1.25,0,0,1,13.868,19.506Z"/></svg>
+      </button></li>
+      <hr>
+      <li><button title="Align (Center, Left)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4,4 20,4 20,20 4,20 4,20"/>
+          <g transform="translate(4 12)">
+            <line x1="0" y1="-3" x2="0" y2="3"/>
+            <line x1="-3" y1="0" x2="3" y2="0"/>
+          </g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Center, Center)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" />
+          <g transform="translate(12 12)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Center, Right)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20,4 4,4 4,20 20,20 20,20"/>
+          <g transform="translate(20 12)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Top, Center)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4,4 4,20 20,20 20,4 20,4"/>
+          <g transform="translate(12 4)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Bottom, Center)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4,20 4,4 20,4 20,20 20,20"/>
+          <g transform="translate(12 20)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Top, Left)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12,4 20,4 20,20 4,20 4,12 4,12"/>
+          <g transform="translate(4 4)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Top, Right)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12,4 4,4 4,20 20,20 20,12 20,12"/>
+          <g transform="translate(20 4)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Bottom, Left)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4,12 4,4 20,4 20,20 12,20 12,20"/>
+          <g transform="translate(4 20)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <li><button title="Align (Bottom, Right)">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12,20 4,20 4,4 20,4 20,12 20,12"/>
+          <g transform="translate(20 20)"><line x1="0" y1="-3" x2="0" y2="3" /><line x1="-3" y1="0" x2="3" y2="0" /></g>
+        </svg>
+      </button></li>
+      <hr>
+      <li><button title="Hit Boxes">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+          <rect width="256" height="256" fill="none"/>
+          <path d="M216,112V56a8,8,0,0,0-8-8H48a8,8,0,0,0-8,8v56c0,96,88,120,88,120S216,208,216,112Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          <line x1="128" y1="232" x2="128" y2="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          <line x1="40.86" y1="128" x2="215.14" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+        </svg>
+      </button></li>
+      <li><button title="Attack Boxes">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/>
+          <circle cx="128" cy="48" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          <line x1="128" y1="104" x2="216" y2="104" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          <polyline points="128 104 128 144 48 216" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          <polyline points="128 144 184 168 184 216" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+        </svg>
+      </button></li>
+    </ul>
+  </div>
+  <main>
+
+
+
+
+
+    <!-- Left Panels -->
+    <div class="leftpanel">
+
+
+
+      <div class="leftsidepanel nopanel" data-view="character-code">
+        Code
+      </div>
+
+
+
+      <div class="leftsidepanel panel" data-view="character-sprites">
+        <span>
+          <button title="Add one or more sprites"></button>
+          <button title="Remove the current sprite"></button>
+          <button title="Duplicate the current sprite"></button>
+          <button title="Delete a group of sprites"></button>
+          <button title="Rename a group of sprites"></button>
+          <button title="Change the image od the sprite from a file…"></button>
+          <button title="Save one or more sprites as images files…"></button>
+          <button title="Open the Image editor"></button>
+        </span>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+        <div style="display: flex; gap: 10px; width: 100%; margin-bottom: 15px;">
+          <div>
+            Group:<br>
+            <input type="number" name="number" min="0" max="99999" style="width: 80px;"/>
+          </div>
+          <div>
+            Index:<br>
+            <input type="number" name="number" min="0" max="99999" style="width: 80px;"/>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr) repeat(3, 35px); grid-template-rows: repeat(2, 1fr); grid-column-gap: 0px; grid-row-gap: 0px; align-items: center; justify-items: center; height: 75px;">
+          <div style="grid-area: 1 / 1 / 2 / 2;">X Axis:</div>
+          <div style="grid-area: 1 / 2 / 2 / 3; padding-right: 15px;"><input type="number" name="spr-xaxis" style="width: 60px;"/></div>
+          <div style="grid-area: 2 / 1 / 3 / 2;">Y Axis:</div>
+          <div style="grid-area: 2 / 2 / 3 / 3; padding-right: 15px;"><input type="number" name="spr-xaxis" style="width: 60px;"/></div>
+          <div style="grid-area: 1 / 3 / 3 / 4;"><button class="arrow-btn" id="">◀</button></div>
+          <div style="grid-area: 1 / 4 / 2 / 5;"><button class="arrow-btn" id="">▲</button></div>
+          <div style="grid-area: 2 / 4 / 3 / 5;"><button class="arrow-btn" id="">▼</button></div>
+          <div style="grid-area: 1 / 5 / 3 / 6;"><button class="arrow-btn" id="">▶</button></div>
+        </div>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+      </div>
+
+
+
+      <div class="leftsidepanel panel" data-view="animation">
+        Animation
+        <span>
+          <button title="Add a new animation"></button>
+          <button title="Remove the current animation"></button>
+          <button title="Duplicate the current animation"></button>
+          <button title="Edit the code of current animation"></button>
+          <button title="Save the current animation as an animated GIF…"></button>
+          <button title="Play the current animation"></button>
+          <button title="Stop the animation"></button>
+          <button title="Edit animatin code in code editor"></button>
+        </span>
+                <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+        Number|Name<br>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+        Group|index: DPad<br>
+        XAxis|YAxis<button>Offset</button><button>Align</button><br>
+        Time|Button|Flip|<button></button><br>
+        Transparency|Source|Dest<button></button>
+        Check loop frame<br>
+        XScale|YScale<button>Apply Scale</button>Angle<br>
+        Interpolate,<br>
+        Blend|Scale|Offset|Angle (checkboxes)<br>
+        <span>
+          <button title="Enable/disable the drawing mode for Attack contact box"></button>
+          <button title="Enable/disable the drawing mode for Collision contact box"></button>
+          <button title="Remvoe all selected Contact boxes"></button>
+          <button title="Remove all Contact boxes of current frame"></button>
+          <button title="Remove all Contact boxes of current animation"></button>
+          <button title="Copy all Contact boxes of previous frame"></button>
+          <button title="Switch type of all selected Contact boxes"></button>
+          <button title="Switch all seleced Contact boxes between regular and default"></button>
+        </span>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+        </div>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="leftsidepanel panel" data-view="commands">
+        Command Information<br><br>
+; The CMD file.<br>
+;<br>
+; Two parts: 1. Command definition and  2. State entry<br>
+; (state entry is after the commands def section)<br>
+;<br>
+; 1. Command definition<br>
+; ---------------------<br>
+; Note: The commands are CASE-SENSITIVE, and so are the command names.<br>
+; The eight directions are:<br>
+;   B, DB, D, DF, F, UF, U, UB     (all CAPS)<br>
+;   corresponding to back, down-back, down, downforward, etc.<br>
+; The six buttons are:<br>
+;   a, b, c, x, y, z               (all lower case)<br>
+;   In default key config, abc are are the bottom, and xyz are on the<br>
+;   top row. For 2 button characters, we recommend you use a and b.<br>
+;   For 6 button characters, use abc for kicks and xyz for punches.<br>
+;<br>
+; Each [Command] section defines a command that you can use for<br>
+; state entry, as well as in the CNS file.<br>
+; The command section should look like:<br>
+;<br>
+;   [Command]<br>
+;   name = some_name<br>
+;   command = the_command<br>
+;   time = time (optional)<br>
+;   buffer.time = time (optional)<br>
+;<br>
+; - some_name<br>
+;   A name to give that command. You'll use this name to refer to<br>
+;   that command in the state entry, as well as the CNS. It is case-<br>
+;   sensitive (QCB_a is NOT the same as Qcb_a or QCB_A).<br>
+;<br>
+; - command<br>
+;   list of buttons or directions, separated by commas. Each of these<br>
+;   buttons or directions is referred to as a "symbol".<br>
+;   Directions and buttons can be preceded by special characters:<br>
+;   slash (/) - means the key must be held down<br>
+;          egs. command = /D       ;hold the down direction<br>
+;               command = /DB, a   ;hold down-back while you press a<br>
+;   tilde (~) - to detect key releases<br>
+;          egs. command = ~a       ;release the a button<br>
+;               command = ~D, F, a ;release down, press fwd, then a<br>
+;          If you want to detect "charge moves", you can specify<br>
+;          the time the key must be held down for (in game-ticks)<br>
+;          egs. command = ~30a     ;hold a for at least 30 ticks, then release<br>
+;   dollar ($) - Direction-only: detect as 4-way<br>
+;          egs. command = $D       ;will detect if D, DB or DF is held<br>
+;               command = $B       ;will detect if B, DB or UB is held<br>
+;   plus (+) - Buttons only: simultaneous press<br>
+;          egs. command = a+b      ;press a and b at the same time<br>
+;               command = x+y+z    ;press x, y and z at the same time<br>
+;   greater-than (>) - means there must be no other keys pressed or released<br>
+;                      between the previous and the current symbol.<br>
+;          egs. command = a, >~a   ;press a and release it without having hit<br>
+;                                  ;or released any other keys in between<br>
+;   You can combine the symbols:<br>
+;     eg. command = ~30$D, a+b     ;hold D, DB or DF for 30 ticks, release,<br>
+;                                  ;then press a and b together<br>
+;<br>
+;   Note: Successive direction symbols are always expanded in a manner similar<br>
+;         to this example:<br>
+;           command = F, F<br>
+;         is expanded when MUGEN reads it, to become equivalent to:<br>
+;           command = F, >~F, >F<br>
+;<br>
+;   It is recommended that for most "motion" commads, eg. quarter-circle-fwd,<br>
+;   you start off with a "release direction". This makes the command easier<br>
+;   to do.<br>
+;<br>
+; - time (optional)<br>
+;   Time allowed to do the command, given in game-ticks. The default<br>
+;   value for this is set in the [Defaults] section below. A typical<br>
+;   value is 15.<br>
+;<br>
+; - buffer.time (optional)<br>
+;   Time that the command will be buffered for. If the command is done<br>
+;   successfully, then it will be valid for this time. The simplest<br>
+;   case is to set this to 1. That means that the command is valid<br>
+;   only in the same tick it is performed. With a higher value, such<br>
+;   as 3 or 4, you can get a "looser" feel to the command. The result<br>
+;   is that combos can become easier to do because you can perform<br>
+;   the command early. Attacks just as you regain control (eg. from<br>
+;   getting up) also become easier to do. The side effect of this is<br>
+;   that the command is continuously asserted, so it will seem as if<br>
+;   you had performed the move rapidly in succession during the valid<br>
+;   time. To understand this, try setting buffer.time to 30 and hit<br>
+;   a fast attack, such as KFM's light punch.<br>
+;   The default value for this is set in the [Defaults] section below.<br>
+;   This parameter does not affect hold-only commands (eg. /F). It<br>
+;   will be assumed to be 1 for those commands.<br>
+;<br>
+; If you have two or more commands with the same name, all of them will<br>
+; work. You can use it to allow multiple motions for the same move.<br>
+;<br>
+; Some common commands examples are given below.<br>
+;<br>
+; [Command] ;Quarter circle forward + x<br>
+; name = "QCF_x"<br>
+; command = ~D, DF, F, x<br>
+;<br>
+; [Command] ;Half circle back + a<br>
+; name = "HCB_a"<br>
+; command = ~F, DF, D, DB, B, a<br>
+;<br>
+; [Command] ;Two quarter circles forward + y<br>
+; name = "2QCF_y"<br>
+; command = ~D, DF, F, D, DF, F, y<br>
+;<br>
+; [Command] ;Tap b rapidly<br>
+; name = "5b"<br>
+; command = b, b, b, b, b<br>
+; time = 30<br>
+;<br>
+; [Command] ;Charge back, then forward + z<br>
+; name = "charge_B_F_z"<br>
+; command = ~60$B, F, z<br>
+; time = 10<br>
+;<br>
+; [Command] ;Charge down, then up + c<br>
+; name = "charge_D_U_c"<br>
+; command = ~60$D, U, c<br>
+; time = 10<br>
+      </div>
+
+
+
+      <div class="leftsidepanel panel" data-view="states">
+        States<br>
+        <span>
+          <button title="Open the PalFX editor"></button>
+          <button title="Open the Offset viewer"></button>
+          <button title="Open the Throw creator"></button>
+          <button title="Insert variable usage log"></button>
+          <button title="View variable usage list"></button>
+        </span>
+        List
+      </div>
+
+
+
+      <div class="leftsidepanel nopanel" data-view="sounds">
+        Sounds
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- Main View -->
+    <div class="main">
+      <div class="view active" data-view="welcome">
+        <div style="padding:60px; text-align:center;">
+            <h1>Welcome FighterZ</h1>
+            <p>Let's get your FighterZ ready for battle!</p>
+        </div>
+      </div>
+
+
+
+      <div class="view" data-view="character-code">
+        <textarea id="sff-out" spellcheck="false" readonly></textarea>
+      </div>
+
+
+
+      <div class="view" data-view="character-sprites">
+        <canvas id="stage-bg-canvas"></canvas>
+      </div>
+
+
+
+      <div class="view" data-view="animation">
+        <canvas id="anim-bg-canvas"></canvas>
+      </div>
+
+
+
+      <div class="view" data-view="commands">
+        Commands
+        <table id="movelist" contenteditable="true" spellcheck="false">
+          <thead contenteditable="false">
+            <tr>
+              <th>Name</th>
+              <th>Command</th>
+              <th>Time</th>
+              <th>Buffer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>shungoku</td>
+              <td>~x, x, F, a, z</td>
+              <td>37</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>shungoku</td>
+              <td>~x, x, F, a, ~z</td>
+              <td>37</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>m_hadou1</td>
+              <td>~D, DF, F, D, DF, x</td>
+              <td>23</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+
+      <div class="view" data-view="states">
+        States
+        <ul>
+          <li>State 1</li>
+          <li>State 2</li>
+        </ul>
+      </div>
+
+
+
+      <div class="view" data-view="sounds">
+        Sounds
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- Right Panels -->
+    <div class="rightpanel">
+
+
+
+      <div class="rightsidepanel" data-view="character-code">
+        <div class="preview-header">
+          <div class="label">Code</div>
+          <div class="button-group">
+            <!-- <button class="action-btn" onclick="openCharacterFile()">OPEN</button> -->
+            <button id="dl-code-btn" class="action-btn" onclick="saveCharacterFile()" style="display: none;">DOWNLOAD</button>
+          </div>
+        </div>
+        <div class="preview-header">
+          <div class="label">Sound</div>
+          <button id="dl-snd-btn" class="action-btn" style="display: none;" onclick="downloadAudio()">💾OWNLOAD</button>
+        </div>
+        <div class="sound-container">
+          <audio id="char-audio" controls></audio>
+        </div>
+        <div class="preview-header">
+          <div class="label">Spritesheet</div>
+          <button id="dl-btn" class="action-btn" style="display: none;" onclick="downloadPNG()">DOWNLOAD</button>
+        </div>
+        <canvas id="spritesheet-canvas"></canvas>
+        <div>
+          <div id="size-tag" style="position: relative; width: 35%; font-size:10px; color:#555; display: inline-block;">0 x 0</div>
+          <div id="numOfSprites" style="position: relative; width: 60%; font-size:10px; color:#555; display: inline-block; text-align: right;">-</div>
+        </div>
+      </div>
+
+
+
+      <div class="rightsidepanel" data-view="character-sprites">
+        <span>
+          <button title="Add one or more palettes"></button>
+          <button title="Remove the current palette"></button>
+          <button title="Define new colros to the palette from a file…"></button>
+          <button title="Save the palette as a file…"></button>
+          <button title="Undo"></button>
+          <button title="Redo"></button>
+          <button title="Switch the palette color (32 to 256 or 256 to 32)"></button>
+          <button title="Exchange position of selected colors"></button>
+          <button title="Enable the Color picker for quick selection"></button>
+          <button title="Sets the oclor of the selected slots"></button>
+          <button title="Open the palette Remap tool"></button>
+          <button title="Apply the current palette to the specified sprites"></button>
+          <button title="Edit the palette in the 'Advanced palette editor'"></button>
+        </span>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <input id="switch-pal-sprite" type="checkbox" /><label for="switch-pal-sprite">Switch to the sprite palette</label>
+        </div>
+        <div style="display: flex; gap: 10px; width: 100%;">
+          <div>
+            Group:<br>
+            <input type="number" name="number" min="0" max="99999" style="width: 80px;"/>
+          </div>
+          <div>
+            Index:<br>
+            <input type="number" name="number" min="0" max="99999" style="width: 80px;"/>
+          </div>
+        </div>
+        <div class="palette" id="palette"></div>
+      </div>
+
+
+
+      <div class="rightsidepanel" data-view="animation">
+        Animation
+        <span>
+          <button title="Add seleced to the current animation"></button>
+          <button title="Add alll to the current animation"></button>
+          <button title="New animation with selected"></button>
+          <button title="New animation with all"></button>
+          <button title="Save selected images"></button>
+        </span>
+      </div>
+
+
+
+      <div class="rightsidepanel" data-view="commands">
+        Commands<br>
+        <select id="CommandList" style="position: relative; width: 100%; height: 100%; overflow: auto;" size="2">
+          <option value="">Command 1</option>
+          <option value="">Command 2</option>
+          <option value="">Command 3</option>
+          <option value="">Command 4</option>
+          <option value="">Command 5</option>
+        </select>
+      </div>
+
+
+
+      <div class="rightsidepanel" data-view="states">
+        StateControllers<br>
+        <span>
+          <button title="New State controller"></button>
+          <button title="Edit selected"></button>
+          <button title="Delete selected"></button>
+        </span>
+        <select id="StateControllers" style="position: relative; width: 100%; height: 100%; overflow: auto;" size="2">
+          <option value="">AfterImage</option>
+          <option value="">AfterImageTime</option>
+          <option value="">AllPalFX</option>
+          <option value="">AngleAdd</option>
+          <option value="">AngleDraw</option>
+          <option value="">AngleMul</option>
+          <option value="">AngleSet</option>
+          <option value="">AppendToClipboard</option>
+          <option value="">AssertSpecial</option>
+          <option value="">AttackDist</option>
+          <option value="">AttackMulSet</option>
+          <option value="">BGPalFX</option>
+          <option value="">BindToParent</option>
+          <option value="">BindToRoot</option>
+          <option value="">BindToTarget</option>
+          <option value="">ChangeAnim</option>
+          <option value="">ChangeAnim2</option>
+          <option value="">ChangeState</option>
+          <option value="">ClearClipboard</option>
+          <option value="">CtrlSet</option>
+          <option value="">DefenceMulSet</option>
+          <option value="">DestroySelf</option>
+          <option value="">DisplayToClipboard</option>
+          <option value="">EnvColor</option>
+          <option value="">EnvShake</option>
+          <option value="">Explod</option>
+          <option value="">ExplodBindTime</option>
+          <option value="">FallEnvShake</option>
+          <option value="">ForceFeedback</option>
+          <option value="">GameMakeAnim</option>
+          <option value="">Gravity</option>
+          <option value="">Helper</option>
+          <option value="">HitAdd</option>
+          <option value="">HitBy</option>
+          <option value="">HitDef</option>
+          <option value="">HitFallDamage</option>
+          <option value="">HitFallSet</option>
+          <option value="">HitFallVel</option>
+          <option value="">HitOverride</option>
+          <option value="">HitVelSet</option>
+          <option value="">LifeAdd</option>
+          <option value="">LifeSet</option>
+          <option value="">MakeDust</option> <!-- deprecated - use Explod controller -->
+          <option value="">ModifyExplod</option>
+          <option value="">MoveHitReset</option>
+          <option value="">NotHitBy</option>
+          <option value="">Null</option>
+          <option value="">Offset</option>
+          <option value="">PalFX</option>
+          <option value="">ParentVarAdd</option>
+          <option value="">ParentVarSet</option>
+          <option value="">Pause</option>
+          <option value="">PlayerPush</option>
+          <option value="">PlaySnd</option>
+          <option value="">PosAdd</option>
+          <option value="">PosFreeze</option>
+          <option value="">PosSet</option>
+          <option value="">PowerAdd</option>
+          <option value="">PowerSet</option>
+          <option value="">Projectile</option>
+          <option value="">RemapPal</option>
+          <option value="">RemoveExplod</option>
+          <option value="">ReversalDef</option>
+          <option value="">ScreenBound</option>
+          <option value="">SelfState</option>
+          <option value="">SndPan</option>
+          <option value="">SprPriority</option>
+          <option value="">StateDef</option>
+          <option value="">StateTypeSet</option>
+          <option value="">StopSnd</option>
+          <option value="">SuperPause</option>
+          <option value="">TargetBind</option>
+          <option value="">TargetDrop</option>
+          <option value="">TargetFacing</option>
+          <option value="">TargetLifeAdd</option>
+          <option value="">TargetPowerAdd</option>
+          <option value="">TargetState</option>
+          <option value="">TargetVelAdd</option>
+          <option value="">TargetVelSet</option>
+          <option value="">Trans</option>
+          <option value="">Turn</option>
+          <option value="">VarAdd</option>
+          <option value="">VarRandom</option>
+          <option value="">VarRangeSet</option>
+          <option value="">VarSet</option>
+          <option value="">VelAdd</option>
+          <option value="">VelMul</option>
+          <option value="">VelSet</option>
+          <option value="">VictoryQuote</option>
+          <option value="">Width</option>
+        </select>
+      </div>
+
+
+
+      <div class="rightsidepanel" data-view="sounds">
+        Sounds
+        <span>
+          <button title="Add one or more sounds"></button>
+          <button title="Remove the current sound"></button>
+          <button title="Change the current sound from a file…"></button>
+          <button title="Save the sound as WAV…"></button>
+          <button title="Play the curent sound"></button>
+          <button title="Play the current sound with infinite loop"></button>
+          <button title="Pause"></button>
+          <button title="Stop the sound"></button>
+        </span>
+        <div class="scrollbar-container">
+          <div class="scrollbar">
+            <button class="arrow-btn" id="prevBtn">◀</button>
+            <input type="range" id="slider" min="1" max="250" value="1" />
+            <button class="arrow-btn" id="nextBtn">▶</button>
+          </div>
+          <div class="value-text" id="valueText">1 / 250</div>
+        </div>
+        Group|Index<br>
+        Audio Info|Volume<br>
+        <span>
+          <button title=""></button>
+          <button title=""></button>
+          <button title=""></button>
+          <button title=""></button>
+          <button title=""></button>
+          <button title=""></button>
+        </span>
+        Current Sample:<button title=""></button><button title=""></button><br>
+        Selection [ Start|End ]
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+  </main>
+</div>
+
+<div id="spritesheet-view"></div>
+
+<dialog id="aboutDialog" style="max-width: 400px; background: var(--tab-bg); color: #d4d4d4; border: 0; border-radius: 8px;">
+  <h2 style="margin: 0 0 10px 0;">FighterZ Studio</h2>
+  <p>FighterZ Studio allows you to create fighters or import fighters from M.U.G.E.N to be used for the FighterZ web fighting engine.</p>
+  <form method="dialog" style="position: relative; text-align: center;"><button class="action-btn">Close</button></form>
+</dialog>
+
+<input type="file" id="safari-folder-picker" webkitdirectory directory multiple style="display:none;">
+
+<!-- <script src="editor.js"></script> -->
+<script>
+// Menubar 
+// ==================================================
+
+const menuItems = document.querySelectorAll('.can-hover > li');
+let focusedItem = null;
+
+function closeMainMenu() {
+  menuItems.forEach(item => {
+    item.addEventListener('blur', () => {
+      focusedItem = null;
+    });
+
+    item.blur();
+  });
+}
+
+menuItems.forEach(item => {
+  item.addEventListener('mouseover', () => {
+    if (focusedItem) {
+      focusedItem.blur();
+      item.focus();
+      focusedItem = item;
+    }
+  });
+
+  item.addEventListener('focus', () => {
+    focusedItem = item;
+// console.log(`${focusedItem}`);
+  });
+
+  item.addEventListener('blur', () => {
+    focusedItem = null;
+  });
+
+  item.addEventListener('mousedown', (event) => {
+    // Check if the clicked element is an li inside a .can-hover > li
+    const clickedLi = event.target.closest('.can-hover > li li');
+    if (!clickedLi && item === focusedItem) {
+      // Prevents the element from getting focus again
+      // closeMainMenu();
+      event.preventDefault();
+      item.blur();
+    }
+  });
+});
+
+function OpenFile() {
+  closeMainMenu();
+
+  let input = document.createElement('input');
+  input.type = 'file';
+  input.onchange = _ => {
+    // you can use this method to get file and perform respective operations
+    let files =   Array.from(input.files);
+    console.log(files);
+  };
+  input.click();
+}
+
+function SaveFile() {
+  closeMainMenu();
+}
+
+function SaveAsFile() {
+  closeMainMenu();
+}
+
+function Exit() {
+  closeMainMenu();
+}
+
+function view(viewId) {
+  closeMainMenu();
+
+  // Hide all
+  document.querySelectorAll('.view, .leftsidepanel, .rightsidepanel').forEach(el => el.classList.remove('active'));
+
+  // Show selected
+  const v = document.querySelector(`.view[data-view="${viewId}"]`);
+  const l = document.querySelector(`.leftsidepanel[data-view="${viewId}"]`);
+  const r = document.querySelector(`.rightsidepanel[data-view="${viewId}"]`);
+  
+  if (v) v.classList.add('active');
+  if (r) r.classList.add('active');
+  if (l) l.classList.add('active');
+
+  // Draw the stage
+  if (viewId === 'character-sprites') {
+    updateViewStage();
+  }
+}
+
+function togglePanel(selector) {
+  closeMainMenu();
+  const el = document.querySelector(selector);
+  if (!el) return;
+
+  el.style.display = getComputedStyle(el).display === 'none' ? 'flex' : 'none';
+}
+
+// let contextMenu = null;
+let contextMenu = document.querySelector(".context-menu");
+
+document.addEventListener('contextmenu', event => {
+  event.preventDefault();
+});
+
+document.querySelector('main').addEventListener('contextmenu', e => {
+
+  e.preventDefault();
+
+  // Remove existing context menu
+  // if (contextMenu !== null) {
+  if (contextMenu.style.display !== "none") {
+    // document.body.removeChild(contextMenu);
+    contextMenu.style.display = "none";
+  }
+
+  // Create new context menu
+  // contextMenu = document.createElement('div');
+  // contextMenu.classList.add('context-menu');
+  // contextMenu.innerHTML = `
+  // <div class="menu">
+  //   <ul style="width: 200px">
+  //     <li>
+  //       <input type="radio" name="icon-size" id="example12">
+  //       <label for="example12">Large icons</label>
+  //     </li>
+  //     <li>
+  //       <input type="radio" name="icon-size" id="example13" checked>
+  //       <label for="example13">Medium icons</label>
+  //     </li>
+  //     <li class="has-divider">
+  //       <input type="radio" name="icon-size" id="example14">
+  //       <label for="example14">Small icons</label>
+  //     </li>
+  //     <li>
+  //       <input type="checkbox" id="example15">
+  //       <label for="example15">Auto arrange icons</label>
+  //     </li>
+  //     <li>
+  //       <input type="checkbox" id="example16" checked>
+  //       <label for="example16">Align icons to grid</label>
+  //     </li>
+  //   </ul>
+  // <div>
+  // `;
+  // document.body.appendChild(contextMenu);
+
+  contextMenu.style.display = "block";
+
+  // Set the position of the context menu
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+  const menuWidth = contextMenu.offsetWidth;
+  const menuHeight = contextMenu.offsetHeight;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const x = Math.min(mouseX, screenWidth - menuWidth);
+  const y = Math.min(mouseY, screenHeight - menuHeight);
+  contextMenu.style.top = `${y}px`;
+  contextMenu.style.left = `${x}px`;
+
+  // Left click on current location
+  const evt = new MouseEvent('click', {
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+  });
+  document.elementFromPoint(x, y).dispatchEvent(evt);
+});
+
+// Close context menu on click outside of it
+document.addEventListener('click', e => {
+  if (contextMenu !== null && !contextMenu.contains(e.target)) {
+  // document.body.removeChild(contextMenu);
+    contextMenu.style.display = "none";
+  // contextMenu = null;
+  }
+});
+
+
+
+
+
+
+
+
+
+
+// UI EventListeners
+// ==================================================
+
+// function updateDynamicCommandList() {
+//   var dynamicCommandList = document.getElementById('CommandList');
+//   dynamicCommandList.setAttribute('size', dynamicCommandList.childElementCount);
+// }
+
+
+
+
+
+
+
+
+
+// Database File Handler
+// ==================================================
+const dbName = "FighterZEditor", storeName = "CharFolder";
+let gameDirHandle = null;
+
+async function openDB() {
+  return new Promise(res => {
+    const req = indexedDB.open(dbName, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(storeName);
+    req.onsuccess = () => res(req.result);
+  });
+}
+
+async function saveHandle(handle) {
+  const db = await openDB();
+  db.transaction(storeName, "readwrite").objectStore(storeName).put(handle, "root");
+}
+
+async function getHandle() {
+  const db = await openDB();
+  return new Promise(res => {
+    const req = db.transaction(storeName).objectStore(storeName).get("root");
+    req.onsuccess = () => res(req.result);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+// M.U.G.E.N Importer
+// ==================================================
+
+function parseAirFile(text) {
+  const anims = {};
+  const lines = text.split(/\r?\n/);
+  let currentAction = null;
+  let currentBoxes = { clsn1: [], clsn2: [] };
+  let defaultBoxes = { clsn1: [], clsn2: [] };
+  let loopStartIndex = 0;
+
+  lines.forEach(line => {
+    // Remove comments and whitespace
+    const cleanLine = line.split(';')[0].trim();
+    if (!cleanLine) return;
+
+    // 1. Detect [Begin Action #]
+    const beginMatch = cleanLine.match(/^\[Begin Action\s+(\d+)\]/i);
+    if (beginMatch) {
+      currentAction = beginMatch[1];
+      anims[currentAction] = { frames: [], loopStart: 0 };
+      currentBoxes = { clsn1: [], clsn2: [] };
+      defaultBoxes = { clsn1: [], clsn2: [] };
+      loopStartIndex = 0;
+      return;
+    }
+
+    if (currentAction === null) return;
+
+    // 2. Detect Loopstart
+    if (cleanLine.toLowerCase() === "loopstart") {
+      loopStartIndex = anims[currentAction].frames.length;
+      anims[currentAction].loopStart = loopStartIndex;
+      return;
+    }
+
+    // 3. Detect Default Box Definitions
+    const clsn1DefMatch = cleanLine.match(/^Clsn1Default:\s*(\d+)/i);
+    if (clsn1DefMatch) { defaultBoxes.clsn1 = []; return; }
+    
+    const clsn2DefMatch = cleanLine.match(/^Clsn2Default:\s*(\d+)/i);
+    if (clsn2DefMatch) { defaultBoxes.clsn2 = []; return; }
+
+    // 4. Detect Specific Box Definitions
+    const clsn1Match = cleanLine.match(/^Clsn1\[(\d+)\]\s*=\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)/i);
+    if (clsn1Match) {
+      const box = clsn1Match.slice(2).map(Number);
+      // If we are currently in a Default block or standard block
+      // MUGEN logic is line-order dependent.
+      currentBoxes.clsn1.push(box);
+      return;
+    }
+
+    const clsn2Match = cleanLine.match(/^Clsn2\[(\d+)\]\s*=\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)/i);
+    if (clsn2Match) {
+      currentBoxes.clsn2.push(clsn2Match.slice(2).map(Number));
+      return;
+    }
+
+    // 5. Detect Frame line: Group, Image, X, Y, Time, [Flip], [Alpha]
+    const frameMatch = cleanLine.match(/^(\d+)\s*,\s*(\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)(?:\s*,\s*([VH]?))?(?:\s*,\s*([AS\d]+))?/i);
+    if (frameMatch) {
+      // Logic for Box Inheritance:
+      // If specific boxes were defined right before this frame, use them.
+      // Otherwise, use the Default boxes defined for this action.
+      const finalClsn1 = currentBoxes.clsn1.length > 0 ? [...currentBoxes.clsn1] : [...defaultBoxes.clsn1];
+      const finalClsn2 = currentBoxes.clsn2.length > 0 ? [...currentBoxes.clsn2] : [...defaultBoxes.clsn2];
+
+      anims[currentAction].frames.push({
+        sprite: `"${frameMatch[1]}-${frameMatch[2]}"`,
+        offset: [Number(frameMatch[3]), Number(frameMatch[4])],
+        time: Number(frameMatch[5]),
+        flip: frameMatch[6] || "",
+        clsn1: finalClsn1,
+        clsn2: finalClsn2
+      });
+
+      // After a frame, specific boxes reset, but Default boxes persist
+      currentBoxes = { clsn1: [], clsn2: [] };
+    }
+  });
+
+  return anims;
+}
+
+function parseCMD(text) {
+  if (typeof text !== "string") return null;
+
+  const lines = text.split(/\r?\n/);
+  let section = "";
+  
+  const out = {
+    commands: {},
+    remap: {},
+    defaults: {}
+  };
+
+  let currentName = null;
+
+  for (let raw of lines) {
+    // Strip comments
+    let line = raw.split(";")[0].trim();
+    if (!line) continue;
+
+    // Section headers
+    const secMatch = line.match(/^\[(.+?)\]/);
+    if (secMatch) {
+      section = secMatch[1].toLowerCase();
+      continue;
+    }
+
+    if (section !== "command") continue;
+
+    const eq = line.indexOf("=");
+    if (eq === -1) continue;
+
+    const key = line.slice(0, eq).trim().toLowerCase();
+    let val = line.slice(eq + 1).trim();
+
+    // ---- NAME ----
+    if (key === "name") {
+      currentName = val
+        .replace(/^"+|"+$/g, "")   // remove quotes
+        .replace(/\\/g, "")        // remove backslashes
+        .trim();
+
+      if (!out.commands[currentName]) {
+        out.commands[currentName] = [];
+      }
+    }
+
+    // ---- COMMAND ----
+    else if (key === "command" && currentName) {
+      // normalize spacing: comma + single space
+      val = val
+        .replace(/\s*,\s*/g, ", ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      out.commands[currentName].push(val);
+    }
+
+    // ---- TIME (optional, ignored for now) ----
+    // else if (key === "time") {}
+  }
+
+  return out;
+}
+
+
+
+function parseCNS(text) {
+  const lines = text.split(/\r?\n/);
+  const states = {};
+  let cur = null;
+
+  for (let l of lines) {
+    l = l.split(";")[0].trim();
+    if (!l) continue;
+
+    const m = l.match(/^\[State\s+(-?\d+)\]/i);
+    if (m) {
+      cur = { id:+m[1], controllers: [] };
+      states[cur.id] = cur;
+      continue;
+    }
+
+    if (!cur) continue;
+
+    if (l.startsWith("type")) {
+      cur.controllers.push({ type: l.split("=")[1].trim(), params:{} });
+    }
+    else if (cur.controllers.length) {
+      const [k,v] = l.split("=").map(s=>s.trim());
+      if (k && v)
+        cur.controllers[cur.controllers.length-1].params[k] = v;
+    }
+  }
+
+  return states;
+}
+
+function decodePCX(buffer, offset, length, externalPalette) {
+  const dv = new DataView(buffer, offset, length);
+  const width = dv.getUint16(8, true) - dv.getUint16(4, true) + 1;
+  const height = dv.getUint16(10, true) - dv.getUint16(6, true) + 1;
+  let bpl = dv.getUint16(66, true);
+  if (bpl < width) bpl = width;
+
+  let palette = [];
+  
+  // Check if an external palette was provided (e.g., from an .act file)
+  if (externalPalette && externalPalette.length === 256) {
+    palette = externalPalette;
+  } else {
+    // Look for the palette marker (12) 769 bytes from the end of the PCX data
+    const palMarkerOffset = length - 769;
+    if (palMarkerOffset >= 0 && dv.getUint8(palMarkerOffset) === 12) {
+      const pOff = length - 768;
+      for (let i = 0; i < 256; i++) {
+        palette.push({
+          r: dv.getUint8(pOff + i * 3),
+          g: dv.getUint8(pOff + i * 3 + 1),
+          b: dv.getUint8(pOff + i * 3 + 2)
+        });
+      }
+    } else {
+      // Fallback to grayscale if no palette is found
+      for (let i = 0; i < 256; i++) palette.push({ r: i, g: i, b: i });
+    }
+  }
+
+  // Decompression logic remains the same...
+  const raw = new Uint8Array(bpl * height);
+  let r = 128, w = 0;
+  while (w < raw.length && r < length) {
+    let b = dv.getUint8(r++);
+    if ((b & 0xC0) === 0xC0) {
+      let count = b & 0x3F;
+      let val = dv.getUint8(r++);
+      for (let i = 0; i < count && w < raw.length; i++) raw[w++] = val;
+    } else {
+      raw[w++] = b;
+    }
+  }
+  return { raw, width, height, bpl, palette };
+}
+
+function decompressRLE8(buffer, offset, length, width, height) {
+  const dv = new DataView(buffer, offset, length);
+  const raw = new Uint8Array(width * height);
+  let r = 0, w = 0;
+  while (r < length && w < raw.length) {
+    const byte = dv.getUint8(r++);
+    if ((byte & 0xC0) === 0x40) {
+      const count = byte & 0x3F;
+      const value = dv.getUint8(r++);
+      for (let i = 0; i < count && w < raw.length; i++) raw[w++] = value;
+    } else raw[w++] = byte;
+  }
+  return raw;
+}
+
+function decodeSFFv1(buffer) {
+  console.log("decodeSFFv1");
+  const dv = new DataView(buffer);
+  const count = dv.getUint32(20, true);
+  const first = dv.getUint32(24, true);
+  const sprites = [];
+  let off = first;
+
+  for (let i = 0; i < count; i++) {
+    // Safety 1: Ensure we can at least read the 32-byte header
+    if (off + 32 > buffer.byteLength) {
+      console.warn(`Reached end of buffer at sprite ${i}`);
+      break;
+    }
+
+    const next = dv.getUint32(off, true);
+    const len = dv.getUint32(off + 4, true);
+    const axisX = dv.getInt16(off + 8, true); // Extract X pivot
+    const axisY = dv.getInt16(off + 10, true); // Extract Y pivot
+    const grp = dv.getUint16(off + 12, true);
+    const img = dv.getUint16(off + 14, true);
+    const prevIdx = dv.getUint16(off + 16, true);
+    const samePal = dv.getUint8(off + 18);
+
+    // Safety 2: Ensure the image data (length 'len') actually exists in the buffer
+    if (off + 32 + len > buffer.byteLength) {
+      console.warn(`Sprite ${grp}-${img} data truncated. Expected ${len} bytes.`);
+      // Optional: push a placeholder or skip
+      break; 
+    }
+
+    sprites.push({
+      group: grp, 
+      image: img, 
+      axisX: axisX,
+      axisY: axisY,
+      prevIdx, 
+      samePal,
+      offset: off + 32, 
+      length: len, 
+      isV2: false
+    });
+
+    // Logical break for Kung Fu Man and older SFFs
+    if (next === 0 || next <= off) {
+      off += (32 + len);
+    } else {
+      off = next;
+    }
+  }
+  return sprites;
+}
+
+function decodeSFFv2(buffer) {
+  const dv = new DataView(buffer);
+  const palNodeOff = dv.getUint32(40, true);
+  const palCount   = dv.getUint32(44, true);
+  const sprNodeOff = dv.getUint32(48, true); 
+  const sprCount   = dv.getUint32(52, true);
+
+  const palettes = [];
+  for (let i = 0; i < palCount; i++) {
+    const entryOff = palNodeOff + (i * 16);
+    const dataOff = dv.getUint32(entryOff + 8, true);
+    const dataLen = dv.getUint32(entryOff + 12, true);
+    
+    const palArray = [];
+    for (let j = 0; j < 256; j++) {
+      const p = dataOff + (j * 4); // SFFv2 often uses RGBA (4 bytes)
+      palArray.push({
+        r: dv.getUint8(p),
+        g: dv.getUint8(p + 1),
+        b: dv.getUint8(p + 2)
+      });
+    }
+    palettes.push(palArray);
+  }
+
+  const sprites = [];
+  for (let i = 0; i < sprCount; i++) {
+    const entryOff = sprNodeOff + (i * 28);
+    const grp = dv.getUint16(entryOff, true);
+    const img = dv.getUint16(entryOff + 2, true);
+    const axisX = dv.getInt16(entryOff + 4, true);
+    const axisY = dv.getInt16(entryOff + 6, true);
+    const palIdx = dv.getUint16(entryOff + 10, true); // Palette index for this sprite
+    
+    // ... extract dataOff and dataLen ...
+
+    sprites.push({
+      group: grp,
+      image: img,
+      axisX: axisX,
+      axisY: axisY,
+      palette: palettes[palIdx] || palettes[0], // Assign the correct palette
+      // ... other properties ...
+    });
+  }
+  return sprites;
+}
+
+/* ============================================================
+   DEF PARSER
+============================================================ */
+function parseDEF(text) {
+  const lines = text.split(/\r?\n/);
+  let section = null;
+  const files = {};
+
+  for (let line of lines) {
+    line = line.split(";")[0].trim();
+    if (!line) continue;
+
+    const m = line.match(/^\[(.+?)\]$/);
+    if (m) {
+      section = m[1].toLowerCase();
+      continue;
+    }
+
+    if (section === "files") {
+      const [k,v] = line.split("=").map(s=>s.trim());
+      if (k && v) files[k.toLowerCase()] = v;
+    }
+  }
+
+  console.log("DEF files:", files);
+  return files;
+}
+
+function parseStageDEFFile(text) {
+  if (typeof text !== "string") {
+    console.warn("parseStageDEFFile: invalid input", text);
+    return {};
+  }
+
+  const lines = text.split(/\r?\n/);
+  const data = {
+    info: {},
+    sprite: {},
+    camera: {},
+    playerinfo: {},
+    scaling: {},
+    bound: {},
+    stageinfo: {},
+    shadow: {},
+    music: {},
+    bgdef: {},
+  };
+
+  let currentSection = null;
+  let currentAction = null;
+  let currentBG = null;
+  let currentBGCtrl = null;
+  let currentBGCtrlDef = null;
+
+  for (let raw of lines) {
+    let line = raw.split(";")[0].trim();
+    if (!line) continue;
+
+    /* -----------------------------
+       [Section Name] - Handle standard sections and special groups
+    ----------------------------- */
+    let m = line.match(/^\[(.+?)\]$/i);
+    if (m) {
+      const sectionName = m[1].toLowerCase();
+
+      // Check for special section types that need grouping
+      const actionMatch = sectionName.match(/^begin action\s+(\d+)$/i);
+      const bgMatch = sectionName.match(/^bg\s+(.+)$/i);
+      const bgCtrlMatch = sectionName.match(/^bgctrl\s+(\d+)$/i);
+      const bgCtrlDefMatch = sectionName.match(/^bgctrldef\s+(\d+)$/i);
+
+      // Reset all 'current' trackers when a new top-level section starts
+      currentSection = null;
+      currentAction = null;
+      currentBG = null;
+      currentBGCtrl = null;
+      currentBGCtrlDef = null;
+
+      if (actionMatch) {
+        // Handle Begin Action X
+        const actionNum = actionMatch[1];
+        if (!data.hasOwnProperty('begin action')) {
+          data['begin action'] = {};
+        }
+        data['begin action'][actionNum] = []; // Initialize as an array for frames
+        currentAction = actionNum; // Set active action number
+      } else if (bgMatch) {
+        // Handle BG Name
+        const bgName = bgMatch[1].toLowerCase();
+        if (!data.hasOwnProperty('bg')) {
+          data.bg = {};
+        }
+        data.bg[bgName] = {}; // Initialize BG properties object
+        currentBG = bgName; // Set active BG name
+      } else if (bgCtrlMatch) {
+        // Handle BGCtrl X
+        const bgCtrlNum = bgCtrlMatch[1];
+        if (!data.hasOwnProperty('bgctrl')) {
+          data.bgctrl = {};
+        }
+        data.bgctrl[bgCtrlNum] = {}; // Initialize BGCtrl properties object
+        currentBGCtrl = bgCtrlNum; // Set active BGCtrl number
+      } else if (bgCtrlDefMatch) {
+        // Handle BGCtrlDef X
+        const bgCtrlDefNum = bgCtrlDefMatch[1];
+        if (!data.hasOwnProperty('bgctrldef')) {
+          data.bgctrldef = {};
+        }
+        data.bgctrldef[bgCtrlDefNum] = {}; // Initialize BGCtrlDef properties object
+        currentBGCtrlDef = bgCtrlDefNum; // Set active BGCtrlDef number
+      } else {
+        // Handle standard sections (info, camera, etc.)
+        if (!data.hasOwnProperty(sectionName)) {
+          data[sectionName] = {};
+        }
+        currentSection = sectionName; // Set active standard section
+      }
+      continue;
+    }
+
+    if (!currentSection && !currentAction && !currentBG && !currentBGCtrl && !currentBGCtrlDef) continue;
+
+    /* -----------------------------
+       Key = Value or Frame Data
+    ----------------------------- */
+    if (currentAction) {
+        // Match frame format: number, number, number, number, number, ...
+        const frameMatch = line.match(/^(\d+(?:\s*,\s*\d+)*)\s*$/);
+        if (frameMatch) {
+            // Split the matched string by comma, trim spaces, and convert to numbers
+            const frameValues = frameMatch[1].split(/\s*,\s*/).map(Number);
+            // Add the frame array to the current action's array
+            data['begin action'][currentAction].push(frameValues);
+            continue;
+        }
+    }
+
+    // For other sections, parse key-value pairs
+    const kv = line.match(/^([\w\.\-]+)\s*=\s*(.+)$/);
+    if (kv) {
+      const key = kv[1].toLowerCase(); // Keys remain lowercase strings
+      let val = kv[2].trim();       // Get raw value string
+
+      // Process the value string
+      val = val.replace(/^"|"$/g, ''); // Remove leading and trailing quotes
+      val = val.replace(/\\/g, '/'); // Replace backslashes with forward slashes
+
+      // Attempt to convert value to number or array of numbers if it contains commas
+      // Check if it looks like a comma-separated list (not inside quotes within the value)
+      if (val.includes(',')) {
+          // Split by comma, trim spaces, convert to numbers, filter out NaN
+          const parts = val.split(/\s*,\s*/).map(part => {
+              const num = Number(part);
+              return isNaN(num) ? part : num; // Keep as string if not a number
+          });
+          // If all parts are numbers, use the array; otherwise, keep as a string
+          // For simplicity, we'll assume if there's a comma, it's intended as an array of potentially mixed types
+          // but often, coordinates/values are all numbers.
+          // Let's refine: if all parts are numbers, make it a number array, else keep as string array.
+          const allNumbers = parts.every(part => typeof part === 'number');
+          val = allNumbers ? parts : parts; // parts is already the array of potentially mixed types
+      } else {
+          // If no comma, try converting the whole string to a number
+          const numVal = Number(val);
+          val = isNaN(numVal) ? val : numVal;
+      }
+
+      // Determine where to store the key-value pair based on the active tracker
+      if (currentSection) {
+        data[currentSection][key] = val;
+      } else if (currentBG) {
+        data.bg[currentBG][key] = val; // Apply conversion logic here too
+      } else if (currentBGCtrl) {
+        data.bgctrl[currentBGCtrl][key] = val; // Apply conversion logic here too
+      } else if (currentBGCtrlDef) {
+        data.bgctrldef[currentBGCtrlDef][key] = val; // Apply conversion logic here too
+      }
+      continue;
+    }
+  }
+
+  // console.log("Parsed Stage DEF ", data); // Debug log
+  return data;
+}
+
+function parseStateFile(text) {
+  if (typeof text !== "string") {
+    console.warn("parseStateFile: invalid input", text);
+    return {};
+  }
+
+  const lines = text.split(/\r?\n/);
+  const states = {};
+
+  let currentState = null;
+  let currentCtrl  = null;
+
+  for (let raw of lines) {
+    let line = raw.split(";")[0].trim();
+    if (!line) continue;
+
+    /* -----------------------------
+       [Statedef X]
+    ----------------------------- */
+    let m = line.match(/^\[statedef\s+(-?\d+)\]/i);
+    if (m) {
+      const id = Number(m[1]);
+      currentState = {
+        id,
+        statedef: {},
+        controllers: []
+      };
+      states[id] = currentState;
+      currentCtrl = null;
+      continue;
+    }
+
+    /* -----------------------------
+       [State X, Name]
+    ----------------------------- */
+    m = line.match(/^\[state\s+(-?\d+)\s*,/i);
+    if (m && currentState) {
+      currentCtrl = {
+        type: "",
+        trigger: [],
+        params: {}
+      };
+      currentState.controllers.push(currentCtrl);
+      continue;
+    }
+
+    if (!currentState) continue;
+
+    /* -----------------------------
+       Key = Value
+    ----------------------------- */
+    const kv = line.match(/^([\w\.\-]+)\s*=\s*(.+)$/);
+    if (!kv) continue;
+
+    const key = kv[1].toLowerCase();
+    const val = kv[2].trim();
+
+    /* -----------------------------
+       Inside controller
+    ----------------------------- */
+    if (currentCtrl) {
+      if (key.startsWith("trigger")) {
+        currentCtrl.trigger.push(val);
+      }
+      else if (key === "type") {
+        currentCtrl.type = val;
+      }
+      else {
+        currentCtrl.params[key] = val;
+      }
+    }
+    /* -----------------------------
+       Inside Statedef
+    ----------------------------- */
+    else {
+      currentState.statedef[key] = val;
+    }
+  }
+
+  return states;
+}
+
+// Post-processor function to format simple arrays in JSON string
+function formatSimpleArrays(jsonString) {
+  // Regular expression to match:
+  // - An opening square bracket '['
+  // - Followed by optional whitespace (\s*)
+  // - Followed by content that is NOT a closing bracket or another opening bracket ([^\[\]]*)
+  // - This content can repeat, separated by commas and optional whitespace (,\s*[^\[\]]*)*
+  // - Followed by optional whitespace (\s*)
+  // - And a closing square bracket ']'
+  // This aims to find arrays that don't contain nested objects or arrays.
+  // It's a simplified pattern and might not cover all edge cases perfectly.
+  return jsonString.replace(/\[\s*([^\[\]]*(?:\s*,\s*[^\[\]]*)*)\s*\]/g, (match, content) => {
+    // If the content contains '{' or '[', it means it has nested objects or arrays,
+    // so we don't format it.
+    if (content.includes('{') || content.includes('[')) {
+      return match; // Return the original match unchanged
+    }
+    // Otherwise, format the content: remove newlines/spaces around commas, add single space after comma
+    const formattedContent = content.replace(/\s*\n\s*/g, ' ') // Remove newlines and surrounding spaces
+                                  .replace(/\s*,\s*/g, ', ')    // Normalize comma spacing
+                                  .trim();                    // Trim leading/trailing spaces
+    return `[ ${formattedContent} ]`; // Return the reformatted array string
+  });
+}
+
+// Example usage (assuming jsonData is your JavaScript object):
+// let jsonString = JSON.stringify(jsonData, null, 2); // Pretty-printed original
+// let formattedJsonString = formatSimpleArrays(jsonString); // Apply post-processing
+// textarea.value = formattedJsonString; // Set the textarea value
+
+async function importMugenChar() {
+  closeMainMenu();
+
+  let allFiles = [];
+  currentFileHandle = null;
+
+  try {
+    /* ============================================================
+       DIRECTORY PICKER
+    ============================================================ */
+    if (!("showDirectoryPicker" in window)) {
+      alert("Your browser does not support directory picking.");
+      return;
+    }
+
+    const dirHandle = await window.showDirectoryPicker();
+    const folderName = dirHandle.name;
+
+    async function collect(handle, path = "") {
+      for await (const entry of handle.values()) {
+        const fullPath = path ? `${path}/${entry.name}` : entry.name;
+        if (entry.kind === "file") {
+          const file = await entry.getFile();
+          Object.defineProperty(file, "webkitRelativePath", {
+            value: fullPath,
+            writable: false
+          });
+          allFiles.push(file);
+        } else if (entry.kind === "directory") {
+          await collect(entry, fullPath);
+        }
+      }
+    }
+
+    await collect(dirHandle);
+
+    /* ============================================================
+       FIND DEF
+    ============================================================ */
+    const defName = (folderName + ".def").toLowerCase();
+    const defFile = allFiles.find(f => f.name.toLowerCase() === defName);
+
+    if (!defFile) {
+      throw new Error(`Missing ${defName}`);
+    }
+
+    const defText = (await defFile.text()).replace(/\xa0/g, " ");
+    const def = parseDEF(defText);
+
+    /* ============================================================
+       BASIC INFO
+    ============================================================ */
+    function stripComments(text) {
+      return text
+        .split(/\r?\n/)
+        .map(l => l.split(";")[0])
+        .join("\n");
+    }
+    
+    const defNoComments = stripComments(defText);
+    
+    const nameMatch = defNoComments.match(/^\s*name\s*=\s*"?(.*?)"?\s*$/im);
+    const displayMatch = defNoComments.match(/^\s*displayname\s*=\s*"?(.*?)"?\s*$/im);
+
+    currentFighterInfo.name =
+      nameMatch?.[1]?.trim() || folderName;
+
+    currentFighterInfo.displayname =
+      displayMatch?.[1]?.trim() || currentFighterInfo.name;
+
+    /* ============================================================
+       FILE RESOLVER
+    ============================================================ */
+    function resolve(name) {
+      if (!name) return null;
+      const base = name.split(/[\\/]/).pop().toLowerCase();
+      return allFiles.find(f => f.name.toLowerCase() === base) || null;
+    }
+
+    /* ============================================================
+       LOAD PALETTES (.ACT)
+    ============================================================ */
+    const externalPalettes = {};
+
+    for (let i = 1; i <= 12; i++) {
+      const palKey = `pal${i}`;
+      if (!def[palKey]) continue;
+
+      const actFile = resolve(def[palKey]);
+      if (!actFile) continue;
+
+      const buf = await actFile.arrayBuffer();
+      if (buf.byteLength < 768) continue;
+
+      const dv = new DataView(buf);
+      const pal = [];
+
+      for (let j = 0; j < 256; j++) {
+        const o = (255 - j) * 3;
+        pal.push({
+          r: dv.getUint8(o),
+          g: dv.getUint8(o + 1),
+          b: dv.getUint8(o + 2)
+        });
+      }
+
+      externalPalettes[String(i)] = pal;
+    }
+
+    /* ============================================================
+       LOAD SFF
+    ============================================================ */
+    const sffFile =
+      resolve(def.sprite) ||
+      allFiles.find(f => f.name.toLowerCase().endsWith(".sff"));
+
+    if (!sffFile) throw new Error("Missing SFF");
+
+    const sffBuf = await sffFile.arrayBuffer();
+    const dv = new DataView(sffBuf);
+    const ver = dv.getUint8(15);
+
+    const sprites =
+      ver === 1 ? decodeSFFv1(sffBuf) : decodeSFFv2(sffBuf);
+
+    /* ============================================================
+       LOAD AIR
+    ============================================================ */
+    let airData = {};
+    const airFile = resolve(def.anim);
+
+    if (airFile) {
+      const airText = await airFile.text();
+      airData = parseAirFile(airText);
+    }
+
+    /* ============================================================
+       LOAD CNS / CMD / ST
+    ============================================================ */
+    const cnsFiles = {};
+    const cmdFiles = {};
+    const stFiles  = {};
+
+    for (const f of allFiles) {
+      const name = f.name.toLowerCase();
+
+      if (name.endsWith(".cns")) cnsFiles[f.name] = await f.text();
+      if (name.endsWith(".cmd")) cmdFiles[f.name] = await f.text();
+      if (name.endsWith(".st"))  stFiles[f.name]  = await f.text();
+    }
+
+    /* ============================================================
+       PARSE CMD (SAFE)
+    ============================================================ */
+    const mergedCommands = {};
+    const mergedRemap = {};
+    const mergedDefaults = {};
+    
+    for (const [fileName, text] of Object.entries(cmdFiles)) {
+      if (typeof text !== "string") {
+        console.warn("Skipping CMD:", fileName);
+        continue;
+      }
+    
+      const parsed = parseCMD(text);
+      if (!parsed) continue;
+    
+      // Merge commands
+      for (const [cmdName, seqs] of Object.entries(parsed.commands)) {
+        if (!mergedCommands[cmdName]) mergedCommands[cmdName] = [];
+        mergedCommands[cmdName].push(...seqs);
+      }
+    
+      // Merge remap / defaults (last one wins, like MUGEN)
+      Object.assign(mergedRemap, parsed.remap);
+      Object.assign(mergedDefaults, parsed.defaults);
+    }
+
+    /* ============================================================
+       PARSE STATES (ST / CNS)
+    ============================================================ */
+    const mergedStates = {};
+
+    function mergeStateData(stateBlock) {
+      for (const [id, state] of Object.entries(stateBlock)) {
+        const sid = Number(id);
+        if (!mergedStates[sid]) {
+          mergedStates[sid] = state;
+        } else {
+          // Append controllers (later files override / extend)
+          mergedStates[sid].controllers.push(...state.controllers);
+        }
+      }
+    }
+    
+    for (const text of Object.values(stFiles)) {
+      if (typeof text !== "string") continue;
+      mergeStateData(parseStateFile(text));
+    }
+    
+    for (const text of Object.values(cnsFiles)) {
+      if (typeof text !== "string") continue;
+      mergeStateData(parseStateFile(text));
+    }
+    
+    console.log("Merged states:", Object.keys(mergedStates).length);
+
+    /* ============================================================
+       GENERATE SPRITESHEET + CHARACTER JS
+    ============================================================ */
+    generateSpritesheet(
+      "char",
+      sprites,
+      sffBuf,
+      externalPalettes,
+      airData,
+      mergedCommands,
+      mergedRemap,
+      mergedDefaults,
+      mergedStates
+    );
+
+    view("character-code");
+
+    console.log("MUGEN character imported:", currentFighterInfo.name);
+  }
+  catch (e) {
+    console.error(e);
+    alert("Import failed: " + e.message);
+  }
+}
+
+// Stage Import Function (Updated to pass buffer for palette extraction)
+// ==================================================
+async function importMugenStage() {
+    closeMainMenu();
+    currentFileHandle = null; // Clear current handle for stages
+    const externalPalettes = {};
+
+    try {
+        if ('showOpenFilePicker' in window) {
+            const handles = await window.showOpenFilePicker({
+                multiple: true, // Allow multiple file selection
+                types: [{
+                    description: 'M.U.G.E.N Stage Files',
+                    accept: {
+                        'text/plain': ['.def'], // Accept .def files
+                        'application/octet-stream': ['.sff'] // Accept .sff files (binary)
+                    }
+                }]
+            });
+
+            // Separate the handles by file type
+            let defHandle = null;
+            let sffHandle = null;
+            for (const handle of handles) {
+                const lowerName = handle.name.toLowerCase();
+                if (lowerName.endsWith('.def')) {
+                    if (defHandle) throw new Error("Multiple .def files selected. Please select only one.");
+                    defHandle = handle;
+                } else if (lowerName.endsWith('.sff')) {
+                    if (sffHandle) throw new Error("Multiple .sff files selected. Please select only one.");
+                    sffHandle = handle;
+                }
+            }
+
+            if (!defHandle) throw new Error("No .def file selected.");
+            if (!sffHandle) throw new Error("No .sff file selected.");
+
+            // Read the files
+            const defFile = await defHandle.getFile();
+            const sffFile = await sffHandle.getFile();
+
+            /* ============================================================
+              FIND DEF
+            ============================================================ */
+
+            const defText = (await defFile.text()).replace(/\xa0/g, " ");
+            const def = parseStageDEFFile(defText);
+
+            /* ============================================================
+              BASIC INFO
+            ============================================================ */
+            function stripComments(text) {
+              return text
+                .split(/\r?\n/)
+                .map(l => l.split(";")[0])
+                .join("\n");
+            }
+            
+            const defNoComments = stripComments(defText);
+            const nameMatch = defNoComments.match(/^\s*name\s*=\s*"?(.*?)"?\s*$/im);
+
+            const stageInfo = {
+                name: nameMatch ? nameMatch[1].trim() : defHandle.name.replace('.def', ''),
+            };
+
+            // Find the .sff file path from the .def file (as before)
+            const sprMatch = defNoComments.match(/^\s*spr\s*=\s*"?(.*?)"?\s*(?:;|$)/im);
+            if (!sprMatch) throw new Error("Could not find 'spr' entry in .def file.");
+
+            const sffPath = sprMatch[1].trim();
+            const sffFileName = sffPath.split(/[\\/]/).pop().toLowerCase(); // Extract filename from path
+            if (sffFile.name.toLowerCase() !== sffFileName) {
+                 console.warn(`Def file specifies .sff: "${sffFileName}", but selected file is: "${sffFile.name}". Using selected file.`);
+            }
+
+            const buf = await sffFile.arrayBuffer();
+            const verMajor = new DataView(buf).getUint8(15); // Check version byte at offset 15
+            let sprites = (verMajor === 1) ? decodeSFFv1(buf) : decodeSFFv2(buf);
+
+            console.log(`Decoded ${sprites.length} sprites from SFF.`);
+
+            document.getElementById("numOfSprites").textContent = `${sprites.length} sprites and ${Object.keys(externalPalettes).length} palettes loaded.`;
+
+            console.log(`Processed ${sprites.length} valid sprites for stage: ${stageInfo.displayname}`);
+
+            // Generate the stage spritesheet and JSON data
+            generateSpritesheet("stage", sprites, buf, null, def); // Pass palette
+
+            // Switch to the character-code view to display the JSON and canvas
+            view('character-code');
+
+        } else {
+            alert("File picker not supported in this browser. Please use a browser that supports the File System Access API (e.g., Chrome/Edge 86+).");
+        }
+    } catch (e) {
+        console.error("Stage import error:", e);
+        alert("Error importing stage: " + e.message);
+    }
+}
+
+function rgbToHex(r, g, b) {
+  return [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  }).join('');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const STEP = 250;
+let currentFighterInfo = { name: "Unknown", displayname: "Unknown" };
+let currentFileHandle = null; // Stores the handle for the currently open JS file
+
+// ===== STAGE =====
+class Stage {
+  render(ctx, width, height) {
+    // Fill Base Background
+    ctx.fillStyle = '#1a2634';
+    ctx.fillRect(0, 0, width, height);
+
+    // Middle Band
+    ctx.fillStyle = '#2b3948';
+    ctx.fillRect(0, height * 0.62, width, height * 0.38);
+
+    // Bottom Band
+    ctx.fillStyle = '#263341';
+    ctx.fillRect(0, height * 0.77, width, height * 0.23);
+
+    // Highlight Line
+    ctx.strokeStyle = '#415061';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, height * 0.77);
+    ctx.lineTo(width, height * 0.77);
+    ctx.stroke();
+
+    // Uniform Blueprint Grid
+    const gridSize = 32;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 0.5;
+
+    for (let x = 0; x <= width; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+    }
+    for (let y = 0; y <= height; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+    }
+  }
+}
+
+function updateViewStage() {
+  const w = 1280;
+  const h = 720;
+  const Stagecanvas = document.getElementById('stage-bg-canvas');
+  const Animcanvas = document.getElementById('anim-bg-canvas');
+
+  if (!Stagecanvas) return;
+  const BGctx = Stagecanvas.getContext('2d');
+  // Set internal resolution
+  Stagecanvas.width = w;
+  Stagecanvas.height = h;
+  const BGstage = new Stage();
+  BGstage.render(BGctx, w, h);
+
+  if (!Animcanvas) return;
+  const Animctx = Animcanvas.getContext('2d');
+  // Set internal resolution
+  Animcanvas.width = w;
+  Animcanvas.height = h;
+  const Animstage = new Stage();
+  Animstage.render(Animctx, w, h);
+}
+
+async function openCharacterFile() {
+  try {
+    const [fileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'Character/Stage File', accept: { 'application/json': ['.json'] } }],
+      multiple: false
+    });
+    currentFileHandle = fileHandle; // Save the handle
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+    document.getElementById("sff-out").value = text;
+  } catch (err) { console.log("File open cancelled", err); }
+}
+
+async function saveCharacterFile() {
+  try {
+    // If we don't have a handle yet, ask for a file path
+    if (!currentFileHandle) {
+      currentFileHandle = await window.showSaveFilePicker({
+        suggestedName: 'character.json',
+        types: [{ description: 'Character/Stage File', accept: { 'application/json': ['.json'] } }]
+      });
+    }
+        
+    // Write the data to the handle
+    const writable = await currentFileHandle.createWritable();
+    await writable.write(document.getElementById("sff-out").value);
+    await writable.close();
+    console.log("File saved successfully.");
+  } catch (err) { 
+    console.log("File save failed or cancelled", err); 
+  }
+}
+
+function indentBlock(str, spaces) {
+  const pad = " ".repeat(spaces);
+  return str
+    .split("\n")
+    .map(line => pad + line)
+    .join("\n");
+}
+
+async function generateSpritesheet(type, spriteList, buffer, externalPalettes = {}, data = {}, mergedCommands = {}, mergedRemap = {}, mergedDefaults = {}, stateData  = {}) {
+  const view = document.getElementById("spritesheet-view");
+  const textarea = document.getElementById("sff-out");
+  view.innerHTML = "";
+
+  let totalArea = 0;
+  const groups = new Map();
+  const cache = [];
+    
+  const actPalMap = new Map();
+
+  if (type == "char") {
+    for (const [num, colors] of Object.entries(externalPalettes)) {
+      const hexStr = colors.map(c => rgbToHex(c.r, c.g, c.b)).join('');
+      actPalMap.set(`1-${num}`, { hexStr, colors });
+    }
+  }
+
+  const internalPalettes = new Map(); 
+  let mPal = null, aPal = null, v2Pal = null;
+
+  if (spriteList.length > 0 && spriteList[0].isV2) {
+    const dv = new DataView(buffer);
+    const palNodeOff = dv.getUint32(56, true);
+    const palCount = dv.getUint32(64, true);
+    if (palCount > 0 && palNodeOff > 0) {
+      const pDataOff = dv.getUint32(palNodeOff + 12, true);
+      if (pDataOff > 0) {
+        v2Pal = [];
+        for (let i = 0; i < 256; i++) {
+          const cIdx = pDataOff + (i * 4);
+          v2Pal.push({ r: dv.getUint8(cIdx), g: dv.getUint8(cIdx+1), b: dv.getUint8(cIdx+2) });
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < Math.min(spriteList.length, 1200); i++) {
+    const s = spriteList[i];
+    let d = null;
+    if (s.isV2) {
+      const raw = (s.format === 2) ? decompressRLE8(buffer, s.offset, s.length, s.width, s.height) : new Uint8Array(buffer, s.offset, s.width * s.height);
+      d = { raw, width: s.width, height: s.height, bpl: s.width, palette: v2Pal };
+    } else {
+      if (s.length === 0 || (s.prevIdx < i && spriteList[s.prevIdx].length === 0)) {
+        d = cache[s.prevIdx];
+      } else {
+        d = decodePCX(buffer, s.offset, s.length, s.samePal ? (aPal || mPal) : null);
+        if (s.group === 0 && s.image === 0) mPal = d.palette;
+        aPal = d.palette;
+      }
+    }
+    cache[i] = d;
+    if (!d || d.width === 0) continue;
+
+    const currentHexStr = d.palette.map(c => rgbToHex(c.r, c.g, c.b)).join('');
+    let palLabel = "";
+      
+    let foundActKey = null;
+    for (let [key, val] of actPalMap.entries()) {
+      if (val.hexStr === currentHexStr) { foundActKey = key; break; }
+    }
+
+    if (foundActKey) {
+      palLabel = foundActKey; 
+    } else {
+      let foundInternalKey = null;
+      for (let [key, colors] of internalPalettes.entries()) {
+        const internalHexStr = colors.map(c => rgbToHex(c.r, c.g, c.b)).join('');
+        if (internalHexStr === currentHexStr) { foundInternalKey = key; break; }
+      }
+      if (foundInternalKey) {
+        palLabel = foundInternalKey;
+      } else {
+        palLabel = `${s.group}-${s.image}`;
+        internalPalettes.set(palLabel, d.palette);
+      }
+    }
+
+    if (!groups.has(s.group)) groups.set(s.group, []);
+    groups.get(s.group).push({ ...s, ...d, palID: palLabel });
+    totalArea += (d.width * d.height);
+  }
+
+  const baseWidth = Math.ceil(Math.sqrt(totalArea * 1.5));
+  view.style.width = (Math.ceil(baseWidth / STEP) * STEP) + "px";
+
+  for (const [gid, items] of groups) {
+    const maxHeight = Math.max(...items.map(it => it.height));
+    const block = document.createElement("div"); block.className = "group-block";
+    block.innerHTML = `<span class="group-title">GROUP ${gid}</span>`;
+    const row = document.createElement("div"); row.className = "sprite-row";
+    
+    items.forEach(it => {
+      const canvas = document.createElement("canvas");
+      canvas.width = it.width; canvas.height = maxHeight;
+      const ctx = canvas.getContext("2d");
+      const imgData = ctx.createImageData(it.width, maxHeight);
+      let drawPalette = it.palette;
+      let finalPalID = it.palID;
+      if (it.group !== 9000 && it.palID.startsWith("9000-")) finalPalID = "1-1";
+
+      if (actPalMap.has(finalPalID)) drawPalette = actPalMap.get(finalPalID).colors;
+      else if (internalPalettes.has(finalPalID)) drawPalette = internalPalettes.get(finalPalID);
+
+      for(let y=0; y<maxHeight; y++){
+        for(let x=0; x<it.width; x++){
+          const dIdx = (y * it.width + x) * 4;
+          if(y < it.height){
+            const pIdx = it.raw[y * it.bpl + x];
+            const col = (drawPalette && drawPalette[pIdx]) ? drawPalette[pIdx] : {r:0,g:0,b:0};
+            imgData.data[dIdx] = col.r; 
+            imgData.data[dIdx+1] = col.g; 
+            imgData.data[dIdx+2] = col.b;
+            imgData.data[dIdx+3] = (pIdx === 0) ? 0 : 255;
+          } else imgData.data[dIdx+3] = 0;
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      const img = new Image(); 
+      img.src = canvas.toDataURL(); 
+      img.dataset.id = `${it.group}-${it.image}`;
+      img.dataset.ax = it.axisX; // Add this line
+      img.dataset.ay = it.axisY; // Add this line
+      img.dataset.pal = finalPalID; 
+      img.dataset.h = it.height; 
+      const cell = document.createElement("div"); cell.className = "ct"; 
+      cell.appendChild(img); row.appendChild(cell);
+    });
+    block.appendChild(row); view.appendChild(block);
+  }
+
+  // Output Generation
+  requestAnimationFrame(() => {
+    const viewRect = view.getBoundingClientRect();
+    view.style.height = (Math.ceil(view.scrollHeight / STEP) * STEP) + "px";
+
+    let palEntries = "";
+    [actPalMap, internalPalettes].forEach(map => {
+      map.forEach((data, label) => {
+        const colors = Array.isArray(data) ? data : data.colors;
+        palEntries += `    "${label}": [\n      `;
+        colors.forEach((c, idx) => {
+          palEntries += `"${rgbToHex(c.r, c.g, c.b)}"`;
+          if (idx < 255) palEntries += ",";
+          if ((idx + 1) % 8 === 0 && idx < 255) palEntries += "\n      ";
+        });
+        palEntries += `\n    ],\n`;
+      });
+    });
+
+    const imgs = [...view.querySelectorAll('img')];
+    const spriteData = imgs.map(img => {
+      const r = img.getBoundingClientRect();
+      const [g, i] = img.dataset.id.split('-');
+      return { 
+        g: String(g || "0"), 
+        i: String(i || "0"), 
+        palFull: img.dataset.pal || "0-0",
+        x: Math.round(r.left - viewRect.left), 
+        y: Math.round(r.top - viewRect.top), 
+        w: img.naturalWidth, 
+        h: parseInt(img.dataset.h || 0),
+        // ADD THIS: Capture axis from dataset (ensure you added it to the img tag earlier)
+        ax: img.dataset.ax || 0,
+        ay: img.dataset.ay || 0
+      };
+    });
+
+    if (spriteData.length === 0) return;
+
+    const maxGLen = Math.max(...spriteData.map(s => s.g.length));
+    const maxLabelLen = Math.max(...spriteData.map(s => `"${s.g}-${s.i}"`.length + (maxGLen - s.g.length)));
+    const maxPalGLen = Math.max(...spriteData.map(s => s.palFull.split('-')[0].length));
+    const maxPalILen = Math.max(...spriteData.map(s => (s.palFull.split('-')[1] || "").length));
+
+    let spriteList = "";
+    spriteData.forEach((s, idx) => {
+      const labelStr = `"${s.g}-${s.i}"`;
+      const alignedLabel = ((" ".repeat(maxGLen - s.g.length)) + labelStr).padEnd(maxLabelLen);
+      const [pG, pI] = s.palFull.split('-');
+      const alignedPal = `${" ".repeat(maxPalGLen - pG.length)}"${pG}-${pI || "0"}"${" ".repeat(maxPalILen - (pI || "0").length)}`;
+      spriteList += `    ${alignedLabel}: [[ ${String(s.ax).padStart(3)}, ${String(s.ay).padStart(3)} ], [ ${String(s.x + 1).padStart(5)}, ${String(s.y + 1).padStart(5)}, ${String(s.w).padStart(5)}, ${String(s.h).padStart(5)} ], ${alignedPal} ]`;
+      spriteList += (idx < spriteData.length - 1 ? ",\n" : "\n");
+    });
+
+    let code = "";
+    if (type == "char") {
+      // ANIMATION STRING GENERATION
+      let animEntries = "";
+      Object.entries(data).forEach(([actionId, data]) => {
+        animEntries += `    "${actionId}": {\n      \"loopStart\": ${data.loopStart},\n      \"frames\": [\n`;
+        
+        // --- ADD PERSISTENCE LOGIC HERE ---
+        let currentClsn1 = []; // Attack
+        let currentClsn2 = []; // Body
+
+        data.frames.forEach((f, idx) => {
+          // If the frame has boxes, update our 'current' state
+          // If MUGEN data uses [] to signal a reset, you may need a specific check
+          if (f.clsn1 && f.clsn1.length > 0) currentClsn1 = f.clsn1;
+          if (f.clsn2 && f.clsn2.length > 0) currentClsn2 = f.clsn2;
+          
+          // If the AIR data specifically says to clear boxes (Clsn1Default: 0)
+          if (f.clsn1_reset) currentClsn1 = []; 
+          if (f.clsn2_reset) currentClsn2 = [];
+
+          // Use currentClsn1/2 instead of f.clsn1/2
+          const frameStr = `        [ ${f.sprite.padEnd(10)}, [${f.offset[0]}, ${f.offset[1]}], ${String(f.time).padStart(3)}, ${JSON.stringify(currentClsn1)}, ${JSON.stringify(currentClsn2)} ]`;
+          animEntries += frameStr + (idx < data.frames.length - 1 ? ",\n" : "\n");
+        });
+        animEntries += `      ]\n    },\n`;
+      });
+
+      code = `{\n  "name": "${currentFighterInfo.name}",\n  "displayName": "${currentFighterInfo.displayname}",\n  "pal": {\n${palEntries.slice(0, -2)}\n  },\n  "sprite": {\n`;
+      code += spriteList;      
+      code += `  },
+  "anim": {
+${animEntries.slice(0, -2)}
+  },
+  "commands": {${indentBlock(JSON.stringify(mergedCommands, null, 2).slice(1, -1), 2)}},
+  "remap": ${JSON.stringify(mergedRemap, null, 2)},
+  "defaults": ${JSON.stringify(mergedDefaults, null, 2)},
+  "states": {${indentBlock(JSON.stringify(stateData, null, 2).slice(1, -1), 2)}}
+}`;
+    } else if (type == "stage") {
+        // Use placeholder for palEntries
+        const PAL_PLACEHOLDER = "__PAL_DATA_PLACEHOLDER__";
+        // The palEntries string is now built with the desired formatting (newline after [ and every 8 values)
+        // and ends with ",\n" (e.g., ",\n    ],\n"). We need to remove the trailing ",\n" before splicing.
+        const palContentLines = palEntries.slice(0, -2).split('\n'); // Split the correctly formatted string
+
+        data.pal = PAL_PLACEHOLDER; // Assign the placeholder
+
+        // Use placeholder for spriteList
+        const SPRITE_PLACEHOLDER = "__SPRITE_DATA_PLACEHOLDER__";
+        data.sprite = SPRITE_PLACEHOLDER; // Assign the placeholder
+
+        // Stringify the data object with placeholders
+        let jsonString = JSON.stringify(data, null, 2);
+
+        // Process the JSON string to replace placeholders with actual formatted data
+        let jsonLines = jsonString.split('\n');
+
+        for (let i = 0; i < jsonLines.length; i++) {
+             // Replace sprite placeholder
+             if (jsonLines[i].includes(`"${SPRITE_PLACEHOLDER}"`)) { // Find the line containing the sprite placeholder value
+                 const line = jsonLines[i];
+                 const indentMatch = line.match(/^(\s*)/); // Get the indent of the current line
+                 const currentIndent = indentMatch ? indentMatch[1] : '';
+
+                 // Prepare replacement lines for sprite data
+                 const newLine = currentIndent + '"sprite": {'; // Opening line for sprite object
+                 const closingLine = currentIndent + '},';       // Closing line for sprite object (note the comma)
+
+                 // Splice the new opening line into the array, replacing the placeholder line
+                 jsonLines[i] = newLine;
+
+                 // Calculate where to insert the content and closing brace
+                 let insertIndex = i + 1;
+
+                 // Split the pre-formatted spriteList string into individual lines
+                 const spriteContentLines = spriteList.trimEnd().split('\n'); // Remove trailing newline and split
+                 // Insert the content lines into the JSON lines array
+                 jsonLines.splice(insertIndex, 0, ...spriteContentLines);
+                 // Calculate the index after the content lines where the closing brace goes
+                 const closingIndex = insertIndex + spriteContentLines.length;
+                 // Insert the closing brace line
+                 jsonLines.splice(closingIndex, 0, closingLine);
+                 // Continue to check for pal placeholder on potentially shifted lines
+             }
+
+             // Replace pal placeholder (it might be on a line that shifted after sprite replacement)
+             if (jsonLines[i].includes(`"${PAL_PLACEHOLDER}"`)) { // Find the line containing the pal placeholder value
+                 const line = jsonLines[i];
+                 const indentMatch = line.match(/^(\s*)/); // Get the indent of the current line
+                 const currentIndent = indentMatch ? indentMatch[1] : '';
+
+                 // Prepare replacement lines for pal data
+                 const newLine = currentIndent + '"pal": {';    // Opening line for pal object
+                 // `palContentLines` is already correctly formatted and split from `palEntries.slice(0, -2)`
+                 // It now starts with the label and opening [, followed by values on new lines
+                 const closingLine = currentIndent + '},';      // Closing line for pal object (note the comma)
+
+                 // Splice the new opening line into the array, replacing the placeholder line
+                 jsonLines[i] = newLine;
+
+                 // Calculate where to insert the content and closing brace
+                 let insertIndex = i + 1;
+                 // Insert the pre-split pal content lines into the JSON lines array
+                 jsonLines.splice(insertIndex, 0, ...palContentLines);
+                 // Calculate the index after the content lines where the closing brace goes
+                 const closingIndex = insertIndex + palContentLines.length;
+                 // Insert the closing brace line
+                 jsonLines.splice(closingIndex, 0, closingLine);
+                 // No break needed if other replacements might happen later
+             }
+        }
+
+        // Rebuild the JSON string from the modified lines
+        jsonString = jsonLines.join('\n');
+
+        // Apply the post-processing function to format simple arrays
+        code = formatSimpleArrays(jsonString);
+    }
+
+    textarea.value = code;
+    document.getElementById("dl-code-btn").style.display = "block";
+    updateSpritesheetPreview();
+  });
+}
+
+function updateSpritesheetPreview() {
+  const canvas = document.getElementById('spritesheet-canvas');
+  const view = document.getElementById('spritesheet-view');
+  const ctx = canvas.getContext('2d');
+  const w = parseInt(view.style.width);
+  const h = parseInt(view.style.height);
+  canvas.width = w; canvas.height = h;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, w, h);
+  const viewRect = view.getBoundingClientRect();
+  view.querySelectorAll('.group-title').forEach(el => {
+    const r = el.getBoundingClientRect();
+    const x = Math.floor(r.left - viewRect.left);
+    const y = Math.floor(r.top - viewRect.top);
+    ctx.fillStyle = "#444444"; ctx.fillRect(x, y, Math.floor(r.width), Math.floor(r.height));
+    ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 10px monospace"; ctx.fillText(el.textContent, x + 5, y + 10);
+  });
+  // view.querySelectorAll('img').forEach(img => {
+  //   const r = img.getBoundingClientRect();
+  //   const x = Math.floor(r.left - viewRect.left);
+  //   const y = Math.floor(r.top - viewRect.top);
+  //   ctx.drawImage(img, x, y);
+  //   ctx.strokeStyle = "#000000"; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, img.naturalWidth - 1, img.naturalHeight - 1);
+  // });
+  view.querySelectorAll('img').forEach(img => {
+    const r = img.getBoundingClientRect();
+    const x = Math.floor(r.left - viewRect.left + 1);
+    const y = Math.floor(r.top - viewRect.top + 1);
+        
+    // Use the stored true height for the visual box
+    const trueH = parseInt(img.dataset.h);
+        
+    ctx.drawImage(img, x, y);
+
+    ctx.strokeStyle = "#000000"; 
+    ctx.lineWidth = 1; 
+    // Draw the rectangle using trueH instead of img.naturalHeight
+    ctx.strokeRect(x - 0.5, y - 0.5, img.naturalWidth + 1, trueH + 1);
+  });
+  document.getElementById("size-tag").textContent = `${canvas.width} x ${canvas.height}`;
+  document.getElementById("dl-btn").style.display = "block";
+}
+
+function downloadPNG() {
+  const canvas = document.getElementById('spritesheet-canvas');
+  const a = document.createElement('a');
+  a.download = 'spritesheet.png'; a.href = canvas.toDataURL("image/png"); a.click();
+}
+
+function downloadAudio() {
+  const audio = document.getElementById('char-audio');
+  if(audio.src) {
+    const a = document.createElement('a');
+    a.download = 'sound.mp3'; a.href = audio.src; a.click();
+  } else { alert("No audio loaded."); }
+}
+
+function drawStageToView() {
+  const container = document.querySelector('[data-view="character-sprites"]');
+  const stageCanvas = document.getElementById('stage-bg-canvas');
+  const animCanvas = document.getElementById('anim-bg-canvas');
+  if (!container || !stageCanvas || !animCanvas) return;
+
+  // Match container size
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  stageCanvas.width = w;
+  stageCanvas.height = h;
+  animCanvas.width = w;
+  animCanvas.height = h;
+
+  const BGctx = stageCanvas.getContext('2d');
+  const BGstage = new Stage();
+  BGstage.render(BGctx, w, h);
+
+  const Animctx = stageCanvas.getContext('2d');
+  const Animstage = new Stage();
+  Animstage.render(Animctx, w, h);
+}
+
+// Call it once on load
+window.addEventListener('load', drawStageToView);
+// Call it when window resizes to keep the gradient correct
+// window.addEventListener('resize', drawStageToView);
+
+// Call this whenever you load new sprites or change the view
+// Place this inside your generateSpritesheet function after the view is populated
+requestAnimationFrame(updateViewStage);
+
+const slider = document.getElementById("slider");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const valueText = document.getElementById("valueText");
+
+function updateText() {
+  valueText.textContent = `${slider.value} / ${slider.max}`;
+}
+
+prevBtn.addEventListener("click", () => {
+  slider.value = Math.max(slider.min, slider.value - 1);
+  updateText();
+});
+
+nextBtn.addEventListener("click", () => {
+  slider.value = Math.min(slider.max, Number(slider.value) + 1);
+  updateText();
+});
+
+slider.addEventListener("input", updateText);
+</script>
+</body>
+</html>
