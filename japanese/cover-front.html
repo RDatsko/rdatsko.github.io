@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./css/styles.css">
+<style>
+#title {
+  position: absolute;
+  top: 70mm;
+  left: 23mm;
+  width: 78mm;
+  height: 57mm;
+  font-weight: 600;
+}
+
+#title > p {
+  text-align: center;
+  margin-bottom: 0;
+  color: black;
+}
+
+#title > p:first-child {
+  font-size: 68pt;
+  border-bottom: 2px solid black;
+  margin-top: 20px;
+}
+
+#title > p:last-child {
+  font-size: 32pt;
+  margin-top: 0;
+}
+
+#name {
+  position: absolute;
+  top: 171mm;
+  left: 62mm;
+  width: 85mm;
+  height: 19mm;
+  color: black;
+}
+
+td {
+    color: black;
+}
+
+td:first-child {
+  width: 15mm;
+  font-size: 10pt;
+  font-weight: 600;
+}
+
+td:last-child {
+  font-size: 16pt;
+  outline: none;
+}
+
+</style>
+</head>
+<body>
+<img class="page-bg" src="./images/cover-front.jpg" alt="">
+
+<div id="title">
+  <p>日本語</p>
+  <p>学&nbsp;&nbsp;&nbsp;習&nbsp;&nbsp;&nbsp;書</p>
+</div>
+
+<table id="name">
+  <tr>
+    <td>Name:</td>
+    <td contenteditable>Your Name</td>
+  </tr>
+  <tr>
+    <td>名前：</td>
+    <td contenteditable>なまえ</td>
+  </tr>
+</table>
+
+</body>
+</html>
