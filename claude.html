@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Claude HTML Copilot</title>
+
+<!-- Puter AI -->
+<script src="https://js.puter.com/v2/"></script>
+
+<!-- Prism.js – VS Code Dark+ -->
+<link href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-vsc-dark-plus.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-markup.min.js"></script>
+
+<style>
+  :root {
+    --bg: #1e1e1e;
+    --panel: #252526;
+    --border: #3c3c3c;
+    --editor: #1e1e1e;
+    --input: #3c3c3c;
+    --user: #264f78;
+    --assistant: #2d2d30;
+    --text: #d4d4d4;
+    --muted: #858585;
+    --accent: #0e639c;
+    --accent-hover: #1177bb;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  .app { height: 100vh; display: flex; flex-direction: column; }
+
+  header {
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-buttons { display: flex; gap: 8px; }
+
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  .left {
+    width: 50%;
+    padding: 16px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+
+  .right {
+    width: 50%;
+    overflow-y: auto;
+    background: var(--editor);
+    position: relative;
+  }
+
+  .message {
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    max-width: 90%;
+    font-size: 14px;
+  }
+
+  .user { background: var(--user); margin-left: auto; }
+  .assistant { background: var(--assistant); border: 1px solid var(--border); }
+
+  pre { margin: 0; background: transparent; font-size: 14px; }
+  code { font-family: Consolas, "Courier New", monospace; }
+
+  .input-bar {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+  }
+
+  textarea {
+    flex: 1;
+    height: 64px;
+    resize: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--input);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .hint { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: center; }
+
+  /* Copied tooltip */
+  #copyHint {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    background: #0e639c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    display: none;
+    z-index: 10;
+  }
+
+  iframe.preview {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header>
+    <span>Claude.ai — Sonnet 4.5</span>
+    <div class="header-buttons">
+      <button id="copyBtn">Copy</button>
+      <button id="toggleBtn">Preview</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div id="chat" class="left"></div>
+
+    <div class="right">
+      <div id="copyHint">Copied!</div>
+      <pre id="codeContainer"><code id="codeBlock" class="language-html">
+// HTML output will appear here
+</code></pre>
+      <iframe id="previewFrame" class="preview" style="display:none;"></iframe>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <textarea id="prompt" placeholder="Ask or request a change…"></textarea>
+    <div style="display:flex; flex-direction:column; gap:4px;">
+      <button id="sendBtn">Send</button>
+      <div class="hint">Ctrl + Enter</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chat = document.getElementById('chat');
+const codeBlock = document.getElementById('codeBlock');
+const codeContainer = document.getElementById('codeContainer');
+const previewFrame = document.getElementById('previewFrame');
+const textarea = document.getElementById('prompt');
+const sendBtn = document.getElementById('sendBtn');
+const copyBtn = document.getElementById('copyBtn');
+const toggleBtn = document.getElementById('toggleBtn');
+const copyHint = document.getElementById('copyHint');
+
+let lastHTML = '';
+let busy = false;
+let showingPreview = false;
+
+textarea.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') {
+    e.preventDefault();
+    sendPrompt();
+  }
+});
+
+sendBtn.onclick = sendPrompt;
+
+function addMessage(text, role) {
+  const div = document.createElement('div');
+  div.className = `message ${role}`;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function extractHTML(text) {
+  const match = text.match(/```html\s*([\s\S]*?)```/i);
+  return match ? match[1].trim() : null;
+}
+
+async function sendPrompt() {
+  if (busy) return;
+
+  let prompt = textarea.value.trim();
+  if (!prompt) return;
+
+  textarea.value = '';
+  busy = true;
+  sendBtn.disabled = true;
+
+  if (lastHTML) {
+    prompt += "\n\nCurrent HTML:\n```html\n" + lastHTML + "\n```";
+  }
+
+  addMessage(prompt, 'user');
+  const assistantDiv = addMessage('', 'assistant');
+
+  try {
+    const resp = await puter.ai.chat(prompt, {
+      model: 'claude-sonnet-4.5',
+      stream: true
+    });
+
+    let full = '';
+    for await (const part of resp) {
+      if (part?.text) {
+        full += part.text;
+        assistantDiv.textContent = full;
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }
+
+    const html = extractHTML(full);
+    if (html) {
+      lastHTML = html;
+      codeBlock.textContent = html;
+      Prism.highlightElement(codeBlock);
+      if (showingPreview) updatePreview();
+    }
+
+  } catch (err) {
+    console.error(err);
+    assistantDiv.textContent = '⚠️ Error sending request. Check console.';
+  }
+
+  busy = false;
+  sendBtn.disabled = false;
+}
+
+// COPY BUTTON
+copyBtn.onclick = () => {
+  if (!lastHTML) return;
+  navigator.clipboard.writeText(lastHTML).then(() => {
+    copyHint.style.display = 'block';
+    setTimeout(() => copyHint.style.display = 'none', 1200);
+  });
+};
+
+// TOGGLE BUTTON
+toggleBtn.onclick = () => {
+  showingPreview = !showingPreview;
+  if (showingPreview) {
+    codeContainer.style.display = 'none';
+    previewFrame.style.display = 'block';
+    toggleBtn.textContent = 'Code';
+    updatePreview();
+  } else {
+    codeContainer.style.display = 'block';
+    previewFrame.style.display = 'none';
+    toggleBtn.textContent = 'Preview';
+  }
+};
+
+function updatePreview() {
+  if (!lastHTML) return;
+  const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+  doc.open();
+  doc.write(lastHTML);
+  doc.close();
+}
+</script>
+</body>
+</html>
