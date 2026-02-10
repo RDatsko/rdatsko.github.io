@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPS Posing Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        #canvas-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            cursor: grab;
+            background: #1a1a2e;
+        }
+        
+        canvas:active {
+            cursor: grabbing;
+        }
+        
+        #controls {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section h2 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .joint-control {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .joint-name {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .slider-group {
+            margin-bottom: 8px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1976d2;
+            line-height: 1.5;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        #dropZone {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #dropZone:hover {
+            border-color: #5568d3;
+            background: #e8eaf6;
+        }
+        
+        #dropZone.dragover {
+            border-color: #5568d3;
+            background: #e8eaf6;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="canvas-container">
+            <canvas id="glCanvas"></canvas>
+        </div>
+        <div id="controls">
+            <h1>XNA Posing Studio</h1>
+            
+            <div class="section">
+                <h2>Load Model</h2>
+                <div id="dropZone">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📂</div>
+                    <div style="font-weight: 600; margin-bottom: 8px;">Drop Folder with .ascii file</div>
+                    <div style="font-size: 12px; color: #666;">or click to browse (select folder)</div>
+                    <input type="file" id="fileInput" multiple accept=".ascii,.jpg,.jpeg,.png,.tga" style="display: none;" webkitdirectory directory>
+                </div>
+                <div id="loadInfo" class="info" style="margin-top: 10px; display: none;"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Camera Controls</h2>
+                <div class="info">
+                    • Drag to rotate camera<br>
+                    • Scroll to zoom<br>
+                    • Right-click drag to pan
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Joint Rotations</h2>
+                <div id="joint-controls"></div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="resetPose()">Reset Pose</button>
+                <button onclick="randomPose()">Random Pose</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix and Vector Math Utilities
+        const mat4 = {
+            create() {
+                return new Float32Array([
+                    1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+            },
+            
+            perspective(out, fovy, aspect, near, far) {
+                const f = 1.0 / Math.tan(fovy / 2);
+                out[0] = f / aspect;
+                out[1] = 0;
+                out[2] = 0;
+                out[3] = 0;
+                out[4] = 0;
+                out[5] = f;
+                out[6] = 0;
+                out[7] = 0;
+                out[8] = 0;
+                out[9] = 0;
+                out[11] = -1;
+                out[12] = 0;
+                out[13] = 0;
+                out[15] = 0;
+                if (far != null && far !== Infinity) {
+                    const nf = 1 / (near - far);
+                    out[10] = (far + near) * nf;
+                    out[14] = 2 * far * near * nf;
+                } else {
+                    out[10] = -1;
+                    out[14] = -2 * near;
+                }
+                return out;
+            },
+            
+            lookAt(out, eye, center, up) {
+                const eyex = eye[0], eyey = eye[1], eyez = eye[2];
+                const upx = up[0], upy = up[1], upz = up[2];
+                const centerx = center[0], centery = center[1], centerz = center[2];
+                
+                let z0 = eyex - centerx;
+                let z1 = eyey - centery;
+                let z2 = eyez - centerz;
+                
+                let len = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2);
+                z0 *= len;
+                z1 *= len;
+                z2 *= len;
+                
+                let x0 = upy * z2 - upz * z1;
+                let x1 = upz * z0 - upx * z2;
+                let x2 = upx * z1 - upy * z0;
+                len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
+                if (!len) {
+                    x0 = 0;
+                    x1 = 0;
+                    x2 = 0;
+                } else {
+                    len = 1 / len;
+                    x0 *= len;
+                    x1 *= len;
+                    x2 *= len;
+                }
+                
+                let y0 = z1 * x2 - z2 * x1;
+                let y1 = z2 * x0 - z0 * x2;
+                let y2 = z0 * x1 - z1 * x0;
+                
+                out[0] = x0;
+                out[1] = y0;
+                out[2] = z0;
+                out[3] = 0;
+                out[4] = x1;
+                out[5] = y1;
+                out[6] = z1;
+                out[7] = 0;
+                out[8] = x2;
+                out[9] = y2;
+                out[10] = z2;
+                out[11] = 0;
+                out[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
+                out[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
+                out[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+                out[15] = 1;
+                
+                return out;
+            },
+            
+            translate(out, a, v) {
+                const x = v[0], y = v[1], z = v[2];
+                out[0] = a[0];
+                out[1] = a[1];
+                out[2] = a[2];
+                out[3] = a[3];
+                out[4] = a[4];
+                out[5] = a[5];
+                out[6] = a[6];
+                out[7] = a[7];
+                out[8] = a[8];
+                out[9] = a[9];
+                out[10] = a[10];
+                out[11] = a[11];
+                out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+                out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+                out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+                out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+                return out;
+            },
+            
+            rotateX(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a10 = a[4];
+                const a11 = a[5];
+                const a12 = a[6];
+                const a13 = a[7];
+                const a20 = a[8];
+                const a21 = a[9];
+                const a22 = a[10];
+                const a23 = a[11];
+                
+                out[0] = a[0];
+                out[1] = a[1];
+                out[2] = a[2];
+                out[3] = a[3];
+                out[4] = a10 * c + a20 * s;
+                out[5] = a11 * c + a21 * s;
+                out[6] = a12 * c + a22 * s;
+                out[7] = a13 * c + a23 * s;
+                out[8] = a20 * c - a10 * s;
+                out[9] = a21 * c - a11 * s;
+                out[10] = a22 * c - a12 * s;
+                out[11] = a23 * c - a13 * s;
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            rotateY(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a00 = a[0];
+                const a01 = a[1];
+                const a02 = a[2];
+                const a03 = a[3];
+                const a20 = a[8];
+                const a21 = a[9];
+                const a22 = a[10];
+                const a23 = a[11];
+                
+                out[0] = a00 * c - a20 * s;
+                out[1] = a01 * c - a21 * s;
+                out[2] = a02 * c - a22 * s;
+                out[3] = a03 * c - a23 * s;
+                out[4] = a[4];
+                out[5] = a[5];
+                out[6] = a[6];
+                out[7] = a[7];
+                out[8] = a00 * s + a20 * c;
+                out[9] = a01 * s + a21 * c;
+                out[10] = a02 * s + a22 * c;
+                out[11] = a03 * s + a23 * c;
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            rotateZ(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a00 = a[0];
+                const a01 = a[1];
+                const a02 = a[2];
+                const a03 = a[3];
+                const a10 = a[4];
+                const a11 = a[5];
+                const a12 = a[6];
+                const a13 = a[7];
+                
+                out[0] = a00 * c + a10 * s;
+                out[1] = a01 * c + a11 * s;
+                out[2] = a02 * c + a12 * s;
+                out[3] = a03 * c + a13 * s;
+                out[4] = a10 * c - a00 * s;
+                out[5] = a11 * c - a01 * s;
+                out[6] = a12 * c - a02 * s;
+                out[7] = a13 * c - a03 * s;
+                out[8] = a[8];
+                out[9] = a[9];
+                out[10] = a[10];
+                out[11] = a[11];
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            multiply(out, a, b) {
+                const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+                const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+                const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+                const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+                
+                let b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+                out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+                out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+                out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+                out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                return out;
+            }
+        };
+
+        // WebGL Setup
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+        
+        if (!gl) {
+            alert('WebGL not supported');
+            throw new Error('WebGL not supported');
+        }
+
+        // Model Data
+        let meshes = []; // Array of { vertices, indices, texCoords, weights, boneIndices, texture }
+        let bones = []; // Array of Joint objects
+        let hasMeshLoaded = false;
+        let loadedTextures = new Map();
+
+        // Vertex Shader
+        const vertexShaderSource = `
+            attribute vec3 aPosition;
+            attribute vec3 aColor;
+            attribute vec2 aTexCoord;
+            
+            uniform mat4 uModelViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            
+            varying vec3 vColor;
+            varying vec2 vTexCoord;
+            
+            void main() {
+                gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+                vColor = aColor;
+                vTexCoord = aTexCoord;
+            }
+        `;
+
+        // Fragment Shader
+        const fragmentShaderSource = `
+            precision mediump float;
+            varying vec3 vColor;
+            varying vec2 vTexCoord;
+            
+            uniform sampler2D uSampler;
+            uniform bool uUseTexture;
+            
+            void main() {
+                if (uUseTexture) {
+                    gl_FragColor = texture2D(uSampler, vTexCoord);
+                } else {
+                    gl_FragColor = vec4(vColor, 1.0);
+                }
+            }
+        `;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            
+            return shader;
+        }
+
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Program link error:', gl.getProgramInfoLog(program));
+        }
+
+        gl.useProgram(program);
+
+        const aPosition = gl.getAttribLocation(program, 'aPosition');
+        const aColor = gl.getAttribLocation(program, 'aColor');
+        const aTexCoord = gl.getAttribLocation(program, 'aTexCoord');
+        const uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
+        const uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
+        const uSampler = gl.getUniformLocation(program, 'uSampler');
+        const uUseTexture = gl.getUniformLocation(program, 'uUseTexture');
+
+        // Joint/Bone System
+        class Joint {
+            constructor(name, position, parent = null) {
+                this.name = name;
+                this.position = position;
+                this.parent = parent;
+                this.rotation = { x: 0, y: 0, z: 0 };
+                this.children = [];
+                
+                if (parent) {
+                    parent.children.push(this);
+                }
+            }
+            
+            getWorldMatrix() {
+                const localMatrix = mat4.create();
+                mat4.translate(localMatrix, localMatrix, this.position); // Position is relative to parent
+                mat4.rotateZ(localMatrix, localMatrix, this.rotation.z);
+                mat4.rotateY(localMatrix, localMatrix, this.rotation.y);
+                mat4.rotateX(localMatrix, localMatrix, this.rotation.x);
+                
+                if (this.parent) {
+                    const parentMatrix = this.parent.getWorldMatrix();
+                    const worldMatrix = mat4.create();
+                    mat4.multiply(worldMatrix, parentMatrix, localMatrix);
+                    return worldMatrix;
+                }
+                
+                return localMatrix;
+            }
+            
+            getWorldPosition() {
+                const matrix = this.getWorldMatrix();
+                return [matrix[12], matrix[13], matrix[14]];
+            }
+        }
+
+        // XPS ASCII Parser
+        function parseXPS(text) {
+            const lines = text.split(/\r?\n/);
+            let ptr = 0;
+            
+            const nextLine = () => {
+                let line;
+                while (ptr < lines.length) {
+                    line = lines[ptr++];
+                    const commentPos = line.indexOf('#');
+                    if (commentPos !== -1) {
+                        line = line.substring(0, commentPos);
+                    }
+                    line = line.trim();
+                    if (line) {
+                        return line;
+                    }
+                }
+                return null;
+            };
+
+            // Bones
+            let boneCount = parseInt(nextLine());
+            if (isNaN(boneCount)) {
+                boneCount = parseInt(nextLine()); // Try second line if first is a version/header
+            }
+            const rawBones = [];
+            for(let i=0; i<boneCount && ptr < lines.length; i++) {
+                const name = nextLine();
+                const parentIdx = parseInt(nextLine());
+                const coords = nextLine().split(' ').map(parseFloat);
+                rawBones.push({ name, parentIdx, pos: coords });
+            }
+
+            // Meshes
+            const meshCount = parseInt(nextLine()) || 0;
+            const rawMeshes = [];
+            
+            for(let m=0; m<meshCount && ptr < lines.length; m++) {
+                const name = nextLine();
+                const uvLayerCount = parseInt(nextLine());
+                const texCount = parseInt(nextLine());
+                const textures = [];
+                for(let t=0; t<texCount; t++) {
+                    textures.push(nextLine());
+                }
+                
+                const vertCount = parseInt(nextLine());
+                const vertices = [];
+                for(let v=0; v<vertCount && ptr < lines.length; v++) {
+                    const line = nextLine();
+                    const parts = line.split(' ').map(parseFloat);
+                    
+                    // XPS ASCII Vertex Format:
+                    // X Y Z NX NY NZ R G B A U V [BoneIdx1 Weight1 BoneIdx2 Weight2 BoneIdx3 Weight3 BoneIdx4 Weight4]
+                    
+                    const vert = {
+                        x: parts[0], y: parts[1], z: parts[2],
+                        u: parts[10], v: parts[11],
+                        boneIndices: [],
+                        weights: []
+                    };
+                    
+                    // Read 4 bone weights
+                    // Indices start at index 12
+                    for(let b=0; b<4; b++) {
+                        vert.boneIndices.push(parts[12 + b*2]);
+                        vert.weights.push(parts[13 + b*2]);
+                    }
+                    vertices.push(vert);
+                }
+                
+                const faceCount = parseInt(nextLine());
+                const faces = [];
+                for(let f=0; f<faceCount && ptr < lines.length; f++) {
+                    faces.push(nextLine().split(' ').map(n => parseInt(n)));
+                }
+                
+                rawMeshes.push({ name, textures, vertices, faces });
+            }
+            
+            return { rawBones, rawMeshes };
+        }
+
+        // File Loading
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                await loadXPSFiles(files);
+            }
+        });
+        
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                await loadXPSFiles(files);
+            }
+        });
+        
+        function loadTexture(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const buffer = reader.result;
+                    const data = new Uint8Array(buffer);
+                    
+                    // Check for PNG signature: 89 50 4E 47
+                    if (data[0] === 0x89 && data[1] === 0x50 && data[2] === 0x4E && data[3] === 0x47) {
+                        loadAsImage(new Blob([buffer], {type: 'image/png'}));
+                        return;
+                    }
+                    
+                    // Check for JPG signature: FF D8
+                    if (data[0] === 0xFF && data[1] === 0xD8) {
+                        loadAsImage(new Blob([buffer], {type: 'image/jpeg'}));
+                        return;
+                    }
+
+                    // Check for BMP signature: 42 4D
+                    if (data[0] === 0x42 && data[1] === 0x4D) {
+                         loadAsImage(new Blob([buffer], {type: 'image/bmp'}));
+                         return;
+                    }
+                
+                    if (file.name.toLowerCase().endsWith('.tga')) {
+                        try {
+                            const texture = loadTGATexture(gl, buffer);
+                            resolve(texture);
+                        } catch (e) {
+                            console.error("TGA error", e);
+                            reject(new Error(`Failed to parse TGA: ${file.name} - ${e.message}`));
+                        }
+                        return;
+                    }
+                    
+                    // Fallback
+                    loadAsImage(file);
+                };
+                
+                reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
+                reader.readAsArrayBuffer(file);
+
+                function loadAsImage(blob) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const texture = gl.createTexture();
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        resolve(texture);
+                    };
+                    img.onerror = () => reject(new Error(`Failed to load texture: ${file.name}`));
+                    img.src = URL.createObjectURL(blob);
+                }
+            });
+        }
+
+        function loadTGATexture(gl, buffer) {
+            const data = new Uint8Array(buffer);
+            
+            // TGA Header
+            const idLength = data[0];
+            const colorMapType = data[1];
+            const imageType = data[2];
+            
+            const width = data[12] | (data[13] << 8);
+            const height = data[14] | (data[15] << 8);
+            const pixelDepth = data[16];
+            const descriptor = data[17];
+            
+            // Check support (2 = uncompressed RGB, 10 = RLE RGB)
+            const isSupported = (imageType === 2 && (pixelDepth === 24 || pixelDepth === 32)) ||
+                                (imageType === 3 && pixelDepth === 8) ||
+                                (imageType === 10 && (pixelDepth === 24 || pixelDepth === 32));
+
+            if (!isSupported) {
+                 throw new Error(`Unsupported TGA type: ${imageType}, depth: ${pixelDepth}`);
+            }
+            
+            let offset = 18 + idLength;
+            if (colorMapType === 1) {
+                const colorMapLength = data[5] | (data[6] << 8);
+                const colorMapDepth = data[7];
+                offset += colorMapLength * (colorMapDepth >> 3);
+            }
+            
+            const imageSize = width * height * 4;
+            const imageData = new Uint8Array(imageSize);
+            let pixelIndex = 0;
+            
+            // Handle RLE
+            if (imageType === 10) {
+                let pixelsRead = 0;
+                const totalPixels = width * height;
+                
+                while (pixelsRead < totalPixels && offset < data.length) {
+                    const header = data[offset++];
+                    const count = (header & 0x7F) + 1;
+                    const isRLE = header & 0x80;
+                    
+                    if (isRLE) {
+                        const b = data[offset++];
+                        const g = data[offset++];
+                        const r = data[offset++];
+                        const a = pixelDepth === 32 ? data[offset++] : 255;
+                        
+                        for (let i = 0; i < count; i++) {
+                            imageData[pixelIndex++] = r;
+                            imageData[pixelIndex++] = g;
+                            imageData[pixelIndex++] = b;
+                            imageData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    } else {
+                        for (let i = 0; i < count; i++) {
+                            const b = data[offset++];
+                            const g = data[offset++];
+                            const r = data[offset++];
+                            const a = pixelDepth === 32 ? data[offset++] : 255;
+                            
+                            imageData[pixelIndex++] = r;
+                            imageData[pixelIndex++] = g;
+                            imageData[pixelIndex++] = b;
+                            imageData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    }
+                }
+            } else {
+                // Uncompressed
+                if (imageType === 2) { // RGB
+                    for (let i = 0; i < width * height; i++) {
+                        const b = data[offset++];
+                        const g = data[offset++];
+                        const r = data[offset++];
+                        const a = pixelDepth === 32 ? data[offset++] : 255;
+                        imageData[pixelIndex++] = r;
+                        imageData[pixelIndex++] = g;
+                        imageData[pixelIndex++] = b;
+                        imageData[pixelIndex++] = a;
+                    }
+                } else if (imageType === 3) { // Grayscale
+                    for (let i = 0; i < width * height; i++) {
+                        const l = data[offset++];
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = 255;
+                    }
+                }
+            }
+            
+            // Handle Orientation (Bit 5: 0 = Bottom-Left, 1 = Top-Left)
+            // We want Top-Left for consistency with Image loader
+            const isTopLeft = (descriptor & 0x20) !== 0;
+            let finalData = imageData;
+            
+            if (!isTopLeft) {
+                const flipped = new Uint8Array(imageSize);
+                const stride = width * 4;
+                for (let y = 0; y < height; y++) {
+                    const srcRow = imageData.subarray(y * stride, (y + 1) * stride);
+                    const dstOffset = (height - 1 - y) * stride;
+                    flipped.set(srcRow, dstOffset);
+                }
+                finalData = flipped;
+            }
+            
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, finalData);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            
+            return texture;
+        }
+
+        async function loadXPSFiles(files) {
+            const loadInfo = document.getElementById('loadInfo');
+            loadInfo.style.display = 'block';
+            loadInfo.className = 'info';
+            loadInfo.textContent = `Processing ${files.length} file(s)...`;
+            
+            try {
+                // Reset mesh data
+                meshes = [];
+                bones = [];
+                loadedTextures.clear();
+                
+                // Find .ascii file
+                const asciiFile = files.find(f => f.name.toLowerCase().endsWith('.ascii'));
+                if (!asciiFile) throw new Error("No .ascii file found in selection");
+
+                // Load textures
+                const imageFiles = files.filter(f => f.name.match(/\.(jpg|jpeg|png|tga|bmp)$/i));
+                for (const imgFile of imageFiles) {
+                    const tex = await loadTexture(imgFile);
+                    loadedTextures.set(imgFile.name.toLowerCase(), tex);
+                }
+
+                // Parse Model
+                const text = await asciiFile.text();
+                const data = parseXPS(text);
+                
+                // Build Skeleton
+                // First pass: create joints
+                data.rawBones.forEach(b => {
+                    // XPS stores absolute positions, we need relative for our Joint class logic
+                    // We'll fix positions in second pass
+                    bones.push(new Joint(b.name, b.pos, null));
+                });
+                
+                // Second pass: link parents and fix positions
+                data.rawBones.forEach((b, i) => {
+                    const joint = bones[i];
+                    if (b.parentIdx >= 0 && b.parentIdx < bones.length) {
+                        joint.parent = bones[b.parentIdx];
+                        joint.parent.children.push(joint);
+                        
+                        // Convert absolute pos to relative pos
+                        const parentPos = data.rawBones[b.parentIdx].pos;
+                        joint.position = [
+                            b.pos[0] - parentPos[0],
+                            b.pos[1] - parentPos[1],
+                            b.pos[2] - parentPos[2]
+                        ];
+                    } else {
+                        joint.position = b.pos;
+                    }
+                });
+                
+                // Normalize mesh to fit in view
+                // Calculate bounds from all vertices in all meshes
+                const bounds = {
+                    minX: Infinity, maxX: -Infinity,
+                    minY: Infinity, maxY: -Infinity,
+                    minZ: Infinity, maxZ: -Infinity
+                };
+                
+                for (const mesh of data.rawMeshes) {
+                    for (const v of mesh.vertices) {
+                        bounds.minX = Math.min(bounds.minX, v.x);
+                        bounds.maxX = Math.max(bounds.maxX, v.x);
+                        bounds.minY = Math.min(bounds.minY, v.y);
+                        bounds.maxY = Math.max(bounds.maxY, v.y);
+                        bounds.minZ = Math.min(bounds.minZ, v.z);
+                        bounds.maxZ = Math.max(bounds.maxZ, v.z);
+                    }
+                }
+                
+                const centerX = (bounds.minX + bounds.maxX) / 2;
+                const centerY = (bounds.minY + bounds.maxY) / 2;
+                const centerZ = (bounds.minZ + bounds.maxZ) / 2;
+                const sizeX = bounds.maxX - bounds.minX;
+                const sizeY = bounds.maxY - bounds.minY;
+                const sizeZ = bounds.maxZ - bounds.minZ;
+                const maxSize = Math.max(sizeX, sizeY, sizeZ);
+                const scale = 2.0 / maxSize;
+                
+                // Process meshes into renderable buffers
+                for (const rawMesh of data.rawMeshes) {
+                    const vertices = [];
+                    const texCoords = [];
+                    const indices = [];
+                    const boneWeights = [];
+                    const boneIndices = [];
+                    
+                    // Center and scale vertices
+                    for (const v of rawMesh.vertices) {
+                        vertices.push(
+                            (v.x - centerX) * scale,
+                            (v.y - centerY) * scale,
+                            (v.z - centerZ) * scale
+                        );
+                        texCoords.push(v.u, 1.0 - v.v); // Flip V for WebGL
+                        boneWeights.push(...v.weights);
+                        boneIndices.push(...v.boneIndices);
+                    }
+                    
+                    // Flatten indices
+                    for (const face of rawMesh.faces) {
+                        indices.push(...face);
+                    }
+                    
+                    // Find texture
+                    let texture = null;
+                    if (rawMesh.textures.length > 0) {
+                        // Try to find the texture file in loaded textures
+                        // XPS texture paths can be absolute or relative, we just match filename
+                        const texName = rawMesh.textures[0].split(/[\\/]/).pop().toLowerCase();
+                        texture = loadedTextures.get(texName) || null;
+                    }
+                    
+                    meshes.push({ vertices, indices, texCoords, boneWeights, boneIndices, texture });
+                }
+                
+                hasMeshLoaded = true;
+                
+                loadInfo.className = 'info success';
+                loadInfo.innerHTML = `✓ Loaded ${asciiFile.name}<br>Bones: ${bones.length}<br>Meshes: ${meshes.length}`;
+                
+                // Create UI controls
+                createJointControls();
+                
+                render();
+                
+            } catch (error) {
+                console.error('Error loading OBJ:', error);
+                loadInfo.className = 'info error';
+                loadInfo.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Create UI Controls
+        function createJointControls() {
+            const controlsContainer = document.getElementById('joint-controls');
+            controlsContainer.innerHTML = '';
+
+            bones.forEach((joint, index) => {
+                
+                const div = document.createElement('div');
+                div.className = 'joint-control';
+                
+                const name = document.createElement('span');
+                name.className = 'joint-name';
+                name.textContent = joint.name;
+                div.appendChild(name);
+                
+                ['x', 'y', 'z'].forEach(axis => {
+                    const sliderGroup = document.createElement('div');
+                    sliderGroup.className = 'slider-group';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'slider-label';
+                    label.innerHTML = `
+                        <span>${axis.toUpperCase()}</span>
+                        <span id="joint-${index}-${axis}-value">0°</span>
+                    `;
+                    
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.min = '-180';
+                    slider.max = '180';
+                    slider.value = '0';
+                    slider.addEventListener('input', (e) => {
+                        const degrees = parseInt(e.target.value);
+                        const radians = degrees * Math.PI / 180;
+                        joint.rotation[axis] = radians;
+                        document.getElementById(`joint-${index}-${axis}-value`).textContent = degrees + '°';
+                        render();
+                    });
+                    
+                    sliderGroup.appendChild(label);
+                    sliderGroup.appendChild(slider);
+                    div.appendChild(sliderGroup);
+                });
+                
+                controlsContainer.appendChild(div);
+            });
+        }
+
+        createJointControls();
+
+        // Camera Control
+        let camera = {
+            distance: 4,
+            rotationX: 0.3,
+            rotationY: 0.3,
+            panX: 0,
+            panY: 0
+        };
+
+        let isDragging = false;
+        let isPanning = false;
+        let lastX, lastY;
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+            } else if (e.button === 2) {
+                isPanning = true;
+            }
+            lastX = e.clientX;
+            lastY = e.clientY;
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                camera.rotationY += deltaX * 0.01;
+                camera.rotationX += deltaY * 0.01;
+                camera.rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotationX));
+                render();
+            } else if (isPanning) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                camera.panX += deltaX * 0.01;
+                camera.panY -= deltaY * 0.01;
+                render();
+            }
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            isPanning = false;
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            camera.distance += e.deltaY * 0.01;
+            camera.distance = Math.max(1, Math.min(20, camera.distance));
+            render();
+            e.preventDefault();
+        });
+
+        // Drawing Functions
+        function createCylinderVertices(start, end, radius, color) {
+            const vertices = [];
+            const colors = [];
+            const segments = 6;
+            
+            const dx = end[0] - start[0];
+            const dy = end[1] - start[1];
+            const dz = end[2] - start[2];
+            const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            
+            if (length < 0.001) return { vertices, colors };
+            
+            const nx = dx / length;
+            const ny = dy / length;
+            const nz = dz / length;
+            
+            let tx, ty, tz;
+            if (Math.abs(ny) < 0.99) {
+                tx = 0; ty = 1; tz = 0;
+            } else {
+                tx = 1; ty = 0; tz = 0;
+            }
+            
+            const bx = ty * nz - tz * ny;
+            const by = tz * nx - tx * nz;
+            const bz = tx * ny - ty * nx;
+            const blen = Math.sqrt(bx * bx + by * by + bz * bz);
+            const bnx = bx / blen;
+            const bny = by / blen;
+            const bnz = bz / blen;
+            
+            const cx = bny * nz - bnz * ny;
+            const cy = bnz * nx - bnx * nz;
+            const cz = bnx * ny - bny * nx;
+            
+            for (let i = 0; i < segments; i++) {
+                const angle1 = (i / segments) * Math.PI * 2;
+                const angle2 = ((i + 1) / segments) * Math.PI * 2;
+                
+                const cos1 = Math.cos(angle1) * radius;
+                const sin1 = Math.sin(angle1) * radius;
+                const cos2 = Math.cos(angle2) * radius;
+                const sin2 = Math.sin(angle2) * radius;
+                
+                const x1 = cos1 * bnx + sin1 * cx;
+                const y1 = cos1 * bny + sin1 * cy;
+                const z1 = cos1 * bnz + sin1 * cz;
+                
+                const x2 = cos2 * bnx + sin2 * cx;
+                const y2 = cos2 * bny + sin2 * cy;
+                const z2 = cos2 * bnz + sin2 * cz;
+                
+                vertices.push(
+                    start[0] + x1, start[1] + y1, start[2] + z1,
+                    end[0] + x1, end[1] + y1, end[2] + z1,
+                    start[0] + x2, start[1] + y2, start[2] + z2,
+                    
+                    start[0] + x2, start[1] + y2, start[2] + z2,
+                    end[0] + x1, end[1] + y1, end[2] + z1,
+                    end[0] + x2, end[1] + y2, end[2] + z2
+                );
+                
+                for (let j = 0; j < 6; j++) {
+                    colors.push(...color);
+                }
+            }
+            
+            return { vertices, colors };
+        }
+
+        function createSphereVertices(center, radius, color) {
+            const vertices = [];
+            const colors = [];
+            const segments = 6;
+            
+            for (let lat = 0; lat < segments; lat++) {
+                const theta1 = (lat / segments) * Math.PI;
+                const theta2 = ((lat + 1) / segments) * Math.PI;
+                
+                for (let lon = 0; lon < segments; lon++) {
+                    const phi1 = (lon / segments) * Math.PI * 2;
+                    const phi2 = ((lon + 1) / segments) * Math.PI * 2;
+                    
+                    const v1 = [
+                        center[0] + radius * Math.sin(theta1) * Math.cos(phi1),
+                        center[1] + radius * Math.cos(theta1),
+                        center[2] + radius * Math.sin(theta1) * Math.sin(phi1)
+                    ];
+                    const v2 = [
+                        center[0] + radius * Math.sin(theta1) * Math.cos(phi2),
+                        center[1] + radius * Math.cos(theta1),
+                        center[2] + radius * Math.sin(theta1) * Math.sin(phi2)
+                    ];
+                    const v3 = [
+                        center[0] + radius * Math.sin(theta2) * Math.cos(phi1),
+                        center[1] + radius * Math.cos(theta2),
+                        center[2] + radius * Math.sin(theta2) * Math.sin(phi1)
+                    ];
+                    const v4 = [
+                        center[0] + radius * Math.sin(theta2) * Math.cos(phi2),
+                        center[1] + radius * Math.cos(theta2),
+                        center[2] + radius * Math.sin(theta2) * Math.sin(phi2)
+                    ];
+                    
+                    vertices.push(...v1, ...v2, ...v3);
+                    vertices.push(...v2, ...v4, ...v3);
+                    
+                    for (let i = 0; i < 6; i++) {
+                        colors.push(...color);
+                    }
+                }
+            }
+            
+            return { vertices, colors };
+        }
+
+        // Render Function
+        function render() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            
+            if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width;
+                canvas.height = height;
+                gl.viewport(0, 0, width, height);
+            }
+            
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.enable(gl.DEPTH_TEST);
+            
+            const projectionMatrix = mat4.create();
+            mat4.perspective(projectionMatrix, 45 * Math.PI / 180, width / height, 0.1, 100.0);
+            
+            const viewMatrix = mat4.create();
+            const eye = [
+                camera.distance * Math.sin(camera.rotationY) * Math.cos(camera.rotationX) + camera.panX,
+                camera.distance * Math.sin(camera.rotationX) + camera.panY,
+                camera.distance * Math.cos(camera.rotationY) * Math.cos(camera.rotationX)
+            ];
+            mat4.lookAt(viewMatrix, eye, [camera.panX, camera.panY, 0], [0, 1, 0]);
+            
+            gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+            
+            if (hasMeshLoaded) {
+                renderMesh(viewMatrix);
+            } else {
+                renderSkeleton(viewMatrix);
+            }
+        }
+        
+        function renderMesh(viewMatrix) {
+            // Calculate bone transforms
+            const boneTransforms = bones.map(joint => joint.getWorldMatrix());
+            
+            // Render each mesh
+            for (const mesh of meshes) {
+                // Apply skinning to vertices (CPU skinning)
+                const skinnedVertices = [];
+                
+                for (let i = 0; i < mesh.vertices.length / 3; i++) {
+                    const vx = mesh.vertices[i * 3];
+                    const vy = mesh.vertices[i * 3 + 1];
+                    const vz = mesh.vertices[i * 3 + 2];
+                    
+                    let finalX = 0, finalY = 0, finalZ = 0;
+                    
+                    // Blend based on bone weights
+                    for (let j = 0; j < 4; j++) {
+                        const boneIndex = mesh.boneIndices[i * 4 + j];
+                        const weight = mesh.weights[i * 4 + j];
+                        
+                        if (weight > 0 && boneIndex >= 0 && boneIndex < boneTransforms.length) {
+                            const transform = boneTransforms[boneIndex];
+                            
+                            const x = transform[0] * vx + transform[4] * vy + transform[8] * vz + transform[12];
+                            const y = transform[1] * vx + transform[5] * vy + transform[9] * vz + transform[13];
+                            const z = transform[2] * vx + transform[6] * vy + transform[10] * vz + transform[14];
+                            
+                            finalX += x * weight;
+                            finalY += y * weight;
+                            finalZ += z * weight;
+                        }
+                    }
+                    
+                    skinnedVertices.push(finalX, finalY, finalZ);
+                }
+                
+                // Create colors for mesh (gradient based on height)
+                const colors = [];
+                for (let i = 0; i < skinnedVertices.length / 3; i++) {
+                    const y = skinnedVertices[i * 3 + 1];
+                    const t = (y + 1.5) / 3;
+                    colors.push(0.4 + t * 0.4, 0.6 + t * 0.2, 0.9 - t * 0.1);
+                }
+                
+                // Render mesh
+                const vertexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(skinnedVertices), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aPosition);
+                gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+                
+                const colorBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aColor);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+                
+                // Texture Coords
+                if (mesh.texCoords.length > 0) {
+                    const texCoordBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.texCoords), gl.STATIC_DRAW);
+                    gl.enableVertexAttribArray(aTexCoord);
+                    gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, false, 0, 0);
+                }
+                
+                const indexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.indices), gl.STATIC_DRAW);
+                
+                gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+                
+                // Texture Uniforms
+                if (mesh.texture && mesh.texCoords.length > 0) {
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, mesh.texture);
+                    gl.uniform1i(uSampler, 0);
+                    gl.uniform1i(uUseTexture, 1);
+                } else {
+                    gl.uniform1i(uUseTexture, 0);
+                }
+                
+                gl.drawElements(gl.TRIANGLES, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
+            }
+            
+            // Draw skeleton overlay
+            renderSkeletonOverlay(viewMatrix);
+        }
+        
+        function renderSkeletonOverlay(viewMatrix) {
+            const allVertices = [];
+            const allColors = [];
+            
+            function drawBone(joint, color) {
+                if (!joint.parent) return;
+                
+                const start = joint.parent.getWorldPosition();
+                const end = joint.getWorldPosition();
+                const { vertices, colors } = createCylinderVertices(start, end, 0.015, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            function drawJoint(joint, color) {
+                const pos = joint.getWorldPosition();
+                const { vertices, colors } = createSphereVertices(pos, 0.03, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            bones.forEach(joint => {
+                drawBone(joint, [1.0, 0.6, 0.0]);
+                drawJoint(joint, [1.0, 0.8, 0.2]);
+            });
+            
+            if (allVertices.length > 0) {
+                const vertexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allVertices), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aPosition);
+                gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+                
+                const colorBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allColors), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aColor);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.disableVertexAttribArray(aTexCoord);
+                gl.uniform1i(uUseTexture, 0);
+                
+                gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+                gl.drawArrays(gl.TRIANGLES, 0, allVertices.length / 3);
+            }
+        }
+        
+        function renderSkeleton(viewMatrix) {
+            const allVertices = [];
+            const allColors = [];
+            
+            function drawBone(joint, color) {
+                if (!joint.parent) return;
+                
+                const start = joint.parent.getWorldPosition();
+                const end = joint.getWorldPosition();
+                const { vertices, colors } = createCylinderVertices(start, end, 0.03, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            function drawJoint(joint, color) {
+                const pos = joint.getWorldPosition();
+                const { vertices, colors } = createSphereVertices(pos, 0.05, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            bones.forEach(joint => {
+                drawBone(joint, [0.3, 0.7, 1.0]);
+                drawJoint(joint, [1.0, 0.8, 0.3]);
+            });
+            
+            if (allVertices.length > 0) {
+                const vertexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allVertices), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aPosition);
+                gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+                
+                const colorBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allColors), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aColor);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.disableVertexAttribArray(aTexCoord);
+                gl.uniform1i(uUseTexture, 0);
+                
+                gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+                gl.drawArrays(gl.TRIANGLES, 0, allVertices.length / 3);
+            }
+        }
+
+        // Button Functions
+        function resetPose() {
+            bones.forEach(joint => {
+                joint.rotation.x = 0;
+                joint.rotation.y = 0;
+                joint.rotation.z = 0;
+            });
+            
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.value = 0;
+            });
+            
+            document.querySelectorAll('[id$="-value"]').forEach(label => {
+                label.textContent = '0°';
+            });
+            
+            render();
+        }
+
+        function randomPose() {
+            bones.forEach((joint, index) => {
+                ['x', 'y', 'z'].forEach(axis => {
+                    const degrees = Math.floor(Math.random() * 60 - 30);
+                    const radians = degrees * Math.PI / 180;
+                    joint.rotation[axis] = radians;
+                    
+                    const valueLabel = document.getElementById(`joint-${index}-${axis}-value`);
+                    if (valueLabel) valueLabel.textContent = degrees + '°';
+                });
+            });
+            
+            // Update slider positions
+            document.querySelectorAll('.joint-control').forEach((control, index) => {
+                const joint = bones[index];
+                if (!joint) return;
+                const sliders = control.querySelectorAll('input[type="range"]');
+                if (sliders.length === 3) {
+                    sliders[0].value = Math.round(joint.rotation.x * 180 / Math.PI);
+                    sliders[1].value = Math.round(joint.rotation.y * 180 / Math.PI);
+                    sliders[2].value = Math.round(joint.rotation.z * 180 / Math.PI);
+                }
+            });
+            
+            render();
+        }
+
+        // Initialize
+        gl.clearColor(0.1, 0.1, 0.18, 1.0);
+        
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            render();
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
+</body>
+</html>
