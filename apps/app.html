@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XNA Posing Studio</title>
+<script>
+let showGround = true;
+let showFloor = true;
+let showWireframe = false;
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --ui-bg: #252526;
+  --main-bg: #323232;
+  --accent: #0e639c;
+  --tab-bg: #2d2d2d;
+  --border: #444;
+  --accent: #317696;
+  --text: #d4d4d4;
+  --hover: #444444;
+  --menubar-bg: #181818;
+}
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--main-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif;
+  font-size: 10px;
+  overflow: hidden;
+}
+
+body {
+  font-size: 12px;
+}
+
+::selection {
+  background: transparent;
+}
+
+textarea::selection {
+  background: Highlight;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+textarea:focus-visible {
+  outline: auto;
+}
+
+select {
+  border: 1px solid var(--border);
+  background-color: var(--ui-bg);
+  color: var(--text);
+  border-radius: 4px;
+  outline: 0;
+}
+
+option {
+  padding: .25rem;
+  background-color: var(--ui-bg);
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+option:hover {
+  background-color: var(--hover);
+}
+
+select:focus option:checked {
+  background: var(--accent) linear-gradient(0deg, var(--accent) 0%, var(--accent) 100%);
+}
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 41px 41px 1fr; /* Menu, Toolbar, Main content */
+  overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+/* Menus amd Toolbar */
+/* ================================================== */
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 41px 1fr; /* Menu, Toolbar, Main content */
+  overflow: hidden;
+  position: relative;
+}
+
+.mainmenu {
+  width: 100vw;
+  background-color: var(--menubar-bg);
+}
+
+nav .appicon {
+  max-height: 32px;
+  max-width: 32px;
+}
+
+nav .app-title
+{
+  font-weight: 700;
+  font-size: 12px;
+  color: lightgray;
+}
+
+nav, .toolbar {
+  border-bottom: 1px solid var(--border);
+  background-color: var(--menubar-bg);
+  color: var(--text);
+  font-size: 14px;
+  align-items: center;
+  display: flex;
+  height: 41px;
+  padding: 4px;
+}
+
+nav hr, .toolbar hr {
+  max-height: 32px;
+  min-width: 1px;
+  border-color:var(--border);
+  background-color: var(--border);
+  align-self: stretch;
+  border-style: none;
+}
+
+nav * {
+  display: flex;
+  flex: 0 0 auto;
+  margin: 4px;
+}
+
+nav {
+  flex-grow: 1;
+}
+
+menu {
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu > ul {
+  color: initial;
+  position: relative;
+  display: flex;
+}
+
+menu li {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: block;
+  justify-content: space-between;
+  position: relative;
+  white-space: nowrap;
+}
+
+menu hr, .context-menu hr {
+  background-color: var(--border);
+  border-bottom-color: var(--border);
+  content: "";
+  display: block;
+  height: 1px;
+  border: 0px;
+  margin: 3px 12px;
+  pointer-events: none;
+}
+
+menu ul {
+  cursor: default;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+menu > ul {
+  background-color: var(--menubar-bg);
+  display: flex;
+}
+
+menu > ul > li {
+  padding: 2px 10px;
+  position: relative;
+  color: var(--text);
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  background: var(--hover);
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  background: var(--menubar-bg);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  color: var(--color);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+}
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+.menubar {
+  padding: 0;
+  z-index: 25001;
+  position: relative;
+  height: 100%;
+}
+
+.menubar > ul > li > ul{
+    margin-top: 8px;
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+  background-color: var(--menubar-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu > ul > ul ul li > ul,
+.menu > ul ul li > ul {
+  left: 100%;
+  top: -4px;
+}
+
+menu > ul ul > li > a,
+menu > ul ul > li > button,
+menu > ul ul > li > label,
+menu > ul ul > li[aria-haspopup="true"],
+.menu ul > li > a,
+.menu ul > li > button,
+.menu ul > li > label,
+.menu ul > li[aria-haspopup="true"] {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 10px 4px 32px;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+  font-size: 1.2rem;
+}
+
+menu > ul ul ul > li[aria-haspopup="true"] {
+  padding: 0;
+}
+
+menu ul ul > li > a:focus,
+menu ul ul > li > a:hover,
+menu ul ul > li > button:focus,
+menu ul ul > li > button:hover,
+menu ul ul > li > label:focus,
+menu ul ul > li > label:hover,
+menu ul ul > li[aria-haspopup="true"]:focus,
+menu ul ul > li[aria-haspopup="true"]:hover,
+.menu ul > li > a:focus,
+.menu ul > li > a:hover,
+.menu ul > li > button:focus,
+.menu ul > li > button:hover,
+.menu ul > li > label:focus,
+.menu ul > li > label:hover,
+.menu ul > li[aria-haspopup="true"]:focus,
+.menu ul > li[aria-haspopup="true"]:hover {
+  background-color: var(--hover);
+  color:var(--text);
+}
+
+menu >ul ul > li[aria-haspopup="true"]:after,
+.menu ul > li[aria-haspopup="true"]:after {
+  border: 4px solid transparent;
+  border-left-color: currentcolor;
+  content: "";
+  color: var(--text);
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li,
+.menu li {
+  position: relative;
+  font-size: 1.2rem;
+}
+
+menu ul li > input[type],
+.menu li > input[type] {
+  position: absolute;
+  z-index: 2;
+  margin: 0.7rem 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+menu ul li > svg,
+.menu ul li > svg {
+  position: absolute;
+  z-index: 2;
+  margin: 0.4rem 0.6rem;
+  height: 1.8rem;
+  width: 1.8rem;
+  stroke: var(--text);
+}
+
+menu ul li > input[type] + label,
+.menu li > input[type] + label {
+  display: block;
+  position: relative;
+}
+
+menu ul li > input[type] + label:before,
+.menu li > input[type] + label:before {
+  all: unset;
+  border-radius: inherit;
+  box-sizing: border-box;
+  height: 22px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 22px;
+}
+
+menu ul li > input[type]:checked + label:before,
+.menu li > input[type]:checked + label:before {
+  content: "";
+}
+
+menu ul li > input[type][type="radio"]:checked + label:after,
+.menu li > input[type][type="radio"]:checked + label:after {
+  box-shadow: none;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li > input[type][type="checkbox"]:checked + label:after,
+.menu li > input[type][type="checkbox"]:checked + label:after {
+  font-size: 10pt;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-52%);
+}
+
+menu ul li:focus-within > ul,
+menu ul li:focus > ul,
+.menu li:focus-within > ul,
+.menu li:focus > ul {
+  display: block;
+}
+
+menu ul li:focus-within:has(~ li:hover) > ul,
+menu ul li:focus:has(~ li:hover) > ul,
+.menu li:focus-within:has(~ li:hover) > ul,
+.menu li:focus:has(~ li:hover) > ul {
+  display: none;
+}
+
+menu ul li[aria-disabled],
+.menu li[aria-disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+menu ul li.has-divider:after,
+.menu li.has-divider:after {
+  box-shadow: inset 0 1px rgba(0, 0, 0, 0.15), inset 0 -1px var(--text);
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 3px 0 2px 30px;
+  pointer-events: none;
+}
+
+menu ul li img,
+.menu li img {
+  left: 2px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+menu ul li span,
+.menu li span {
+  margin-left: 32px;
+}
+
+menu > ul ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu > ul ul.can-hover li:hover ~ li:focus,
+menu > ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul > ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul > ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+.toolbar > ul {
+  margin: 0;
+  padding: 0 11px 0 12px;
+  display: flex;
+}
+
+.toolbar > ul > li {
+  display: inline-block;
+}
+
+.toolbar button {
+  display: inline-block;
+  position: relative;
+  min-width: 28px;
+  height: 28px;
+  margin: 5px 2px;
+  border: 0;
+  padding: 2px;
+  background-color: transparent;
+  color: var(--text);
+  border-radius: 4px;
+}
+
+.toolbar hr {
+  margin: 4px;
+}
+
+.toolbar button:hover {
+  background-color: var(--hover);
+}
+
+main { 
+  display: flex; 
+  flex-direction: row;
+  overflow: hidden; /* Prevents the whole app from scrolling */
+  height: 100%; /* Fills the remaining grid row */
+}
+
+.mobile-menu {
+  display: none;
+  padding: 0;
+  width: 0;
+  height: 32px;
+}
+
+@media screen and (max-width: 649px) {
+  .appicon, .app-title, .app-title + hr { display: none; }
+  .mobile-menu {
+    display: block;
+    padding: 0;
+    width: 32px;
+  }
+
+  .mobile-menu + ul {
+    display: none;
+  }
+
+  .menubar:hover > ul > ul {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 32px;
+    min-width: 0;
+  }
+
+  menu.menubar > ul > ul > li {
+    padding: 2px 32px 2px 10px;
+  }
+
+  menu.menubar > ul > ul > li > ul {
+    position: absolute;
+    left: 100%;
+    top: -0.4rem;
+  }
+}
+
+@media screen and (min-width: 650px) {
+  menu > ul > ul {
+    border: 0;
+    box-shadow: none;
+  }
+
+  menu.menubar > ul > ul > li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0
+  }
+  
+  menu > ul > ul > li::after{
+    display: none;
+  }
+}
+
+/* Rest of CSS
+   ================================================== */
+
+.context-menu {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="mainmenu">
+    <nav>
+      <svg class="appicon" version="1.1" viewBox="0 0 32 32" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><rect x="3" y="5" class="st0" width="26" height="22"/><line class="st0" x1="13" y1="8" x2="13" y2="8"/><line class="st0" x1="10" y1="8" x2="10" y2="8"/><line class="st0" x1="7" y1="8" x2="7" y2="8"/><line class="st0" x1="3" y1="11" x2="29" y2="11"/></svg>
+      <div class="app-title">Application</div>
+      <hr>
+      <menu class="menubar">
+        <ul>
+          <li class="mobile-menu">
+            <svg fill="currentColor" viewBox="0 0 18 18" aria-hidden="true" aria-label="" focusable="false"><rect fill-rule="evenodd" x="2" y="8" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="3" width="14" height="2" rx="0.5"></rect><rect fill-rule="evenodd" x="2" y="13" width="14" height="2" rx="0.5"></rect></svg><a></a>
+          </li>
+          <ul class="can-hover">
+            <li tabindex="0" aria-haspopup="true">File
+              <ul>
+                <li>
+                  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 32 32" xml:space="preserve"><polygon fill="none" stroke-width="2" stroke-miterlimit="10" points="25,28 7,28 7,4 19,4 25,10 "/><polyline fill="none" stroke="white" stroke-width="2" stroke-miterlimit="10" points="19,4 19,10 25,10 "/></svg>
+                  <a onclick="NewFile()">New</a>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21,8V19a1,1,0,0,1-1,1H4a1,1,0,0,1-1-1V5A1,1,0,0,1,4,4H9.59a1,1,0,0,1,.7.29l2.42,2.42a1,1,0,0,0,.7.29H20A1,1,0,0,1,21,8Z" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></svg>
+                  <a onclick="OpenFile()">Open</a>
+                </li>
+                <hr>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20V15H9V20M20 9.82843V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V6C4 4.89543 4.89543 4 6 4H14.1716C14.702 4 15.2107 4.21071 15.5858 4.58579L19.4142 8.41421C19.7893 8.78929 20 9.29799 20 9.82843Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <a onclick="SaveFile()">Save</a>
+                </li>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Edit
+              <ul>
+                <li><input type="checkbox" id="chk-itemname"/><label for="chk-itemname">Checked Item</label></li>
+                <hr>
+                <li aria-haspopup="true"><a>Subitems</a>
+                    <ul>
+                        <li><a>Subitem 1</a></li>
+                        <li><a>Subitem 2</a></li>
+                    </ul>
+                </li>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">View</li>
+          </ul>
+        </ul>
+      </menu>
+    </nav>
+  </div>
+
+  <div class="toolbar">
+    <ul>
+      <li>
+        <button onclick="" title="Code">
+          <svg width="24" height="24" viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20,40h-.5a2,2,0,0,1-1.4-2.5l8-27.9a2,2,0,0,1,3.8,1l-8,28A1.9,1.9,0,0,1,20,40Z"></path>
+            <path d="M14,35a2,2,0,0,0,1.3-3.5L7,24l8.3-7.5a2,2,0,0,0-2.6-3l-10,9a2,2,0,0,0,0,3l10,9A1.9,1.9,0,0,0,14,35Z"></path>
+            <path d="M34,35a2,2,0,0,1-1.3-3.5L41,24l-8.3-7.5a2,2,0,1,1,2.6-3l10,9a2,2,0,0,1,0,3l-10,9A1.9,1.9,0,0,1,34,35Z"></path>
+          </svg>
+        </button>
+      </li>
+      <hr>
+      <li>
+        <button onclick="" title="Palette Editor">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="13.5" cy="6.5" r=".5"></circle>
+            <circle cx="17.5" cy="10.5" r=".5"></circle>
+            <circle cx="8.5" cy="7.5" r=".5"></circle>
+            <circle cx="6.5" cy="12.5" r=".5"></circle>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+          </svg>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <main>
+    <!-- Main Windoe -->
+  </main>
+</div>
+
+<div class="menu context-menu">
+  <ul style="width: 200px">
+    <li>
+      <input type="radio" name="icon-size" id="example12">
+      <label for="example12">Large icons</label>
+    </li>
+    <li>
+      <input type="radio" name="icon-size" id="example13" checked>
+      <label for="example13">Medium icons</label>
+    </li>
+    <li>
+      <input type="radio" name="icon-size" id="example14">
+      <label for="example14">Small icons</label>
+    </li>
+    <hr>
+    <li>
+      <input type="checkbox" id="example15">
+      <label for="example15">Auto arrange icons</label>
+    </li>
+    <li>
+      <input type="checkbox" id="example16" checked>
+      <label for="example16">Align icons to grid</label>
+    </li>
+  </ul>
+</div>
+
+<script>
+// Menubar 
+// ==================================================
+
+const menuItems = document.querySelectorAll('.can-hover > li');
+let focusedItem = null;
+
+function closeMainMenu() {
+  menuItems.forEach(item => {
+    item.addEventListener('blur', () => {
+      focusedItem = null;
+    });
+
+    item.blur();
+  });
+}
+
+menuItems.forEach(item => {
+  item.addEventListener('mouseover', () => {
+    if (focusedItem) {
+      focusedItem.blur();
+      item.focus();
+      focusedItem = item;
+    }
+  });
+
+  item.addEventListener('focus', () => {
+    focusedItem = item;
+  });
+
+  item.addEventListener('blur', () => {
+    focusedItem = null;
+  });
+
+  item.addEventListener('mousedown', (event) => {
+    // Check if the clicked element is an li inside a .can-hover > li
+    const clickedLi = event.target.closest('.can-hover > li li');
+    if (!clickedLi && item === focusedItem) {
+      event.preventDefault();
+      item.blur();
+    }
+  });
+});
+
+function SaveFile() {
+  closeMainMenu();
+}
+
+function SaveAsFile() {
+  closeMainMenu();
+}
+
+function Exit() {
+  closeMainMenu();
+}
+
+
+let contextMenu = document.querySelector(".context-menu");
+
+document.addEventListener('contextmenu', event => {
+  event.preventDefault();
+});
+
+
+// Context Menu
+// ==================================================
+
+document.querySelector('main').addEventListener('contextmenu', e => {
+
+  e.preventDefault();
+
+  // Remove existing context menu
+  if (contextMenu.style.display !== "none") {
+    contextMenu.style.display = "none";
+  }
+
+  contextMenu.style.display = "block";
+
+  // Set the position of the context menu
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+  const menuWidth = contextMenu.offsetWidth;
+  const menuHeight = contextMenu.offsetHeight;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const x = Math.min(mouseX, screenWidth - menuWidth);
+  const y = Math.min(mouseY, screenHeight - menuHeight);
+  contextMenu.style.top = `${y}px`;
+  contextMenu.style.left = `${x}px`;
+
+  // Left click on current location
+  const evt = new MouseEvent('click', {
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+  });
+  document.elementFromPoint(x, y).dispatchEvent(evt);
+});
+
+// Close context menu on click outside of it
+document.addEventListener('click', e => {
+  if (contextMenu !== null && !contextMenu.contains(e.target)) {
+    contextMenu.style.display = "none";
+  }
+});
+
+</script>
+</body>
+</html>
