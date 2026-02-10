@@ -1,0 +1,3669 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Posing Studio</title>
+<script>
+let showGround = true;
+let showFloor = true;
+let showWireframe = false;
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --ui-bg: #252526;
+  --main-bg: #323232;
+  --accent: #0e639c;
+  --tab-bg: #2d2d2d;
+  --border: #444;
+  --accent: #317696;
+  --text: #d4d4d4;
+  --hover: #666666;
+  --activity-bg: #181818;
+}
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--main-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Trebuchet MS", "Lucida Grande", sans-serif;
+  font-size: 10px;
+  overflow: hidden;
+}
+
+body {
+  font-size: 12px;
+}
+
+::selection {
+  background: transparent;
+}
+
+textarea::selection {
+  background: Highlight;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+textarea:focus-visible {
+  outline: auto;
+}
+
+select {
+  border: 1px solid var(--border);
+  background-color: var(--ui-bg);
+  color: var(--text);
+  border-radius: 4px;
+  outline: 0;
+}
+
+option {
+  padding: .25rem;
+  background-color: var(--ui-bg);
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+option:hover {
+  background-color: var(--hover);
+}
+
+select:focus option:checked {
+  background: var(--accent) linear-gradient(0deg, var(--accent) 0%, var(--accent) 100%);
+}
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 41px 41px 1fr; /* Menu, Toolbar, Main content */
+  overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+/* Menus amd Toolbar */
+/* ================================================== */
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 41px /*41px*/ 1fr; /* Menu, Toolbar, Main content */
+  overflow: hidden;
+  position: relative;
+}
+
+.mainmenu {
+  width: 100vw;
+  background-color: var(--activity-bg);
+}
+
+.app-title
+{
+  font-weight: 700;
+  font-size: 12px;
+  color: lightgray;
+}
+
+/* The container for the panels and center view */
+main { 
+  display: flex; 
+  flex-direction: row;
+  overflow: hidden; /* Prevents the whole app from scrolling */
+  height: 100%; /* Fills the remaining grid row */
+}
+
+/* The center area where the canvas/code lives */
+.main { 
+  position: relative; 
+  flex-grow: 1; /* This makes it fill the middle */
+  background-color: var(--ui-bg); 
+  overflow: hidden;
+}
+
+/* Side panels should fill the height of the main container */
+.leftpanel, .rightpanel { 
+  min-width: 0; 
+  height: 100%;
+  flex: 0 0 auto; 
+  background-color: var(--tab-bg);
+  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Scrollbar lives inside the panel only */
+}
+
+nav, #toolbar {
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  align-items: center;
+  display: flex;
+  height: 41px; /*32px*/
+  padding: 4px;
+}
+
+nav .appicon {
+  /* margin: 4px; */
+  max-height: 32px;
+  max-width: 32px;
+}
+
+nav hr, #toolbar hr {
+  max-height: 32px;
+  /* margin: 4px; */
+  min-width: 1px;
+  border-color:var(--border);
+  background-color: var(--border);
+  align-self: stretch;
+  border-style: none;
+}
+
+nav * {
+  display: flex;
+  flex: 0 0 auto;
+  margin: 4px;
+}
+
+nav #tabs {
+  flex-grow: 1;
+}
+
+menu {
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu > ul {
+  color: initial;
+  position: relative;
+  display: flex;
+}
+
+menu li {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: block;
+  justify-content: space-between;
+  position: relative;
+  white-space: nowrap;
+}
+
+menu hr {
+  background-color: var(--border);
+  border-bottom-color: var(--border);
+  content: "";
+  display: block;
+  height: 1px;
+  border: 0px;
+  margin: 3px 12px;
+  pointer-events: none;
+}
+
+menu ul {
+  cursor: default;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+menu > ul {
+  background-color: var(--menubar-bg);
+  display: flex;
+}
+
+menu > ul > li {
+  padding: 2px 10px;
+  position: relative;
+  color: var(--text);
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  background: var(--hover);
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  background: var(--menu-bg);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  color: var(--color);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+}
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+.menubar {
+  padding: 0;
+}
+
+.menubar > ul > li > ul{
+    margin-top: 8px;
+}
+
+menu > ul > li:focus,
+menu > ul > li:focus-within,
+menu > ul > li:hover {
+  color: var(--text);
+  outline: none;
+}
+
+menu > ul > li:focus-within ~ li:focus,
+menu > ul > li:focus-within ~ li:focus-within,
+menu > ul > li:focus ~ li:focus,
+menu > ul > li:focus ~ li:focus-within,
+menu > ul > li:hover ~ li:focus,
+menu > ul > li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu > ul > li:focus-within:has(~ li:hover),
+menu > ul > li:focus:has(~ li:hover),
+menu > ul > li:hover:has(~ li:hover) {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul ul,
+.menu ul {
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 3px -2px rgba(0, 0, 0, 0.5);
+  min-width: 150px;
+  padding: 2px;
+  position: relative;
+  background-color: var(--tab-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  color-scheme: dark;
+  user-select: none;
+}
+
+menu li ul {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 99;
+}
+
+menu > ul ul li > ul,
+.menu > ul ul li > ul {
+  left: 100%;
+  top: -4px;
+}
+
+menu ul ul > li > a,
+menu ul ul > li > button,
+menu ul ul > li > label,
+menu ul ul > li[aria-haspopup="true"],
+.menu ul > li > a,
+.menu ul > li > button,
+.menu ul > li > label,
+.menu ul > li[aria-haspopup="true"] {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 10px 4px 32px;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+}
+
+menu ul ul > li > a:focus,
+menu ul ul > li > a:hover,
+menu ul ul > li > button:focus,
+menu ul ul > li > button:hover,
+menu ul ul > li > label:focus,
+menu ul ul > li > label:hover,
+menu ul ul > li[aria-haspopup="true"]:focus,
+menu ul ul > li[aria-haspopup="true"]:hover,
+.menu ul > li > a:focus,
+.menu ul > li > a:hover,
+.menu ul > li > button:focus,
+.menu ul > li > button:hover,
+.menu ul > li > label:focus,
+.menu ul > li > label:hover,
+.menu ul > li[aria-haspopup="true"]:focus,
+.menu ul > li[aria-haspopup="true"]:hover {
+  background-color: var(--hover);
+  color:var(--text);
+}
+
+menu ul ul > li[aria-haspopup="true"]:after,
+.menu ul > li[aria-haspopup="true"]:after {
+  border: 4px solid transparent;
+  border-left-color: currentcolor;
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li,
+.menu li {
+  position: relative;
+  font-size: 1.2rem;
+}
+
+menu ul li > input[type],
+.menu li > input[type] {
+  /* display: none; */
+  position: absolute;
+  z-index: 2;
+  margin: 7px 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+menu ul li > input[type] + label,
+.menu li > input[type] + label {
+  display: block;
+  position: relative;
+}
+
+menu ul li > input[type] + label:before,
+.menu li > input[type] + label:before {
+  all: unset;
+  /* background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.6), rgba(230, 236, 245, 0.8) 90%, hsla(0, 0%, 100%, 0.8)); */
+  border-radius: inherit;
+  box-sizing: border-box;
+  height: 22px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 22px;
+}
+
+menu ul li > input[type]:checked + label:before,
+.menu li > input[type]:checked + label:before {
+  content: "";
+}
+
+menu ul li > input[type][type="radio"]:checked + label:after,
+.menu li > input[type][type="radio"]:checked + label:after {
+  box-shadow: none;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+menu ul li > input[type][type="checkbox"]:checked + label:after,
+.menu li > input[type][type="checkbox"]:checked + label:after {
+  font-size: 10pt;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-52%);
+}
+
+menu ul li:focus-within > ul,
+menu ul li:focus > ul,
+.menu li:focus-within > ul,
+.menu li:focus > ul {
+  display: block;
+}
+
+menu ul li:focus-within:has(~ li:hover) > ul,
+menu ul li:focus:has(~ li:hover) > ul,
+.menu li:focus-within:has(~ li:hover) > ul,
+.menu li:focus:has(~ li:hover) > ul {
+  display: none;
+}
+
+menu ul li[aria-disabled],
+.menu li[aria-disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+menu ul li.has-divider:after,
+.menu li.has-divider:after {
+  box-shadow: inset 0 1px rgba(0, 0, 0, 0.15), inset 0 -1px var(--text);
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 3px 0 2px 30px;
+  pointer-events: none;
+}
+
+menu ul li img,
+.menu li img {
+  left: 2px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+menu ul li span,
+.menu li span {
+  margin-left: 32px;
+}
+
+menu ul.can-hover  ul li:hover > ul,
+.menu.can-hover ul li:hover > ul {
+  display: block;
+}
+
+menu ul.can-hover li:hover ~ li:focus,
+menu ul.can-hover li:hover ~ li:focus-within,
+.menu.can-hover li:hover ~ li:focus,
+.menu.can-hover li:hover ~ li:focus-within {
+  background: transparent;
+  color: inherit;
+}
+
+menu ul.can-hover li:hover ~ li:focus-within > ul,
+menu ul.can-hover li:hover ~ li:focus > ul,
+.menu.can-hover li:hover ~ li:focus-within > ul,
+.menu.can-hover li:hover ~ li:focus > ul {
+  display: none;
+}
+
+#toolbar > ul {
+  margin: 0;
+  padding: 0 11px 0 12px;
+  display: flex;
+}
+
+#toolbar > ul > li {
+  display: inline-block;
+}
+
+#toolbar button {
+  display: inline-block;
+  position: relative;
+  min-width: 28px;
+  height: 28px;
+  margin: 5px 2px;
+  border: 0;
+  padding: 2px;
+  background-color: transparent;
+  color: var(--text);
+  border-radius: 4px;
+}
+
+#toolbar hr {
+  margin: 4px;
+}
+
+#toolbar button:hover {
+  background-color: var(--hover);
+}
+
+
+
+
+
+
+
+
+
+
+/*  */
+
+#container {
+  display: flex;
+  height: calc(100vh - 35px);
+}
+
+#canvas-container {
+  flex: 1;
+  position: relative;
+  background-color: #000;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  cursor: grab;
+  /* background: #1a1a2e; */
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+#activity-bar {
+  width: 48px;
+  background-color: var(--activity-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.activity-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 24px;
+  color: #fff;
+}
+
+.activity-icon:hover {
+  opacity: 1;
+}
+
+.activity-icon.active {
+  opacity: 1;
+  border-left: 2px solid var(--accent);
+}
+
+#controls {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  background: var(--activity-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+h1 {
+  display: none;
+}
+
+.section {
+  border-bottom: 1px solid var(--border);
+}
+
+.section h2 {
+    background-color: #383838;
+    color: #cccccc;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 22px;
+}
+
+.section-content {
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.joint-control {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: var(--item-hover);
+  border-radius: 8px;
+}
+
+.joint-name {
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.slider-label {
+  display: inline-block;
+  width: 20px;
+  margin: 0;
+  font-weight: bold;
+  color: #aaa;
+}
+
+input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #444;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+.slider-value {
+  width: 35px;
+  text-align: right;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #0e639c;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #1177bb;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.info {
+  background: #2a2d2e;
+  padding: 12px;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #9cdcfe;
+  line-height: 1.5;
+}
+
+.success {
+  background: #2a2d2e;
+  color: #4ec9b0;
+  border-left: 3px solid #4ec9b0;
+}
+
+.error {
+  background: #2a2d2e;
+  color: #f48771;
+  border-left: 3px solid #f48771;
+}
+
+#dropZone {
+  border: 1px dashed #555;
+  border-radius: 4px;
+  padding: 30px;
+  text-align: center;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #aaa;
+}
+
+#dropZone:hover {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.05);
+}
+
+#dropZone.dragover {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.02);
+}
+
+/* Tree View Styles */
+.bone-tree, .bone-tree ul {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.bone-tree li {
+  position: relative;
+}
+
+/* Vertical line connector */
+.bone-tree li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  bottom: 0;
+  width: 1px;
+  background: #444;
+}
+
+/* Horizontal line connector */
+.bone-tree li::after {
+  content: '';
+  position: absolute;
+  top: 12px; /* Approx half line height */
+  left: -10px;
+  width: 10px;
+  height: 1px;
+  background: #444;
+}
+
+/* Remove bottom part of vertical line for last child */
+.bone-tree li:last-child::before {
+  height: 12px;
+}
+
+/* Hide lines for root */
+.bone-tree > li::before, .bone-tree > li::after {
+  display: none;
+}
+
+.bone-tree {
+  padding-left: 0;
+}
+
+.bone-label {
+  cursor: pointer;
+  padding: 2px 5px;
+  display: inline-block;
+  border-radius: 3px;
+  font-size: 12px;
+  white-space: nowrap;
+  line-height: 18px;
+  color: #ccc;
+}
+.bone-label:hover { background-color: var(--item-hover); }
+.bone-label.selected { background-color: var(--item-active); color: white; }
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #252526;
+  color: #cccccc;
+  padding: 10px 15px;
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 1000;
+  font-size: 13px;
+  border: 1px solid #454545;
+  animation: slideIn 0.3s ease-out;
+}
+.notification.success { border-left: 3px solid #4ec9b0; }
+.notification.error { border-left: 3px solid #f48771; }
+.notification.info { border-left: 3px solid #007acc; }
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+#chk-accessories {
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+  margin: 0;
+}
+
+#chk-accessories > li > a,
+#chk-accessories > li > label {
+  all: unset;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 10px 4px 32px;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+}
+
+#chk-accessories > li:hover > a,
+#chk-accessories > li:hover > label {
+  background-color: var(--hover);
+  color: var(--text);
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="mainmenu">
+    <nav>
+      <svg class="appicon" version="1.1" viewBox="0 0 32 32" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><rect x="3" y="5" class="st0" width="26" height="22"/><line class="st0" x1="13" y1="8" x2="13" y2="8"/><line class="st0" x1="10" y1="8" x2="10" y2="8"/><line class="st0" x1="7" y1="8" x2="7" y2="8"/><line class="st0" x1="3" y1="11" x2="29" y2="11"/></svg>
+      <div class="app-title">GLTF Posing Studio</div>
+      <hr>
+      <span id="tabs">
+        <menu class="menubar">
+          <ul class="can-hover">
+            <li tabindex="0" aria-haspopup="true">File
+              <ul>
+                <li><a onclick="OpenXPSFile()">Open XPS Model Folder</a></li>
+                <li><a onclick="OpenGLTFFile()">Open GLTF Model File</a></li>
+                <hr>
+                <li><a onclick="SaveGLTFFile()">Save GLTF Model File</a></li>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Edit</li>
+            <li tabindex="0" aria-haspopup="true">View
+              <ul>
+                <li><input type="checkbox" id="chk-skeleton"/><label for="chk-skeleton">Show Skeleton</label></li>
+                <li><input type="checkbox" id="chk-floor" checked/><label for="chk-floor">Show Floor</label></li>
+                <li><input type="checkbox" id="chk-wireframe"/><label for="chk-wireframe">Show Wireframe</label></li>
+                <hr>
+                <li><a>Show Accessories</a></li>
+                <hr style="border-bottom: 1px dashed #545454; height: 0; background-color: transparent;">
+                <span id="chk-accessories">
+                  <li><input type="checkbox" /><label>No Model Loaded</label></li>
+                </span>
+              </ul>
+            </li>
+            <li tabindex="0" aria-haspopup="true">Help</li>
+          </ul>
+        </menu>
+      </span>
+    </nav>
+  </div>
+
+  <main>
+        <div id="activity-bar">
+            <div class="activity-icon active" id="act-bones" title="Bones">
+                🦴
+            </div>
+        </div>
+        <div id="controls">
+            <input type="file" id="fileInput" multiple accept=".ascii,.jpg,.jpeg,.png,.tga" style="display: none;" webkitdirectory directory>
+            <input type="file" id="gltfInput" accept=".gltf,.glb" style="display: none;">
+            
+            <div class="section">
+                <h2 id="selected-bone-name">Models</h2>
+                <div class="section-content" style="position: relative; width: 100%;">
+                  <select id="model-list" style="width: 80%;">
+                  </select>
+                  <span style="position: relative; display: inline-block; width: 8%; text-align: center;">+</span>
+                  <span style="position: relative; display: inline-block; width: 8%; text-align: center;">-</span>
+                </div>
+
+                <h2 id="selected-bone-name">No Bone Selected</h2>
+                <div class="section-content">
+                    <div class="slider-group">
+                        <span class="slider-label">X</span>
+                        <input type="range" id="slider-x" min="-180" max="180" value="0">
+                        <span id="val-x" class="slider-value">0°</span>
+                    </div>
+                    <div class="slider-group">
+                        <span class="slider-label">Y</span>
+                        <input type="range" id="slider-y" min="-180" max="180" value="0">
+                        <span id="val-y" class="slider-value">0°</span>
+                    </div>
+                    <div class="slider-group">
+                        <span class="slider-label">Z</span>
+                        <input type="range" id="slider-z" min="-180" max="180" value="0">
+                        <span id="val-z" class="slider-value">0°</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                <h2>Bone Hierarchy</h2>
+                <div class="section-content" style="padding: 0; flex: 1; overflow-y: auto;">
+                    <div id="bone-tree-container" style="padding: 5px;"></div>
+                </div>
+            </div>
+
+            
+            <div class="button-group">
+                <button onclick="resetPose()">Reset Pose</button>
+                <button onclick="randomPose()">Random Pose</button>
+            </div>
+        </div>
+        <div id="canvas-container">
+            <canvas id="glCanvas"></canvas>
+        </div>
+  </main>
+</div>
+
+<script>
+        // Matrix and Vector Math Utilities
+        const mat4 = {
+            create() {
+                return new Float32Array([
+                    1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+            },
+            
+            perspective(out, fovy, aspect, near, far) {
+                const f = 1.0 / Math.tan(fovy / 2);
+                out[0] = f / aspect;
+                out[1] = 0;
+                out[2] = 0;
+                out[3] = 0;
+                out[4] = 0;
+                out[5] = f;
+                out[6] = 0;
+                out[7] = 0;
+                out[8] = 0;
+                out[9] = 0;
+                out[11] = -1;
+                out[12] = 0;
+                out[13] = 0;
+                out[15] = 0;
+                if (far != null && far !== Infinity) {
+                    const nf = 1 / (near - far);
+                    out[10] = (far + near) * nf;
+                    out[14] = 2 * far * near * nf;
+                } else {
+                    out[10] = -1;
+                    out[14] = -2 * near;
+                }
+                return out;
+            },
+            
+            lookAt(out, eye, center, up) {
+                const eyex = eye[0], eyey = eye[1], eyez = eye[2];
+                const upx = up[0], upy = up[1], upz = up[2];
+                const centerx = center[0], centery = center[1], centerz = center[2];
+                
+                let z0 = eyex - centerx;
+                let z1 = eyey - centery;
+                let z2 = eyez - centerz;
+                
+                let len = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2);
+                z0 *= len;
+                z1 *= len;
+                z2 *= len;
+                
+                let x0 = upy * z2 - upz * z1;
+                let x1 = upz * z0 - upx * z2;
+                let x2 = upx * z1 - upy * z0;
+                len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
+                if (!len) {
+                    x0 = 0;
+                    x1 = 0;
+                    x2 = 0;
+                } else {
+                    len = 1 / len;
+                    x0 *= len;
+                    x1 *= len;
+                    x2 *= len;
+                }
+                
+                let y0 = z1 * x2 - z2 * x1;
+                let y1 = z2 * x0 - z0 * x2;
+                let y2 = z0 * x1 - z1 * x0;
+                
+                out[0] = x0;
+                out[1] = y0;
+                out[2] = z0;
+                out[3] = 0;
+                out[4] = x1;
+                out[5] = y1;
+                out[6] = z1;
+                out[7] = 0;
+                out[8] = x2;
+                out[9] = y2;
+                out[10] = z2;
+                out[11] = 0;
+                out[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
+                out[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
+                out[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+                out[15] = 1;
+                
+                return out;
+            },
+            
+            translate(out, a, v) {
+                const x = v[0], y = v[1], z = v[2];
+                out[0] = a[0];
+                out[1] = a[1];
+                out[2] = a[2];
+                out[3] = a[3];
+                out[4] = a[4];
+                out[5] = a[5];
+                out[6] = a[6];
+                out[7] = a[7];
+                out[8] = a[8];
+                out[9] = a[9];
+                out[10] = a[10];
+                out[11] = a[11];
+                out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+                out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+                out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+                out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+                return out;
+            },
+            
+            rotateX(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a10 = a[4];
+                const a11 = a[5];
+                const a12 = a[6];
+                const a13 = a[7];
+                const a20 = a[8];
+                const a21 = a[9];
+                const a22 = a[10];
+                const a23 = a[11];
+                
+                out[0] = a[0];
+                out[1] = a[1];
+                out[2] = a[2];
+                out[3] = a[3];
+                out[4] = a10 * c + a20 * s;
+                out[5] = a11 * c + a21 * s;
+                out[6] = a12 * c + a22 * s;
+                out[7] = a13 * c + a23 * s;
+                out[8] = a20 * c - a10 * s;
+                out[9] = a21 * c - a11 * s;
+                out[10] = a22 * c - a12 * s;
+                out[11] = a23 * c - a13 * s;
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            rotateY(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a00 = a[0];
+                const a01 = a[1];
+                const a02 = a[2];
+                const a03 = a[3];
+                const a20 = a[8];
+                const a21 = a[9];
+                const a22 = a[10];
+                const a23 = a[11];
+                
+                out[0] = a00 * c - a20 * s;
+                out[1] = a01 * c - a21 * s;
+                out[2] = a02 * c - a22 * s;
+                out[3] = a03 * c - a23 * s;
+                out[4] = a[4];
+                out[5] = a[5];
+                out[6] = a[6];
+                out[7] = a[7];
+                out[8] = a00 * s + a20 * c;
+                out[9] = a01 * s + a21 * c;
+                out[10] = a02 * s + a22 * c;
+                out[11] = a03 * s + a23 * c;
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            rotateZ(out, a, rad) {
+                const s = Math.sin(rad);
+                const c = Math.cos(rad);
+                const a00 = a[0];
+                const a01 = a[1];
+                const a02 = a[2];
+                const a03 = a[3];
+                const a10 = a[4];
+                const a11 = a[5];
+                const a12 = a[6];
+                const a13 = a[7];
+                
+                out[0] = a00 * c + a10 * s;
+                out[1] = a01 * c + a11 * s;
+                out[2] = a02 * c + a12 * s;
+                out[3] = a03 * c + a13 * s;
+                out[4] = a10 * c - a00 * s;
+                out[5] = a11 * c - a01 * s;
+                out[6] = a12 * c - a02 * s;
+                out[7] = a13 * c - a03 * s;
+                out[8] = a[8];
+                out[9] = a[9];
+                out[10] = a[10];
+                out[11] = a[11];
+                out[12] = a[12];
+                out[13] = a[13];
+                out[14] = a[14];
+                out[15] = a[15];
+                return out;
+            },
+            
+            multiply(out, a, b) {
+                const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+                const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+                const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+                const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+                
+                let b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+                out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+                out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+                out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                
+                b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+                out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                return out;
+            }
+        };
+
+        // WebGL Setup
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+        
+        if (!gl) {
+            alert('WebGL not supported');
+            throw new Error('WebGL not supported');
+        }
+
+        // Model Data
+        let meshes = []; // Array of { vertices, indices, texCoords, weights, boneIndices, texture }
+        let bones = []; // Array of Joint objects
+        let hasMeshLoaded = false;
+        let loadedTextures = new Map();
+        let textureFiles = new Map();
+        let showSkeleton = false;
+        let selectedBone = null;
+        
+        // Reusable buffers for skeleton
+        let skeletonVertexBuffer = null;
+        let skeletonColorBuffer = null;
+
+        // Vertex Shader
+        const vertexShaderSource = `
+            attribute vec3 aPosition;
+            attribute vec3 aNormal;
+            attribute vec4 aColor;
+            attribute vec2 aTexCoord;
+            
+            uniform mat4 uModelViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            
+            varying vec4 vColor;
+            varying vec2 vTexCoord;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            
+            void main() {
+                vec4 pos = uModelViewMatrix * vec4(aPosition, 1.0);
+                gl_Position = uProjectionMatrix * pos;
+                vPosition = pos.xyz;
+                vNormal = mat3(uModelViewMatrix) * aNormal;
+                vColor = aColor;
+                vTexCoord = aTexCoord;
+            }
+        `;
+
+        // Fragment Shader
+        const fragmentShaderSource = `
+            precision mediump float;
+            varying vec4 vColor;
+            varying vec2 vTexCoord;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            
+            uniform sampler2D uSampler;
+            uniform bool uUseTexture;
+            uniform float uShininess;
+            uniform float uSpecular;
+            
+            void main() {
+                vec4 texColor;
+                if (uUseTexture) {
+                    texColor = texture2D(uSampler, vTexCoord);
+                } else {
+                    texColor = vColor;
+                }
+                
+                if (texColor.a < 0.1) discard;
+                
+                vec3 normal = normalize(vNormal);
+                vec3 lightDir = normalize(vec3(0.5, 0.8, 0.75));
+                
+                vec3 ambient = vec3(0.5, 0.5, 0.5);
+                
+                float diff = max(dot(normal, lightDir), 0.0);
+                vec3 diffuse = vec3(0.8, 0.8, 0.8) * diff;
+                
+                vec3 viewDir = normalize(-vPosition);
+                vec3 reflectDir = reflect(-lightDir, normal);
+                float spec = 0.0;
+                if (diff > 0.0 && uShininess > 0.0) {
+                    spec = pow(max(dot(viewDir, reflectDir), 0.0), uShininess);
+                }
+                vec3 specular = vec3(1.0, 1.0, 1.0) * (spec * uSpecular);
+                
+                vec3 finalColor = (ambient + diffuse) * texColor.rgb + specular;
+                
+                gl_FragColor = vec4(finalColor, texColor.a);
+            }
+        `;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            
+            return shader;
+        }
+
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Program link error:', gl.getProgramInfoLog(program));
+        }
+
+        gl.useProgram(program);
+
+        const aPosition = gl.getAttribLocation(program, 'aPosition');
+        const aNormal = gl.getAttribLocation(program, 'aNormal');
+        const aColor = gl.getAttribLocation(program, 'aColor');
+        const aTexCoord = gl.getAttribLocation(program, 'aTexCoord');
+        const uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
+        const uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
+        const uSampler = gl.getUniformLocation(program, 'uSampler');
+        const uUseTexture = gl.getUniformLocation(program, 'uUseTexture');
+        const uShininess = gl.getUniformLocation(program, 'uShininess');
+        const uSpecular = gl.getUniformLocation(program, 'uSpecular');
+
+        // Joint/Bone System
+        class Joint {
+            constructor(name, position, parent = null) {
+                this.name = name;
+                this.position = position;
+                this.parent = parent;
+                this.rotation = { x: 0, y: 0, z: 0 };
+                this.children = [];
+                
+                if (parent) {
+                    parent.children.push(this);
+                }
+            }
+            
+            getWorldMatrix() {
+                const localMatrix = mat4.create();
+                mat4.translate(localMatrix, localMatrix, this.position); // Position is relative to parent
+                mat4.rotateZ(localMatrix, localMatrix, this.rotation.z);
+                mat4.rotateY(localMatrix, localMatrix, this.rotation.y);
+                mat4.rotateX(localMatrix, localMatrix, this.rotation.x);
+                
+                if (this.parent) {
+                    const parentMatrix = this.parent.getWorldMatrix();
+                    const worldMatrix = mat4.create();
+                    mat4.multiply(worldMatrix, parentMatrix, localMatrix);
+                    return worldMatrix;
+                }
+                
+                return localMatrix;
+            }
+            
+            getWorldPosition() {
+                const matrix = this.getWorldMatrix();
+                return [matrix[12], matrix[13], matrix[14]];
+            }
+        }
+
+        // XPS ASCII Parser
+        function parseXPS(text) {
+            const lines = text.split(/\r?\n/);
+            let ptr = 0;
+            
+            const nextLine = () => {
+                let line;
+                while (ptr < lines.length) {
+                    line = lines[ptr++];
+                    const commentPos = line.indexOf('#');
+                    if (commentPos !== -1) {
+                        line = line.substring(0, commentPos);
+                    }
+                    line = line.trim();
+                    if (line) {
+                        return line;
+                    }
+                }
+                return null;
+            };
+
+            // Bones
+            let boneCount = parseInt(nextLine());
+            if (isNaN(boneCount)) {
+                boneCount = parseInt(nextLine()); // Try second line if first is a version/header
+            }
+            const rawBones = [];
+            for(let i=0; i<boneCount && ptr < lines.length; i++) {
+                const name = nextLine();
+                const parentIdx = parseInt(nextLine());
+                const coords = nextLine().trim().split(/\s+/).map(parseFloat);
+                while (coords.length < 3) coords.push(0); // Ensure valid position
+                rawBones.push({ name, parentIdx, pos: coords });
+            }
+
+            // Meshes
+            const meshCount = parseInt(nextLine()) || 0;
+            const rawMeshes = [];
+
+            console.log(`Parsing ${meshCount} meshes...`);
+            for(let m=0; m<meshCount && ptr < lines.length; m++) {
+                const name = nextLine();
+                
+                // Heuristic to determine format version (XNALara vs XPS)
+                // XPS: Name, UVCount, TexCount, Texture(s)..., VertCount
+                // XNALara: Name, TexCount, Texture(s)..., VertCount
+                
+                let line1 = nextLine();
+                let line2 = nextLine();
+                
+                let uvLayerCount = 0;
+                let texCount = 0;
+                let vertCount = 0;
+                const textures = [];
+                
+                const val1 = parseInt(line1);
+                if (!line2) break;
+                const line2Trimmed = line2.trim();
+                const isLine2Number = /^\d+$/.test(line2Trimmed);
+                const val2 = parseInt(line2);
+                
+                // Check if line2 looks like vertex data (at least 2 numbers separated by space)
+                const line2Parts = line2Trimmed.split(/\s+/);
+                const isLine2Vertex = line2Parts.length >= 5 && !isNaN(parseFloat(line2Parts[0])) && !isNaN(parseFloat(line2Parts[1]));
+
+                if (isLine2Vertex) {
+                    // Line 2 is vertex data -> Line 1 is VertCount, TexCount is 0
+                    texCount = 0;
+                    vertCount = val1;
+                    ptr--; // Un-read line2
+                } else if (!isLine2Number) {
+                    // Line 2 is a texture name -> Old Format (val1 is TexCount)
+                    texCount = val1;
+                    textures.push(line2);
+                    for(let t=1; t<texCount; t++) textures.push(nextLine());
+                    vertCount = parseInt(nextLine());
+                } else if (val1 === 0) {
+                    // Line 1 is 0. If New Format, UV=0 (unlikely). If Old Format, Tex=0.
+                    // Line 2 is number. If New Format, Tex=val2. If Old Format, Vert=val2.
+                    // We assume Old Format (TexCount=0) because UVCount=0 is rare/invalid.
+                    texCount = 0;
+                    vertCount = val2;
+                } else {
+                    // New Format: val1=UVCount, val2=TexCount
+                    uvLayerCount = val1;
+                    texCount = val2;
+                    for(let t=0; t<texCount; t++) {
+                        textures.push(nextLine());
+                        nextLine(); // Consume UV layer index
+                    }
+                    vertCount = parseInt(nextLine());
+                }
+                
+                const vertices = [];
+                for(let v=0; v<vertCount && ptr < lines.length; v++) {
+                    const line = nextLine();
+                    const parts = line ? line.trim().split(/\s+/).map(parseFloat) : [];
+                    
+                    // XPS ASCII Vertex Format:
+                    // X Y Z NX NY NZ R G B A U V [BoneIdx1 Weight1 BoneIdx2 Weight2 BoneIdx3 Weight3 BoneIdx4 Weight4]
+                    
+                    const vert = {
+                        x: parts[0], y: parts[1], z: parts[2],
+                        nx: parts[3] || 0, ny: parts[4] || 0, nz: parts[5] || 0,
+                        r: parts[6], g: parts[7], b: parts[8], a: parts[9],
+                        u: parts[10] || 0, v: parts[11] || 0,
+                        boneIndices: [],
+                        weights: []
+                    };
+                    
+                    if (parts.length > 3) {
+                        // Single line format
+                        // Read 4 bone weights
+                        // Indices start at index 12. Ensure we have enough data.
+                        for(let b=0; b<4; b++) {
+                            vert.boneIndices.push(parts[12 + b*2]);
+                            vert.weights.push(parts[13 + b*2]);
+                        }
+                    } else {
+                        // Multi-line format
+                        nextLine(); // Normal
+                        nextLine(); // Color
+                        const uvLine = nextLine();
+                        const uvParts = uvLine ? uvLine.trim().split(/\s+/).map(parseFloat) : [0,0];
+                        vert.u = uvParts[0]; vert.v = uvParts[1];
+                        
+                        // Skip extra UV layers if any
+                        for(let k=1; k<uvLayerCount; k++) nextLine();
+
+                        const boneIdxLine = nextLine();
+                        vert.boneIndices = boneIdxLine ? boneIdxLine.trim().split(/\s+/).map(parseFloat) : [0,0,0,0];
+                        
+                        const weightLine = nextLine();
+                        vert.weights = weightLine ? weightLine.trim().split(/\s+/).map(parseFloat) : [0,0,0,0];
+                    }
+                    vertices.push(vert);
+                }
+                
+                const faceCount = parseInt(nextLine());
+                const faces = [];
+                for(let f=0; f<faceCount && ptr < lines.length; f++) {
+                    faces.push(nextLine().trim().split(/\s+/).map(n => parseInt(n)));
+                }
+                
+                rawMeshes.push({ name, textures, vertices, faces });
+            }
+            console.log("Parsing complete.");
+
+            return { rawBones, rawMeshes };
+        }
+
+        // GLTF Loader
+        async function loadGLTF(file) {
+            showNotification(`Loading ${file.name}...`, 'info');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                let gltf;
+                let buffers = [];
+
+                if (file.name.toLowerCase().endsWith('.glb')) {
+                    const data = new DataView(arrayBuffer);
+                    const magic = data.getUint32(0, true);
+                    const version = data.getUint32(4, true);
+                    const length = data.getUint32(8, true);
+
+                    if (magic !== 0x46546C67) throw new Error("Invalid GLB magic");
+
+                    let offset = 12;
+                    while (offset < length) {
+                        const chunkLength = data.getUint32(offset, true);
+                        const chunkType = data.getUint32(offset + 4, true);
+                        offset += 8;
+
+                        if (chunkType === 0x4E4F534A) { // JSON
+                            const jsonStr = new TextDecoder().decode(new Uint8Array(arrayBuffer, offset, chunkLength));
+                            gltf = JSON.parse(jsonStr);
+                        } else if (chunkType === 0x004E4942) { // BIN
+                            buffers.push(new Uint8Array(arrayBuffer, offset, chunkLength));
+                        }
+                        offset += chunkLength;
+                    }
+                } else {
+                    const jsonStr = new TextDecoder().decode(arrayBuffer);
+                    gltf = JSON.parse(jsonStr);
+                    // Handle embedded buffers
+                    for (const buffer of gltf.buffers || []) {
+                        if (buffer.uri && buffer.uri.startsWith('data:')) {
+                            const response = await fetch(buffer.uri);
+                            const blob = await response.blob();
+                            buffers.push(new Uint8Array(await blob.arrayBuffer()));
+                        } else {
+                            // For external buffers in single-file mode, we can't easily load them without user selecting them.
+                            // We'll assume embedded or GLB for this implementation.
+                            console.warn("External buffers not fully supported in single-file mode");
+                            buffers.push(new Uint8Array(0));
+                        }
+                    }
+                }
+
+                await processGLTF(gltf, buffers);
+                showNotification(`✓ Loaded ${file.name}`, 'success');
+
+            } catch (error) {
+                console.error('Error loading GLTF:', error);
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function processGLTF(gltf, buffers) {
+            meshes = [];
+            bones = [];
+            loadedTextures.clear();
+            textureFiles.clear();
+
+            const getBuffer = (accessor) => {
+                const bufferView = gltf.bufferViews[accessor.bufferView];
+                const buffer = buffers[bufferView.buffer];
+                const offset = (bufferView.byteOffset || 0) + (accessor.byteOffset || 0);
+                return { buffer, offset, stride: bufferView.byteStride };
+            };
+
+            const getAccessorData = (index) => {
+                if (index === undefined) return null;
+                const accessor = gltf.accessors[index];
+                const { buffer, offset, stride } = getBuffer(accessor);
+                const count = accessor.count;
+                const numComponents = { 'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT4': 16 }[accessor.type];
+                const TypedArray = { 5120: Int8Array, 5121: Uint8Array, 5122: Int16Array, 5123: Uint16Array, 5125: Uint32Array, 5126: Float32Array }[accessor.componentType];
+                
+                const elementSize = numComponents * TypedArray.BYTES_PER_ELEMENT;
+                const effectiveStride = stride || elementSize;
+                
+                const output = new Float32Array(count * numComponents); // Normalize to Float32 for internal use
+                
+                // If tightly packed, we can just copy
+                if (!stride || stride === elementSize) {
+                     const source = new TypedArray(buffer.buffer, buffer.byteOffset + offset, count * numComponents);
+                     output.set(source);
+                } else {
+                    const view = new DataView(buffer.buffer, buffer.byteOffset + offset);
+                    let outIdx = 0;
+                    for (let i = 0; i < count; i++) {
+                        let byteOffset = i * effectiveStride;
+                        for (let j = 0; j < numComponents; j++) {
+                            let val;
+                            switch(accessor.componentType) {
+                                case 5126: val = view.getFloat32(byteOffset, true); break;
+                                case 5123: val = view.getUint16(byteOffset, true); break;
+                                case 5121: val = view.getUint8(byteOffset); break;
+                                // Add others if needed
+                                default: val = 0;
+                            }
+                            output[outIdx++] = val;
+                            byteOffset += TypedArray.BYTES_PER_ELEMENT;
+                        }
+                    }
+                }
+                return output;
+            };
+
+            // 1. Skeleton
+            // We need to map GLTF nodes to Joints.
+            // If there is a skin, use it to define the bone list.
+            const gltfNodes = gltf.nodes || [];
+            const nodeToJointIndex = new Map();
+            
+            if (gltf.skins && gltf.skins.length > 0) {
+                const skin = gltf.skins[0];
+                const jointNodes = skin.joints;
+                
+                // Read Inverse Bind Matrices to restore bindPosition
+                let ibms = null;
+                if (skin.inverseBindMatrices !== undefined) {
+                    ibms = getAccessorData(skin.inverseBindMatrices);
+                }
+                
+                // Create joints
+                jointNodes.forEach((nodeIdx, i) => {
+                    const node = gltfNodes[nodeIdx];
+                    const name = node.name || `Bone_${i}`;
+                    const pos = node.translation || [0, 0, 0];
+                    const rot = node.rotation || [0, 0, 0, 1]; // Quaternion
+                    
+                    // Convert Quat to Euler for our Joint class
+                    const euler = quaternionToEuler(rot);
+                    
+                    const joint = new Joint(name, pos, null);
+                    joint.rotation = euler;
+                    
+                    // Restore bindPosition from IBM
+                    // IBM = Inverse(BindMatrix). If BindMatrix is just translation T, IBM is translation -T.
+                    // IBM is column-major. Translation part is at indices 12, 13, 14.
+                    if (ibms) {
+                        const matIndex = i * 16;
+                        // We assume the IBM represents a translation of -bindPosition (ignoring rotation for this simple model)
+                        joint.bindPosition = [-ibms[matIndex + 12], -ibms[matIndex + 13], -ibms[matIndex + 14]];
+                    } else {
+                        joint.bindPosition = [0,0,0];
+                    }
+                    
+                    bones.push(joint);
+                    nodeToJointIndex.set(nodeIdx, i);
+                });
+
+                // Link parents
+                jointNodes.forEach((nodeIdx) => {
+                    const node = gltfNodes[nodeIdx];
+                    const jointIdx = nodeToJointIndex.get(nodeIdx);
+                    const joint = bones[jointIdx];
+                    
+                    if (node.children) {
+                        node.children.forEach(childIdx => {
+                            if (nodeToJointIndex.has(childIdx)) {
+                                const childJoint = bones[nodeToJointIndex.get(childIdx)];
+                                childJoint.parent = joint;
+                                joint.children.push(childJoint);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 2. Meshes
+            for (const node of gltfNodes) {
+                if (node.mesh !== undefined) {
+                    const meshData = gltf.meshes[node.mesh];
+                    for (const primitive of meshData.primitives) {
+                        const posData = getAccessorData(primitive.attributes.POSITION);
+                        const normData = getAccessorData(primitive.attributes.NORMAL);
+                        const uvData = getAccessorData(primitive.attributes.TEXCOORD_0);
+                        const jointsData = getAccessorData(primitive.attributes.JOINTS_0);
+                        const weightsData = getAccessorData(primitive.attributes.WEIGHTS_0);
+                        const indicesData = getAccessorData(primitive.indices);
+
+                        const vertices = [];
+                        const normals = [];
+                        const texCoords = [];
+                        const boneIndices = [];
+                        const boneWeights = [];
+                        const colors = []; // Default white
+
+                        for (let i = 0; i < posData.length; i += 3) {
+                            vertices.push(posData[i], posData[i+1], posData[i+2]);
+                            if (normData) normals.push(normData[i], normData[i+1], normData[i+2]);
+                            else normals.push(0, 1, 0);
+                            
+                            colors.push(1, 1, 1, 1);
+                        }
+
+                        if (uvData) {
+                            for (let i = 0; i < uvData.length; i++) texCoords.push(uvData[i]);
+                        } else {
+                            for (let i = 0; i < posData.length / 3; i++) texCoords.push(0, 0);
+                        }
+
+                        if (jointsData && weightsData) {
+                            // GLTF joints are indices into the skin.joints array, which maps 1:1 to our bones array
+                            for (let i = 0; i < jointsData.length; i++) boneIndices.push(jointsData[i]);
+                            for (let i = 0; i < weightsData.length; i++) boneWeights.push(weightsData[i]);
+                        } else {
+                             for (let i = 0; i < posData.length / 3 * 4; i++) {
+                                 boneIndices.push(0);
+                                 boneWeights.push(0);
+                             }
+                        }
+
+                        const indices = [];
+                        for (let i = 0; i < indicesData.length; i++) indices.push(indicesData[i]);
+
+                        // Texture
+                        let texture = null;
+                        if (primitive.material !== undefined) {
+                            const mat = gltf.materials[primitive.material];
+                            if (mat.pbrMetallicRoughness && mat.pbrMetallicRoughness.baseColorTexture) {
+                                const texInfo = mat.pbrMetallicRoughness.baseColorTexture;
+                                const tex = gltf.textures[texInfo.index];
+                                const img = gltf.images[tex.source];
+                                
+                                if (img.bufferView !== undefined) {
+                                    const bv = gltf.bufferViews[img.bufferView];
+                                    const buf = buffers[bv.buffer];
+                                    const imgData = new Uint8Array(buf.buffer, buf.byteOffset + (bv.byteOffset||0), bv.byteLength);
+                                    const blob = new Blob([imgData], {type: img.mimeType || 'image/png'});
+                                    texture = await new Promise((resolve) => {
+                                        const image = new Image();
+                                        image.onload = () => {
+                                            const t = gl.createTexture();
+                                            gl.bindTexture(gl.TEXTURE_2D, t);
+                                            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); // GLTF usually doesn't flip Y
+                                            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                                            gl.generateMipmap(gl.TEXTURE_2D);
+                                            resolve(t);
+                                        };
+                                        image.src = URL.createObjectURL(blob);
+                                    });
+                                }
+                            }
+                        }
+                        if (!texture) texture = defaultTexture;
+
+                        // Buffers
+                        const vertexBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                        const normalBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+
+                        const colorBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+                        const texCoordBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
+
+                        const indexBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+                        // Get alpha mode from material
+                        let renderGroup = 0;
+                        let alphaMode = "OPAQUE";
+                        if (primitive.material !== undefined) {
+                            const mat = gltf.materials[primitive.material];
+                            if (mat.alphaMode) {
+                                alphaMode = mat.alphaMode;
+                                // Set renderGroup based on alpha mode for export compatibility
+                                if (alphaMode === "BLEND") renderGroup = 25;
+                                else if (alphaMode === "MASK") renderGroup = 15;
+                            }
+                        }
+
+                        meshes.push({
+                            name: meshData.name || "Mesh",
+                            alphaMode: alphaMode,  // Store original alpha mode
+                            renderGroup: renderGroup,
+                            shininess: 0, specular: 0, bump: 0,
+                            vertices, normals, colors, indices, texCoords, boneWeights, boneIndices, texture,
+                            vertexBuffer, normalBuffer, colorBuffer, texCoordBuffer, indexBuffer,
+                            indexCount: indices.length, indexType: gl.UNSIGNED_SHORT,
+                            visible: true
+                        });
+                    }
+                }
+            }
+
+            hasMeshLoaded = true;
+            renderBoneTree();
+            updateAccessoriesUI();
+            render();
+        }
+
+        function quaternionToEuler(q) {
+            const x = q[0], y = q[1], z = q[2], w = q[3];
+            const t0 = +2.0 * (w * x + y * z);
+            const t1 = +1.0 - 2.0 * (x * x + y * y);
+            const roll = Math.atan2(t0, t1);
+
+            const t2 = +2.0 * (w * y - z * x);
+            const t2_ = t2 > +1.0 ? +1.0 : t2 < -1.0 ? -1.0 : t2;
+            const pitch = Math.asin(t2_);
+
+            const t3 = +2.0 * (w * z + x * y);
+            const t4 = +1.0 - 2.0 * (y * y + z * z);
+            const yaw = Math.atan2(t3, t4);
+
+            return { x: roll, y: pitch, z: yaw };
+        }
+
+        // Create a default white texture for missing files
+        const defaultTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, defaultTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+        // File Loading
+        const fileInput = document.getElementById('fileInput');
+        
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                await loadXPSFiles(files);
+            }
+        });
+
+        const gltfInput = document.getElementById('gltfInput');
+        gltfInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await loadGLTF(file);
+            }
+        });
+        
+        function loadTexture(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const buffer = reader.result;
+                    const data = new Uint8Array(buffer);
+
+console.log(`Loaded texture: ${file.name}`);
+                    
+                    // Check for PNG signature: 89 50 4E 47
+                    if (data[0] === 0x89 && data[1] === 0x50 && data[2] === 0x4E && data[3] === 0x47) {
+                        loadAsImage(new Blob([buffer], {type: 'image/png'}));
+                        return;
+                    }
+                    
+                    // Check for JPG signature: FF D8
+                    if (data[0] === 0xFF && data[1] === 0xD8) {
+                        loadAsImage(new Blob([buffer], {type: 'image/jpeg'}));
+                        return;
+                    }
+
+                    // Check for BMP signature: 42 4D
+                    if (data[0] === 0x42 && data[1] === 0x4D) {
+                         loadAsImage(new Blob([buffer], {type: 'image/bmp'}));
+                         return;
+                    }
+                
+                    if (file.name.toLowerCase().endsWith('.tga')) {
+                        try {
+                            const texture = loadTGATexture(gl, buffer);
+                            resolve(texture);
+                        } catch (e) {
+                            console.error("TGA error", e);
+                            reject(new Error(`Failed to parse TGA: ${file.name} - ${e.message}`));
+                        }
+                        return;
+                    }
+                    
+                    // Fallback
+                    loadAsImage(file);
+                };
+                
+                reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
+                reader.readAsArrayBuffer(file);
+
+                function loadAsImage(blob) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const texture = gl.createTexture();
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                        resolve(texture);
+                    };
+                    img.onerror = () => reject(new Error(`Failed to load texture: ${file.name}`));
+                    img.src = URL.createObjectURL(blob);
+                }
+            });
+        }
+
+        function loadTGATexture(gl, buffer) {
+            const data = new Uint8Array(buffer);
+            
+            // TGA Header
+            const idLength = data[0];
+            const colorMapType = data[1];
+            const imageType = data[2];
+            
+            const width = data[12] | (data[13] << 8);
+            const height = data[14] | (data[15] << 8);
+            const pixelDepth = data[16];
+            const descriptor = data[17];
+            
+            // Check support (2 = uncompressed RGB, 10 = RLE RGB)
+            const isSupported = (imageType === 2 && (pixelDepth === 24 || pixelDepth === 32)) ||
+                                (imageType === 3 && pixelDepth === 8) ||
+                                (imageType === 10 && (pixelDepth === 24 || pixelDepth === 32));
+
+            if (!isSupported) {
+                 throw new Error(`Unsupported TGA type: ${imageType}, depth: ${pixelDepth}`);
+            }
+            
+            let offset = 18 + idLength;
+            if (colorMapType === 1) {
+                const colorMapLength = data[5] | (data[6] << 8);
+                const colorMapDepth = data[7];
+                offset += colorMapLength * (colorMapDepth >> 3);
+            }
+            
+            const imageSize = width * height * 4;
+            const imageData = new Uint8Array(imageSize);
+            let pixelIndex = 0;
+            
+            // Handle RLE
+            if (imageType === 10) {
+                let pixelsRead = 0;
+                const totalPixels = width * height;
+                
+                while (pixelsRead < totalPixels && offset < data.length) {
+                    const header = data[offset++];
+                    const count = (header & 0x7F) + 1;
+                    const isRLE = header & 0x80;
+                    
+                    if (isRLE) {
+                        const b = data[offset++];
+                        const g = data[offset++];
+                        const r = data[offset++];
+                        const a = pixelDepth === 32 ? data[offset++] : 255;
+                        
+                        for (let i = 0; i < count; i++) {
+                            imageData[pixelIndex++] = r;
+                            imageData[pixelIndex++] = g;
+                            imageData[pixelIndex++] = b;
+                            imageData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    } else {
+                        for (let i = 0; i < count; i++) {
+                            const b = data[offset++];
+                            const g = data[offset++];
+                            const r = data[offset++];
+                            const a = pixelDepth === 32 ? data[offset++] : 255;
+                            
+                            imageData[pixelIndex++] = r;
+                            imageData[pixelIndex++] = g;
+                            imageData[pixelIndex++] = b;
+                            imageData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    }
+                }
+            } else {
+                // Uncompressed
+                if (imageType === 2) { // RGB
+                    for (let i = 0; i < width * height; i++) {
+                        const b = data[offset++];
+                        const g = data[offset++];
+                        const r = data[offset++];
+                        const a = pixelDepth === 32 ? data[offset++] : 255;
+                        imageData[pixelIndex++] = r;
+                        imageData[pixelIndex++] = g;
+                        imageData[pixelIndex++] = b;
+                        imageData[pixelIndex++] = a;
+                    }
+                } else if (imageType === 3) { // Grayscale
+                    for (let i = 0; i < width * height; i++) {
+                        const l = data[offset++];
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = l;
+                        imageData[pixelIndex++] = 255;
+                    }
+                }
+            }
+            
+            // Handle Orientation (Bit 5: 0 = Bottom-Left, 1 = Top-Left)
+            const isTopLeft = (descriptor & 0x20) !== 0;
+
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, isTopLeft);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imageData);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            
+            return texture;
+        }
+
+        async function loadXPSFiles(files) {
+            showNotification(`Processing ${files.length} file(s)...`, 'info');
+            
+            try {
+                // Reset mesh data
+                meshes = [];
+                bones = [];
+                loadedTextures.clear();
+                textureFiles.clear();
+                
+                // Find .ascii file
+                const asciiFile = files.find(f => f.name.toLowerCase().endsWith('.ascii'));
+                if (!asciiFile) throw new Error("No .ascii file found in selection");
+
+                // Load textures
+                const imageFiles = files.filter(f => f.name.match(/\.(jpg|jpeg|png|tga|bmp)$/i));
+                for (const imgFile of imageFiles) {
+                    try {
+                        const tex = await loadTexture(imgFile);
+                        // Use just the filename as the key, lowercased
+                        const name = imgFile.name.split(/[\\/]/).pop().toLowerCase();
+                        loadedTextures.set(name, tex);
+                        textureFiles.set(name, imgFile);
+                    } catch (e) {
+                        console.warn("Failed to load texture", imgFile.name, e);
+                    }
+                }
+
+                // Parse Model
+                const text = await asciiFile.text();
+                const data = parseXPS(text);
+                console.log("Parsed Data:", data);
+                
+                // Normalize mesh to fit in view
+                // Calculate bounds from all vertices in all meshes
+                const bounds = {
+                    minX: Infinity, maxX: -Infinity,
+                    minY: Infinity, maxY: -Infinity,
+                    minZ: Infinity, maxZ: -Infinity
+                };
+                
+                let hasVertices = false;
+
+                for (const mesh of data.rawMeshes) {
+                    for (const v of mesh.vertices) {
+                        hasVertices = true;
+                        bounds.minX = Math.min(bounds.minX, v.x);
+                        bounds.maxX = Math.max(bounds.maxX, v.x);
+                        bounds.minY = Math.min(bounds.minY, v.y);
+                        bounds.maxY = Math.max(bounds.maxY, v.y);
+                        bounds.minZ = Math.min(bounds.minZ, v.z);
+                        bounds.maxZ = Math.max(bounds.maxZ, v.z);
+                    }
+                }
+
+                if (!hasVertices && data.rawBones.length > 0) {
+                    data.rawBones.forEach(b => {
+                        bounds.minX = Math.min(bounds.minX, b.pos[0]);
+                        bounds.maxX = Math.max(bounds.maxX, b.pos[0]);
+                        bounds.minY = Math.min(bounds.minY, b.pos[1]);
+                        bounds.maxY = Math.max(bounds.maxY, b.pos[1]);
+                        bounds.minZ = Math.min(bounds.minZ, b.pos[2]);
+                        bounds.maxZ = Math.max(bounds.maxZ, b.pos[2]);
+                    });
+                }
+
+                if (!isFinite(bounds.minX) || !isFinite(bounds.maxX)) {
+                    bounds.minX = -10; bounds.maxX = 10;
+                    bounds.minY = -10; bounds.maxY = 10;
+                    bounds.minZ = -10; bounds.maxZ = 10;
+                }
+                
+                let centerX = (bounds.minX + bounds.maxX) / 2;
+                let centerY = (bounds.minY + bounds.maxY) / 2;
+                let centerZ = (bounds.minZ + bounds.maxZ) / 2;
+
+                const rootGround = data.rawBones.find(b => b.name.toLowerCase() === 'root ground');
+                if (rootGround) {
+                    centerX = rootGround.pos[0];
+                    centerY = rootGround.pos[1];
+                    centerZ = rootGround.pos[2];
+                }
+
+                const sizeX = bounds.maxX - bounds.minX;
+                const sizeY = bounds.maxY - bounds.minY;
+                const sizeZ = bounds.maxZ - bounds.minZ;
+                const maxSize = Math.max(sizeX, sizeY, sizeZ);
+                let scale = 2.0 / maxSize;
+                if (!isFinite(scale)) scale = 1.0;
+                
+                // Build Skeleton
+                // First pass: create joints
+                data.rawBones.forEach(b => {
+                    // XPS stores absolute positions. We use a placeholder here.
+                    // Positions will be set in the second pass with proper scaling/centering.
+                    bones.push(new Joint(b.name, [0, 0, 0], null));
+                });
+                
+                // Second pass: link parents and fix positions
+                data.rawBones.forEach((b, i) => {
+                    const joint = bones[i];
+                    
+                    // Store bind position for skinning
+                    joint.bindPosition = [
+                        (b.pos[0] - centerX) * scale,
+                        (b.pos[1] - centerY) * scale,
+                        (b.pos[2] - centerZ) * scale
+                    ];
+
+                    if (b.parentIdx >= 0 && b.parentIdx < bones.length) {
+                        joint.parent = bones[b.parentIdx];
+                        joint.parent.children.push(joint);
+                        
+                        // Convert absolute pos to relative pos and apply scale
+                        const parentPos = data.rawBones[b.parentIdx].pos;
+                        joint.position = [
+                            (b.pos[0] - parentPos[0]) * scale,
+                            (b.pos[1] - parentPos[1]) * scale,
+                            (b.pos[2] - parentPos[2]) * scale
+                        ];
+                    } else {
+                        // Root bone: apply centering and scaling
+                        joint.position = [
+                            (b.pos[0] - centerX) * scale,
+                            (b.pos[1] - centerY) * scale,
+                            (b.pos[2] - centerZ) * scale
+                        ];
+                    }
+                });
+                
+                // Check for uint extension for large meshes
+                const uintExt = gl.getExtension('OES_element_index_uint');
+                console.log("Processing meshes for WebGL...");
+
+                // Process meshes into renderable buffers
+                for (const rawMesh of data.rawMeshes) {
+                    const vertices = [];
+                    const normals = [];
+                    const colors = [];
+                    const texCoords = [];
+                    const indices = [];
+                    const wireframeIndices = [];
+                    const boneWeights = [];
+                    const boneIndices = [];
+                    
+                    // Center and scale vertices
+                    for (const v of rawMesh.vertices) {
+                        vertices.push(
+                            (v.x - centerX) * scale,
+                            (v.y - centerY) * scale,
+                            (v.z - centerZ) * scale
+                        );
+                        normals.push(v.nx, v.ny, v.nz);
+                        
+                        // Colors are 0-255, normalize to 0-1
+                        if (v.r !== undefined) {
+                            colors.push(v.r/255, v.g/255, v.b/255, v.a/255);
+                        } else {
+                            colors.push(1, 1, 1, 1);
+                        }
+                        
+                        texCoords.push(v.u, 1.0 - v.v); // Flip V for WebGL
+                        boneWeights.push(...v.weights);
+                        boneIndices.push(...v.boneIndices);
+                    }
+                    
+                    // Flatten indices
+                    const numVertices = vertices.length / 3;
+                    for (const face of rawMesh.faces) {
+                        // Generate wireframe indices (lines)
+                        for (let i = 0; i < face.length; i++) {
+                            const idx1 = face[i];
+                            const idx2 = face[(i + 1) % face.length];
+                            if (idx1 < numVertices && idx2 < numVertices) {
+                                wireframeIndices.push(idx1, idx2);
+                            }
+                        }
+                        // Generate triangle indices
+                        for (const idx of face) {
+                            if (idx < numVertices) {
+                                indices.push(idx);
+                            }
+                        }
+                    }
+                    
+                    // Find texture
+                    let texture = null;
+                    let textureName = null;
+                    if (rawMesh.textures.length > 0) {
+                        // Try to find the texture file in loaded textures
+                        // XPS texture paths can be absolute or relative, we just match filename
+                        const texPath = rawMesh.textures[0];
+                        const texName = texPath.split(/[\\/]/).pop().toLowerCase();
+                        
+                        textureName = texName;
+                        texture = loadedTextures.get(texName);
+
+                        // Fallback: try matching without extension (e.g. .tga in file, .png loaded)
+                        if (!texture) {
+                            const baseName = texName.substring(0, texName.lastIndexOf('.'));
+                            for (const [key, val] of loadedTextures.entries()) {
+                                if (key.startsWith(baseName + '.')) {
+                                    texture = val;
+                                    textureName = key;
+                                    console.log(`Texture match found (extension mismatch): ${texName} -> ${key}`);
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!texture) {
+                            console.warn(`Texture not found: ${texName} (from ${texPath})`);
+                            // Use default white texture instead of leaving it null
+                            // This ensures the mesh is visible (white) rather than black/invisible
+                            // if vertex colors are black or missing.
+                            texture = defaultTexture; 
+                            
+                            console.log("Available textures:", Array.from(loadedTextures.keys()));
+                        }
+                    }
+                    
+                    // Create static buffers
+                    let texCoordBuffer = null;
+                    if (texCoords.length > 0) {
+                        texCoordBuffer = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
+                    }
+
+                    const indexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                    
+                    let indexType = gl.UNSIGNED_SHORT;
+                    let indexArray;
+                    
+                    // Use uint32 if indices exceed 65535 and extension exists
+                    if (vertices.length / 3 > 65536 && uintExt) {
+                        indexType = gl.UNSIGNED_INT || 0x1405;
+                        indexArray = new Uint32Array(indices);
+                    } else {
+                        indexArray = new Uint16Array(indices);
+                    }
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
+
+                    // Wireframe Index Buffer
+                    const wireframeIndexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, wireframeIndexBuffer);
+                    let wireframeIndexArray;
+                    if (vertices.length / 3 > 65536 && uintExt) {
+                        wireframeIndexArray = new Uint32Array(wireframeIndices);
+                    } else {
+                        wireframeIndexArray = new Uint16Array(wireframeIndices);
+                    }
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, wireframeIndexArray, gl.STATIC_DRAW);
+
+                    // Create dynamic buffers (for vertices and colors)
+                    const vertexBuffer = gl.createBuffer();
+                    const normalBuffer = gl.createBuffer();
+                    const colorBuffer = gl.createBuffer();
+
+                    // Parse XPS Name for Visibility and Grouping
+                    // Pattern: RenderGroup_[+-]Name_Shininess_Specular_Bump
+                    let meshName = rawMesh.name;
+                    let isVisible = true;
+                    let renderGroup = 0;
+                    let shininess = 0;
+                    let specular = 0;
+                    let bump = 0;
+                    
+                    const parts = rawMesh.name.split('_');
+                    
+                    // Check if first part is a number (Render Group)
+                    if (parts.length > 1 && !isNaN(parseInt(parts[0]))) {
+                        renderGroup = parseInt(parts[0]);
+                        
+                        const namePart = parts[1];
+                        if (namePart.startsWith('+')) {
+                            isVisible = true;
+                            meshName = namePart.substring(1);
+                        } else if (namePart.startsWith('-')) {
+                            isVisible = false;
+                            meshName = namePart.substring(1);
+                        }
+                        
+                        if (parts.length >= 3) shininess = parseFloat(parts[2]) || 0;
+                        if (parts.length >= 4) specular = parseFloat(parts[3]) || 0;
+                        if (parts.length >= 5) bump = parseFloat(parts[4]) || 0;
+                    }
+
+                    meshes.push({ 
+                        name: meshName,
+                        renderGroup, shininess, specular, bump,
+                        vertices, normals, colors, indices, texCoords, boneWeights, boneIndices, texture,
+                        vertexBuffer, normalBuffer, colorBuffer, texCoordBuffer, indexBuffer, indexCount: indices.length, indexType, textureName,
+                        wireframeIndexBuffer, wireframeIndexCount: wireframeIndices.length,
+                        visible: isVisible
+                    });
+                }
+                console.log("Meshes ready:", meshes.length);
+                
+                hasMeshLoaded = true;
+                
+                showNotification(`✓ Loaded ${asciiFile.name}<br>Bones: ${bones.length}<br>Meshes: ${meshes.length}`, 'success');
+                
+                // Create UI controls
+                renderBoneTree();
+                updateAccessoriesUI();
+                
+                render();
+                
+            } catch (error) {
+                console.error('Error loading OBJ:', error);
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Create UI Controls
+        function renderBoneTree() {
+            const container = document.getElementById('bone-tree-container');
+            container.innerHTML = '';
+            
+            const treeRoot = document.createElement('ul');
+            treeRoot.className = 'bone-tree';
+            
+            const roots = bones.filter(b => !b.parent);
+            
+            function buildTree(joint, parentElement) {
+                const li = document.createElement('li');
+                
+                const label = document.createElement('span');
+                label.textContent = joint.name;
+                label.className = 'bone-label';
+                label.onclick = (e) => {
+                    e.stopPropagation();
+                    selectBone(joint);
+                };
+                
+                li.appendChild(label);
+                
+                if (joint.children.length > 0) {
+                    const ul = document.createElement('ul');
+                    joint.children.forEach(child => buildTree(child, ul));
+                    li.appendChild(ul);
+                }
+                
+                parentElement.appendChild(li);
+            }
+            
+            roots.forEach(root => buildTree(root, treeRoot));
+            container.appendChild(treeRoot);
+        }
+
+        function updateAccessoriesUI() {
+            const container = document.getElementById('chk-accessories');
+            container.innerHTML = '';
+            
+            if (meshes.length === 0) {
+                 const li = document.createElement('li');
+                 li.innerHTML = '<input type="checkbox" disabled /><label>No Model Loaded</label>';
+                 container.appendChild(li);
+                 return;
+            }
+
+            // Group meshes by name
+            const meshGroups = new Map();
+            meshes.forEach(mesh => {
+                const name = mesh.name || 'Unnamed';
+                if (!meshGroups.has(name)) {
+                    meshGroups.set(name, []);
+                }
+                meshGroups.get(name).push(mesh);
+            });
+
+            meshGroups.forEach((groupMeshes, name) => {
+                const li = document.createElement('li');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = groupMeshes.every(m => m.visible !== false);
+                checkbox.addEventListener('change', (e) => {
+                    const isVisible = e.target.checked;
+                    groupMeshes.forEach(m => m.visible = isVisible);
+                    render();
+                });
+                
+                const label = document.createElement('label');
+                label.textContent = name;
+                label.style.cursor = 'pointer';
+                label.onclick = () => checkbox.click();
+                
+                li.appendChild(checkbox);
+                li.appendChild(label);
+                container.appendChild(li);
+            });
+        }
+
+        function selectBone(joint) {
+            selectedBone = joint;
+            
+            // Update tree highlighting
+            document.querySelectorAll('.bone-label').forEach(el => el.classList.remove('selected'));
+            const selectedEl = Array.from(document.querySelectorAll('.bone-label')).find(el => el.textContent === joint.name);
+            if (selectedEl) selectedEl.classList.add('selected');
+            
+            // Show properties
+            document.getElementById('selected-bone-name').textContent = joint.name;
+            
+            // Update sliders
+            updateSliders();
+        }
+
+        function updateSliders() {
+            if (!selectedBone) return;
+            const r = selectedBone.rotation;
+            const toDeg = rad => Math.round(rad * 180 / Math.PI);
+            
+            ['x', 'y', 'z'].forEach(axis => {
+                const deg = toDeg(r[axis]);
+                document.getElementById(`slider-${axis}`).value = deg;
+                document.getElementById(`val-${axis}`).textContent = deg + '°';
+            });
+        }
+
+        // Bind unified sliders
+        ['x', 'y', 'z'].forEach(axis => {
+            const slider = document.getElementById(`slider-${axis}`);
+            slider.addEventListener('input', (e) => {
+                if (selectedBone) {
+                    const deg = parseInt(e.target.value);
+                    selectedBone.rotation[axis] = deg * Math.PI / 180;
+                    document.getElementById(`val-${axis}`).textContent = deg + '°';
+                    render();
+                }
+            });
+        });
+
+        // Bind Skeleton Toggle
+        document.getElementById('chk-skeleton').addEventListener('change', (e) => {
+            showSkeleton = e.target.checked;
+            render();
+        });
+
+        // Bind Floor Toggle
+        document.getElementById('chk-floor').addEventListener('change', (e) => {
+            showGround = e.target.checked;
+            render();
+        });
+
+        // Bind Wireframe Toggle
+        document.getElementById('chk-wireframe').addEventListener('change', (e) => {
+            showWireframe = e.target.checked;
+            render();
+        });
+
+        // Camera Control
+        let camera = {
+            distance: 4,
+            rotationX: 0.3,
+            rotationY: 0.3,
+            panX: 0,
+            panY: 0
+        };
+
+        let isDragging = false;
+        let isPanning = false;
+        let lastX, lastY;
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+            } else if (e.button === 2) {
+                isPanning = true;
+            }
+            lastX = e.clientX;
+            lastY = e.clientY;
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                camera.rotationY += deltaX * 0.01;
+                camera.rotationX += deltaY * 0.01;
+                camera.rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotationX));
+                render();
+            } else if (isPanning) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                camera.panX += deltaX * 0.01;
+                camera.panY -= deltaY * 0.01;
+                render();
+            }
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            isPanning = false;
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            camera.distance += e.deltaY * 0.01;
+            camera.distance = Math.max(1, Math.min(20, camera.distance));
+            render();
+            e.preventDefault();
+        });
+
+        // Drawing Functions
+        function createCylinderVertices(start, end, radius, color) {
+            const vertices = [];
+            const colors = [];
+            const segments = 6;
+            
+            const dx = end[0] - start[0];
+            const dy = end[1] - start[1];
+            const dz = end[2] - start[2];
+            const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            
+            if (length < 0.001) return { vertices, colors };
+            
+            const nx = dx / length;
+            const ny = dy / length;
+            const nz = dz / length;
+            
+            let tx, ty, tz;
+            if (Math.abs(ny) < 0.99) {
+                tx = 0; ty = 1; tz = 0;
+            } else {
+                tx = 1; ty = 0; tz = 0;
+            }
+            
+            const bx = ty * nz - tz * ny;
+            const by = tz * nx - tx * nz;
+            const bz = tx * ny - ty * nx;
+            const blen = Math.sqrt(bx * bx + by * by + bz * bz);
+            const bnx = bx / blen;
+            const bny = by / blen;
+            const bnz = bz / blen;
+            
+            const cx = bny * nz - bnz * ny;
+            const cy = bnz * nx - bnx * nz;
+            const cz = bnx * ny - bny * nx;
+            
+            for (let i = 0; i < segments; i++) {
+                const angle1 = (i / segments) * Math.PI * 2;
+                const angle2 = ((i + 1) / segments) * Math.PI * 2;
+                
+                const cos1 = Math.cos(angle1) * radius;
+                const sin1 = Math.sin(angle1) * radius;
+                const cos2 = Math.cos(angle2) * radius;
+                const sin2 = Math.sin(angle2) * radius;
+                
+                const x1 = cos1 * bnx + sin1 * cx;
+                const y1 = cos1 * bny + sin1 * cy;
+                const z1 = cos1 * bnz + sin1 * cz;
+                
+                const x2 = cos2 * bnx + sin2 * cx;
+                const y2 = cos2 * bny + sin2 * cy;
+                const z2 = cos2 * bnz + sin2 * cz;
+                
+                vertices.push(
+                    start[0] + x1, start[1] + y1, start[2] + z1,
+                    end[0] + x1, end[1] + y1, end[2] + z1,
+                    start[0] + x2, start[1] + y2, start[2] + z2,
+                    
+                    start[0] + x2, start[1] + y2, start[2] + z2,
+                    end[0] + x1, end[1] + y1, end[2] + z1,
+                    end[0] + x2, end[1] + y2, end[2] + z2
+                );
+                
+                for (let j = 0; j < 6; j++) {
+                    colors.push(...color);
+                }
+            }
+            
+            return { vertices, colors };
+        }
+
+        function createSphereVertices(center, radius, color) {
+            const vertices = [];
+            const colors = [];
+            const segments = 6;
+            
+            for (let lat = 0; lat < segments; lat++) {
+                const theta1 = (lat / segments) * Math.PI;
+                const theta2 = ((lat + 1) / segments) * Math.PI;
+                
+                for (let lon = 0; lon < segments; lon++) {
+                    const phi1 = (lon / segments) * Math.PI * 2;
+                    const phi2 = ((lon + 1) / segments) * Math.PI * 2;
+                    
+                    const v1 = [
+                        center[0] + radius * Math.sin(theta1) * Math.cos(phi1),
+                        center[1] + radius * Math.cos(theta1),
+                        center[2] + radius * Math.sin(theta1) * Math.sin(phi1)
+                    ];
+                    const v2 = [
+                        center[0] + radius * Math.sin(theta1) * Math.cos(phi2),
+                        center[1] + radius * Math.cos(theta1),
+                        center[2] + radius * Math.sin(theta1) * Math.sin(phi2)
+                    ];
+                    const v3 = [
+                        center[0] + radius * Math.sin(theta2) * Math.cos(phi1),
+                        center[1] + radius * Math.cos(theta2),
+                        center[2] + radius * Math.sin(theta2) * Math.sin(phi1)
+                    ];
+                    const v4 = [
+                        center[0] + radius * Math.sin(theta2) * Math.cos(phi2),
+                        center[1] + radius * Math.cos(theta2),
+                        center[2] + radius * Math.sin(theta2) * Math.sin(phi2)
+                    ];
+                    
+                    vertices.push(...v1, ...v2, ...v3);
+                    vertices.push(...v2, ...v4, ...v3);
+                    
+                    for (let i = 0; i < 6; i++) {
+                        colors.push(...color);
+                    }
+                }
+            }
+            
+            return { vertices, colors };
+        }
+
+        function renderGrid(viewMatrix) {
+            if (typeof showGround === 'undefined' || !showGround) return;
+
+            const size = 10;
+            const divisions = 20;
+            const step = size / divisions;
+            const vertices = [];
+            const colors = [];
+
+            for (let i = -divisions; i <= divisions; i++) {
+                const p = i * step;
+                // X axis lines
+                vertices.push(-size, 0, p);
+                vertices.push(size, 0, p);
+                
+                // Z axis lines
+                vertices.push(p, 0, -size);
+                vertices.push(p, 0, size);
+
+                // Color
+                const c = i === 0 ? 0.6 : 0.3; // Highlight axis
+                for (let j = 0; j < 4; j++) {
+                    colors.push(c, c, c);
+                }
+            }
+
+            const vertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            gl.enableVertexAttribArray(aPosition);
+            gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+
+            const colorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+            gl.enableVertexAttribArray(aColor);
+            gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+
+            gl.disableVertexAttribArray(aNormal);
+            gl.vertexAttrib3f(aNormal, 0.0, 1.0, 0.0);
+
+            gl.disableVertexAttribArray(aTexCoord);
+            gl.uniform1i(uUseTexture, 0);
+            gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+            gl.drawArrays(gl.LINES, 0, vertices.length / 3);
+        }
+
+        // Render Function
+        function render() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            
+            if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.enable(gl.DEPTH_TEST);
+            gl.disable(gl.CULL_FACE);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            
+            const projectionMatrix = mat4.create();
+            mat4.perspective(projectionMatrix, 45 * Math.PI / 180, width / height, 0.1, 100.0);
+            
+            const viewMatrix = mat4.create();
+            const eye = [
+                camera.distance * Math.sin(camera.rotationY) * Math.cos(camera.rotationX) + camera.panX,
+                camera.distance * Math.sin(camera.rotationX) + camera.panY,
+                camera.distance * Math.cos(camera.rotationY) * Math.cos(camera.rotationX)
+            ];
+            mat4.lookAt(viewMatrix, eye, [camera.panX, camera.panY, 0], [0, 1, 0]);
+            
+            gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+            
+            renderGrid(viewMatrix);
+            
+            if (hasMeshLoaded) {
+                renderMesh(viewMatrix);
+            } else if (showSkeleton) {
+                renderSkeleton(viewMatrix);
+            }
+        }
+        
+function renderMesh(viewMatrix) {
+    if (meshes.length === 0) return;
+    
+    // Calculate bone transforms
+    const boneTransforms = bones.map(joint => joint.getWorldMatrix());
+
+    const opaqueMeshes = [];
+    const alphaMeshes = [];
+    
+    for (const mesh of meshes) {
+        if (mesh.visible === false) continue;
+        
+        // Use Render Group for sorting
+        // < 20: Opaque
+        // >= 20: Alpha/Transparent
+        if (mesh.renderGroup >= 20) {
+            alphaMeshes.push(mesh);
+        }
+        else {
+            opaqueMeshes.push(mesh);
+        }
+    }
+    
+    // Sort alpha meshes by render group
+    alphaMeshes.sort((a, b) => a.renderGroup - b.renderGroup);
+    
+    // Function to render a single mesh
+    const renderSingleMesh = (mesh) => {
+        // Apply skinning to vertices (CPU skinning)
+        const skinnedVertices = [];
+        const skinnedNormals = [];
+        
+        for (let i = 0; i < mesh.vertices.length / 3; i++) {
+            const vx = mesh.vertices[i * 3];
+            const vy = mesh.vertices[i * 3 + 1];
+            const vz = mesh.vertices[i * 3 + 2];
+            const vnx = mesh.normals[i * 3];
+            const vny = mesh.normals[i * 3 + 1];
+            const vnz = mesh.normals[i * 3 + 2];
+
+            let finalX = 0, finalY = 0, finalZ = 0;
+            let finalNX = 0, finalNY = 0, finalNZ = 0;
+            
+            // Blend based on bone weights
+            for (let j = 0; j < 4; j++) {
+                const boneIndex = Math.floor(mesh.boneIndices[i * 4 + j]);
+                const weight = mesh.boneWeights[i * 4 + j];
+                
+                if (weight > 0 && boneIndex >= 0 && boneIndex < boneTransforms.length) {
+                    const transform = boneTransforms[boneIndex];
+                    const bindPos = bones[boneIndex].bindPosition;
+                    
+                    // Transform vertex relative to bone bind position
+                    const lx = vx - bindPos[0];
+                    const ly = vy - bindPos[1];
+                    const lz = vz - bindPos[2];
+                    
+                    const x = transform[0] * lx + transform[4] * ly + transform[8] * lz + transform[12];
+                    const y = transform[1] * lx + transform[5] * ly + transform[9] * lz + transform[13];
+                    const z = transform[2] * lx + transform[6] * ly + transform[10] * lz + transform[14];
+                    
+                    finalX += x * weight;
+                    finalY += y * weight;
+                    finalZ += z * weight;
+                    
+                    // Rotate normal (ignore translation)
+                    const nx = transform[0] * vnx + transform[4] * vny + transform[8] * vnz;
+                    const ny = transform[1] * vnx + transform[5] * vny + transform[9] * vnz;
+                    const nz = transform[2] * vnx + transform[6] * vny + transform[10] * vnz;
+                    
+                    finalNX += nx * weight;
+                    finalNY += ny * weight;
+                    finalNZ += nz * weight;
+                }
+            }
+            
+            skinnedVertices.push(finalX, finalY, finalZ);
+            
+            // Normalize normal
+            const len = Math.sqrt(finalNX*finalNX + finalNY*finalNY + finalNZ*finalNZ) || 1;
+            skinnedNormals.push(finalNX/len, finalNY/len, finalNZ/len);
+        }
+        
+        // Render mesh
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(skinnedVertices), gl.DYNAMIC_DRAW);
+        gl.enableVertexAttribArray(aPosition);
+        gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(skinnedNormals), gl.DYNAMIC_DRAW);
+        gl.enableVertexAttribArray(aNormal);
+        gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, 0, 0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.colors), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(aColor);
+        gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
+        
+        // Texture Coords
+        if (mesh.texCoordBuffer) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordBuffer);
+            gl.enableVertexAttribArray(aTexCoord);
+            gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, false, 0, 0);
+        } else {
+            gl.disableVertexAttribArray(aTexCoord);
+        }
+        
+        gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+        
+        // Set material uniforms
+        gl.uniform1f(uShininess, mesh.shininess);
+        gl.uniform1f(uSpecular, mesh.specular);
+        
+        // Texture Uniforms
+        if (mesh.texture && !showWireframe) {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, mesh.texture);
+            gl.uniform1i(uSampler, 0);
+            gl.uniform1i(uUseTexture, 1);
+        } else {
+            gl.uniform1i(uUseTexture, 0);
+        }
+        
+        if (showWireframe && mesh.wireframeIndexBuffer) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.wireframeIndexBuffer);
+            gl.drawElements(gl.LINES, mesh.wireframeIndexCount, mesh.indexType, 0);
+        } else {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
+            gl.drawElements(gl.TRIANGLES, mesh.indexCount, mesh.indexType, 0);
+        }
+    };
+    
+    // Pass 1: Render opaque meshes with depth write ON
+    gl.depthMask(true);
+    for (const mesh of opaqueMeshes) {
+        renderSingleMesh(mesh);
+    }
+
+    for (const mesh of alphaMeshes) {
+        renderSingleMesh(mesh);
+    }
+    
+    // Draw skeleton overlay
+    if (showSkeleton) renderSkeletonOverlay(viewMatrix);
+}
+        
+        function renderSkeletonOverlay(viewMatrix) {
+            const allVertices = [];
+            const allColors = [];
+            
+            function drawBone(joint, color) {
+                if (!joint.parent) return;
+                // Use bind position for skeleton visualization if not animated, 
+                // or use current world position if animated. 
+                // Here we use current world position to see rotations.
+                const start = joint.parent.getWorldPosition(); 
+                const end = joint.getWorldPosition(); 
+                const { vertices, colors } = createCylinderVertices(start, end, 0.015, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+
+            function drawJoint(joint, color) {
+                const pos = joint.getWorldPosition();
+                const { vertices, colors } = createSphereVertices(pos, 0.03, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            bones.forEach(joint => {
+                drawBone(joint, [1.0, 0.6, 0.0]);
+                drawJoint(joint, [1.0, 0.8, 0.2]);
+            });
+            
+            if (allVertices.length > 0) {
+                // Reuse buffers
+                if (!skeletonVertexBuffer) skeletonVertexBuffer = gl.createBuffer();
+                if (!skeletonColorBuffer) skeletonColorBuffer = gl.createBuffer();
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, skeletonVertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allVertices), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aPosition);
+                gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.bindBuffer(gl.ARRAY_BUFFER, skeletonColorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allColors), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aColor);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.disableVertexAttribArray(aNormal);
+                gl.vertexAttrib3f(aNormal, 0.0, 1.0, 0.0);
+                
+                gl.disableVertexAttribArray(aTexCoord);
+                gl.uniform1i(uUseTexture, 0);
+                
+                gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+                gl.drawArrays(gl.TRIANGLES, 0, allVertices.length / 3);
+            }
+        }
+        
+        function renderSkeleton(viewMatrix) {
+            const allVertices = [];
+            const allColors = [];
+            
+            function drawBone(joint, color) {
+                if (!joint.parent) return;
+                
+                const start = joint.parent.getWorldPosition();
+                const end = joint.getWorldPosition();
+                const { vertices, colors } = createCylinderVertices(start, end, 0.03, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            function drawJoint(joint, color) {
+                const pos = joint.getWorldPosition();
+                const { vertices, colors } = createSphereVertices(pos, 0.05, color);
+                allVertices.push(...vertices);
+                allColors.push(...colors);
+            }
+            
+            bones.forEach(joint => {
+                drawBone(joint, [0.3, 0.7, 1.0]);
+                drawJoint(joint, [1.0, 0.8, 0.3]);
+            });
+            
+            if (allVertices.length > 0) {
+                // Reuse buffers
+                if (!skeletonVertexBuffer) skeletonVertexBuffer = gl.createBuffer();
+                if (!skeletonColorBuffer) skeletonColorBuffer = gl.createBuffer();
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, skeletonVertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allVertices), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aPosition);
+                gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.bindBuffer(gl.ARRAY_BUFFER, skeletonColorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allColors), gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(aColor);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+                
+                gl.disableVertexAttribArray(aNormal);
+                gl.vertexAttrib3f(aNormal, 0.0, 1.0, 0.0);
+                
+                gl.disableVertexAttribArray(aTexCoord);
+                gl.uniform1i(uUseTexture, 0);
+                
+                gl.uniformMatrix4fv(uModelViewMatrix, false, viewMatrix);
+                gl.drawArrays(gl.TRIANGLES, 0, allVertices.length / 3);
+            }
+        }
+
+        // Button Functions
+        function resetPose() {
+            bones.forEach(joint => {
+                joint.rotation.x = 0;
+                joint.rotation.y = 0;
+                joint.rotation.z = 0;
+            });
+            
+            if (selectedBone) updateSliders();
+            
+            render();
+        }
+
+        function randomPose() {
+            bones.forEach((joint, index) => {
+                ['x', 'y', 'z'].forEach(axis => {
+                    const degrees = Math.floor(Math.random() * 60 - 30);
+                    const radians = degrees * Math.PI / 180;
+                    joint.rotation[axis] = radians;
+                });
+            });
+            
+            if (selectedBone) updateSliders();
+            
+            render();
+        }
+
+        // Initialize
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        
+        function resizeCanvas() {
+            render();
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        function showNotification(message, type = 'info') {
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.innerHTML = message;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.style.opacity = '0';
+                notif.style.transition = 'opacity 0.5s';
+                setTimeout(() => notif.remove(), 500);
+            }, 3000);
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Check for CTRL key
+            if (e.ctrlKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'b': // Toggle Bones
+                        e.preventDefault();
+                        showSkeleton = !showSkeleton;
+                        document.getElementById('chk-skeleton').checked = showSkeleton;
+                        render();
+                        break;
+                    case 'g': // Toggle Ground
+                        e.preventDefault();
+                        showGround = !showGround;
+                        document.getElementById('chk-floor').checked = showGround;
+                        render();
+                        break;
+                    case 'w': // Toggle Wireframe
+                        e.preventDefault();
+                        showWireframe = !showWireframe;
+                        document.getElementById('chk-wireframe').checked = showWireframe;
+                        render();
+                        break;
+                }
+            }
+        });
+
+
+
+                function convertTgaToPng(buffer) {
+            const data = new Uint8Array(buffer);
+            const idLength = data[0];
+            const colorMapType = data[1];
+            const imageType = data[2];
+            const width = data[12] | (data[13] << 8);
+            const height = data[14] | (data[15] << 8);
+            const pixelDepth = data[16];
+            const descriptor = data[17];
+
+            let offset = 18 + idLength;
+            if (colorMapType === 1) {
+                const colorMapLength = data[5] | (data[6] << 8);
+                const colorMapDepth = data[7];
+                offset += colorMapLength * (colorMapDepth >> 3);
+            }
+
+            const totalPixels = width * height;
+            const rgbaData = new Uint8Array(totalPixels * 4);
+            let pixelIndex = 0;
+
+            if (imageType === 10) { // RLE
+                let pixelsRead = 0;
+                while (pixelsRead < totalPixels && offset < data.length) {
+                    const header = data[offset++];
+                    const count = (header & 0x7F) + 1;
+                    const isRLE = header & 0x80;
+                    if (isRLE) {
+                        const b = data[offset++];
+                        const g = data[offset++];
+                        const r = data[offset++];
+                        const a = pixelDepth === 32 ? data[offset++] : 255;
+                        for (let i = 0; i < count; i++) {
+                            rgbaData[pixelIndex++] = r; rgbaData[pixelIndex++] = g; rgbaData[pixelIndex++] = b; rgbaData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    } else {
+                        for (let i = 0; i < count; i++) {
+                            const b = data[offset++];
+                            const g = data[offset++];
+                            const r = data[offset++];
+                            const a = pixelDepth === 32 ? data[offset++] : 255;
+                            rgbaData[pixelIndex++] = r; rgbaData[pixelIndex++] = g; rgbaData[pixelIndex++] = b; rgbaData[pixelIndex++] = a;
+                        }
+                        pixelsRead += count;
+                    }
+                }
+            } else if (imageType === 2) { // Uncompressed RGB
+                 for (let i = 0; i < totalPixels; i++) {
+                    const b = data[offset++]; const g = data[offset++]; const r = data[offset++];
+                    const a = pixelDepth === 32 ? data[offset++] : 255;
+                    rgbaData[pixelIndex++] = r; rgbaData[pixelIndex++] = g; rgbaData[pixelIndex++] = b; rgbaData[pixelIndex++] = a;
+                }
+            } else if (imageType === 3) { // Grayscale
+                for (let i = 0; i < totalPixels; i++) {
+                    const l = data[offset++];
+                    rgbaData[pixelIndex++] = l; rgbaData[pixelIndex++] = l; rgbaData[pixelIndex++] = l; rgbaData[pixelIndex++] = 255;
+                }
+            }
+
+            // Fix for 32-bit TGA with 0 alpha (common in XPS models where alpha is ignored)
+            if (pixelDepth === 32) {
+                let hasAlpha = false;
+                for (let i = 3; i < rgbaData.length; i += 4) {
+                    if (rgbaData[i] > 0) {
+                        hasAlpha = true;
+                        break;
+                    }
+                }
+                if (!hasAlpha) {
+                    for (let i = 3; i < rgbaData.length; i += 4) {
+                        rgbaData[i] = 255;
+                    }
+                }
+            }
+
+            const isTopLeft = (descriptor & 0x20) !== 0;
+            const canvas = document.createElement('canvas');
+            canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(width, height);
+            
+            if (!isTopLeft) {
+                const stride = width * 4;
+                for (let y = 0; y < height; y++) {
+                    const srcRowStart = y * stride;
+                    const dstRowStart = (height - 1 - y) * stride;
+                    imgData.data.set(rgbaData.subarray(srcRowStart, srcRowStart + stride), dstRowStart);
+                }
+            } else {
+                imgData.data.set(rgbaData);
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+
+        function sanitizeImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    const mime = file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+                    canvas.toBlob(resolve, mime);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); console.warn("Image sanitize failed for " + file.name); resolve(file); };
+                img.src = url;
+            });
+        }
+        
+        async function SaveGLTFFile() {
+            if (meshes.length === 0) {
+                alert("No model loaded to export!");
+                return;
+            }
+
+            const gltf = {
+                asset: { version: "2.0", generator: "XPS to GLTF Web Exporter" },
+                scenes: [{ nodes: [] }],
+                scene: 0,
+                nodes: [],
+                meshes: [],
+                materials: [],
+                textures: [],
+                images: [],
+                samplers: [{ magFilter: 9729, minFilter: 9987, wrapS: 10497, wrapT: 10497 }],
+                skins: [],
+                accessors: [],
+                bufferViews: [],
+                buffers: []
+            };
+
+            const bufferData = [];
+            let bufferOffset = 0;
+
+            function addBufferView(data, target) {
+                const padding = (4 - (data.byteLength % 4)) % 4;
+                const paddedData = new Uint8Array(data.byteLength + padding);
+                paddedData.set(new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
+                
+                const view = {
+                    buffer: 0,
+                    byteOffset: bufferOffset,
+                    byteLength: data.byteLength
+                };
+                if (target) view.target = target;
+                
+                bufferData.push(paddedData);
+                bufferOffset += paddedData.byteLength;
+                gltf.bufferViews.push(view);
+                return gltf.bufferViews.length - 1;
+            }
+
+            function addAccessor(bufferViewIndex, componentType, count, type, min, max) {
+                const accessor = {
+                    bufferView: bufferViewIndex,
+                    componentType: componentType,
+                    count: count,
+                    type: type
+                };
+                if (min) accessor.min = min;
+                if (max) accessor.max = max;
+                gltf.accessors.push(accessor);
+                return gltf.accessors.length - 1;
+            }
+
+            // 1. Bones / Nodes
+            const boneNodeIndices = [];
+            const modelRootNodeIndex = gltf.nodes.length;
+            gltf.nodes.push({ name: "Model", children: [] });
+            gltf.scenes[0].nodes.push(modelRootNodeIndex);
+
+            bones.forEach((bone) => {
+                const node = { name: bone.name };
+                const q = getQuaternionFromEuler(bone.rotation.x, bone.rotation.y, bone.rotation.z);
+                node.translation = Array.from(bone.position);
+                node.rotation = q;
+                gltf.nodes.push(node);
+                boneNodeIndices.push(gltf.nodes.length - 1);
+            });
+
+            bones.forEach((bone, index) => {
+                const nodeIndex = boneNodeIndices[index];
+                if (bone.parent) {
+                    const parentIndex = bones.indexOf(bone.parent);
+                    if (parentIndex !== -1) {
+                        const parentNode = gltf.nodes[boneNodeIndices[parentIndex]];
+                        if (!parentNode.children) parentNode.children = [];
+                        parentNode.children.push(nodeIndex);
+                    }
+                } else {
+                    gltf.nodes[modelRootNodeIndex].children.push(nodeIndex);
+                }
+            });
+
+            // 2. Skin
+            const inverseBindMatrices = [];
+            bones.forEach(bone => {
+                const ibm = mat4.create();
+                ibm[12] = -bone.bindPosition[0];
+                ibm[13] = -bone.bindPosition[1];
+                ibm[14] = -bone.bindPosition[2];
+                inverseBindMatrices.push(...ibm);
+            });
+
+            const ibmBufferView = addBufferView(new Float32Array(inverseBindMatrices));
+            const ibmAccessor = addAccessor(ibmBufferView, 5126, bones.length, "MAT4");
+
+            const skin = {
+                inverseBindMatrices: ibmAccessor,
+                joints: boneNodeIndices,
+                skeleton: boneNodeIndices[0]
+            };
+            gltf.skins.push(skin);
+            const skinIndex = 0;
+
+            // 3. Meshes
+            for (let i = 0; i < meshes.length; i++) {
+                const mesh = meshes[i];
+                if (mesh.visible === false) continue;
+                
+                // Calculate Min/Max for positions manually to avoid stack overflow
+                let minX = Infinity, minY = Infinity, minZ = Infinity;
+                let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+                for(let k=0; k<mesh.vertices.length; k+=3) {
+                    const x = mesh.vertices[k], y = mesh.vertices[k+1], z = mesh.vertices[k+2];
+                    if(x < minX) minX = x; if(x > maxX) maxX = x;
+                    if(y < minY) minY = y; if(y > maxY) maxY = y;
+                    if(z < minZ) minZ = z; if(z > maxZ) maxZ = z;
+                }
+
+                const posView = addBufferView(new Float32Array(mesh.vertices), 34962);
+                const posAcc = addAccessor(posView, 5126, mesh.vertices.length / 3, "VEC3", 
+                    [minX, minY, minZ],
+                    [maxX, maxY, maxZ]
+                );
+
+                // Normalize Normals
+                const normArray = new Float32Array(mesh.normals);
+                for(let k=0; k<normArray.length; k+=3) {
+                    let x = normArray[k], y = normArray[k+1], z = normArray[k+2];
+                    let len = Math.sqrt(x*x + y*y + z*z);
+                    if (len < 1e-6) { x=0; y=1; z=0; }
+                    else { x/=len; y/=len; z/=len; }
+                    normArray[k] = x; normArray[k+1] = y; normArray[k+2] = z;
+                }
+                const normView = addBufferView(normArray, 34962);
+                const normAcc = addAccessor(normView, 5126, mesh.normals.length / 3, "VEC3");
+
+                // const uvView = addBufferView(new Float32Array(mesh.texCoords), 34962);
+                // Flip V coordinate for GLTF export (GLTF uses Top-Left origin for UVs)
+                const texCoordArray = new Float32Array(mesh.texCoords);
+                for(let k=1; k<texCoordArray.length; k+=2) {
+                    texCoordArray[k] = 1.0 - texCoordArray[k];
+                }
+                const uvView = addBufferView(texCoordArray, 34962);
+
+                const uvAcc = addAccessor(uvView, 5126, mesh.texCoords.length / 2, "VEC2");
+                
+                // Normalize Weights
+                const weightArray = new Float32Array(mesh.boneWeights);
+                for(let k=0; k<weightArray.length; k+=4) {
+                    let s = weightArray[k] + weightArray[k+1] + weightArray[k+2] + weightArray[k+3];
+                    if (s > 1e-6) { weightArray[k] /= s; weightArray[k+1] /= s; weightArray[k+2] /= s; weightArray[k+3] /= s; }
+                    else { weightArray[k] = 1; weightArray[k+1] = 0; weightArray[k+2] = 0; weightArray[k+3] = 0; }
+                }
+                const weightsView = addBufferView(weightArray, 34962);
+                const weightsAcc = addAccessor(weightsView, 5126, mesh.boneWeights.length / 4, "VEC4");
+
+                const jointsView = addBufferView(new Uint16Array(mesh.boneIndices), 34962);
+                const jointsAcc = addAccessor(jointsView, 5123, mesh.boneIndices.length / 4, "VEC4");
+
+                const indicesView = addBufferView(new Uint16Array(mesh.indices), 34963);
+                const indicesAcc = addAccessor(indicesView, 5123, mesh.indices.length, "SCALAR");
+
+                let materialIndex = undefined;
+                if (mesh.textureName && textureFiles.has(mesh.textureName)) {
+                     const imgFile = textureFiles.get(mesh.textureName);
+                     let imgBuffer;
+                     let mimeType;
+
+                     if (imgFile.name.toLowerCase().endsWith('.tga')) {
+                         const tgaBuffer = await imgFile.arrayBuffer();
+                         const pngBlob = await convertTgaToPng(tgaBuffer);
+                         imgBuffer = await pngBlob.arrayBuffer();
+                         mimeType = 'image/png';
+                     } else {
+                         const sanitizedBlob = await sanitizeImage(imgFile);
+                         imgBuffer = await sanitizedBlob.arrayBuffer();
+                         mimeType = sanitizedBlob.type || 'image/png';
+                     }
+
+                     const imgView = addBufferView(new Uint8Array(imgBuffer));
+                     
+                     const imageIndex = gltf.images.length;
+                     gltf.images.push({ bufferView: imgView, mimeType: mimeType });
+                     
+                     const textureIndex = gltf.textures.length;
+                     gltf.textures.push({ source: imageIndex, sampler: 0 });
+                     
+                      materialIndex = gltf.materials.length;
+
+                      // Determine alpha mode
+                      let alphaMode = "OPAQUE";
+                      let alphaCutoff = undefined;
+
+                      // If mesh already has alphaMode from a previous GLTF import, use it
+                      if (mesh.alphaMode) {
+                          alphaMode = mesh.alphaMode;
+                          if (alphaMode === "MASK") alphaCutoff = 0.5;
+                      }
+
+                      const material = {
+                          name: mesh.name || 'material',
+                          pbrMetallicRoughness: { 
+                              baseColorTexture: { index: textureIndex }, 
+                              metallicFactor: 0.0, 
+                              roughnessFactor: 0.8
+                          },
+                          doubleSided: true,
+                          alphaMode: alphaMode
+                      };
+
+                      if (alphaCutoff !== undefined) {
+                          material.alphaCutoff = alphaCutoff;
+                      }
+
+                      gltf.materials.push(material);
+                } else {
+                     materialIndex = gltf.materials.length;
+                     gltf.materials.push({ name: mesh.name + "_mat", pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0.0, roughnessFactor: 1.0 }, doubleSided: true });
+                }
+
+                const primitive = { attributes: { POSITION: posAcc, NORMAL: normAcc, TEXCOORD_0: uvAcc, JOINTS_0: jointsAcc, WEIGHTS_0: weightsAcc }, indices: indicesAcc, material: materialIndex };
+                const meshIndex = gltf.meshes.length;
+                gltf.meshes.push({ name: mesh.name, primitives: [primitive] });
+                const meshNodeIndex = gltf.nodes.length;
+                gltf.nodes.push({ name: mesh.name, mesh: meshIndex, skin: skinIndex });
+                gltf.scenes[0].nodes.push(meshNodeIndex);
+            }
+
+            const totalLength = bufferData.reduce((acc, b) => acc + b.byteLength, 0);
+            const combinedBuffer = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const b of bufferData) { combinedBuffer.set(b, offset); offset += b.byteLength; }
+            
+            // Convert to Base64 Data URI for embedded .gltf
+            const reader = new FileReader();
+            const base64Promise = new Promise(resolve => {
+                reader.onloadend = () => resolve(reader.result);
+            });
+            reader.readAsDataURL(new Blob([combinedBuffer]));
+            const bufferUri = await base64Promise;
+
+            gltf.buffers.push({ byteLength: totalLength, uri: bufferUri });
+            
+            const jsonString = JSON.stringify(gltf, null, 2);
+            const blob = new Blob([jsonString], { type: 'model/gltf+json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = "model.gltf"; a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function getQuaternionFromEuler(x, y, z) {
+            const c1 = Math.cos(x / 2), c2 = Math.cos(y / 2), c3 = Math.cos(z / 2);
+            const s1 = Math.sin(x / 2), s2 = Math.sin(y / 2), s3 = Math.sin(z / 2);
+            return [s1 * c2 * c3 - c1 * s2 * s3, c1 * s2 * c3 + s1 * c2 * s3, c1 * c2 * s3 - s1 * s2 * c3, c1 * c2 * c3 + s1 * s2 * s3];
+        }
+</script>
+
+<script>
+// Menubar 
+// ==================================================
+
+const menuItems = document.querySelectorAll('.can-hover > li');
+let focusedItem = null;
+
+function closeMainMenu() {
+  menuItems.forEach(item => {
+    item.addEventListener('blur', () => {
+      focusedItem = null;
+    });
+
+    item.blur();
+  });
+}
+
+document.getElementById('glCanvas').addEventListener('mousedown', () => {
+  closeMainMenu();
+});
+
+menuItems.forEach(item => {
+  item.addEventListener('mouseover', () => {
+    if (focusedItem) {
+      focusedItem.blur();
+      item.focus();
+      focusedItem = item;
+    }
+  });
+
+  item.addEventListener('focus', () => {
+    focusedItem = item;
+  });
+
+  item.addEventListener('blur', () => {
+    focusedItem = null;
+  });
+
+  item.addEventListener('mousedown', (event) => {
+    // Check if the clicked element is an li inside a .can-hover > li
+    const clickedLi = event.target.closest('.can-hover > li li');
+    if (!clickedLi && item === focusedItem) {
+      event.preventDefault();
+      item.blur();
+    }
+  });
+});
+
+function OpenXPSFile() {
+  closeMainMenu();
+  document.getElementById('fileInput').click();
+}
+
+function OpenGLTFFile() {
+  closeMainMenu();
+  document.getElementById('gltfInput').click();
+}
+
+function SaveFile() {
+  closeMainMenu();
+}
+
+function SaveAsFile() {
+  closeMainMenu();
+}
+
+function Exit() {
+  closeMainMenu();
+}
+
+
+let contextMenu = document.querySelector(".context-menu");
+
+document.addEventListener('contextmenu', event => {
+  event.preventDefault();
+});
+
+// document.querySelector('main').addEventListener('contextmenu', e => {
+
+//   e.preventDefault();
+
+//   // Remove existing context menu
+//   // if (contextMenu !== null) {
+//   if (contextMenu.style.display !== "none") {
+//     // document.body.removeChild(contextMenu);
+//     contextMenu.style.display = "none";
+//   }
+
+//   // Create new context menu
+//   // contextMenu = document.createElement('div');
+//   // contextMenu.classList.add('context-menu');
+//   // contextMenu.innerHTML = `
+//   // <div class="menu">
+//   //   <ul style="width: 200px">
+//   //     <li>
+//   //       <input type="radio" name="icon-size" id="example12">
+//   //       <label for="example12">Large icons</label>
+//   //     </li>
+//   //     <li>
+//   //       <input type="radio" name="icon-size" id="example13" checked>
+//   //       <label for="example13">Medium icons</label>
+//   //     </li>
+//   //     <li class="has-divider">
+//   //       <input type="radio" name="icon-size" id="example14">
+//   //       <label for="example14">Small icons</label>
+//   //     </li>
+//   //     <li>
+//   //       <input type="checkbox" id="example15">
+//   //       <label for="example15">Auto arrange icons</label>
+//   //     </li>
+//   //     <li>
+//   //       <input type="checkbox" id="example16" checked>
+//   //       <label for="example16">Align icons to grid</label>
+//   //     </li>
+//   //   </ul>
+//   // <div>
+//   // `;
+//   // document.body.appendChild(contextMenu);
+
+//   contextMenu.style.display = "block";
+
+//   // Set the position of the context menu
+//   const mouseX = e.clientX;
+//   const mouseY = e.clientY;
+//   const menuWidth = contextMenu.offsetWidth;
+//   const menuHeight = contextMenu.offsetHeight;
+//   const screenWidth = window.innerWidth;
+//   const screenHeight = window.innerHeight;
+//   const x = Math.min(mouseX, screenWidth - menuWidth);
+//   const y = Math.min(mouseY, screenHeight - menuHeight);
+//   contextMenu.style.top = `${y}px`;
+//   contextMenu.style.left = `${x}px`;
+
+//   // Left click on current location
+//   const evt = new MouseEvent('click', {
+//     bubbles: true,
+//     cancelable: true,
+//     clientX: x,
+//     clientY: y,
+//   });
+//   document.elementFromPoint(x, y).dispatchEvent(evt);
+// });
+
+// Close context menu on click outside of it
+document.addEventListener('click', e => {
+  if (contextMenu !== null && !contextMenu.contains(e.target)) {
+  // document.body.removeChild(contextMenu);
+    contextMenu.style.display = "none";
+  // contextMenu = null;
+  }
+});
+
+</script>
+</body>
+</html>
