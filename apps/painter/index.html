@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1842,7 +1841,11 @@ const state = {
   documents: [],
   activeDocIndex: -1,
   docCounter: 1,
-  activeButton: 0
+  activeButton: 0,
+  selectionDraft: null,
+  selectionOperation: 'replace',
+  isAnimatingSelection: false,
+  polygonalLassoClosed: false
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1954,7 +1957,9 @@ function selectTool(tool) {
   const keepSelectionTools = ['select', 'lasso', 'magic-wand', 'move'];
   if (!keepSelectionTools.includes(tool)) {
     clearSelection();
+    state.selectionDraft = null;
     state.lassoPoints = [];
+    state.polygonalLassoClosed = false;
   }
   
   const cursors = {
@@ -1999,7 +2004,14 @@ function handleMouseDown(e) {
   state.lastX = x;
   state.lastY = y;
   state.activeButton = e.button;
-  
+
+
+  if (['select', 'lasso', 'magic-wand'].includes(state.currentTool)) {
+    if (e.shiftKey) state.selectionOperation = 'add';
+    else if (e.ctrlKey || e.metaKey) state.selectionOperation = 'subtract';
+    else state.selectionOperation = 'replace';
+  }
+
   if (state.currentTool === 'lasso' && state.selection && state.selection.type === 'lasso' && state.toolSettings.lasso.type === 'polygonal') {
       const threshold = 10 / state.zoom;
       for (let i = 0; i < state.selection.points.length; i++) {
@@ -2018,33 +2030,40 @@ function handleMouseDown(e) {
     case 'eraser': drawEraser(x, y); break;
     case 'fill': floodFill(Math.floor(x), Math.floor(y)); state.isDrawing = false; break;
     case 'eyedropper': pickColor(Math.floor(x), Math.floor(y)); state.isDrawing = false; break;
-        case 'select': 
-          state.lassoPoints = [];
-          state.selectionStart = { x, y }; 
-          break;
-        case 'magic-wand':
-          magicWandSelect(Math.floor(x), Math.floor(y));
-          state.isDrawing = false;
-          break;
-        case 'lasso': 
-          if (state.toolSettings.lasso.type === 'polygonal') {
-             if (state.selection) {
-                 clearSelection();
-                 state.lassoPoints = [];
-             }
-             state.lassoPoints.push({ x, y });
-             state.isDraggingLassoPoint = true;
-             state.isDrawing = false; // Not a standard drawing op
-             drawLassoPath(x, y);
-          } else {
-             if (state.selection) {
-                 clearSelection();
-             }
-             state.isDrawing = true;
-             state.lassoPoints = [{ x, y }]; 
-             drawLassoPath();
+    case 'select': 
+      if (state.selectionOperation === 'replace') clearSelection();
+      state.selectionStart = { x, y };
+      state.selectionDraft = { type: 'rect', x, y, width: 0, height: 0 };
+      if (!state.isAnimatingSelection) animateMarchingAnts();
+      break;
+    case 'magic-wand':
+      magicWandSelect(Math.floor(x), Math.floor(y));
+      state.isDrawing = false;
+      break;
+    case 'lasso': 
+      if (state.toolSettings.lasso.type === 'polygonal') {
+          if (state.polygonalLassoClosed) {
+            state.lassoPoints = [];
+            state.polygonalLassoClosed = false;
           }
-          break;
+          if (state.selection) {
+            if (state.selectionOperation === 'replace') {
+              clearSelection();
+              state.lassoPoints = [];
+            }
+          }
+          state.lassoPoints.push({ x, y });
+          state.isDraggingLassoPoint = true;
+          state.isDrawing = false; // Not a standard drawing op
+          if (!state.isAnimatingSelection) animateMarchingAnts();
+      } else {
+          if (state.selectionOperation === 'replace') clearSelection();
+          state.isDrawing = true;
+          state.lassoPoints = [{ x, y }];
+          state.selectionDraft = { type: 'lasso', points: state.lassoPoints };
+          if (!state.isAnimatingSelection) animateMarchingAnts();
+      }
+      break;
     case 'text': addText(x, y); state.isDrawing = false; break;
         case 'shape': 
           state.lassoPoints = [];
@@ -2065,8 +2084,13 @@ function handleMouseMove(e) {
   
   document.getElementById('statusCoords').textContent = `X: ${Math.floor(x)}, Y: ${Math.floor(y)}`;
 
-  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0) {
-      drawLassoPath(x, y);
+  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal') {
+    state.lastX = x;
+    state.lastY = y;
+  }
+
+  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0 && !state.isAnimatingSelection) {
+      animateMarchingAnts();
   }
 
   if (state.draggingPointIndex > -1) {
@@ -2093,16 +2117,22 @@ function handleMouseMove(e) {
       state.lastY = y;
       break;
     case 'select':
-      drawSelectionRect(state.selectionStart.x, state.selectionStart.y, x, y);
+      state.selectionDraft = {
+        type: 'rect',
+        x: Math.min(state.selectionStart.x, x),
+        y: Math.min(state.selectionStart.y, y),
+        width: Math.abs(x - state.selectionStart.x),
+        height: Math.abs(y - state.selectionStart.y)
+      };
       break;
     case 'lasso':
           if (state.toolSettings.lasso.type === 'polygonal') {
-             if (state.isDraggingLassoPoint && state.lassoPoints.length > 0) {
-                 state.lassoPoints[state.lassoPoints.length - 1] = { x, y };
-             }
-             drawLassoPath(x, y);
+            if (state.isDraggingLassoPoint && state.lassoPoints.length > 0) {
+              state.lassoPoints[state.lassoPoints.length - 1] = { x, y };
+            }
           } else {
-             state.lassoPoints.push({ x, y });
+            state.lassoPoints.push({ x, y });
+            state.selectionDraft = { type: 'lasso', points: state.lassoPoints };
           }
           break;
     case 'shape':
@@ -2111,6 +2141,10 @@ function handleMouseMove(e) {
     case 'move':
       moveLayer(x, y);
       break;
+  }
+
+  if (state.selection || state.selectionDraft) {
+    if (!state.isAnimatingSelection) animateMarchingAnts();
   }
 
   if (state.selection || state.selectionDraft) {
@@ -2157,6 +2191,7 @@ function stopDrawing(e) {
     }
     
     state.isDrawing = false;
+    state.selectionDraft = null;
     
     if (['brush', 'eraser', 'shape', 'move'].includes(state.currentTool)) {
       saveHistory();
@@ -2402,16 +2437,47 @@ function getColorTest(mode, startColor, tolerance) {
     }
 }
 
-function createPathFromMask(selectionMask, w, h) {
+function selectionToMaskCanvas(selection, width, height) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = '#FFFFFF';
+  
+  if (selection.type === 'mask') {
+    ctx.drawImage(selection.canvas, 0, 0);
+  } else if (selection.type === 'rect') {
+    ctx.fillRect(selection.x, selection.y, selection.width, selection.height);
+  } else if (selection.type === 'lasso') {
+    if (selection.points.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(selection.points[0].x, selection.points[0].y);
+        for (let i = 1; i < selection.points.length; i++) {
+            ctx.lineTo(selection.points[i].x, selection.points[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+  }
+  return canvas;
+}
+
+function createPathFromMask(data, w, h, stride = 1) {
   const path = new Path2D();
+  const getVal = (x, y) => {
+      if (x < 0 || y < 0 || x >= w || y >= h) return 0;
+      const idx = (y * w + x) * stride;
+      return stride === 4 ? (data[idx + 3] > 0 ? 1 : 0) : (data[idx] > 0 ? 1 : 0);
+  };
+
   // Horizontal edges
   for (let y = 0; y <= h; y++) {
     let startX = -1;
     for (let x = 0; x < w; x++) {
-      const idx = y * w + x;
-      const aboveIdx = (y - 1) * w + x;
-      const current = (y < h) ? selectionMask[idx] : 0;
-      const above = (y > 0) ? selectionMask[aboveIdx] : 0;
+      const current = getVal(x, y);
+      const above = getVal(x, y - 1);
       if (current !== above) {
         if (startX === -1) startX = x;
       } else {
@@ -2422,19 +2488,15 @@ function createPathFromMask(selectionMask, w, h) {
         }
       }
     }
-    if (startX !== -1) {
-      path.moveTo(startX, y);
-      path.lineTo(w, y);
-    }
+    if (startX !== -1) { path.moveTo(startX, y); path.lineTo(w, y); }
   }
+
   // Vertical edges
   for (let x = 0; x <= w; x++) {
     let startY = -1;
     for (let y = 0; y < h; y++) {
-      const idx = y * w + x;
-      const leftIdx = y * w + (x - 1);
-      const current = (x < w) ? selectionMask[idx] : 0;
-      const left = (x > 0) ? selectionMask[leftIdx] : 0;
+      const current = getVal(x, y);
+      const left = getVal(x - 1, y);
       if (current !== left) {
         if (startY === -1) startY = y;
       } else {
@@ -2445,12 +2507,25 @@ function createPathFromMask(selectionMask, w, h) {
         }
       }
     }
-    if (startY !== -1) {
-      path.moveTo(x, startY);
-      path.lineTo(x, h);
-    }
+    if (startY !== -1) { path.moveTo(x, startY); path.lineTo(x, h); }
   }
   return path;
+}
+
+function combineSelections(oldSel, newSel, op, w, h) {
+    if (!oldSel || op === 'replace') return newSel;
+    
+    const c1 = selectionToMaskCanvas(oldSel, w, h);
+    const ctx1 = c1.getContext('2d');
+    const c2 = selectionToMaskCanvas(newSel, w, h);
+    
+    ctx1.globalCompositeOperation = op === 'subtract' ? 'destination-out' : 'source-over';
+    ctx1.drawImage(c2, 0, 0);
+    
+    const maskData = ctx1.getImageData(0, 0, w, h).data;
+    const path = createPathFromMask(maskData, w, h, 4);
+    
+    return { type: 'mask', canvas: c1, path: path };
 }
 
 function magicWandSelect(startX, startY) {
@@ -2510,244 +2585,53 @@ function magicWandSelect(startX, startY) {
   }
   maskCtx.putImageData(maskImageData, 0, 0);
 
-  // Generate boundary path for marching ants
-  const path = new Path2D();
-  
-  // Horizontal edges
-  for (let y = 0; y <= h; y++) {
-    let startX = -1;
-    for (let x = 0; x < w; x++) {
-      const idx = y * w + x;
-      const aboveIdx = (y - 1) * w + x;
-      
-      const current = (y < h) ? selectionMask[idx] : 0;
-      const above = (y > 0) ? selectionMask[aboveIdx] : 0;
-      
-      if (current !== above) {
-        if (startX === -1) startX = x;
-      } else {
-        if (startX !== -1) {
-          path.moveTo(startX, y);
-          path.lineTo(x, y);
-          startX = -1;
-        }
-      }
-    }
-    if (startX !== -1) {
-      path.moveTo(startX, y);
-      path.lineTo(w, y);
-    }
-  }
+  const path = createPathFromMask(selectionMask, w, h, 1);
 
-  // Vertical edges
-  for (let x = 0; x <= w; x++) {
-    let startY = -1;
-    for (let y = 0; y < h; y++) {
-      const idx = y * w + x;
-      const leftIdx = y * w + (x - 1);
-      
-      const current = (x < w) ? selectionMask[idx] : 0;
-      const left = (x > 0) ? selectionMask[leftIdx] : 0;
-      
-      if (current !== left) {
-        if (startY === -1) startY = y;
-      } else {
-        if (startY !== -1) {
-          path.moveTo(x, startY);
-          path.lineTo(x, y);
-          startY = -1;
-        }
-      }
-    }
-    if (startY !== -1) {
-      path.moveTo(x, startY);
-      path.lineTo(x, h);
-    }
-  }
-
-  state.selection = {
+  const newSelection = {
     type: 'mask',
     canvas: maskCanvas,
     path: path
   };
+
+  state.selection = combineSelections(state.selection, newSelection, state.selectionOperation, w, h);
   
   animateMarchingAnts();
   saveHistory();
 }
 
-function drawSelectionRect(x1, y1, x2, y2) {
-  clearSelection();
-  const z = state.zoom;
-  const lineWidth = 1;
-  const dash = [4, 4];
-  const offset = Date.now() / 50;
-  
-  const x = Math.min(x1, x2) * z;
-  const y = Math.min(y1, y2) * z;
-  const w = Math.abs(x2 - x1) * z;
-  const h = Math.abs(y2 - y1) * z;
-  
-  state.selectionCtx.lineWidth = lineWidth;
-  state.selectionCtx.setLineDash(dash);
-  
-  state.selectionCtx.strokeStyle = '#FFFFFF';
-  state.selectionCtx.lineDashOffset = offset;
-  state.selectionCtx.strokeRect(x, y, w, h);
-  
-  state.selectionCtx.strokeStyle = '#000000';
-  state.selectionCtx.lineDashOffset = offset + 4;
-  state.selectionCtx.strokeRect(x, y, w, h);
-  
-  requestAnimationFrame(() => {
-    if (state.isDrawing && state.currentTool === 'select') {
-      drawSelectionRect(x1, y1, x2, y2);
-    }
-  });
-}
-
 function finalizeRectSelection(x1, y1, x2, y2) {
-  state.selection = {
+  const newSelection = {
     type: 'rect',
     x: Math.min(x1, x2),
     y: Math.min(y1, y2),
     width: Math.abs(x2 - x1),
     height: Math.abs(y2 - y1)
   };
-      saveHistory();
+
+  state.selection = combineSelections(state.selection, newSelection, state.selectionOperation, state.canvas.width, state.canvas.height);
+  saveHistory();
   animateMarchingAnts();
-}
-
-function drawLassoPath(currentX, currentY) {
-  if (state.selection) return;
-
-  if (state.isDrawing && state.currentTool === 'lasso' && state.toolSettings.lasso.type !== 'polygonal') {
-    requestAnimationFrame(() => {
-      if (state.isDrawing) drawLassoPath();
-    });
-  }
-
-  clearSelection();
-  if (state.lassoPoints.length === 0) return;
-  if (state.toolSettings.lasso.type !== 'polygonal' && state.lassoPoints.length < 2 && currentX === undefined) return;
-
-  const ctx = state.selectionCtx;
-  const z = state.zoom;
-  const lineWidth = 1;
-  const dash = [4, 4];
-  const offset = Date.now() / 50;
-
-  ctx.lineWidth = lineWidth;
-  ctx.setLineDash(dash);
-  
-  ctx.beginPath();
-  ctx.moveTo(state.lassoPoints[0].x * z, state.lassoPoints[0].y * z);
-  for (let i = 1; i < state.lassoPoints.length; i++) {
-    ctx.lineTo(state.lassoPoints[i].x * z, state.lassoPoints[i].y * z);
-  }
-  
-  if (currentX !== undefined) {
-    ctx.lineTo(currentX * z, currentY * z);
-  }
-  
-  ctx.strokeStyle = '#FFFFFF';
-  ctx.lineDashOffset = offset;
-  ctx.stroke();
-  
-  ctx.strokeStyle = '#000000';
-  ctx.lineDashOffset = offset + 4;
-  ctx.stroke();
-  
-  if (state.toolSettings.lasso.type === 'polygonal') {
-      const squareSize = 6;
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 1;
-      
-      for (const p of state.lassoPoints) {
-          ctx.fillRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
-          ctx.strokeRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
-      }
-      
-      if (currentX !== undefined) {
-          ctx.fillRect(currentX * z - squareSize/2, currentY * z - squareSize/2, squareSize, squareSize);
-          ctx.strokeRect(currentX * z - squareSize/2, currentY * z - squareSize/2, squareSize, squareSize);
-      }
-  }
 }
 
 function finalizeLassoSelection() {
-      if (state.lassoPoints.length < 3) return;
-  state.selection = {
+  if (state.lassoPoints.length < 3) return;
+  const newSelection = {
     type: 'lasso',
     points: [...state.lassoPoints]
   };
-      if (state.toolSettings.lasso.type !== 'polygonal') {
-          state.lassoPoints = []; 
-      }
-      saveHistory();
+
+  state.selection = combineSelections(state.selection, newSelection, state.selectionOperation, state.canvas.width, state.canvas.height);
+
+  state.polygonalLassoClosed = true;
+  saveHistory();
   animateMarchingAnts();
 }
 
-// function animateMarchingAnts() {
-//   if (!state.selection) return;
-//   if (state.selection.type === 'lasso' && (!state.selection.points || state.selection.points.length < 3)) return;
-//   state.selectionCtx.clearRect(0, 0, state.selectionCanvas.width, state.selectionCanvas.height);
-  
-//   const z = state.zoom;
-//   const lineWidth = 1;
-//   const dash = [4, 4];
-//   const offset = Date.now() / 50;
-  
-//   state.selectionCtx.lineWidth = lineWidth;
-//   state.selectionCtx.setLineDash(dash);
-  
-//   // White
-//   state.selectionCtx.strokeStyle = '#FFFFFF';
-//   state.selectionCtx.lineDashOffset = offset;
-  
-//   if (state.selection.type === 'rect') {
-//     state.selectionCtx.strokeRect(state.selection.x * z, state.selection.y * z, state.selection.width * z, state.selection.height * z);
-//   } else if (state.selection.type === 'lasso') {
-//     state.selectionCtx.beginPath();
-//     state.selectionCtx.moveTo(state.selection.points[0].x * z, state.selection.points[0].y * z);
-//     for (let i = 1; i < state.selection.points.length; i++) {
-//       state.selectionCtx.lineTo(state.selection.points[i].x * z, state.selection.points[i].y * z);
-//     }
-//     state.selectionCtx.closePath();
-//     state.selectionCtx.stroke();
-//   }
-  
-//   // Black
-//   state.selectionCtx.strokeStyle = '#000000';
-//   state.selectionCtx.lineDashOffset = offset + 4;
-  
-//   if (state.selection.type === 'rect') {
-//     state.selectionCtx.strokeRect(state.selection.x * z, state.selection.y * z, state.selection.width * z, state.selection.height * z);
-//   } else if (state.selection.type === 'lasso') {
-//     state.selectionCtx.stroke();
-//   }
-
-//   if (state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0) {
-//       const squareSize = 6;
-//       state.selectionCtx.setLineDash([]);
-//       state.selectionCtx.fillStyle = '#FFFFFF';
-//       state.selectionCtx.strokeStyle = '#000000';
-//       state.selectionCtx.lineWidth = 1;
-      
-//       for (const p of state.lassoPoints) {
-//           state.selectionCtx.fillRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
-//           state.selectionCtx.strokeRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
-//       }
-//   }
-  
-//   requestAnimationFrame(animateMarchingAnts);
-// }
-
 function animateMarchingAnts() {
-  if (!state.selection) return;
-  if (!state.selection) {
+  state.isAnimatingSelection = true;
+  if (!state.selection && !state.selectionDraft && state.lassoPoints.length === 0) {
     clearSelection();
+    state.isAnimatingSelection = false;
     return;
   }
 
@@ -2771,32 +2655,66 @@ function animateMarchingAnts() {
     state.selectionCtx.stroke(path);
   };
 
-  if (state.selection.type === 'mask') {
-    if (state.selection.path) {
-      state.selectionCtx.save();
-      state.selectionCtx.scale(z, z);
-      state.selectionCtx.lineWidth = 1 / z;
-      state.selectionCtx.setLineDash(dash.map(d => d / z));
-      state.selectionCtx.strokeStyle = '#FFFFFF';
-      state.selectionCtx.lineDashOffset = offset / z;
-      state.selectionCtx.stroke(state.selection.path);
-      state.selectionCtx.strokeStyle = '#000000';
-      state.selectionCtx.lineDashOffset = (offset + 4) / z;
-      state.selectionCtx.stroke(state.selection.path);
-      state.selectionCtx.restore();
-    }
-  } else {
-    const path = new Path2D();
-    if (state.selection.type === 'rect') {
-      path.rect(state.selection.x * z, state.selection.y * z, state.selection.width * z, state.selection.height * z);
-    } else if (state.selection.type === 'lasso' && state.selection.points.length > 0) {
-      path.moveTo(state.selection.points[0].x * z, state.selection.points[0].y * z);
-      for (let i = 1; i < state.selection.points.length; i++) {
-        path.lineTo(state.selection.points[i].x * z, state.selection.points[i].y * z);
+  const drawSelection = (sel) => {
+    if (!sel) return;
+    if (sel.type === 'mask') {
+      if (sel.path) {
+        state.selectionCtx.save();
+        state.selectionCtx.scale(z, z);
+        state.selectionCtx.lineWidth = 1 / z;
+        state.selectionCtx.setLineDash(dash.map(d => d / z));
+        state.selectionCtx.strokeStyle = '#FFFFFF';
+        state.selectionCtx.lineDashOffset = offset / z;
+        state.selectionCtx.stroke(sel.path);
+        state.selectionCtx.strokeStyle = '#000000';
+        state.selectionCtx.lineDashOffset = (offset + 4) / z;
+        state.selectionCtx.stroke(sel.path);
+        state.selectionCtx.restore();
       }
+    } else {
+      const path = new Path2D();
+      if (sel.type === 'rect') {
+        path.rect(sel.x * z, sel.y * z, sel.width * z, sel.height * z);
+      } else if (sel.type === 'lasso' && sel.points.length > 0) {
+        path.moveTo(sel.points[0].x * z, sel.points[0].y * z);
+        for (let i = 1; i < sel.points.length; i++) {
+          path.lineTo(sel.points[i].x * z, sel.points[i].y * z);
+        }
+        if (state.toolSettings.lasso.type !== 'polygonal' || sel === state.selection) path.closePath();
+      }
+      drawAnts(path);
+    }
+  };
+
+  drawSelection(state.selection);
+  drawSelection(state.selectionDraft);
+
+  // Special handling for polygonal lasso rubber band
+  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0) {
+    const path = new Path2D();
+    path.moveTo(state.lassoPoints[0].x * z, state.lassoPoints[0].y * z);
+    for (let i = 1; i < state.lassoPoints.length; i++) {
+      path.lineTo(state.lassoPoints[i].x * z, state.lassoPoints[i].y * z);
+    }
+    
+    if (!state.polygonalLassoClosed && state.lastX !== undefined && state.lastY !== undefined) {
+      path.lineTo(state.lastX * z, state.lastY * z);
+    }
+    if (state.polygonalLassoClosed) {
       path.closePath();
     }
     drawAnts(path);
+
+    const squareSize = 6;
+    state.selectionCtx.setLineDash([]);
+    state.selectionCtx.fillStyle = '#FFFFFF';
+    state.selectionCtx.strokeStyle = '#000000';
+    state.selectionCtx.lineWidth = 1;
+    
+    for (const p of state.lassoPoints) {
+        state.selectionCtx.fillRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
+        state.selectionCtx.strokeRect(p.x * z - squareSize/2, p.y * z - squareSize/2, squareSize, squareSize);
+    }
   }
 
   if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0) {
@@ -2818,6 +2736,8 @@ function animateMarchingAnts() {
 function clearSelection() {
   state.selectionCtx.clearRect(0, 0, state.selectionCanvas.width, state.selectionCanvas.height);
   state.selection = null;
+  state.selectionDraft = null;
+  state.polygonalLassoClosed = false;
 }
 
 function deleteSelection() {
@@ -2825,6 +2745,7 @@ function deleteSelection() {
   
   const layer = getActiveLayer();
   if (!layer || layer.type === 'group') return;
+
   const ctx = layer.canvas.getContext('2d');
   
   ctx.globalCompositeOperation = 'destination-out';
