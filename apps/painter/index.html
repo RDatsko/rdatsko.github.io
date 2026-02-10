@@ -1593,7 +1593,7 @@ main {
             <div id="settings-brush" class="tool-settings active">
               <div class="slider-group">
                 <div class="slider-label"><span>Size</span><span id="val-brush-size">10</span></div>
-                <input type="range" class="slider" min="1" max="100" value="10" oninput="updateToolSetting('brush', 'size', this.value)">
+                <input type="range" class="slider" min="1" max="250" value="10" oninput="updateToolSetting('brush', 'size', this.value)">
               </div>
               <div class="slider-group">
                 <div class="slider-label"><span>Opacity</span><span id="val-brush-opacity">100%</span></div>
@@ -1603,13 +1603,14 @@ main {
                 <div class="slider-label"><span>Hardness</span><span id="val-brush-hardness">100%</span></div>
                 <input type="range" class="slider" min="0" max="100" value="100" oninput="updateToolSetting('brush', 'hardness', this.value)">
               </div>
+              <div>Brush Style, [ round, square], size, hardness, step, density, thichness, rotation, opacity, [blend mode: Normal, Darken, Lighten, Hue, Saturation, Color, Luminance, Multiply, Screen, Disolve, Overlay, Hard Light, SoftLight, Differencfe, Dodge, Burn, Exclusion, Paint Behind ] </div>
             </div>
 
             <!-- Eraser Settings -->
             <div id="settings-eraser" class="tool-settings">
               <div class="slider-group">
                 <div class="slider-label"><span>Size</span><span id="val-eraser-size">20</span></div>
-                <input type="range" class="slider" min="1" max="100" value="20" oninput="updateToolSetting('eraser', 'size', this.value)">
+                <input type="range" class="slider" min="1" max="250" value="20" oninput="updateToolSetting('eraser', 'size', this.value)">
               </div>
               <div class="slider-group">
                 <div class="slider-label"><span>Opacity</span><span id="val-eraser-opacity">100%</span></div>
@@ -1619,6 +1620,7 @@ main {
                 <div class="slider-label"><span>Hardness</span><span id="val-eraser-hardness">100%</span></div>
                 <input type="range" class="slider" min="0" max="100" value="100" oninput="updateToolSetting('eraser', 'hardness', this.value)">
               </div>
+              <div>Brush Style, [round, square], Size, Hardness, Step, Density, thichness, Rotation, Opacity, Smart Edge</div>
             </div>
 
             <!-- Fill Settings -->
@@ -1654,6 +1656,7 @@ main {
                     <div onclick="selectFont('Impact')" style="font-family: Impact">Impact</div>
                   </div>
                 </div>
+                <div>Font, Size, Units [pt, px], Bold, Italic, Underline, Strikeout, Superscript, Subscript, Font Color, Allignment: Left, Center, Right, Force Justify, Justify, Directions [,,], Anti-alias [Off, Sharp, Smooth], Stroke Width, Stroke Color, More: [line, join, miter, leading, offset, kerning, tracking]</div>
               </div>
               <div class="slider-group">
                 <div class="slider-label"><span>Size</span><span id="val-text-size">24</span></div>
@@ -1677,14 +1680,21 @@ main {
                 <div class="slider-label"><span>Line Width</span><span id="val-shape-lineWidth">5</span></div>
                 <input type="range" class="slider" min="1" max="50" value="5" oninput="updateToolSetting('shape', 'lineWidth', this.value)">
               </div>
+              <div>[] Show Nodes, [] Create On Vector, Horizonal Radius, Verical Radius, Left, Top, Width, Height | Line Style, Width, [] Anti-alias, Join [Miter, Round, Bevel], Miter Limit</div>
             </div>
 
             <!-- Info only tools -->
-            <div id="settings-eyedropper" class="tool-settings"><div class="setting-info">Click canvas to pick a color</div></div>
-            <div id="settings-select" class="tool-settings"><div class="setting-info">Click and drag to select a rectangular area</div></div>
+            <div id="settings-eyedropper" class="tool-settings">
+              <div class="setting-info">Click canvas to pick a color</div>
+              <div>Color Profile [RGB, HSL, CMYK, LAB, WEB], Sampel Size [px x px]</div>
+            </div>
+            <div id="settings-select" class="tool-settings">
+              <div class="setting-info">Click and drag to select a rectangular area</div>
+              <div>Type, Mode [], Feather, Selection Type [Normal, Fixed Size, Fixed Ratio], Width, Height, Custom Selection</div>
+            </div>
             <div id="settings-magic-wand" class="tool-settings">
               <div class="slider-group">
-                <div class="slider-label"><span>Mode</span></div>
+                <div class="slider-label"><span>Match Mode</span></div>
                 <select class="tool-select" onchange="updateToolSetting('magic-wand', 'mode', this.value)">
                   <option value="rgb">RGB</option>
                   <option value="color">Color</option>
@@ -1694,6 +1704,7 @@ main {
                   <option value="all-opaque">All Opaque</option>
                   <option value="opacity">Opacity</option>
                 </select>
+                <div>Tolerance, Contiguous, Feather, [] Anti-alias [inside, outside]</div>
               </div>
               <div class="slider-group">
                 <div class="slider-label"><span>Tolerance</span><span id="val-magic-wand-tolerance">32</span></div>
@@ -1710,6 +1721,7 @@ main {
                 </select>
               </div>
               <div class="setting-info" id="lasso-info">Click and drag to draw selection</div>
+              <div>Type, Mode [Replace, Add, Remove], Feather, Range, Smoothing, [] Anti-alias</div>
             </div>
             <div id="settings-move" class="tool-settings"><div class="setting-info">Click and drag to move layer</div></div>
 
@@ -1949,6 +1961,18 @@ function createLayerCanvas() {
 }
 
 function selectTool(tool) {
+  const sidebar = document.querySelector('.sidebar');
+  if (state.currentTool === tool) {
+    if (sidebar) {
+      sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+    }
+    return;
+  }
+  
+  if (sidebar) {
+    sidebar.style.display = 'flex';
+  }
+
   state.currentTool = tool;
   document.querySelectorAll('.tool-button').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tool === tool);
