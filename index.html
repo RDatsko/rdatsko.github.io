@@ -5,27 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/assets/layout/css/cosmuic.css">
 <link rel="stylesheet" href="/assets/layout/css/styles.css">
-<title>Mystic Web: Home Page</title>
+<script src="/assets/layout/layout.js"></script>
+<title>Mystic's Web: Home</title>
 </head>
 <body>
 
-<header>
-<iframe src="/assets/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</header>
+<header></header>
 
 <main>
-    <h3><b>Hello World!</b></h3>
-    <p>
-        I'm a person who likes to make things and I have a keen interest in web design.
+  <div style="position: relative;">
+    <div style="position: absolute; display: inline-block; top: 50px; width: 49%;">
+      <h1><b>Hello World!</b></h1>
+      <p>
+        Welcome to my little section of the world wide web!
+      </p>
+      <p class="indent">
+        I'm a person who likes to make things and I have experimented with many things from microcontrollers to builiding full fledged gaming PCs.
+      </p>
+      <p class="indent">
+        I have a keen interest in web design.
         This is a site mostly for my reference, but available for anyone to use and also display some of my projects.
         This site uses my own custom responsive CSS library which I call COSMUIC, which is designed to simplify the creation of pages without the need for multiple classes.
         Please enjoy, and I hope that this may help you out find what you are looking for.
-    </p>
+      </p>
+    </div>
+    <div style="position: absolute; right: 0; display: inline-block; width: 49%;">
+      <img src="/assets/images/it-man.png" style="  max-width: 100%; max-height: calc(100vh - 64px); width: auto; height: auto; display: block; margin: auto;">
+    </div>
+  </div>
 </main>
 
-<footer>
-<iframe src="/assets/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</footer>
+<footer></footer>
 
 </body>
 </html>
