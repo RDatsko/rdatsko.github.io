@@ -5,30 +5,273 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/assets/layout/css/cosmuic.css">
 <link rel="stylesheet" href="/assets/layout/css/styles.css">
-<title>Mystic Web: Web Apps</title>
+<script src="/assets/layout/layout.js"></script>
+<title>Mystic's Web: Applications</title>
+<style>
+.app-containter {
+  height: auto;
+  padding: 20px;
+  border: 1px solid #f4f4f4;
+  border-radius: 15px;
+  box-shadow: 2px 2px 40px -12px #999;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 3rem;
+}
 
+.hero-container {
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto 3rem;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+/* App Icon in Hero */
+.app-icon {
+  width: 180px;
+  height: 180px;
+  border-radius: 40px;
+  background: #1a1a1a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  color: #5eb3e4;
+  font-weight: bold;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.app-icon svg {
+  width: 140px;
+  height: 140px;
+}
+
+.app-info {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 0;
+  height: 100%;
+}
+
+.app-info h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.app-info h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  font-weight: 400;
+  line-height: 2.5rem;
+  margin: 0;
+}
+
+.app-info i {
+  display: block;
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.app-containter hr {
+  border: 1px solid #cccccc;
+  height: 1px !important;
+}
+
+.launch {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  position: absolute;
+  bottom: 0;
+  gap: 25px;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+  }
+
+  .hero-container {
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+  }
+
+  .app-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 27px;
+    font-size: 54px;
+  }
+
+  .app-info h1 {
+    font-size: 28px;
+  }
+
+  .app-subtitle {
+    font-size: 17px;
+  }
+}
+
+/* Screenshots */
+.screenshots {
+  margin-bottom: 40px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.screenshots-container {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.ss-phone {
+  flex-shrink: 0;
+  width: 230px;
+  height: 480px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.ss-pc {
+  flex-shrink: 0;
+  width: 313px;
+  height: 195px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+</style>
 </head>
 <body>
 
-<header>
-<iframe src="/assets/layout/header.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</header>
+<header></header>
 
 <main>
-  <h3><b>HTML Web Apps</b></h3>
-  <p>
-    <ul>
-      <li><a href="./zipsite/">ZIPSite Virtual Serveer</a></li>
-      <li><a href="./painter/">Painter</a></li>
-      <li><a href="./webdesign/">Web Admin Panel</a></li>
-      <li><a href="./model-poser/">Model Posing Studio</a></li>
-    </ul>
+  <h1>Applications</h1>
+  <hr class="br3">
+  
+  <p class="indent">
+    Those who know me know that I like to make things.
+    I find making website and web apps are something I both enjoy and find to be useful.
+    I'm by no means, a person who can program well, but I do have basic knowledge of web baaed scripting.
+    Using what I do know along with some help of AI coding, I'm in the process of creating some things which I hope others will find useful as well.
   </p>
+  
+  <p class="indent">
+    These are some webapps that I've started work on which are still mostly a work in progress. 
+  </p>
+  <hr class="br5">
+  
+  <div class="container">
+
+      <div class="app-containter">
+        <div class="hero-container">
+          <div class="app-icon">
+            <svg version="1.1" class="appicon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="20px" height="20px" fill="#4298b8" viewBox="796 796 200 200" enable-background="new 796 796 200 200" xml:space="preserve"><g><g><path d="M976.83,857.4l-56.943-56.941c-2.873-2.875-6.694-4.458-10.76-4.458H825.93c-8.393,0-15.218,6.828-15.218,15.222v169.56 c0,8.393,6.825,15.219,15.218,15.219H966.07c8.39,0,15.218-6.826,15.218-15.219V868.162 C981.288,864.099,979.706,860.275,976.83,857.4z M969.676,980.781c0,1.989-1.616,3.609-3.605,3.609h-140.14 c-1.988,0-3.604-1.62-3.604-3.609V811.22c0-1.988,1.616-3.605,3.604-3.605h79.41c2.174,0,3.936,1.762,3.936,3.936v42.937 c0,7.25,5.877,13.126,13.123,13.126h43.343c1.044,0,2.045,0.415,2.783,1.153c0.738,0.738,1.153,1.739,1.153,2.783L969.676,980.781 z"></path></g><g><path d="M909.442,946.483l-10.948-41.951c-2.142-8.205-9.554-13.931-18.034-13.931h-4.952h-4.952 c-8.48,0-15.893,5.726-18.034,13.931l-10.947,41.951c-1.458,5.586-0.244,11.532,3.284,16.101c3.53,4.568,8.977,7.244,14.75,7.244 h15.899h15.9c5.772,0,11.219-2.676,14.749-7.244C909.686,958.016,910.899,952.069,909.442,946.483z M887.747,958.91H863.27 c-5.004,0-9.062-4.057-9.062-9.062s4.058-9.062,9.062-9.062h24.478c5.005,0,9.062,4.057,9.062,9.062 S892.752,958.91,887.747,958.91z"></path></g><g><path d="M888.548,884.37h-26.08c-3.296,0-5.967-2.671-5.967-5.967s2.671-5.967,5.967-5.967h26.08c3.296,0,5.968,2.671,5.968,5.967 S891.844,884.37,888.548,884.37z"></path></g><g><path d="M888.548,864.501h-26.08c-3.296,0-5.967-2.671-5.967-5.967c0-3.295,2.671-5.967,5.967-5.967h26.08 c3.296,0,5.968,2.671,5.968,5.967C894.516,861.83,891.844,864.501,888.548,864.501z"></path></g><g><path d="M888.548,844.632h-26.08c-3.296,0-5.967-2.671-5.967-5.967s2.671-5.967,5.967-5.967h26.08 c3.296,0,5.968,2.671,5.968,5.967S891.844,844.632,888.548,844.632z"></path></g><g><path d="M888.548,825.226h-26.08c-3.296,0-5.967-2.671-5.967-5.967c0-3.295,2.671-5.967,5.967-5.967h26.08 c3.296,0,5.968,2.671,5.968,5.967C894.516,822.555,891.844,825.226,888.548,825.226z"></path></g></g></svg>
+          </div>
+          <div class="app-info">
+            <h1>ZIPSite</h1>
+            <h2>VS Code inspired editor for web coding.
+            </h2>
+            <span class="launch">
+              <a class="button" href="/apps/zipsite/" target="_blank">Open</a>
+              <i>* Work in Progress</i>
+            </span>
+          </div>
+        </div>
+        <hr>
+        <div class="screenshots">
+            <div class="screenshots-container">
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+            </div>
+        </div>
+        <div>
+            VS Code style UI for web design using a virtual web server file system using a ZIP file.
+            Has minimal support for very basic PHP.
+        </div>
+      </div>
+
+      <div class="app-containter">
+        <div class="hero-container">
+          <div class="app-icon">
+            <svg class="appicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
+          </div>
+          <div class="app-info">
+            <h1>Painter</h1>
+            <h2>Web based image editor</h2>
+            <span class="launch">
+              <a class="button" href="/apps/painter/" target="_blank">Open</a>
+              <i>* Work in Progress</i>
+            </span>
+          </div>
+        </div>
+        <hr>
+        <div class="screenshots">
+            <div class="screenshots-container">
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+            </div>
+        </div>
+        <div>
+          A simmple web image editor.
+        </div>
+      </div>
+
+      <div class="app-containter">
+        <div class="hero-container">
+          <div class="app-icon">
+            <svg class="appicon" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M127.8877,84a36,36,0,1,0-36-36A36.04062,36.04062,0,0,0,127.8877,84Zm0-48a12,12,0,1,1-12,12A12.01344,12.01344,0,0,1,127.8877,36ZM234.29,138.17383A11.99491,11.99491,0,0,1,217.82617,142.29C217.5,142.09668,185.4541,123.37305,140,120.407v27.03015l60.96875,68.59015a12.00007,12.00007,0,0,1-17.9375,15.94532L128,170.0625,72.96875,231.97266a12.00007,12.00007,0,0,1-17.9375-15.94532L116,147.43719V120.40234C70.2832,123.35205,38.51611,142.0849,38.17383,142.29A12,12,0,1,1,25.82617,121.71C27.57568,120.66016,69.35059,96,128,96s100.42432,24.66016,102.17383,25.71A12.00021,12.00021,0,0,1,234.29,138.17383Z"/></svg>
+          </div>
+          <div class="app-info">
+            <h1>GLTF Model Poser</h1>
+            <h2>GLTF Model Viewer</h2>
+            <span class="launch">
+              <a class="button" href="/apps/model-poser/" target="_blank">Open</a>
+              <i>* Work in Progress</i>
+            </span>
+          </div>
+        </div>
+        <hr>
+        <div class="screenshots">
+            <div class="screenshots-container">
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+              <div class="ss-pc"></div>
+            </div>
+        </div>
+        <div>
+          Based on the idea of XNA Poser Studio, this allows you to open and modify the poses of XPS ascii files and GLTF files.
+        </div>
+      </div>
+  </div>
+
+  <a href="./webdesign/">Web Admin Panel</a>
+  
+  <br><br>
+
 </main>
 
-<footer>
-<iframe src="/assets/layout/footer.html" onload="this.insertAdjacentHTML('afterend', (this.contentDocument.body||this.contentDocument).innerHTML);this.remove()"></iframe>
-</footer>
+<footer></footer>
 
 </body>
 </html>
+
+
