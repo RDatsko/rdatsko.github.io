@@ -1474,7 +1474,7 @@ main {
 <div id="app">
   <div class="mainmenu">
     <nav>
-      <svg class="appicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
+      <svg class="appicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="#3d2307" fill="#70430d" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path><circle stroke="#0000ff" cx="13.5" cy="6.5" r=".5"></circle><circle stroke="#ffffff" cx="17.5" cy="10.5" r=".5"></circle><circle stroke="#00ff00" cx="8.5" cy="7.5" r=".5"></circle><circle stroke="#ff0000" cx="6.5" cy="12.5" r=".5"></circle></svg>
       <div class="app-title">Painter</div>
       <hr>
       <menu class="menubar">
@@ -1926,10 +1926,15 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelector('.canvas-container').addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -10 : 10;
-    const newZoom = Math.max(10, Math.min(1000, (state.zoom * 100) + delta));
-    setZoom(newZoom);
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -10 : 10;
+      const newZoom = Math.max(10, Math.min(1000, (state.zoom * 100) + delta));
+      setZoom(newZoom);
+    } else if (e.shiftKey) {
+      e.preventDefault();
+      e.currentTarget.scrollLeft += (e.deltaY || e.deltaX);
+    }
   }, { passive: false });
 });
 
@@ -2013,8 +2018,8 @@ function handleMouseDown(e) {
       if (!isCanvas && e.button !== 0) return;
 
   const rect = state.canvas.getBoundingClientRect();
-  let x = (e.clientX - rect.left) / state.zoom;
-  let y = (e.clientY - rect.top) / state.zoom;
+  let x = Math.floor((e.clientX - rect.left) / state.zoom);
+  let y = Math.floor((e.clientY - rect.top) / state.zoom);
 
   // Clamp coordinates to canvas bounds
   x = Math.max(0, Math.min(state.canvas.width, x));
@@ -2052,8 +2057,8 @@ function handleMouseDown(e) {
   switch(state.currentTool) {
     case 'brush': drawBrush(x, y, e.button === 2); break;
     case 'eraser': drawEraser(x, y); break;
-    case 'fill': floodFill(Math.floor(x), Math.floor(y)); state.isDrawing = false; break;
-    case 'eyedropper': pickColor(Math.floor(x), Math.floor(y)); state.isDrawing = false; break;
+    case 'fill': floodFill(x, y); state.isDrawing = false; break;
+    case 'eyedropper': pickColor(x, y); state.isDrawing = false; break;
     case 'select': 
       if (state.selectionOperation === 'replace') clearSelection();
       state.selectionStart = { x, y };
@@ -2061,7 +2066,7 @@ function handleMouseDown(e) {
       if (!state.isAnimatingSelection) animateMarchingAnts();
       break;
     case 'magic-wand':
-      magicWandSelect(Math.floor(x), Math.floor(y));
+      magicWandSelect(x, y);
       state.isDrawing = false;
       break;
     case 'lasso': 
@@ -2099,14 +2104,14 @@ function handleMouseDown(e) {
 
 function handleMouseMove(e) {
   const rect = state.canvas.getBoundingClientRect();
-  let x = (e.clientX - rect.left) / state.zoom;
-  let y = (e.clientY - rect.top) / state.zoom;
+  let x = Math.floor((e.clientX - rect.left) / state.zoom);
+  let y = Math.floor((e.clientY - rect.top) / state.zoom);
 
   // Clamp coordinates to canvas bounds
   x = Math.max(0, Math.min(state.canvas.width, x));
   y = Math.max(0, Math.min(state.canvas.height, y));
   
-  document.getElementById('statusCoords').textContent = `X: ${Math.floor(x)}, Y: ${Math.floor(y)}`;
+  document.getElementById('statusCoords').textContent = `X: ${x}, Y: ${y}`;
 
   if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal') {
     state.lastX = x;
@@ -2198,8 +2203,8 @@ function stopDrawing(e) {
     // Handle all other drawing tools
   if (state.isDrawing) {
     const rect = state.canvas.getBoundingClientRect();
-    let x = (e.clientX - rect.left) / state.zoom;
-    let y = (e.clientY - rect.top) / state.zoom;
+    let x = Math.floor((e.clientX - rect.left) / state.zoom);
+    let y = Math.floor((e.clientY - rect.top) / state.zoom);
     x = Math.max(0, Math.min(state.canvas.width, x));
     y = Math.max(0, Math.min(state.canvas.height, y));
 
