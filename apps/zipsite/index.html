@@ -4415,6 +4415,39 @@ if (isset($add_jsbottom) && is_array($add_jsbottom)) {
           const resolvedFile = this.resolveHtaccess(virtualPath);
 
           if (resolvedFile) {
+            // Handle inner iframe navigation request
+            if (e.data.iframeId) {
+              const fileData = this.files.get(resolvedFile);
+              if (fileData) {
+                const decoder = new TextDecoder();
+                const htmlContent = decoder.decode(fileData);
+                let processedHtmlPromise;
+
+                if (resolvedFile.toLowerCase().endsWith('.php')) {
+                  const transpiledFunctionString = this.phpTranspiler.transpile(htmlContent, resolvedFile, virtualPath, queryPart);
+                  try {
+                    const transpiledFunction = new Function('return ' + transpiledFunctionString)();
+                    const phpGeneratedHtml = transpiledFunction(this.files);
+                    processedHtmlPromise = this.rewriteHtmlForIframe(phpGeneratedHtml, resolvedFile, queryPart);
+                  } catch (err) {
+                    console.error("PHP Error in inner frame", err);
+                    processedHtmlPromise = Promise.resolve(`<pre style="color:red">PHP Error: ${err.message}</pre>`);
+                  }
+                } else {
+                  processedHtmlPromise = this.rewriteHtmlForIframe(htmlContent, resolvedFile, queryPart);
+                }
+
+                processedHtmlPromise.then(html => {
+                  e.source.postMessage({
+                    type: 'ZIP_NAV_RESPONSE',
+                    html: html,
+                    iframeId: e.data.iframeId
+                  }, '*');
+                });
+              }
+              return;
+            }
+
             this.isVirtualNavigation = true;
             this.currentVirtualUri = virtualPath;
             this.currentQueryString = queryPart;
