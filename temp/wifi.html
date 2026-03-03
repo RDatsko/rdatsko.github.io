@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Join WiFi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 100px;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <title>Guest WiFi Access</title>
+  </head>
+  <body>
+    <h2>Welcome to Guest WiFi</h2>
 
-  <h2>Connect to Our WiFi</h2>
-  <button onclick="joinWifi()">Join Network</button>
+    <p>$base_grant_url$</p>
 
-  <script>
-    function joinWifi() {
-      window.location.href = "WIFI:T:WPA;S:YourNetworkName;P:YourPassword;;";
-    }
-  </script>
+    <form method="POST" action="$base_grant_url$">
+      <input type="hidden" name="node_mac" value="$node_mac$" />
+      <input type="hidden" name="client_mac" value="$client_mac$" />
+      <input type="hidden" name="client_ip" value="$client_ip$" />
+      <input type="hidden" name="continue_url" value="$user_continue_url$" />
 
-</body>
+      <!-- Hard-coded sponsor email -->
+      <input type="hidden" name="sponsor_email" value="ryan.datsko@aobajapan.jp" />
+
+      <label>Name:</label><br />
+      <input type="text" name="guest_name" required /><br /><br />
+
+      <label>Email:</label><br />
+      <input type="email" name="guest_email" required /><br /><br />
+
+      <button type="submit">Request Access</button>
+    </form>
+  </body>
 </html>
