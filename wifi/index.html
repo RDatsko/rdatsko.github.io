@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Guest WiFi Access</title>
+  </head>
+  <body>
+    <h2>Welcome to Guest WiFi</h2>
+
+    <p>$base_grant_url$</p>
+
+    <form method="POST" action="$base_grant_url$">
+      <input type="hidden" name="node_mac" value="$node_mac$" />
+      <input type="hidden" name="client_mac" value="$client_mac$" />
+      <input type="hidden" name="client_ip" value="$client_ip$" />
+      <input type="hidden" name="continue_url" value="$user_continue_url$" />
+
+      <!-- Hard-coded sponsor email -->
+      <input type="hidden" name="sponsor_email" value="itt@aobajapan.jp" />
+
+      <label>Name:</label><br />
+      <input type="text" name="guest_name" required /><br /><br />
+
+      <label>Email:</label><br />
+      <input type="email" name="guest_email" required /><br /><br />
+
+      <button type="submit">Request Access</button>
+    </form>
+  </body>
+</html>
