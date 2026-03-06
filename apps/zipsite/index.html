@@ -3681,6 +3681,7 @@ class VSCodeLikeEditor {
     this.zipFileName = null;
     this.lastBlobUrl = null;
     this.fileHandle = null; // Store file handle for direct saving
+    this.androidHasUri = false; // Track if Android SAF has a save URI
     this.currentVirtualUri = null;
     this.currentQueryString = null;
     this.isVirtualNavigation = false;
@@ -3697,6 +3698,43 @@ class VSCodeLikeEditor {
   }
 
   async triggerFileOpen() {
+    // Android SAF path
+    if (window.AndroidInterface && AndroidInterface.requestOpenFile) {
+      // Kotlin writes the file to a temp path then calls _onOpenFileReady with
+      // the file size. We read it back in 1MB chunks via readFileChunk() so
+      // no single bridge call carries more than ~1.3MB of base64.
+      window._onOpenFileReady = async (fileSize, mimeType, filename) => {
+        try {
+          const CHUNK = 1024 * 1024; // 1MB per call
+          const output = new Uint8Array(fileSize);
+          let offset = 0;
+          while (offset < fileSize) {
+            const len = Math.min(CHUNK, fileSize - offset);
+            const b64 = AndroidInterface.readFileChunk(offset, len);
+            if (!b64) throw new Error(`Empty chunk at offset ${offset}`);
+            const binary = atob(b64);
+            for (let i = 0; i < binary.length; i++) {
+              output[offset + i] = binary.charCodeAt(i);
+            }
+            offset += binary.length;
+          }
+          this.zipFileName = filename || 'project.zip';
+          this.androidHasUri = true;
+          await this.parseZip(output.buffer);
+          this.showNotification(`Successfully loaded ${this.files.size} files`, 'success');
+          this.displayFileTree();
+          document.getElementById('uploadSection').style.display = 'none';
+          document.getElementById('sidebarActions').style.display = 'flex';
+          document.getElementById('fileCount').innerHTML = `<span>📦</span><span>${this.zipFileName}</span>`;
+          document.title = `ZIPSite - ${this.zipFileName}`;
+        } catch (err) {
+          console.error('Failed to load ZIP from Android:', err);
+          this.showNotification(`Error loading ZIP: ${err.message}`, 'error');
+        }
+      };
+      AndroidInterface.requestOpenFile('application/zip');
+      return;
+    }
     // Try to use File System Access API first
     if ('showOpenFilePicker' in window) {
       try {
@@ -3732,6 +3770,7 @@ class VSCodeLikeEditor {
     this.currentTab = null;
     this.currentPreviewFile = null;
     this.fileHandle = null;
+    this.androidHasUri = false;
     this.zipFileName = 'untitled.zip';
 
     this.displayFileTree();
@@ -3757,6 +3796,7 @@ class VSCodeLikeEditor {
     this.currentTab = null;
     this.currentPreviewFile = null;
     this.fileHandle = null;
+    this.androidHasUri = false;
     this.zipFileName = 'php-project.zip';
 
     const encoder = new TextEncoder();
@@ -6472,14 +6512,13 @@ ins {
   }
 
   createDataUrl(data, mimeType) {
-    let base64 = '';
+    // Process in 64KB chunks to avoid call stack overflow on large files
     const bytes = new Uint8Array(data);
-    const len = bytes.byteLength;
-    
-    for (let i = 0; i < len; i++) {
-      base64 += String.fromCharCode(bytes[i]);
+    const chunkSize = 65536;
+    let base64 = '';
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      base64 += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
     }
-    
     return `data:${mimeType};base64,${btoa(base64)}`;
   }
 
@@ -6835,6 +6874,33 @@ ins {
         compression: compression,
         compressionOptions: { level: compression === 'DEFLATE' ? 6 : 0 }
       });
+
+      // Android SAF path
+      if (window.AndroidInterface) {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        if (this.androidHasUri && !saveAs) {
+          // Direct overwrite to existing SAF URI
+          AndroidInterface.saveToUri(base64);
+          this.showNotification(window.i18n.msgZipSaved, 'success');
+        } else {
+          // Save As — open native file picker
+          const filename = this.zipFileName || 'project.zip';
+          AndroidInterface.requestSaveAsNew(base64, 'application/zip', filename);
+          this.androidHasUri = true;
+          this.showNotification(window.i18n.msgZipSaved, 'success');
+        }
+
+        // Clear all dirty states
+        this.dirtyFiles.clear();
+        document.querySelectorAll('.tab.dirty').forEach(tab => tab.classList.remove('dirty'));
+        return;
+      }
       
       // Try to use fileHandle to overwrite the file directly
       if (this.fileHandle && !saveAs) {
