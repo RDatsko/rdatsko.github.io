@@ -5942,7 +5942,7 @@ async function loadFile(file, handle = null) {
       };
       fixGroupIds(layers, null);
 
-      createDocument(data.name || file.name.replace('.piff', ''), data.width, data.height, layers);
+      createDocument(file.name || data.name, data.width, data.height, layers);
       const doc = state.documents[state.activeDocIndex];
       doc.fileHandle = handle;
       doc.mimeType = 'application/x-piff';
@@ -8669,30 +8669,50 @@ async function openImage() {
   closeMainMenu();
 
   if (window.AndroidInterface && window.AndroidInterface.requestOpenFile) {
-    // Native SAF open — gets us a persistent URI we can save back to
+    // Chunked open — Kotlin writes the file to a temp path, then JS reads
+    // it back in 1MB slices via readFileChunk() so no large string ever
+    // crosses the bridge.
     await new Promise(resolve => {
-      window._onOpenFileComplete = async (dataUrl, mimeType, filename) => {
-        window._onOpenFileComplete = null;
+      window._onOpenFileReady = async (fileSize, mimeType, filename) => {
+        window._onOpenFileReady = null;
         window._onOpenFileCancelled = null;
-        // Convert the data URL back to a File object for loadFile()
-        const res = await fetch(dataUrl);
-        const blob = await res.blob();
-        const file = new File([blob], filename, { type: mimeType });
-        await loadFile(file, null);
-        // Mark the active doc as having a native URI already
-        const doc = state.documents[state.activeDocIndex];
-        if (doc) {
-          doc.androidHasUri = true;
-          doc.androidMime = mimeType;
-          doc.androidFilename = filename;
-          doc.dirty = false;
-          updateTabs();
-          updateTitle();
+        try {
+          const CHUNK = 1024 * 1024;
+          const output = new Uint8Array(fileSize);
+          let offset = 0;
+          while (offset < fileSize) {
+            const len = Math.min(CHUNK, fileSize - offset);
+            const b64 = AndroidInterface.readFileChunk(offset, len);
+            if (!b64) throw new Error(`Empty chunk at offset ${offset}`);
+            const binary = atob(b64);
+            for (let i = 0; i < binary.length; i++) output[offset + i] = binary.charCodeAt(i);
+            offset += binary.length;
+          }
+          const blob = new Blob([output], { type: mimeType });
+          const file = new File([blob], filename, { type: mimeType });
+          await loadFile(file, null);
+          const doc = state.documents[state.activeDocIndex];
+          if (doc) {
+            doc.androidHasUri = true;
+            // Derive mime from filename — Android's content resolver often returns
+            // application/octet-stream or image/png for unknown extensions like .piff
+            doc.androidMime = filename.toLowerCase().endsWith('.piff') ? 'application/x-piff'
+              : filename.toLowerCase().endsWith('.jpg') || filename.toLowerCase().endsWith('.jpeg') ? 'image/jpeg'
+              : filename.toLowerCase().endsWith('.webp') ? 'image/webp'
+              : mimeType || 'image/png';
+            doc.androidFilename = filename;
+            doc.dirty = false;
+            updateTabs();
+            updateTitle();
+          }
+        } catch (err) {
+          console.error('Failed to load file from Android:', err);
+          showNotification('Error loading file: ' + err.message, 'error');
         }
         resolve();
       };
       window._onOpenFileCancelled = () => {
-        window._onOpenFileComplete = null;
+        window._onOpenFileReady = null;
         window._onOpenFileCancelled = null;
         resolve();
       };
@@ -8831,7 +8851,6 @@ async function getDataUrl(mime) {
       version: '1.0',
       width: doc.width,
       height: doc.height,
-      name: doc.name,
       layers: doc.layers.map(serializeLayerForPIFF)
     };
     const json = JSON.stringify(project);
@@ -8848,14 +8867,88 @@ async function getDataUrl(mime) {
   }
 }
 
+// Returns a Blob for the current doc in the given mime type.
+// Used by the Android chunked-save path to avoid building a base64 string.
+async function getBlob(mime) {
+  const doc = state.documents[state.activeDocIndex];
+  if (!doc) return null;
+  if (mime === 'application/x-piff') {
+    const project = {
+      version: '1.0',
+      width: doc.width,
+      height: doc.height,
+      layers: doc.layers.map(serializeLayerForPIFF)
+    };
+    const json = JSON.stringify(project);
+    return new Blob([json], { type: 'application/x-piff' });
+  } else {
+    return await new Promise(resolve => state.canvas.toBlob(resolve, mime));
+  }
+}
+
+// Send a Blob to Kotlin in 1MB chunks, then commit.
+// isNew=true  → Kotlin opens a CREATE_DOCUMENT picker for filename+folder.
+// isNew=false → Kotlin writes directly to the stored activeSaveUri.
+async function androidSendBlob(blob, mime, filename, isNew) {
+  const CHUNK = 1024 * 1024;
+  const buf = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  AndroidInterface.beginWrite();
+  for (let offset = 0; offset < bytes.length; offset += CHUNK) {
+    const slice = bytes.subarray(offset, offset + CHUNK);
+    const chunkSize = 65536;
+    let b64 = '';
+    for (let i = 0; i < slice.length; i += chunkSize) {
+      b64 += String.fromCharCode.apply(null, slice.subarray(i, i + chunkSize));
+    }
+    AndroidInterface.writeChunk(btoa(b64));
+  }
+  if (isNew) {
+    const savedFilename = await new Promise(resolve => {
+      window._onSaveAsComplete = (name) => {
+        window._onSaveAsComplete = null;
+        window._onSaveAsCancelled = null;
+        resolve(name);
+      };
+      window._onSaveAsCancelled = () => {
+        window._onSaveAsComplete = null;
+        window._onSaveAsCancelled = null;
+        resolve(null);
+      };
+      AndroidInterface.commitWriteNew(mime, filename);
+    });
+    // Update doc state after a successful Save As New
+    if (savedFilename !== null) {
+      const doc = state.documents[state.activeDocIndex];
+      if (doc) {
+        doc.androidHasUri = true;
+        doc.androidMime = mime;
+        doc.androidFilename = savedFilename || filename;
+        doc.name = doc.androidFilename;
+        doc.dirty = false;
+        updateTabs();
+        updateTitle();
+      }
+    }
+  } else {
+    AndroidInterface.commitWrite();
+  }
+}
+
 
 async function androidSaveExisting() {
-  // Called for Save — write to the URI already held by native side
+  // Called for Save — write to the URI already held by native side via chunks
   const doc = state.documents[state.activeDocIndex];
   if (!doc) return;
-  const dataUrl = await getDataUrl(doc.androidMime || 'image/png');
-  if (!dataUrl) return;
-  window.AndroidInterface.saveToUri(dataUrl);
+  // Prefer filename-derived mime over whatever Android reported (often wrong for .piff)
+  const fname = (doc.androidFilename || doc.name || '').toLowerCase();
+  const mime = fname.endsWith('.piff') ? 'application/x-piff'
+    : fname.endsWith('.jpg') || fname.endsWith('.jpeg') ? 'image/jpeg'
+    : fname.endsWith('.webp') ? 'image/webp'
+    : doc.mimeType || doc.androidMime || 'image/png';
+  const blob = await getBlob(mime);
+  if (!blob) return;
+  await androidSendBlob(blob, mime, doc.androidFilename || doc.name, false);
   doc.dirty = false;
   updateTabs();
   updateTitle();
@@ -8890,7 +8983,6 @@ async function saveCurrentDocument() {
          version: '1.0',
          width: doc.width,
          height: doc.height,
-         name: doc.name,
          layers: doc.layers.map(serializeLayerForPIFF)
        };
        const json = JSON.stringify(project);
@@ -8920,7 +9012,7 @@ async function saveAs(preferredType = null) {
   if (!doc) return;
 
   if (window.AndroidInterface && window.AndroidInterface.saveBlob) {
-    // Show format picker, then open native CREATE_DOCUMENT picker for filename + location
+    // Show format picker, then send the file in chunks via beginWrite/writeChunk/commitWriteNew
     await new Promise(resolve => {
       const baseName = (doc.name || 'image').replace(/\.[^/.]+$/, '');
       const formats = [
@@ -8931,7 +9023,7 @@ async function saveAs(preferredType = null) {
       ];
 
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:99999;';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:99999;pointer-events:all;touch-action:none;';
 
       const fmtHtml = formats.map((f, i) => `
         <label class="sa-fmt-opt" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 14px;border:1px solid #555;border-radius:4px;background:${i===0?'rgba(0,120,212,.3)':'transparent'};">
@@ -8972,32 +9064,14 @@ async function saveAs(preferredType = null) {
         const filename = baseName.endsWith(ext) ? baseName : baseName + ext;
         document.body.removeChild(overlay);
 
-        const dataUrl = await getDataUrl(mime);
-        if (!dataUrl) { resolve(); return; }
+        const blob = await getBlob(mime);
+        if (!blob) { resolve(); return; }
 
-        await new Promise(r => {
-          window._onSaveAsComplete = (savedFilename) => {
-            window._onSaveAsComplete = null;
-            window._onSaveAsCancelled = null;
-            doc.androidMime = mime;
-            doc.androidFilename = savedFilename || filename;
-            doc.androidHasUri = true;
-            doc.name = doc.androidFilename;
-            doc.dirty = false;
-            updateTabs();
-            updateTitle();
-            showNotification('File saved successfully');
-            r();
-          };
-          window._onSaveAsCancelled = () => {
-            window._onSaveAsComplete = null;
-            window._onSaveAsCancelled = null;
-            r();
-          };
-          // Always use CREATE_DOCUMENT — user can navigate anywhere and type the filename.
-          // Android will prompt to replace if they pick an existing name in the same folder.
-          window.AndroidInterface.requestSaveAsNew(mime, filename, dataUrl);
-        });
+        await androidSendBlob(blob, mime, filename, true);
+        // androidSendBlob handles all doc state updates (name, androidFilename,
+        // androidHasUri, dirty, updateTabs, updateTitle) inside its commitWriteNew
+        // promise, so nothing more to do here.
+        if (doc.androidHasUri) showNotification('File saved successfully');
         resolve();
       };
     });
