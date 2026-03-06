@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Painter%22,%22short_name%22:%22Painter%22}">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath stroke='%233d2307' fill='%2370430d' d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z'%3e%3c/path%3e%3ccircle stroke='%230000ff' cx='13.5' cy='6.5' r='.5'%3e%3c/circle%3e%3ccircle stroke='%23ffffff' cx='17.5' cy='10.5' r='.5'%3e%3c/circle%3e%3ccircle stroke='%2300ff00' cx='8.5' cy='7.5' r='.5'%3e%3c/circle%3e%3ccircle stroke='%23ff0000' cx='6.5' cy='12.5' r='.5'%3e%3c/circle%3e%3c/svg%3e">
 <title>Painter</title>
@@ -242,6 +242,10 @@ nav * {
   display: flex;
   flex: 0 0 auto;
   margin: 4px;
+}
+
+b#android-menu + nav {
+  margin-left: 48px; /* android */
 }
 
 nav {
@@ -865,7 +869,7 @@ main {
   background: var(--bg-secondary);
   border-left: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
 }
@@ -1718,6 +1722,44 @@ dialog::backdrop {
   from { transform: translateY(100px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.fab-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: var(--accent-blue);
+  color: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.fab-btn-half {
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fab-btn-half:active {
+  background: rgba(0,0,0,0.1);
+}
+.fab-btn-half svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+.fab-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,0.3);
+}
 </style>
 </head>
 <body>
@@ -1782,6 +1824,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="app">
   <div class="mainmenu">
+    <b id="android-menu"></b>
     <nav>
       <svg class="appicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="#3d2307" fill="#70430d" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path><circle stroke="#0000ff" cx="13.5" cy="6.5" r=".5"></circle><circle stroke="#ffffff" cx="17.5" cy="10.5" r=".5"></circle><circle stroke="#00ff00" cx="8.5" cy="7.5" r=".5"></circle><circle stroke="#ff0000" cx="6.5" cy="12.5" r=".5"></circle></svg>
       <div class="app-title">Painter</div>
@@ -2484,6 +2527,16 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 <div id="brushCursor"></div>
 
+<div id="fab-container" class="fab-container">
+  <button class="fab-btn-half" onclick="handleFabCancel()" title="Cancel (Esc)">
+    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+  <div class="fab-divider"></div>
+  <button class="fab-btn-half" onclick="handleFabConfirm()" title="Done (Enter)">
+    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  </button>
+</div>
+
 <!-- End of Application Window -->
 
 <input type="file" id="fileInput" accept="image/*,.piff" style="display: none;">
@@ -2656,6 +2709,7 @@ window.addEventListener('DOMContentLoaded', () => {
   
   // Close context menu on click
   document.addEventListener('click', (e) => {
+    if (e.target.closest('.fab-container')) return;
     const menu = document.getElementById('layerContextMenu');
     if (menu && menu.style.display === 'block') {
       menu.style.display = 'none';
@@ -2740,7 +2794,55 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     e.stopPropagation();
   });
+
+  // Only attach touch listeners on devices that actually support touch.
+  // This prevents the touch handlers from interfering with right-click on desktop.
+  if (window.matchMedia('(any-pointer: coarse)').matches || navigator.maxTouchPoints > 0) {
+    state.canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    state.canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    state.canvas.addEventListener('touchend',   onTouchEnd,   { passive: false });
+    state.canvas.addEventListener('touchcancel',onTouchEnd,   { passive: false });
+  }
 });
+
+function handleFabConfirm() {
+  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal') {
+    finalizeLassoSelection();
+  } else if (state.currentTool === 'pen') {
+    finalizePen();
+  }
+  updateFab();
+}
+
+function handleFabCancel() {
+  state.lassoPoints = [];
+  state.penPoints = [];
+  state.selectionDraft = null;
+  state.isDrawing = false;
+  state.polygonalLassoClosed = false;
+  renderCanvas();
+  updateFab();
+}
+
+function updateFab() {
+  const fab = document.getElementById('fab-container');
+  if (!fab) return;
+  
+  const isTouch = (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches);
+  if (!isTouch) {
+    fab.style.display = 'none';
+    return;
+  }
+  
+  let show = false;
+  if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0 && !state.polygonalLassoClosed) {
+    show = true;
+  } else if (state.currentTool === 'pen' && state.penPoints.length > 0) {
+    show = true;
+  }
+  
+  fab.style.display = show ? 'flex' : 'none';
+}
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
@@ -2781,10 +2883,6 @@ function selectTool(tool) {
     return;
   }
   
-  if (sidebar) {
-    sidebar.style.display = 'flex';
-  }
-
   if (state.currentTool !== tool) {
     updateRecentColorsList();
   }
@@ -2824,10 +2922,11 @@ function selectTool(tool) {
   if (settingsPanel) {
     settingsPanel.classList.add('active');
   }
+  updateFab();
 }
 
 function handleMouseDown(e) {
-      if (e.target.closest('.sidebar, .toolbar, .activity-bar, .title-bar, .status-bar, .tabs-bar, dialog, .mainmenu, .context-menu')) return;
+      if (e.target.closest('.sidebar, .toolbar, .activity-bar, .title-bar, .status-bar, .tabs-bar, dialog, .mainmenu, .context-menu, .fab-container')) return;
 
       const isCanvas = e.target === state.canvas;
       const isAllowedTool = ['select', 'lasso', 'move', 'shape', 'eyedropper', 'pen', 'node-select'].includes(state.currentTool);
@@ -3120,11 +3219,11 @@ function handleMouseDown(e) {
             state.isDrawing = false; 
         }
         break;
-        case 'shape': 
-          if (state.toolSettings.shape.createOnVector) getTargetVectorLayer(); // Ensure vector layer exists
-          state.lassoPoints = [];
-          state.selectionStart = { x, y }; 
-          break;
+    case 'shape': 
+        if (state.toolSettings.shape.createOnVector) getTargetVectorLayer(); // Ensure vector layer exists
+        state.lassoPoints = [];
+        state.selectionStart = { x, y }; 
+        break;
     case 'move': startMove(x, y); break;
     case 'pen':
       if (state.toolSettings.pen.type === 'freehand') {
@@ -3139,6 +3238,7 @@ function handleMouseDown(e) {
       }
       break;
   }
+  updateFab();
 }
 
 function handleMouseMove(e) {
@@ -3498,6 +3598,7 @@ function stopDrawing(e) {
       saveHistory();
       renderCanvas();
     }
+    updateFab();
   }
 }
 
@@ -3988,6 +4089,7 @@ function finalizeRectSelection(x1, y1, x2, y2) {
   state.selection = combineSelections(state.selection, newSelection, state.selectionOperation, state.canvas.width, state.canvas.height);
   saveHistory();
   animateMarchingAnts();
+  updateFab();
 }
 
 function finalizeLassoSelection() {
@@ -4002,6 +4104,7 @@ function finalizeLassoSelection() {
   state.polygonalLassoClosed = true;
   saveHistory();
   animateMarchingAnts();
+  updateFab();
 }
 
 function animateMarchingAnts() {
@@ -4155,6 +4258,7 @@ function clearSelection() {
   state.selectionDraft = null;
   state.polygonalLassoClosed = false;
   state.penPoints = [];
+  updateFab();
 }
 
 function selectAll() {
@@ -5809,6 +5913,7 @@ function restoreHistory() {
       if (state.selection) {
           animateMarchingAnts();
       }
+  updateFab();
 }
 
 document.getElementById('fileInput').addEventListener('change', async (e) => {
@@ -6288,22 +6393,9 @@ function initColorPicker() {
   };
 
   let isDraggingHue = false;
+  let isDraggingColor = false;
+
   hueCanvas.addEventListener('mousedown', (e) => { isDraggingHue = true; pickHue(e); });
-  svCanvas.addEventListener('mousedown', (e) => { 
-    isDraggingColor = true; 
-    const h = currentHue;
-    if (e.button === 2) {
-      setPickerTarget('background');
-    } else {
-      setPickerTarget('foreground');
-    }
-    currentHue = h;
-    state.drawSVBox(currentHue);
-    pickColorFromSV(e); 
-  });
-  svCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
-  window.addEventListener('mousemove', (e) => { if(isDraggingHue) pickHue(e); });
-  window.addEventListener('mouseup', () => { isDraggingHue = false; });
 
   const pickColorFromSV = (e) => {
     const rect = svCanvas.getBoundingClientRect();
@@ -6319,22 +6411,27 @@ function initColorPicker() {
     updateColorSelection(color, false);
   };
 
-  let isDraggingColor = false;
   svCanvas.addEventListener('mousedown', (e) => { 
     isDraggingColor = true; 
     const h = currentHue;
     if (e.button === 2) {
       setPickerTarget('background');
     } else {
-      setPickerTarget('foreground');
+      if (!state.colorPickerTarget) setPickerTarget('foreground');
     }
     currentHue = h;
     state.drawSVBox(currentHue);
     pickColorFromSV(e); 
   });
   svCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
-  window.addEventListener('mousemove', (e) => { if(isDraggingColor) pickColorFromSV(e); });
-  window.addEventListener('mouseup', () => { isDraggingColor = false; });
+  window.addEventListener('mousemove', (e) => { 
+    if(isDraggingHue) pickHue(e);
+    if(isDraggingColor) pickColorFromSV(e); 
+  });
+  window.addEventListener('mouseup', () => { 
+    isDraggingHue = false;
+    isDraggingColor = false; 
+  });
 }
 
 function updateColorSelection(color, updateSV = true) {
@@ -6559,6 +6656,20 @@ function setPickerTarget(target) {
 }
 
 function showColorPicker(target) {
+  const sidebar = document.querySelector('.sidebar');
+  const settingsPanel = document.getElementById('settings-color-picker');
+  const isSettingsActive = settingsPanel && settingsPanel.classList.contains('active');
+  const isSidebarVisible = sidebar && sidebar.style.display !== 'none';
+
+  if (state.colorPickerTarget === target && isSettingsActive && isSidebarVisible) {
+    if (sidebar) sidebar.style.display = 'none';
+    return;
+  }
+  
+  if (sidebar) {
+    sidebar.style.display = 'flex';
+  }
+
   setPickerTarget(target);
 
   // Initialize previews
@@ -6570,7 +6681,7 @@ function showColorPicker(target) {
   
   switchSidebarTab('settings');
   document.querySelectorAll('.tool-settings').forEach(el => el.classList.remove('active'));
-  document.getElementById('settings-color-picker').classList.add('active');
+  if (settingsPanel) settingsPanel.classList.add('active');
 }
 
 function deleteSelectedVectorObject() {
@@ -6616,6 +6727,7 @@ function handleKeyboard(e) {
       state.lassoPoints = [];
       state.penPoints = [];
       renderCanvas();
+      updateFab();
   }
 
   if (e.key === 'Tab') {
@@ -6715,7 +6827,8 @@ function handleKeyboard(e) {
     } else if (state.currentTool === 'lasso' && state.toolSettings.lasso.type === 'polygonal' && state.lassoPoints.length > 0) {
         e.preventDefault();
         state.lassoPoints.pop();
-        drawLassoPath(state.lastX, state.lastY);
+        // drawLassoPath(state.lastX, state.lastY); // Function missing in original code, relying on mousemove or next render
+        updateFab();
     } else if (state.selectedVectorIndices.length > 0) {
         e.preventDefault();
         deleteSelectedVectorObject();
@@ -7424,20 +7537,28 @@ function finalizePen() {
       state.selectionCtx.clearRect(0, 0, state.selectionCanvas.width, state.selectionCanvas.height);
       return;
   }
+
+  let layer = getActiveLayer();
   
-  if (state.toolSettings.pen.createOnVector) {
-      const layer = getTargetVectorLayer();
+  // Create vector path if explicitly requested OR if we are currently on a vector layer
+  if (state.toolSettings.pen.createOnVector || (layer && layer.type === 'vector')) {
+      if (state.toolSettings.pen.createOnVector) {
+          layer = getTargetVectorLayer();
+      }
+      
+      if (!layer || layer.type !== 'vector') return;
+
       const lx = layer.x || 0;
       const ly = layer.y || 0;
       if (!layer.data) layer.data = [];
       layer.data.push({
           type: 'path',
           points: state.penPoints.map(p => ({x: p.x - lx, y: p.y - ly})),
-          closed: false, // Pen usually open unless closed manually
+          closed: false, 
           style: {
               lineWidth: state.toolSettings.pen.lineWidth,
               strokeStyle: state.foregroundColor,
-              fillStyle: null // Pen usually stroke only
+              fillStyle: null 
           }
       });
       state.penPoints = [];
@@ -7447,13 +7568,7 @@ function finalizePen() {
       return;
   }
   
-  const layer = getActiveLayer();
   if (!layer || layer.type === 'group') return;
-
-  if ((layer.type || 'raster') === 'raster') {
-      alert("The current options are not compatible with this type of layer");
-      return;
-  }
 
   const ctx = layer.canvas.getContext('2d');
   
@@ -7478,6 +7593,7 @@ function finalizePen() {
   
   saveHistory();
   renderCanvas();
+  updateFab();
 }
 
 function updateBrushCursor(e) {
@@ -8552,7 +8668,37 @@ function newImage() {
 async function openImage() {
   closeMainMenu();
 
-  if ('showOpenFilePicker' in window) {
+  if (window.AndroidInterface && window.AndroidInterface.requestOpenFile) {
+    // Native SAF open — gets us a persistent URI we can save back to
+    await new Promise(resolve => {
+      window._onOpenFileComplete = async (dataUrl, mimeType, filename) => {
+        window._onOpenFileComplete = null;
+        window._onOpenFileCancelled = null;
+        // Convert the data URL back to a File object for loadFile()
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], filename, { type: mimeType });
+        await loadFile(file, null);
+        // Mark the active doc as having a native URI already
+        const doc = state.documents[state.activeDocIndex];
+        if (doc) {
+          doc.androidHasUri = true;
+          doc.androidMime = mimeType;
+          doc.androidFilename = filename;
+          doc.dirty = false;
+          updateTabs();
+          updateTitle();
+        }
+        resolve();
+      };
+      window._onOpenFileCancelled = () => {
+        window._onOpenFileComplete = null;
+        window._onOpenFileCancelled = null;
+        resolve();
+      };
+      window.AndroidInterface.requestOpenFile('*/*');
+    });
+  } else if ('showOpenFilePicker' in window) {
     try {
       const [handle] = await window.showOpenFilePicker({
         types: [
@@ -8657,11 +8803,19 @@ function saveImage() {
   closeMainMenu();
 
   const doc = state.documents[state.activeDocIndex];
-  const link = document.createElement('a');
-  link.download = (doc?.name || 'image') + '.png';
-  link.href = state.canvas.toDataURL();
-  link.click();
-  
+  const filename = (doc?.name || 'image').replace(/\.[^/.]+$/, '') + '.png';
+  const dataUrl = state.canvas.toDataURL('image/png');
+
+  if (window.AndroidInterface && window.AndroidInterface.saveBlob) {
+    // Android WebView: hand off directly to the native save handler
+    window.AndroidInterface.saveBlob(dataUrl, 'image/png', filename);
+  } else {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = dataUrl;
+    link.click();
+  }
+
   if (doc) {
     doc.dirty = false;
     updateTabs();
@@ -8669,48 +8823,94 @@ function saveImage() {
   }
 }
 
+async function getDataUrl(mime) {
+  const doc = state.documents[state.activeDocIndex];
+  if (!doc) return null;
+  if (mime === 'application/x-piff') {
+    const project = {
+      version: '1.0',
+      width: doc.width,
+      height: doc.height,
+      name: doc.name,
+      layers: doc.layers.map(serializeLayerForPIFF)
+    };
+    const json = JSON.stringify(project);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    return 'data:application/x-piff;base64,' + b64;
+  } else {
+    return await new Promise(resolve => {
+      state.canvas.toBlob(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      }, mime);
+    });
+  }
+}
+
+
+async function androidSaveExisting() {
+  // Called for Save — write to the URI already held by native side
+  const doc = state.documents[state.activeDocIndex];
+  if (!doc) return;
+  const dataUrl = await getDataUrl(doc.androidMime || 'image/png');
+  if (!dataUrl) return;
+  window.AndroidInterface.saveToUri(dataUrl);
+  doc.dirty = false;
+  updateTabs();
+  updateTitle();
+  showNotification('File saved successfully');
+}
+
 async function saveCurrentDocument() {
   closeMainMenu();
   const doc = state.documents[state.activeDocIndex];
   if (!doc) return;
-  
+
+  if (window.AndroidInterface && window.AndroidInterface.saveBlob) {
+    if (doc.androidHasUri) {
+      // We have a native URI — overwrite in place
+      await androidSaveExisting();
+    } else {
+      // First save — go through Save As to pick location
+      await saveAs();
+    }
+    return;
+  }
+
   if (!doc.fileHandle) {
     await saveAs();
     return;
   }
-  
-  if (doc.fileHandle) {
-    try {
-      let blob;
-      if (doc.mimeType === 'application/x-piff' || doc.mimeType === 'application/json' || doc.name.toLowerCase().endsWith('.piff')) {
-         const project = {
-           version: '1.0',
-           width: doc.width,
-           height: doc.height,
-           name: doc.name,
-           layers: doc.layers.map(serializeLayerForPIFF)
-         };
-         const json = JSON.stringify(project);
-         blob = new Blob([json], { type: 'application/x-piff' });
-      } else {
-         const mime = (doc.mimeType && doc.mimeType !== 'application/x-piff') ? doc.mimeType : 'image/png';
-         blob = await new Promise(resolve => state.canvas.toBlob(resolve, mime));
-      }
 
-      const writable = await doc.fileHandle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      
-      doc.dirty = false;
-      updateTabs();
-      updateTitle();
-      showNotification('File saved successfully');
-    } catch (err) {
-      console.error('Save failed:', err);
-      showNotification('Failed to save file.', 'error');
+  try {
+    let blob;
+    if (doc.mimeType === 'application/x-piff' || doc.mimeType === 'application/json' || doc.name.toLowerCase().endsWith('.piff')) {
+       const project = {
+         version: '1.0',
+         width: doc.width,
+         height: doc.height,
+         name: doc.name,
+         layers: doc.layers.map(serializeLayerForPIFF)
+       };
+       const json = JSON.stringify(project);
+       blob = new Blob([json], { type: 'application/x-piff' });
+    } else {
+       const mime = (doc.mimeType && doc.mimeType !== 'application/x-piff') ? doc.mimeType : 'image/png';
+       blob = await new Promise(resolve => state.canvas.toBlob(resolve, mime));
     }
-  } else {
-    saveImage();
+
+    const writable = await doc.fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+
+    doc.dirty = false;
+    updateTabs();
+    updateTitle();
+    showNotification('File saved successfully');
+  } catch (err) {
+    console.error('Save failed:', err);
+    showNotification('Failed to save file.', 'error');
   }
 }
 
@@ -8718,6 +8918,91 @@ async function saveAs(preferredType = null) {
   closeMainMenu();
   const doc = state.documents[state.activeDocIndex];
   if (!doc) return;
+
+  if (window.AndroidInterface && window.AndroidInterface.saveBlob) {
+    // Show format picker, then open native CREATE_DOCUMENT picker for filename + location
+    await new Promise(resolve => {
+      const baseName = (doc.name || 'image').replace(/\.[^/.]+$/, '');
+      const formats = [
+        { label:'PNG',  mime:'image/png',           ext:'.png'  },
+        { label:'JPEG', mime:'image/jpeg',          ext:'.jpg'  },
+        { label:'WebP', mime:'image/webp',          ext:'.webp' },
+        { label:'PIFF', mime:'application/x-piff',  ext:'.piff' },
+      ];
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:99999;';
+
+      const fmtHtml = formats.map((f, i) => `
+        <label class="sa-fmt-opt" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 14px;border:1px solid #555;border-radius:4px;background:${i===0?'rgba(0,120,212,.3)':'transparent'};">
+          <input type="radio" name="sa-fmt" value="${f.mime}" data-ext="${f.ext}" ${i===0?'checked':''} style="display:none;">
+          ${f.label}
+        </label>`).join('');
+
+      overlay.innerHTML = `
+        <div style="background:#2d2d30;border:1px solid #555;border-radius:8px;padding:24px;min-width:280px;max-width:90vw;color:#ccc;font-family:inherit;font-size:14px;">
+          <div style="font-size:16px;font-weight:600;margin-bottom:16px;">Save As</div>
+          <div style="margin-bottom:12px;font-size:12px;color:#999;">Format</div>
+          <div id="sa-formats" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">${fmtHtml}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:16px;">Choose the filename and folder in the next step.</div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button id="sa-cancel" style="padding:8px 18px;background:#3c3c3c;border:1px solid #555;border-radius:4px;color:#ccc;cursor:pointer;font-size:13px;">Cancel</button>
+            <button id="sa-save" style="padding:8px 18px;background:#0078d4;border:none;border-radius:4px;color:#fff;cursor:pointer;font-size:13px;font-weight:600;">Next →</button>
+          </div>
+        </div>`;
+
+      document.body.appendChild(overlay);
+
+      overlay.querySelectorAll('.sa-fmt-opt').forEach(lbl => {
+        lbl.addEventListener('click', () => {
+          overlay.querySelectorAll('.sa-fmt-opt').forEach(l => l.style.background = 'transparent');
+          lbl.style.background = 'rgba(0,120,212,.3)';
+        });
+      });
+
+      overlay.querySelector('#sa-cancel').onclick = () => {
+        document.body.removeChild(overlay);
+        resolve();
+      };
+
+      overlay.querySelector('#sa-save').onclick = async () => {
+        const sel = overlay.querySelector('input[name="sa-fmt"]:checked');
+        const mime = sel ? sel.value : 'image/png';
+        const ext  = sel ? sel.dataset.ext : '.png';
+        const filename = baseName.endsWith(ext) ? baseName : baseName + ext;
+        document.body.removeChild(overlay);
+
+        const dataUrl = await getDataUrl(mime);
+        if (!dataUrl) { resolve(); return; }
+
+        await new Promise(r => {
+          window._onSaveAsComplete = (savedFilename) => {
+            window._onSaveAsComplete = null;
+            window._onSaveAsCancelled = null;
+            doc.androidMime = mime;
+            doc.androidFilename = savedFilename || filename;
+            doc.androidHasUri = true;
+            doc.name = doc.androidFilename;
+            doc.dirty = false;
+            updateTabs();
+            updateTitle();
+            showNotification('File saved successfully');
+            r();
+          };
+          window._onSaveAsCancelled = () => {
+            window._onSaveAsComplete = null;
+            window._onSaveAsCancelled = null;
+            r();
+          };
+          // Always use CREATE_DOCUMENT — user can navigate anywhere and type the filename.
+          // Android will prompt to replace if they pick an existing name in the same folder.
+          window.AndroidInterface.requestSaveAsNew(mime, filename, dataUrl);
+        });
+        resolve();
+      };
+    });
+    return;
+  }
 
   if ('showSaveFilePicker' in window) {
     try {
@@ -8740,7 +9025,6 @@ async function saveAs(preferredType = null) {
       else if (name.endsWith('.webp')) doc.mimeType = 'image/webp';
       else if (name.endsWith('.png')) doc.mimeType = 'image/png';
       else doc.mimeType = 'application/x-piff';
-      
       await saveCurrentDocument();
     } catch (err) {
       if (err.name !== 'AbortError') console.error(err);
@@ -8937,6 +9221,308 @@ function showNotification(message, type = 'success') {
   }, 3000);
 }
 
+</script>
+
+<script>
+// ============================================================
+// PAINTER TOUCH SUPPORT ADDITIONS
+// Paste this entire <script> block just before </body>
+// Also change the viewport meta to:
+// <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+// ============================================================
+
+// Touch state
+const touchState = {
+  lastPinchDist: null,
+  lastPinchCenter: null,
+  isPinching: false,
+  touchStartTime: 0,
+  longPressTimer: null,
+  simulatedButton: 0, // 0 = left (foreground), 2 = right (background)
+  twoFingerPanStart: null,
+};
+
+// --- Geometry helpers ---
+
+function getTouchCanvasPos(touch) {
+  const rect = state.canvas.getBoundingClientRect();
+  return {
+    x: Math.max(0, Math.min(state.canvas.width,  Math.floor((touch.clientX - rect.left) / state.zoom))),
+    y: Math.max(0, Math.min(state.canvas.height, Math.floor((touch.clientY - rect.top)  / state.zoom))),
+    clientX: touch.clientX,
+    clientY: touch.clientY,
+  };
+}
+
+function pinchDistance(t1, t2) {
+  return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+}
+
+function pinchCenter(t1, t2) {
+  return { clientX: (t1.clientX + t2.clientX) / 2, clientY: (t1.clientY + t2.clientY) / 2 };
+}
+
+// Synthetic MouseEvent dispatcher
+function fakeMouse(type, clientX, clientY, button, target) {
+  const evt = new MouseEvent(type, {
+    bubbles: true, cancelable: true,
+    clientX, clientY, button,
+    buttons: button === 0 ? 1 : 2,
+  });
+  (target || state.canvas).dispatchEvent(evt);
+  return evt;
+}
+
+// --- Touch Event Handlers --- (registered in DOMContentLoaded below)
+
+function onTouchStart(e) {
+  e.preventDefault();
+
+  if (e.touches.length === 1 && !touchState.isPinching) {
+    const t = e.touches[0];
+    touchState.touchStartTime = Date.now();
+
+    // Long-press → switch to right-click (background) mode
+    clearTimeout(touchState.longPressTimer);
+    touchState.longPressTimer = setTimeout(() => {
+      if (!touchState.isPinching && state.isDrawing) {
+        setActiveMouseButton(2);
+        showNotification('Right-click (background color) active', 'success');
+      }
+    }, 600);
+
+    fakeMouse('mousedown', t.clientX, t.clientY, touchState.simulatedButton);
+
+  } else if (e.touches.length === 2) {
+    clearTimeout(touchState.longPressTimer);
+
+    // Cancel any ongoing single-touch stroke cleanly
+    if (state.isDrawing) {
+      const t0 = e.touches[0];
+      fakeMouse('mouseup', t0.clientX, t0.clientY, 0, window);
+    }
+
+    touchState.isPinching = true;
+    const t1 = e.touches[0], t2 = e.touches[1];
+    touchState.lastPinchDist   = pinchDistance(t1, t2);
+    touchState.lastPinchCenter = pinchCenter(t1, t2);
+
+    const container = document.querySelector('.canvas-container');
+    touchState.twoFingerPanStart = {
+      scrollLeft:  container.scrollLeft,
+      scrollTop:   container.scrollTop,
+      centerX:     touchState.lastPinchCenter.clientX,
+      centerY:     touchState.lastPinchCenter.clientY,
+    };
+  }
+}
+
+function onTouchMove(e) {
+  e.preventDefault();
+
+  if (e.touches.length === 1 && !touchState.isPinching) {
+    clearTimeout(touchState.longPressTimer);
+    const t = e.touches[0];
+    // Build a synthetic mousemove and pass to the existing handler
+    const synth = { clientX: t.clientX, clientY: t.clientY, target: state.canvas };
+    handleMouseMove(synth);
+
+  } else if (e.touches.length >= 2) {
+    clearTimeout(touchState.longPressTimer);
+    touchState.isPinching = true;
+
+    const t1 = e.touches[0], t2 = e.touches[1];
+    const newDist   = pinchDistance(t1, t2);
+    const newCenter = pinchCenter(t1, t2);
+
+    // ── Pinch-to-Zoom ──────────────────────────────────────
+    if (touchState.lastPinchDist !== null) {
+      const scale        = newDist / touchState.lastPinchDist;
+      const currentPct   = state.zoom * 100;
+      const newZoomPct   = Math.max(10, Math.min(1000, currentPct * scale));
+      setZoom(newZoomPct, { x: newCenter.clientX, y: newCenter.clientY });
+    }
+
+    // ── Two-finger Pan ─────────────────────────────────────
+    if (touchState.twoFingerPanStart) {
+      const container = document.querySelector('.canvas-container');
+      const dx = touchState.twoFingerPanStart.centerX - newCenter.clientX;
+      const dy = touchState.twoFingerPanStart.centerY - newCenter.clientY;
+      container.scrollLeft = touchState.twoFingerPanStart.scrollLeft + dx;
+      container.scrollTop  = touchState.twoFingerPanStart.scrollTop  + dy;
+    }
+
+    touchState.lastPinchDist   = newDist;
+    touchState.lastPinchCenter = newCenter;
+  }
+}
+
+function onTouchEnd(e) {
+  e.preventDefault();
+  clearTimeout(touchState.longPressTimer);
+
+  if (!touchState.isPinching) {
+    const t = e.changedTouches[0];
+    fakeMouse('mouseup', t.clientX, t.clientY, touchState.simulatedButton, window);
+  }
+
+  if (e.touches.length < 2) {
+    touchState.isPinching        = false;
+    touchState.lastPinchDist     = null;
+    touchState.twoFingerPanStart = null;
+  }
+}
+
+// --- Mouse-Button Widget (L / R switcher for touch users) ---
+
+function setActiveMouseButton(btn) {
+  touchState.simulatedButton = btn;
+  const lBtn = document.getElementById('mbLeft');
+  const rBtn = document.getElementById('mbRight');
+  if (lBtn) lBtn.classList.toggle('mb-active', btn === 0);
+  if (rBtn) rBtn.classList.toggle('mb-active', btn === 2);
+}
+
+function buildMouseButtonWidget() {
+  // ── Styles ────────────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    /* ── Mouse Button Widget ── */
+    #mouseButtonWidget {
+      display: none; /* shown via media query or JS below */
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 2px 4px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 4px;
+    }
+    .mb-label {
+      font-size: 8px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+    .mb-buttons { display: flex; flex-direction: column; gap: 3px; }
+    .mb-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 3px 2px;
+      width: 34px;
+      font-size: 8px;
+      font-family: inherit;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .mb-btn:hover   { background: var(--bg-hover); color: var(--text-primary); }
+    .mb-btn.mb-active {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(0,120,212,0.12);
+    }
+
+    /* ── Touch-device enhancements ── */
+    @media (pointer: coarse) {
+      #mouseButtonWidget   { display: flex !important; }
+
+      /* Bigger tap targets */
+      .tool-button         { width: 40px; height: 40px; }
+      .activity-bar        { width: 40px; }
+      .color-swatch        { width: 28px; height: 28px; }
+      .swatch-container    { width: 38px; height: 46px; }
+      .layer-item,
+      .layer-group-header  { padding: 10px 10px; min-height: 44px; }
+      .layer-button        { min-height: 36px; }
+      .dialog-btn          { min-height: 40px; padding: 8px 16px; }
+      .tab                 { padding: 8px 14px; }
+      menu > ul > li       { padding: 6px 12px; }
+
+      /* Bigger slider thumbs */
+      .slider::-webkit-slider-thumb { width: 20px; height: 20px; border-radius: 4px; }
+      .slider::-moz-range-thumb     { width: 20px; height: 20px; border-radius: 4px; }
+
+      /* Hide cursor-follower brush circle */
+      #brushCursor { display: none !important; }
+
+      /* Prevent long-press menu from the browser */
+      canvas { -webkit-touch-callout: none; user-select: none; }
+    }
+
+    /* Also show widget on hybrid devices that have touch + mouse */
+    @media (any-pointer: coarse) {
+      #mouseButtonWidget { display: flex; margin-top: auto; }
+      .color-swatches { margin-top: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── DOM widget ───────────────────────────────────────────
+  const widget = document.createElement('div');
+  widget.id = 'mouseButtonWidget';
+  widget.innerHTML = `
+    <div class="mb-label">Click</div>
+    <div class="mb-buttons">
+      <button id="mbLeft" class="mb-btn mb-active"
+              onclick="setActiveMouseButton(0)"
+              title="Left click — draws with Foreground color">
+        <!-- Mouse icon with left button highlighted -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C8.5 3 6 5.5 6 9v6c0 3.5 2.5 6 6 6s6-2.5 6-6V9c0-3.5-2.5-6-6-6z"
+                stroke="currentColor" stroke-width="1.4" fill="none"/>
+          <line x1="12" y1="3" x2="12" y2="11.5" stroke="currentColor" stroke-width="1.4"/>
+          <line x1="6"  y1="11.5" x2="18" y2="11.5" stroke="currentColor" stroke-width="1.4"/>
+          <!-- Left button fill -->
+          <path d="M12 3C8.5 3 6 5.5 6 9v2.5h6V3z" fill="currentColor" opacity="0.45"/>
+          <circle cx="9.5" cy="16" r="1.5" fill="currentColor" opacity="0.4"/>
+        </svg>
+        <span>L</span>
+      </button>
+      <button id="mbRight" class="mb-btn"
+              onclick="setActiveMouseButton(2)"
+              title="Right click — draws with Background color">
+        <!-- Mouse icon with right button highlighted -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C8.5 3 6 5.5 6 9v6c0 3.5 2.5 6 6 6s6-2.5 6-6V9c0-3.5-2.5-6-6-6z"
+                stroke="currentColor" stroke-width="1.4" fill="none"/>
+          <line x1="12" y1="3" x2="12" y2="11.5" stroke="currentColor" stroke-width="1.4"/>
+          <line x1="6"  y1="11.5" x2="18" y2="11.5" stroke="currentColor" stroke-width="1.4"/>
+          <!-- Right button fill -->
+          <path d="M12 3C15.5 3 18 5.5 18 9v2.5h-6V3z" fill="currentColor" opacity="0.45"/>
+          <circle cx="14.5" cy="16" r="1.5" fill="currentColor" opacity="0.4"/>
+        </svg>
+        <span>R</span>
+      </button>
+    </div>
+  `;
+
+  // Insert just before the color swatches in the activity bar
+  const colorSwatches = document.querySelector('.color-swatches');
+  if (colorSwatches) {
+    colorSwatches.parentNode.insertBefore(widget, colorSwatches);
+  } else {
+    document.querySelector('.activity-bar').appendChild(widget);
+  }
+
+  // Force-show on touch-capable devices (even hybrid desktop/tablet)
+  if (navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches) {
+    widget.style.display = 'flex';
+  }
+}
+
+// Initialise after DOM is ready (safe to call even if DOMContentLoaded already fired)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', buildMouseButtonWidget);
+} else {
+  buildMouseButtonWidget();
+}
 </script>
 </body>
 </html>
