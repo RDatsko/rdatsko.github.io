@@ -2792,9 +2792,9 @@ function rAddDevice(){
   const modelSel=document.getElementById('nd-model');
   if(modelSel && net) {
     const models={
-      combined: ['MR46','MR36','MR55','MR86','MS120-8FP','MS225-24P','MS350-24','MX67','MX84','MX105','MX250','MG21','MG41'],
-      wireless: ['MR36','MR44','MR46','MR55','MR86'],
-      switch:   ['MS120-8FP','MS210-48','MS225-24P','MS350-24','MS390-24'],
+      combined: ['MG21','MG41','MR18','MR26','MR33','MR36','MR44','MR46','MR55','MR86','MS120-8FP','MS120-8LP','MS120-24P','MS125-24','MS210-48','MS220-8P','MS225-24P','MS225-48FP','MS225-48LP','MS350-24','MX67','MX84','MX105','MX250'],
+      wireless: ['MR18','MR26','MR33','MR36','MR44','MR46','MR55','MR86'],
+      switch:   ['MS120-8FP','MS120-8LP','MS120-24P','MS125-24','MS210-48','MS220-8P','MS225-24P','MS225-48FP','MS225-48LP','MS350-24'],
       appliance:['MX67','MX84','MX105','MX250'],
     };
     const opts=(models[net.type]||models.combined);
