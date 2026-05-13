@@ -22,14 +22,12 @@ download_pspi_files() {
     echo "Downloading PSPi files..."
 
     TMP_DIR="/tmp/pspi"
-    mkdir -p "$TMP_DIR"
 
-    # Create directories
+    rm -rf "$TMP_DIR"
+
     mkdir -p "$TMP_DIR/drivers"
     mkdir -p "$TMP_DIR/overlays"
-    mkdir -p "$TMP_DIR/services"
 
-    # Download driver binaries
     DRIVER_FILES=(
         "main_32"
         "main_64"
@@ -43,35 +41,20 @@ download_pspi_files() {
 
     for file in "${DRIVER_FILES[@]}"; do
         echo "Downloading $file..."
-        curl -L "$BASE_URL/drivers/bin/$file" -o "$TMP_DIR/drivers/$file"
+        curl -L "$BASE_URL/drivers/bin/$file" \
+            -o "$TMP_DIR/drivers/$file"
+
         chmod +x "$TMP_DIR/drivers/$file"
     done
 
-    # Download service files
-    SERVICE_FILES=(
-        "main_32.service"
-        "main_64.service"
-        "gamepad_32.service"
-        "gamepad_64.service"
-        "mouse_32.service"
-        "mouse_64.service"
-        "osd_32.service"
-        "osd_64.service"
-    )
-
-    for file in "${SERVICE_FILES[@]}"; do
-        echo "Downloading $file..."
-        curl -L "$BASE_URL/services/$file" -o "$TMP_DIR/services/$file"
-    done
-
-    # Download overlays (add additional files if needed)
     OVERLAY_FILES=(
         "dpi24.dtbo"
     )
 
     for file in "${OVERLAY_FILES[@]}"; do
         echo "Downloading $file..."
-        curl -L "$BASE_URL/overlays/$file" -o "$TMP_DIR/overlays/$file"
+        curl -L "$BASE_URL/overlays/$file" \
+            -o "$TMP_DIR/overlays/$file"
     done
 
     echo "Downloads complete."
@@ -80,8 +63,14 @@ download_pspi_files() {
 lakka_setup() {
     echo "Lakka OS detected. Setting up autostart script..."
 
+    mkdir -p /storage/pspi/drivers
+
+    cp /tmp/pspi/drivers/* /storage/pspi/drivers/
+
     if [ -f "/storage/.config/autostart.sh" ]; then
-        mv "/storage/.config/autostart.sh" "/storage/.config/autostart.old"
+        mv "/storage/.config/autostart.sh" \
+           "/storage/.config/autostart.old"
+
         echo "Renamed existing autostart.sh to autostart.old"
     fi
 
@@ -95,18 +84,15 @@ EOF
 
     chmod +x /storage/.config/autostart.sh
 
-    mkdir -p /storage/pspi/drivers
-    cp /tmp/pspi/drivers/* /storage/pspi/drivers/
-
     echo "New autostart.sh for Lakka created and configured."
 
-    # Check for PSPi-Controller.cfg and rename if it exists
     if [ -f "/storage/joypads/udev/PSPi-Controller.cfg" ]; then
-        mv "/storage/joypads/udev/PSPi-Controller.cfg" "/storage/joypads/udev/PSPi-Controller.old"
-        echo "Renamed existing PSPi-Controller.cfg to PSPi-Controller.old"
+        mv "/storage/joypads/udev/PSPi-Controller.cfg" \
+           "/storage/joypads/udev/PSPi-Controller.old"
+
+        echo "Renamed existing PSPi-Controller.cfg"
     fi
 
-    # Create new PSPi-Controller.cfg
     cat << EOF > /storage/joypads/udev/PSPi-Controller.cfg
 input_driver = "udev"
 input_device = "PSPi-Controller"
@@ -131,21 +117,17 @@ input_l_y_minus_axis = "-1"
 input_gun_trigger_mbtn = "1"
 EOF
 
-    echo "New PSPi-Controller.cfg for Lakka created and configured."
-
-    # Modify RetroArch setting
-    sed -i '/input_quit_gamepad_combo/c\input_quit_gamepad_combo = "4"' \
+    sed -i \
+        '/input_quit_gamepad_combo/c\input_quit_gamepad_combo = "4"' \
         /storage/.config/retroarch/retroarch.cfg
 
-    echo "Modified input_quit_gamepad_combo in retroarch.cfg."
+    echo "Modified RetroArch configuration."
 
-    # Prompt for reboot
-    read -p "Configuration complete. Would you like to reboot now? (yes/no) " answer
+    read -p "Reboot now? (yes/no) " answer
 
     case $answer in
         [Yy]* ) reboot ;;
-        [Nn]* ) echo "Reboot skipped. Please reboot manually for changes to take effect." ;;
-        * ) echo "Invalid response. Please reboot manually for changes to take effect." ;;
+        * ) echo "Please reboot manually." ;;
     esac
 }
 
@@ -157,8 +139,8 @@ raspbian_setup() {
     enable_i2c
     remove_services
     copy_binaries
-    add_services
     install_overlays
+    add_services
 }
 
 ubuntu_setup() {
@@ -171,9 +153,17 @@ remove_services() {
     echo "Disabling and removing existing services..."
 
     for service in main osd mouse gamepad; do
-        sudo systemctl stop ${service}${ARCH_SUFFIX}.service 2>/dev/null || true
-        sudo systemctl disable ${service}${ARCH_SUFFIX}.service 2>/dev/null || true
+        sudo systemctl stop ${service}${ARCH_SUFFIX}.service \
+            2>/dev/null || true
+
+        sudo systemctl disable ${service}${ARCH_SUFFIX}.service \
+            2>/dev/null || true
+
+        sudo rm -f \
+            /etc/systemd/system/${service}${ARCH_SUFFIX}.service
     done
+
+    sudo systemctl daemon-reload
 
     echo "Existing services removed."
 }
@@ -181,34 +171,45 @@ remove_services() {
 enable_i2c() {
     echo "Enabling I2C..."
 
-    SETTING=on
-    CONFIG=/boot/config.txt
-    BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+    CONFIG="/boot/config.txt"
+    BLACKLIST="/etc/modprobe.d/raspi-blacklist.conf"
 
-    if grep -q "^dtparam=i2c_arm=.*" $CONFIG; then
-        sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=$SETTING/" $CONFIG
-    elif grep -q "^#dtparam=i2c_arm=.*" $CONFIG; then
-        sed -i "s/^#dtparam=i2c_arm=.*/dtparam=i2c_arm=$SETTING/" $CONFIG
+    if grep -q "^dtparam=i2c_arm=" "$CONFIG"; then
+        sudo sed -i \
+            's/^dtparam=i2c_arm=.*/dtparam=i2c_arm=on/' \
+            "$CONFIG"
+
+    elif grep -q "^#dtparam=i2c_arm=" "$CONFIG"; then
+        sudo sed -i \
+            's/^#dtparam=i2c_arm=.*/dtparam=i2c_arm=on/' \
+            "$CONFIG"
+
     else
-        echo "dtparam=i2c_arm=$SETTING" >> $CONFIG
+        echo "dtparam=i2c_arm=on" | sudo tee -a "$CONFIG"
     fi
 
-    if [ -e $BLACKLIST ]; then
-        sed -i "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/" $BLACKLIST
+    if [ -e "$BLACKLIST" ]; then
+        sudo sed -i \
+            's/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/' \
+            "$BLACKLIST"
     fi
 
     if ! grep -q "^i2c[-_]dev" /etc/modules; then
-        echo "i2c-dev" >> /etc/modules
+        echo "i2c-dev" | sudo tee -a /etc/modules
     fi
 
-    modprobe i2c-dev
+    sudo modprobe i2c-dev
 }
 
 copy_binaries() {
     echo "Copying binaries..."
 
-    sudo cp -r /tmp/pspi/drivers/* /usr/bin/
-    sudo chmod +x /usr/bin/main_* /usr/bin/gamepad_* /usr/bin/mouse_* /usr/bin/osd_*
+    sudo cp /tmp/pspi/drivers/* /usr/bin/
+
+    sudo chmod +x /usr/bin/main_* \
+                    /usr/bin/gamepad_* \
+                    /usr/bin/mouse_* \
+                    /usr/bin/osd_*
 }
 
 install_overlays() {
@@ -218,39 +219,124 @@ install_overlays() {
 }
 
 add_services() {
-    echo "Installing and enabling services..."
+    echo "Creating startup scripts..."
 
-    sudo cp /tmp/pspi/services/* /etc/systemd/system/
+    sudo tee /usr/local/bin/start_main.sh > /dev/null <<EOF
+#!/bin/bash
+/usr/bin/main$ARCH_SUFFIX
+EOF
+
+    sudo tee /usr/local/bin/start_mouse.sh > /dev/null <<EOF
+#!/bin/bash
+/usr/bin/mouse$ARCH_SUFFIX
+EOF
+
+    sudo tee /usr/local/bin/start_osd.sh > /dev/null <<EOF
+#!/bin/bash
+/usr/bin/osd$ARCH_SUFFIX
+EOF
+
+    sudo chmod +x /usr/local/bin/start_main.sh
+    sudo chmod +x /usr/local/bin/start_mouse.sh
+    sudo chmod +x /usr/local/bin/start_osd.sh
+
+    echo "Creating systemd service files..."
+
+    sudo tee /etc/systemd/system/main${ARCH_SUFFIX}.service > /dev/null <<EOF
+[Unit]
+Description=PSPi Main Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/start_main.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    sudo tee /etc/systemd/system/mouse${ARCH_SUFFIX}.service > /dev/null <<EOF
+[Unit]
+Description=PSPi Mouse Service
+After=main${ARCH_SUFFIX}.service
+
+[Service]
+ExecStart=/usr/local/bin/start_mouse.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    sudo tee /etc/systemd/system/osd${ARCH_SUFFIX}.service > /dev/null <<EOF
+[Unit]
+Description=PSPi On Screen Display Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/start_osd.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
     sudo systemctl daemon-reload
 
-    # Always enable/start main + osd
-    for service in main osd; do
-        sudo systemctl enable ${service}${ARCH_SUFFIX}.service
-        sudo systemctl start ${service}${ARCH_SUFFIX}.service
-    done
+    echo "Enabling services..."
 
-    # Optional services
-    for service in mouse gamepad; do
-        read -p "Enable and start the ${service} service? [y/N]: " enable_service
+    sudo systemctl enable main${ARCH_SUFFIX}.service
+    sudo systemctl enable osd${ARCH_SUFFIX}.service
 
-        if [ "$enable_service" = "y" ]; then
-            sudo systemctl enable ${service}${ARCH_SUFFIX}.service
-            sudo systemctl start ${service}${ARCH_SUFFIX}.service
-        else
-            echo "Skipping ${service}${ARCH_SUFFIX}.service"
-        fi
-    done
+    sudo systemctl start main${ARCH_SUFFIX}.service
+    sudo systemctl start osd${ARCH_SUFFIX}.service
+
+    read -p "Enable and start the mouse service? [y/N]: " enable_mouse
+
+    if [[ "$enable_mouse" =~ ^[Yy]$ ]]; then
+        sudo systemctl enable mouse${ARCH_SUFFIX}.service
+        sudo systemctl start mouse${ARCH_SUFFIX}.service
+    else
+        echo "Skipping mouse${ARCH_SUFFIX}.service"
+    fi
+
+    read -p "Enable and start the gamepad service? [y/N]: " enable_gamepad
+
+    if [[ "$enable_gamepad" =~ ^[Yy]$ ]]; then
+
+        sudo tee /etc/systemd/system/gamepad${ARCH_SUFFIX}.service > /dev/null <<EOF
+[Unit]
+Description=PSPi Gamepad Service
+After=main${ARCH_SUFFIX}.service
+
+[Service]
+ExecStart=/usr/bin/gamepad$ARCH_SUFFIX
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+        sudo systemctl daemon-reload
+
+        sudo systemctl enable gamepad${ARCH_SUFFIX}.service
+        sudo systemctl start gamepad${ARCH_SUFFIX}.service
+
+    else
+        echo "Skipping gamepad${ARCH_SUFFIX}.service"
+    fi
 
     echo "Services added and started."
 }
 
 unknown_setup() {
-    echo "Unknown or unsupported OS. Manual setup may be required."
+    echo "Unknown or unsupported OS."
 }
 
 detect_os_and_setup_services() {
-    OS=$(grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    OS=$(grep '^ID=' /etc/os-release \
+        | cut -d= -f2 \
+        | tr -d '"')
 
     echo "Operating System Detected: $OS"
 
@@ -261,9 +347,6 @@ detect_os_and_setup_services() {
         debian)
             raspbian_setup
             ;;
-        lakka)
-            lakka_setup
-            ;;
         raspbian)
             raspbian_setup
             ;;
@@ -273,8 +356,10 @@ detect_os_and_setup_services() {
         ubuntu)
             ubuntu_setup
             ;;
+        lakka)
+            lakka_setup
+            ;;
         *)
-            echo "Operating System Detection: Unknown or Unsupported"
             unknown_setup
             ;;
     esac
@@ -283,3 +368,5 @@ detect_os_and_setup_services() {
 detect_architecture
 download_pspi_files
 detect_os_and_setup_services
+
+echo "Installation complete."
