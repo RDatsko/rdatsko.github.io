@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Raspberry Pi OS Trixie -> PSPi 6 changes
+# Optimized for Raspberry Pi CM5
+#
+# Fully unattended:
+#   curl -fsSL https://rdatsko.gitub.io/rpios.sh | sudo bash
+#
+# Features:
+# - Mouse driver
+# - Main binary
+
 detect_architecture() {
     ARCH=$(uname -m)
 
