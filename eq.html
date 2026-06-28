@@ -27,7 +27,6 @@ header {
 header h1 { font-size: 1.1rem; font-weight: 600; color: #f0f6fc; }
 #status { font-size: .78rem; color: #8b949e; }
 #copy-preds-btn {
-  margin-left: auto;
   background: none;
   border: 1px solid #30363d;
   border-radius: 6px;
@@ -40,6 +39,19 @@ header h1 { font-size: 1.1rem; font-weight: 600; color: #f0f6fc; }
 }
 #copy-preds-btn:hover { border-color: #58a6ff; color: #58a6ff; background: rgba(56,139,253,.08); }
 #copy-preds-btn.copied { border-color: #3fb950; color: #3fb950; background: rgba(63,185,80,.08); }
+#save-map-btn {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 5px 7px;
+  line-height: 0;
+  transition: border-color .15s, color .15s, background .15s;
+  flex-shrink: 0;
+}
+#save-map-btn:hover { border-color: #58a6ff; color: #58a6ff; background: rgba(56,139,253,.08); }
+#save-map-btn.saving { border-color: #d29922; color: #d29922; background: rgba(210,153,34,.08); }
 #status span.dot {
   display: inline-block; width: 7px; height: 7px;
   border-radius: 50%; background: #3fb950;
@@ -451,12 +463,21 @@ footer a { color: #58a6ff; text-decoration: none; }
 <header>
   <h1>🗾 Japan Earthquake + Typhoon Map</h1>
   <div id="status"><span class="dot"></span>Live · USGS + JMA</div>
-  <button id="copy-preds-btn" title="Copy predictions to clipboard">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-      <path d="M3 11V2.5A1.5 1.5 0 0 1 4.5 1H11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-    </svg>
-  </button>
+  <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
+    <button id="save-map-btn" title="Save map as WebP at 1000% zoom">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+        <circle cx="5.5" cy="6.5" r="1.2" stroke="currentColor" stroke-width="1.1"/>
+        <path d="M1.5 12L5 8.5L7.5 11L10 8.5L14.5 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button id="copy-preds-btn" title="Copy predictions to clipboard">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M3 11V2.5A1.5 1.5 0 0 1 4.5 1H11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <div id="map-wrap">
@@ -6106,9 +6127,11 @@ function drawPredictions() {
     }
 
     // Labels — sized relative to screen pixels, not geo radius
-    const screenR = drawR * scale;
-    const baseFontSize = Math.max(9, Math.min(15, screenR * 0.55));
-    const pctFontSize  = Math.max(7, Math.min(11, screenR * 0.38));
+    // Fixed screen-pixel font sizes — independent of zoom so feed changes
+    // don't affect label size. applyTransform divides by scale to keep
+    // these constant on screen regardless of zoom level.
+    const baseFontSize = 12; // magnitude label: always 12px on screen
+    const pctFontSize  =  9; // percentage label: always 9px on screen
     const magOffY = -pctFontSize * 0.7 / scale;
 
     const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -6713,6 +6736,141 @@ async function fetchTyphoons() {
     drawTyphoons();
   } catch(e) { console.warn('Typhoon fetch error:', e); }
 }
+
+// ── Save map as WebP ──────────────────────────────────────────────────────────
+async function saveMapAsWebP() {
+  const btn = document.getElementById('save-map-btn');
+  btn.classList.add('saving');
+  btn.title = 'Rendering\u2026';
+
+  const savedScale = scale, savedPanX = panX, savedPanY = panY;
+
+  try {
+    const EXPORT_SCALE = 2;
+    const cw = mapWrap.clientWidth, ch = mapWrap.clientHeight;
+    const [x0, ] = geoToPx(122, 46); const [x1, ] = geoToPx(148, 46);
+    const [, y0]  = geoToPx(122, 46); const [, y1]  = geoToPx(122, 24);
+    const newPanX = (cw - (x1 - x0) * EXPORT_SCALE) / 2 - x0 * EXPORT_SCALE;
+    const newPanY = (ch - (y1 - y0) * EXPORT_SCALE) / 2 - y0 * EXPORT_SCALE;
+
+    scale = EXPORT_SCALE; panX = newPanX; panY = newPanY;
+    applyTransform(false);
+
+    // Force city dots visible at 200% — hide text labels, show dots only
+    buildCityLabels();
+    cityLabelLayer.style.display = '';
+    cityLabelLayer.querySelectorAll('[data-city-dot]').forEach(dot => {
+      const br = parseFloat(dot.dataset.baseR);
+      dot.setAttribute('r', (br / EXPORT_SCALE) * 0.5);
+      dot.setAttribute('stroke-width', (0.8 / EXPORT_SCALE) * 0.5);
+    });
+    // Hide text labels — dots only for export
+    cityLabelLayer.querySelectorAll('[data-city-rank]').forEach(g => {
+      g.querySelectorAll('text').forEach(t => t.style.display = 'none');
+    });
+    updatePrefLabels();
+    await new Promise(r => setTimeout(r, 100));
+
+    // Japan screen bounds at 200%
+    const sx0 = x0 * EXPORT_SCALE + newPanX - 30;
+    const sy0 = y0 * EXPORT_SCALE + newPanY - 30;
+    const sw  = (x1 - x0) * EXPORT_SCALE + 60;
+    const sh  = (y1 - y0) * EXPORT_SCALE + 60;
+
+    // Build wrapper SVG — skip Inkscape/metadata children
+    const svgEl = document.getElementById('japan-map');
+    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    wrapper.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    wrapper.setAttribute('width', sw);
+    wrapper.setAttribute('height', sh);
+    wrapper.setAttribute('viewBox', `0 0 ${sw} ${sh}`);
+
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x','0'); bg.setAttribute('y','0');
+    bg.setAttribute('width', sw); bg.setAttribute('height', sh);
+    bg.setAttribute('fill', '#193c6d');
+    wrapper.appendChild(bg);
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', `translate(${newPanX - sx0},${newPanY - sy0}) scale(${EXPORT_SCALE})`);
+    // Strip Inkscape/Sodipodi namespace attrs from an element tree
+    function cleanNS(el) {
+      const bad = [];
+      for (const attr of el.attributes) {
+        if (attr.name.includes(':')) bad.push(attr.name);
+      }
+      bad.forEach(n => el.removeAttribute(n));
+      for (const child of el.children) cleanNS(child);
+    }
+
+    for (const child of svgEl.children) {
+      const tag = child.tagName.toLowerCase();
+      if (tag === 'metadata' || tag.includes(':')) continue;
+      const cl = child.cloneNode(true);
+      cleanNS(cl);
+      g.appendChild(cl);
+    }
+    wrapper.appendChild(g);
+
+    const xml  = new XMLSerializer().serializeToString(wrapper);
+    const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = sw; canvas.height = sh;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#193c6d';
+    ctx.fillRect(0, 0, sw, sh);
+
+    let exported = false;
+    await new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          const dataUrl = canvas.toDataURL('image/webp', 0.93);
+          if (dataUrl && dataUrl.length > 500) {
+            const ext = dataUrl.startsWith('data:image/webp') ? 'webp' : 'png';
+            const ts  = new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
+            const a   = document.createElement('a');
+            a.download = `japan-eq-map_${ts}.${ext}`;
+            a.href = dataUrl; a.click();
+            exported = true;
+          }
+        } catch(e) { console.warn('Canvas export failed:', e); }
+        resolve();
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+      img.src = url;
+    });
+
+    if (!exported) {
+      const fb  = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+      const fbu = URL.createObjectURL(fb);
+      const ts  = new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
+      const a   = document.createElement('a');
+      a.download = `japan-eq-map_${ts}.svg`;
+      a.href = fbu; a.click();
+      setTimeout(() => URL.revokeObjectURL(fbu), 3000);
+    }
+
+  } catch(e) {
+    console.error('Map save error:', e);
+    alert('Export failed: ' + e.message);
+  } finally {
+    scale = savedScale; panX = savedPanX; panY = savedPanY;
+    applyTransform(false);
+    updateCityLabels();
+    updatePrefLabels();
+    setTimeout(() => {
+      btn.classList.remove('saving');
+      btn.title = 'Save map as WebP at 200% zoom';
+    }, 600);
+  }
+}
+
+document.getElementById('save-map-btn').addEventListener('click', saveMapAsWebP);
 
 // ── Copy predictions to clipboard ─────────────────────────────────────────────
 function copyPredictions() {
