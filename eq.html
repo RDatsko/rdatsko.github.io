@@ -4321,11 +4321,11 @@ function showTooltip(evt, primaryQ) {
     const sx = px * scale + panX, sy = py * scale + panY;
     return Math.hypot(sx - cx, sy - cy) <= HIT_RADIUS_PX;
   });
-  // Ensure primary is first
+  // Primary quake first, then sort remaining by time (newest first)
   nearby.sort((a, b) => {
     if (a === primaryQ) return -1;
     if (b === primaryQ) return 1;
-    return b.mag - a.mag;
+    return getTimestamp(b) - getTimestamp(a);
   });
 
   // Also check nearby predictions
