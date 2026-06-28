@@ -3970,7 +3970,7 @@ function applyTransform(animate) {
     const km  = parseFloat(r.dataset.windRingKm);
     if (km > 0 && !isNaN(lat)) {
       // r is in unscaled SVG coords — recompute from km directly
-      r.setAttribute('r', kmToPixels(km, lat));
+      r.setAttribute('r', kmToPixels(km, lat) * 0.75);
       r.setAttribute('stroke-width', 1.5 / scale);
       r.setAttribute('stroke-dasharray', `${6/scale} ${3/scale}`);
     }
@@ -5436,7 +5436,7 @@ function showWindRings(pt, cx, cy) {
   ];
   rings.forEach(({ km, color, fo, so }) => {
     if (!km || km <= 0) return;
-    const r = kmToPixels(km, pt.lat); // unscaled SVG coords — no /scale
+    const r = kmToPixels(km, pt.lat) * 0.75; // unscaled SVG coords — no /scale
     if (r < 0.5) return;
     const el = document.createElementNS(NS_SVG, 'circle');
     el.setAttribute('cx', cx); el.setAttribute('cy', cy); el.setAttribute('r', r);
@@ -5548,7 +5548,7 @@ function drawTyphoons() {
     storm.fcPts.forEach(pt => {
       if (!pt.radius_km || pt.radius_km <= 0) return;
       const [px, py] = geoToPx(pt.lon, pt.lat);
-      const r = kmToPixels(pt.radius_km, pt.lat); // unscaled SVG coords — no /scale
+      const r = kmToPixels(pt.radius_km, pt.lat) * 0.75; // unscaled SVG coords — no /scale
       if (r < 0.5) return;
       const el = document.createElementNS(NS_SVG, 'circle');
       el.setAttribute('cx', px); el.setAttribute('cy', py); el.setAttribute('r', r);
