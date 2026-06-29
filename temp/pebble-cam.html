@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+  video { width: 100%; max-width: 400px; display: block; }
+  canvas { display: none; }
+  #status { color: #0f0; font-family: monospace; font-size: 12px; padding: 8px; text-align: center; width: 100%; }
+  #captureBtn { margin-top: 12px; padding: 12px 32px; background: #0f0; color: #000; border: none; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+</style>
+</head>
+<body>
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+<canvas id="downscaled" width="200" height="228"></canvas>
+<div id="status">Starting camera...</div>
+<button id="captureBtn">Capture (or press SELECT)</button>
+<script>
+var WATCH_W = 200;
+var WATCH_H = 228;
+var CMD_FRAME_START = 3;
+var CMD_FRAME_CHUNK = 2;
+var CMD_FRAME_END   = 4;
+var streaming = false;
+var sending = false;
+var video = document.getElementById('video');
+var canvas = document.getElementById('canvas');
+var downscaled = document.getElementById('downscaled');
+var ctx = canvas.getContext('2d');
+var dctx = downscaled.getContext('2d');
+var status = document.getElementById('status');
+
+navigator.mediaDevices.getUserMedia({
+  video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+  audio: false
+}).then(function(stream) {
+  video.srcObject = stream;
+  video.onloadedmetadata = function() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    streaming = true;
+    status.textContent = 'Streaming to watch...';
+    setInterval(sendFrame, 250);
+  };
+}).catch(function(err) {
+  status.textContent = 'Camera error: ' + err.message;
+});
+
+function captureFullRes() {
+  ctx.drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  var link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = 'pebble-' + Date.now() + '.jpg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  var flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;opacity:0.8;pointer-events:none;';
+  document.body.appendChild(flash);
+  setTimeout(function() { document.body.removeChild(flash); }, 150);
+  status.textContent = 'Photo saved!';
+  setTimeout(function() { status.textContent = 'Streaming to watch...'; }, 2000);
+}
+
+document.getElementById('captureBtn').addEventListener('click', captureFullRes);
+
+setInterval(function() {
+  try {
+    if (localStorage.getItem('pebble_capture') === '1') {
+      localStorage.removeItem('pebble_capture');
+      captureFullRes();
+    }
+  } catch(ex) {}
+}, 200);
+
+function sendFrame() {
+  if (!streaming || sending) return;
+  sending = true;
+  dctx.drawImage(video, 0, 0, WATCH_W, WATCH_H);
+  var imageData = dctx.getImageData(0, 0, WATCH_W, WATCH_H);
+  var pixels = imageData.data;
+  var packed = new Uint8Array(WATCH_W * WATCH_H);
+  for (var i = 0; i < WATCH_W * WATCH_H; i++) {
+    var r = pixels[i*4]   >> 6;
+    var g = pixels[i*4+1] >> 6;
+    var b = pixels[i*4+2] >> 6;
+    packed[i] = (r << 4) | (g << 2) | b;
+  }
+  var b64 = btoa(String.fromCharCode.apply(null, packed));
+  sendChunked(b64);
+}
+
+function sendChunked(b64) {
+  Pebble.sendAppMessage({ CMD: CMD_FRAME_START }, function() {}, function() {});
+  var chunkSize = 100;
+  var offset = 0;
+  function sendNext() {
+    if (offset >= b64.length) {
+      Pebble.sendAppMessage({ CMD: CMD_FRAME_END },
+        function() { sending = false; },
+        function() { sending = false; }
+      );
+      return;
+    }
+    var chunk = b64.slice(offset, offset + chunkSize);
+    offset += chunkSize;
+    Pebble.sendAppMessage(
+      { CMD: CMD_FRAME_CHUNK, DATA: chunk },
+      sendNext,
+      function() { sendNext(); }
+    );
+  }
+  sendNext();
+}
+</script>
+</body>
+</html>
