@@ -466,11 +466,11 @@ function updateScreenUI(statusText, passcode = '') {
   lcd.setTextSize(2);
   lcd.setTextDatum(textdatum_t.middle_center);
 
-  const sysName = (currentSystem === MERAKI) ? 'Meraki' : 'UniFi';
+  const sysName = (currentSystem === 'MERAKI') ? 'Meraki' : 'UniFi';
   lcd.drawString('GUEST WI-FI ACCESS (' + sysName + ')', 240, 20);
 
   if (passcode !== '') {
-    const validHours = (currentSystem === MERAKI) ? MERAKI_HOURS : Math.trunc(UNIFI_MINUTES / 60);
+    const validHours = (currentSystem === 'MERAKI') ? MERAKI_HOURS : Math.trunc(UNIFI_MINUTES / 60);
     const expirationStr = getFormattedExpiration(validHours);
 
     // 2. Left card
@@ -508,7 +508,7 @@ function updateScreenUI(statusText, passcode = '') {
     lcd.drawRoundRect(320, 62, 135, 176, 8, COLOR_HEADER);
 
     // Strip the dashes from a Meraki passcode for the payload string
-    const rawPass = (currentSystem === MERAKI) ? passcode.split('-').join('') : passcode;
+    const rawPass = (currentSystem === 'MERAKI') ? passcode.split('-').join('') : passcode;
     const qrPayload = 'WIFI:S:' + WIFI_SSID + ';T:WPA;P:' + rawPass + ';;';
 
     drawQRCode(qrPayload, 338, 93, 3);
@@ -620,11 +620,11 @@ async function processCodeGeneration() {
   lcd.drawString('          Contacting API...          ', 240, 120);
 
   switch (currentSystem) {
-    case MERAKI:
+    case 'MERAKI':
       await createMerakiPsk();
       break;
 
-    case UNIFI:
+    case 'UNIFI':
       await createUnifiVoucher();
       break;
 
@@ -711,7 +711,6 @@ async function loop() {
     await handlePress();
   }
 }
-
 </script>
 
 <!-- Proxy script for Live API mode, shown in the API tab. Same text as cyd_proxy.py. -->
