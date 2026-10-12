@@ -324,20 +324,6 @@ details.req[open] summary { background: var(--panel-2); }
 
 <!-- The sketch. Plain text, loaded into the editor; the editor copy is what actually runs. -->
 <script type="text/plain" id="src-default">
-// sketch.js: JavaScript port of sketch.ino for the CYD simulator.
-// Edit anything here. Press Run (Ctrl/Cmd + Enter), or pause typing with Auto-run on,
-// and the simulator restarts with your changes.
-//
-// Rules of the port:
-//  - Anything that waits is async: use `await delay(ms)` and `await http.POST(body)`.
-//  - Never write a loop without an await inside it, or the browser tab will freeze.
-//  - Available: lcd, WiFi, WiFiClientSecure, HTTPClient, Serial, delay, millis, random,
-//    randomSeed, analogRead, pinMode, digitalRead, configTime, getLocalTime, nowSec,
-//    strftime(format, seconds) which formats the UTC fields of `seconds`, qrcode,
-//    TFT_* colours, textdatum_t. Define setup() and loop() like an Arduino sketch.
-//  - The original sketch had "#define COLOR_HEADER_BLUE0x1C53" (no space), which does
-//    not compile on a real toolchain. That color is now COLOR_HEADER, below.
-
 // ============================================================================
 // SYSTEM SELECTOR & NETWORK CONFIGURATION
 // ============================================================================
