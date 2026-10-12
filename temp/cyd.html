@@ -343,43 +343,43 @@ details.req[open] summary { background: var(--panel-2); }
 // ============================================================================
 
 const MERAKI = 'MERAKI';
-const UNIFI = 'UNIFI';
+const UNIFI  = 'UNIFI';
 
 // *** SET YOUR ACTIVE SYSTEM HERE ***
-const currentSystem = MERAKI;   // Options: MERAKI or UNIFI
+const currentSystem    = MERAKI;   // Options: MERAKI or UNIFI
 
 // --- Wi-Fi Settings ---
-const WIFI_SSID = 'Guest_WiFi_Network';
-const WIFI_PASSWORD = 'YOUR_WIFI_PASSWORD';
+const WIFI_SSID        = 'Guest_WiFi_Network';
+const WIFI_PASSWORD    = 'YOUR_WIFI_PASSWORD';
 
 // --- Meraki System Settings ---
-const MERAKI_API_KEY = 'YOUR_MERAKI_API_KEY';
-const MERAKI_NET_ID = 'N_123456789012345';
-const MERAKI_SSID_NUM = 0;      // Target SSID index (0 to 14)
-const MERAKI_HOURS = 24;        // Passcode expiration (hours)
+const MERAKI_API_KEY   = 'YOUR_MERAKI_API_KEY';
+const MERAKI_NET_ID    = 'N_123456789012345';
+const MERAKI_SSID_NUM  = 0;      // Target SSID index (0 to 14)
+const MERAKI_HOURS     = 24;        // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
-const UNIFI_HOST = '192.168.1.1';
-const UNIFI_API_KEY = 'YOUR_UNIFI_API_KEY';
-const UNIFI_SITE_ID = 'default';
-const UNIFI_MINUTES = 1440;     // Expiration in minutes (1440 mins = 24 hrs)
+const UNIFI_HOST       = '192.168.1.1';
+const UNIFI_API_KEY    = 'YOUR_UNIFI_API_KEY';
+const UNIFI_SITE_ID    = 'default';
+const UNIFI_MINUTES    = 1440;     // Expiration in minutes (1440 mins = 24 hrs)
 
 // ============================================================================
 
-const NTP_SERVER = 'pool.ntp.org';
-const BOOT_BUTTON = 0;          // Physical BOOT button on CYD board
+const NTP_SERVER       = 'pool.ntp.org';
+const BOOT_BUTTON      = 0;        // Physical BOOT button on CYD board
 const CODE_DISPLAY_SECONDS = 60;   // a displayed code clears itself after this many seconds
-let lastDebounce = 0;
-let codeShown = false;          // true while a code is on screen (the button then reads CLEAR CODE)
-let codeShownAt = 0;            // millis() when that code appeared
+let lastDebounce       = 0;
+let codeShown          = false;    // true while a code is on screen (the button then reads CLEAR CODE)
+let codeShownAt        = 0;        // millis() when that code appeared
 
 // Color palette (RGB565)
-const COLOR_BG_DARK = 0x2124;
-const COLOR_HEADER = 0x6DA8;       // #6BB647
-const COLOR_CARD_BG = 0xE73C;
-const COLOR_BTN = 0x2509;          // #25A34B
-const COLOR_PASSCODE = 0xF582;     // #F7B114, background of the "Passcode" badge
-const COLOR_TEXT_DARK = 0x10A2;
+const COLOR_BG_DARK    = 0x2124;
+const COLOR_HEADER     = 0x6DA8;   // #6BB647
+const COLOR_CARD_BG    = 0xE73C;
+const COLOR_BTN        = 0x2509;   // #25A34B
+const COLOR_PASSCODE   = 0xF582;   // #F7B114, background of the "Passcode" badge
+const COLOR_TEXT_DARK  = 0x10A2;
 const COLOR_TEXT_MUTED = 0x6B4D;   // grey for the small field labels
 
 // Button bounds
