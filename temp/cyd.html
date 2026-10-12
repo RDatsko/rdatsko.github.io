@@ -90,6 +90,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .problems { display: block; width: 100%; text-align: left; border: 0; border-top: 1px solid var(--line); padding: 8px 12px; background: var(--panel-2); font: 12px/1.45 var(--mono); color: var(--muted); cursor: default; overflow-wrap: anywhere; }
 .problems[data-s="ok"] { color: var(--go); }
 .problems[data-s="err"] { color: var(--stop); cursor: pointer; }
+[hidden] { display: none !important; }
+details.genjs { border-top: 1px solid var(--line); background: var(--panel-2); }
+details.genjs > summary { cursor: pointer; color: var(--info); font-size: 12px; padding: 8px 12px; }
+details.genjs pre { margin: 0; padding: 8px 12px; max-height: 260px; overflow: auto; font: 11px/1.5 var(--mono); background: var(--term); white-space: pre; }
 .hint { margin: 0; padding: 7px 12px 10px; font-size: 11px; color: var(--muted); background: var(--panel-2); }
 
 /* stage + board */
@@ -192,7 +196,7 @@ details.req[open] summary { background: var(--panel-2); }
     <!-- LEFT: code, mock API, network -->
     <section class="pane" aria-label="Code and network">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" id="t-code" aria-selected="true" aria-controls="p-code" type="button">sketch.js</button>
+        <button class="tab" role="tab" id="t-code" aria-selected="true" aria-controls="p-code" type="button">sketch.ino</button>
         <button class="tab" role="tab" id="t-mock" aria-selected="false" aria-controls="p-mock" type="button">API</button>
         <button class="tab" role="tab" id="t-net" aria-selected="false" aria-controls="p-net" type="button">Network<span class="count" id="netCount">0</span></button>
       </div>
@@ -206,10 +210,11 @@ details.req[open] summary { background: var(--panel-2); }
         </div>
         <div class="ed">
           <pre class="gutter" id="gutter" aria-hidden="true">1</pre>
-          <textarea id="code" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Sketch code"></textarea>
+          <textarea id="code" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Arduino sketch (.ino)"></textarea>
         </div>
         <button class="problems" id="problems" type="button" data-s="ok">Ready</button>
-        <p class="hint">Tab inserts two spaces; press Esc then Tab to leave the editor. Run with Ctrl or Cmd + Enter. Your edits stay in this browser.</p>
+        <details class="genjs"><summary>Generated JavaScript <span id="genjsInfo"></span></summary><pre id="genjs"></pre></details>
+        <p class="hint">This is the Arduino sketch (.ino). On every Run the page converts it to JavaScript in the background and runs that. Tab inserts two spaces; press Esc then Tab to leave the editor. Run with Ctrl or Cmd + Enter. Your edits stay in this browser.</p>
       </div>
 
       <div id="p-mock" role="tabpanel" aria-labelledby="t-mock" hidden>
@@ -324,105 +329,180 @@ details.req[open] summary { background: var(--panel-2); }
 
 <!-- The sketch. Plain text, loaded into the editor; the editor copy is what actually runs. -->
 <script type="text/plain" id="src-default">
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+#include <time.h>
+#include <qrcode.h>
+#include <LovyanGFX.hpp>
+
 // ============================================================================
 // SYSTEM SELECTOR & NETWORK CONFIGURATION
 // ============================================================================
 
-const MERAKI = 'MERAKI';
-const UNIFI  = 'UNIFI';
+enum NetworkSystem {
+  MERAKI,
+  UNIFI
+};
 
 // *** SET YOUR ACTIVE SYSTEM HERE ***
-const currentSystem    = MERAKI;   // Options: MERAKI or UNIFI
+const NetworkSystem currentSystem = MERAKI;  // Options: MERAKI or UNIFI
 
 // --- Wi-Fi Settings ---
-const WIFI_SSID        = 'Guest_Wifi_Network';
-const WIFI_PASSWORD    = 'YOUR_WIFI_PASSWORD';
-const WIFI_TIMEOUT     = 72;   // Hours
-const DISPLAY_SECONDS  = 60;   // a displayed code clears itself after this many seconds
+const char* WIFI_SSID       = "Guest_Wifi_Network";
+const char* WIFI_PASSWORD   = "YOUR_WIFI_PASSWORD";
+const int   WIFI_TIMEOUT    = 72;   // Hours
+const int   DISPLAY_SECONDS = 60;   // A displayed code clears itself after this many seconds
 
 // --- Meraki System Settings ---
-const MERAKI_API_KEY   = 'YOUR_MERAKI_API_KEY';
-const MERAKI_NET_ID    = 'N_123456789012345';
-const MERAKI_SSID_NUM  = 0;                 // Target SSID index (0 to 14)
-const MERAKI_HOURS     = WIFI_TIMEOUT;      // Passcode expiration (hours)
+const char* MERAKI_API_KEY  = "YOUR_MERAKI_API_KEY";
+const char* MERAKI_NET_ID   = "N_123456789012345";
+const int   MERAKI_SSID_NUM = 0;                  // Target SSID index (0 to 14)
+const int   MERAKI_HOURS    = WIFI_TIMEOUT;       // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
-const UNIFI_HOST       = '192.168.1.1';
-const UNIFI_API_KEY    = 'YOUR_UNIFI_API_KEY';
-const UNIFI_SITE_ID    = 'default';
-const UNIFI_MINUTES    = WIFI_TIMEOUT * 60; // Expiration in minutes
+const char* UNIFI_HOST      = "192.168.1.1";         // UniFi Console LAN IP or Domain
+const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";  // Site Manager API Key
+const char* UNIFI_SITE_ID   = "default";             // Default site ID (usually 'default')
+const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 60;     // Expiration in minutes
 
 // ============================================================================
 
-const NTP_SERVER       = 'pool.ntp.org';
-const BOOT_BUTTON      = 0;        // Physical BOOT button on CYD board
-let lastDebounce       = 0;
-let codeShown          = false;    // true while a code is on screen (the button then reads CLEAR CODE)
-let codeShownAt        = 0;        // millis() when that code appeared
+const char* NTP_SERVER     = "pool.ntp.org";
+const int   BOOT_BUTTON    = 0;  // Physical BOOT button on CYD board
+const long  JST_OFFSET     = 9 * 3600;  // Japan Standard Time, UTC+9 (no daylight saving)
+unsigned long lastDebounce = 0;
+bool          codeShown    = false;  // True while a code is on screen (the button then reads CLEAR CODE)
+unsigned long codeShownAt  = 0;      // millis() when that code appeared
 
-// Color palette (RGB565)
-const COLOR_BG_DARK    = 0x2124;
-const COLOR_HEADER     = 0x6DA8;   // #6BB647
-const COLOR_CARD_BG    = 0xE73C;
-const COLOR_BTN        = 0x2509;   // #25A34B
-const COLOR_PASSCODE   = 0xF582;   // #F7B114, background of the "Passcode" badge
-const COLOR_TEXT_DARK  = 0x10A2;
-const COLOR_TEXT_MUTED = 0x6B4D;   // grey for the small field labels
+// Color Palette Definitions (RGB565)
+#define COLOR_BG_DARK     0x2124  // Dark Charcoal background
+#define COLOR_HEADER      0x6DA8  // #6BB647 Header banner green
+#define COLOR_CARD_BG     0xE73C  // Light grey/silver card background
+#define COLOR_BTN         0x2509  // #25A34B Button green
+#define COLOR_PASSCODE    0xF582  // #F7B114 Background of the "Passcode" badge
+#define COLOR_TEXT_DARK   0x10A2  // Dark Navy/Black text
+#define COLOR_TEXT_MUTED  0x6B4D  // Grey for the small field labels
 
-// Button bounds
-const BTN_X = 25;
-const BTN_Y = 252;
-const BTN_W = 430;
-const BTN_H = 52;
+// --- LOVYANGFX HARDWARE CONFIGURATION (CYD 4.0" ST7796 / GT911) ---
+class LGFX : public lgfx::LGFX_Device {
+  lgfx::Panel_ST7796  _panel_instance;
+  lgfx::Bus_SPI       _bus_instance;
+  lgfx::Light_PWM     _light_instance;
+  lgfx::Touch_GT911   _touch_instance;
+
+public:
+  LGFX() {
+    { // SPI Bus Setup
+      auto cfg = _bus_instance.config();
+      cfg.spi_host = VSPI_HOST;
+      cfg.spi_mode = 0;
+      cfg.freq_write = 40000000;
+      cfg.pin_sclk = 14;
+      cfg.pin_mosi = 13;
+      cfg.pin_miso = 12;
+      cfg.pin_dc   = 2;
+      _bus_instance.config(cfg);
+      _panel_instance.setBus(&_bus_instance);
+    }
+    { // Display Panel Setup (480x320)
+      auto cfg = _panel_instance.config();
+      cfg.pin_cs       = 15;
+      cfg.pin_rst      = -1;
+      cfg.panel_width  = 320;
+      cfg.panel_height = 480;
+      _panel_instance.config(cfg);
+    }
+    { // Backlight Setup
+      auto cfg = _light_instance.config();
+      cfg.pin_bl = 27;
+      cfg.freq   = 44100;
+      cfg.pwm_channel = 7;
+      _light_instance.config(cfg);
+      _panel_instance.setLight(&_light_instance);
+    }
+    { // Touch Controller Setup (I2C GT911)
+      auto cfg = _touch_instance.config();
+      cfg.x_min      = 0;
+      cfg.x_max      = 479;
+      cfg.y_min      = 0;
+      cfg.y_max      = 319;
+      cfg.i2c_port   = 1;
+      cfg.pin_sda    = 33;
+      cfg.pin_scl    = 32;
+      cfg.freq       = 400000;
+      cfg.i2c_addr   = 0x5D;
+      _touch_instance.config(cfg);
+      _panel_instance.setTouch(&_touch_instance);
+    }
+    setPanel(&_panel_instance);
+  }
+};
+
+LGFX lcd;
+
+// Button Bounds
+const int BTN_X = 25;
+const int BTN_Y = 252;
+const int BTN_W = 430;
+const int BTN_H = 52;
 
 // --- UTILITY FUNCTIONS ---
 
 // Generates a 12-character passcode formatted as "XXXX-XXXX-XXXX"
-function generateGroupedPasscode() {
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let raw = '';
-  for (let i = 0; i < 12; i++) {
-    raw += chars[random(0, chars.length)];
+String generateGroupedPasscode() {
+  const char chars[] = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  String raw = "";
+  for (int i = 0; i < 12; i++) {
+    raw += chars[random(0, sizeof(chars) - 1)];
   }
-  return raw.substring(0, 4) + '-' + raw.substring(4, 8) + '-' + raw.substring(8, 12);
+  return raw.substring(0, 4) + "-" + raw.substring(4, 8) + "-" + raw.substring(8, 12);
 }
-
-const JST_OFFSET = 9 * 3600;      // Japan Standard Time, UTC+9 (no daylight saving)
 
 // Formats the expiration in Japan time (e.g. "2026/10/13 20:30")
-function getFormattedExpiration(hoursValid) {
-  return strftime('%Y/%m/%d %H:%M', nowSec() + hoursValid * 3600 + JST_OFFSET);
+String getFormattedExpiration(int hoursValid) {
+  time_t now;
+  time(&now);
+  now += (hoursValid * 3600) + JST_OFFSET;
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+  char buffer[24];
+  strftime(buffer, sizeof(buffer), "%Y/%m/%d %H:%M", &timeinfo);
+  return String(buffer);
 }
 
-function getIsoUtcTimestamp(hoursValid) {
-  return isoUtc(nowSec() + hoursValid * 3600);
+String getIsoUtcTimestamp(int hoursValid) {
+  time_t now;
+  time(&now);
+  now += (hoursValid * 3600);
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+  char buffer[25];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
+  return String(buffer);
 }
 
 // --- QR CODE RENDERER ---
 
-function drawQRCode(payload, startX, startY, scale = 3) {
-  let qr;
-  try {
-    qr = qrcode(4, 'L');              // version 4, ECC_LOW
-    qr.addData(payload);
-    qr.make();
-  } catch (e) {
-    Serial.println('QR failed: ' + payload.length + ' bytes, version 4 / ECC_LOW holds 78');
+void drawQRCode(String payload, int startX, int startY, int scale = 3) {
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(4)];
+  if (qrcode_initText(&qrcode, qrcodeData, 4, ECC_LOW, payload.c_str()) < 0) {
+    Serial.println("QR failed: payload is too long for version 4 / ECC_LOW");
     return;
   }
 
-  const size = qr.getModuleCount();
-  const qrSize = size * scale;
-  const margin = scale * 2;
+  int qrSize = qrcode.size * scale;
+  int margin = scale * 2;
 
   // Draw white background
-  lcd.fillRect(startX - margin, startY - margin, qrSize + margin * 2, qrSize + margin * 2, TFT_WHITE);
+  lcd.fillRect(startX - margin, startY - margin, qrSize + (margin * 2), qrSize + (margin * 2), TFT_WHITE);
 
   // Draw modules
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      if (qr.isDark(y, x)) {
-        lcd.fillRect(startX + x * scale, startY + y * scale, scale, scale, TFT_BLACK);
+  for (uint8_t y = 0; y < qrcode.size; y++) {
+    for (uint8_t x = 0; x < qrcode.size; x++) {
+      if (qrcode_getModule(&qrcode, x, y)) {
+        lcd.fillRect(startX + (x * scale), startY + (y * scale), scale, scale, TFT_BLACK);
       }
     }
   }
@@ -430,96 +510,102 @@ function drawQRCode(payload, startX, startY, scale = 3) {
 
 // --- DISPLAY UI RENDERERS ---
 
-function drawGetCodeButton(isPressed = false) {
-  const bgCol = isPressed ? TFT_GREEN : COLOR_BTN;
-  const border = TFT_WHITE;
-  const textCol = isPressed ? TFT_BLACK : TFT_WHITE;
+// The button reads GET CODE, or CLEAR CODE while a code is on screen
+void drawGetCodeButton(bool isPressed = false) {
+  uint32_t bgCol   = isPressed ? TFT_GREEN : COLOR_BTN;
+  uint32_t border  = TFT_WHITE;
+  uint32_t textCol = isPressed ? TFT_BLACK : TFT_WHITE;
 
   lcd.fillRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, bgCol);
   lcd.drawRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, border);
 
   lcd.setTextColor(textCol, bgCol);
   lcd.setTextSize(3);
-  lcd.setTextDatum(textdatum_t.middle_center);
-  lcd.drawString(codeShown ? 'CLEAR CODE' : 'GET CODE', BTN_X + BTN_W / 2, BTN_Y + BTN_H / 2);
+  lcd.setTextDatum(textdatum_t::middle_center);
+  lcd.drawString(codeShown ? "CLEAR CODE" : "GET CODE", BTN_X + (BTN_W / 2), BTN_Y + (BTN_H / 2));
 }
 
 // Small label above a larger value, left aligned inside the ticket card
-function drawTicketField(label, value, y) {
-  lcd.setTextDatum(textdatum_t.top_left);
+void drawTicketField(const char* label, String value, int y) {
+  lcd.setTextDatum(textdatum_t::top_left);
   lcd.setTextColor(COLOR_TEXT_MUTED, COLOR_CARD_BG);
   lcd.setTextSize(1);
   lcd.drawString(label, 33, y);
   lcd.setTextColor(COLOR_TEXT_DARK, COLOR_CARD_BG);
-  lcd.setTextSize(value.length * 12 > 264 ? 1 : 2);   // a very long SSID falls back to the small font
+  lcd.setTextSize(value.length() * 12 > 264 ? 1 : 2);  // A very long SSID falls back to the small font
   lcd.drawString(value, 33, y + 9);
 }
 
-function updateScreenUI(statusText, passcode = '') {
-  codeShown = (passcode !== '');
-  if (codeShown) codeShownAt = millis();      // the display timeout counts from here
+void updateScreenUI(String statusText, String passcode = "") {
+  codeShown = (passcode != "");
+  if (codeShown) codeShownAt = millis();  // The display timeout counts from here
   lcd.fillScreen(COLOR_BG_DARK);
 
-  // 1. Top header banner
+  // 1. Top Header Banner
   lcd.fillRect(0, 0, 480, 40, COLOR_HEADER);
   lcd.setTextColor(TFT_WHITE, COLOR_HEADER);
   lcd.setTextSize(2);
-  lcd.setTextDatum(textdatum_t.middle_center);
+  lcd.setTextDatum(textdatum_t::middle_center);
 
-  const sysName = (currentSystem === 'MERAKI') ? 'Meraki' : 'UniFi';
-  lcd.drawString('GUEST WI-FI ACCESS (' + sysName + ')', 240, 20);
+  String sysName = (currentSystem == MERAKI) ? "Meraki" : "UniFi";
+  lcd.drawString("GUEST WI-FI ACCESS (" + sysName + ")", 240, 20);
 
-  if (passcode !== '') {
-    const validHours = (currentSystem === 'MERAKI') ? MERAKI_HOURS : Math.trunc(UNIFI_MINUTES / 60);
-    const expirationStr = getFormattedExpiration(validHours);
+  if (passcode != "") {
+    int validHours = (currentSystem == MERAKI) ? MERAKI_HOURS : (UNIFI_MINUTES / 60);
+    String expirationStr = getFormattedExpiration(validHours);
 
-    // 2. Left card
+    // 2. Left Card - Section Header
     lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
     lcd.setTextSize(1);
-    lcd.setTextDatum(textdatum_t.top_left);
-    lcd.drawString('Currently active ticket', 25, 48);
+    lcd.setTextDatum(textdatum_t::top_left);
+    lcd.drawString("Currently active ticket", 25, 48);
 
+    // Left Card Background
     lcd.fillRoundRect(25, 62, 280, 176, 8, COLOR_CARD_BG);
     lcd.drawRoundRect(25, 62, 280, 176, 8, TFT_WHITE);
 
-    // Passcode badge
+    // Badge: "Passcode"
     lcd.fillRoundRect(33, 70, 70, 16, 4, COLOR_PASSCODE);
     lcd.setTextColor(COLOR_TEXT_DARK, COLOR_PASSCODE);
     lcd.setTextSize(1);
-    lcd.drawString('Passcode', 38, 74);
+    lcd.drawString("Passcode", 38, 74);
 
-    // Passcode text, size 3 (14 characters is 252 px, the card holds 264)
+    // Formatted Passcode Text (size 3: 14 characters is 252 px, the card holds 264)
     lcd.setTextColor(COLOR_TEXT_DARK, COLOR_CARD_BG);
     lcd.setTextSize(3);
     lcd.drawString(passcode, 33, 96);
 
-    // Ticket details, size-2 values with small labels so they read on the 4" panel
-    drawTicketField('SSID', WIFI_SSID, 134);
-    drawTicketField('VALID', validHours + ' Hours', 168);
-    drawTicketField('EXPIRES (JST)', expirationStr, 202);
+    // Ticket Details: size-2 values with small labels so they read on the 4" panel
+    drawTicketField("SSID", String(WIFI_SSID), 134);
+    drawTicketField("VALID", String(validHours) + " Hours", 168);
+    drawTicketField("EXPIRES (JST)", expirationStr, 202);
     lcd.setTextSize(1);
 
-    // 3. Right card (QR code)
+    // 3. Right Card - Section Header (QR Code)
     lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
-    lcd.setTextDatum(textdatum_t.top_center);
-    lcd.drawString('QR CODE', 390, 48);
+    lcd.setTextDatum(textdatum_t::top_center);
+    lcd.drawString("QR CODE", 390, 48);
 
+    // QR Code Container Box
     lcd.fillRoundRect(320, 62, 135, 176, 8, COLOR_CARD_BG);
     lcd.drawRoundRect(320, 62, 135, 176, 8, COLOR_HEADER);
 
+    // Render Wi-Fi QR Code (Centered in Right Card)
     // Strip the dashes from a Meraki passcode for the payload string
-    const rawPass = (currentSystem === 'MERAKI') ? passcode.split('-').join('') : passcode;
-    const qrPayload = 'WIFI:S:' + WIFI_SSID + ';T:WPA;P:' + rawPass + ';;';
+    String rawPass = passcode;
+    if (currentSystem == MERAKI) rawPass.replace("-", "");
+    String qrPayload = "WIFI:S:" + String(WIFI_SSID) + ";T:WPA;P:" + rawPass + ";;";
 
     drawQRCode(qrPayload, 338, 93, 3);
 
-    lcd.setTextColor(COLOR_TEXT_DARK, COLOR_CARD_BG);   // dark text, green on light grey is hard to read
+    // Footer Label under QR
+    lcd.setTextColor(COLOR_TEXT_DARK, COLOR_CARD_BG);
     lcd.setTextSize(1);
-    lcd.drawString('SCAN TO JOIN', 387, 207);
+    lcd.drawString("SCAN TO JOIN", 387, 207);
 
   } else {
-    // Status message
-    lcd.setTextDatum(textdatum_t.middle_center);
+    // Status Message Display
+    lcd.setTextDatum(textdatum_t::middle_center);
     lcd.setTextColor(TFT_ORANGE, COLOR_BG_DARK);
     lcd.setTextSize(2);
     lcd.drawString(statusText, 240, 120);
@@ -530,106 +616,107 @@ function updateScreenUI(statusText, passcode = '') {
 
 // --- SYSTEM API WORKFLOWS ---
 
-async function createMerakiPsk() {
-  const client = new WiFiClientSecure();
+bool createMerakiPsk() {
+  WiFiClientSecure client;
   client.setInsecure();
 
-  const http = new HTTPClient();
+  HTTPClient http;
   http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
 
-  const url = 'https://api.meraki.com/api/v1/networks/' + MERAKI_NET_ID +
-              '/wireless/ssids/' + MERAKI_SSID_NUM + '/identityPsks';
+  String url = "https://api.meraki.com/api/v1/networks/" + String(MERAKI_NET_ID) +
+               "/wireless/ssids/" + String(MERAKI_SSID_NUM) + "/identityPsks";
 
-  const formattedPasscode = generateGroupedPasscode();
-  const rawPasscode = formattedPasscode.split('-').join('');   // Strip dashes for API call
+  String formattedPasscode = generateGroupedPasscode();
+  String rawPasscode = formattedPasscode;
+  rawPasscode.replace("-", "");  // Strip dashes for API call
 
-  const expiresAt = getIsoUtcTimestamp(MERAKI_HOURS);
-  const pskName = 'CYD-Guest-' + random(1000, 9999);
+  String expiresAt = getIsoUtcTimestamp(MERAKI_HOURS);
+  String pskName   = "CYD-Guest-" + String(random(1000, 9999));
 
-  const jsonPayload = '{"name":"' + pskName +
-                      '","passphrase":"' + rawPasscode +
-                      '","expiresAt":"' + expiresAt + '"}';
+  String jsonPayload = "{\"name\":\"" + pskName +
+                       "\",\"passphrase\":\"" + rawPasscode +
+                       "\",\"expiresAt\":\"" + expiresAt + "\"}";
 
   http.begin(client, url);
-  http.addHeader('Content-Type', 'application/json');
-  http.addHeader('X-Cisco-Meraki-API-Key', MERAKI_API_KEY);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-Cisco-Meraki-API-Key", MERAKI_API_KEY);
 
-  const httpCode = await http.POST(jsonPayload);
+  int httpCode = http.POST(jsonPayload);
 
-  if (httpCode === 201) {
-    updateScreenUI('SUCCESS', formattedPasscode);
+  if (httpCode == 201) {
+    updateScreenUI("SUCCESS", formattedPasscode);
     http.end();
     return true;
   } else {
-    updateScreenUI('Meraki API Error: ' + httpCode);
+    updateScreenUI("Meraki API Error: " + String(httpCode));
     http.end();
     return false;
   }
 }
 
-async function createUnifiVoucher() {
-  const client = new WiFiClientSecure();
+bool createUnifiVoucher() {
+  WiFiClientSecure client;
   client.setInsecure();
 
-  const http = new HTTPClient();
+  HTTPClient http;
   http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
 
-  const url = 'https://' + UNIFI_HOST + '/v1/sites/' + UNIFI_SITE_ID + '/hotspot/vouchers';
+  String url = "https://" + String(UNIFI_HOST) + "/v1/sites/" + String(UNIFI_SITE_ID) + "/hotspot/vouchers";
 
-  const jsonPayload = '{"name":"CYD-Guest","count":1,"timeLimitMinutes":' +
-                      UNIFI_MINUTES + ',"authorizedGuestLimit":1}';
+  String jsonPayload = "{\"name\":\"CYD-Guest\",\"count\":1,\"timeLimitMinutes\":" +
+                       String(UNIFI_MINUTES) + ",\"authorizedGuestLimit\":1}";
 
   http.begin(client, url);
-  http.addHeader('Content-Type', 'application/json');
-  http.addHeader('X-API-KEY', UNIFI_API_KEY);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-API-KEY", UNIFI_API_KEY);
 
-  const httpCode = await http.POST(jsonPayload);
+  int httpCode = http.POST(jsonPayload);
 
-  if (httpCode === 200 || httpCode === 201) {
-    const response = http.getString();
+  if (httpCode == 200 || httpCode == 201) {
+    String response = http.getString();
 
-    const codeIndex = response.indexOf('"code":"');
-    if (codeIndex !== -1) {
-      const start = codeIndex + 8;
-      const end = response.indexOf('"', start);
-      const rawCode = response.substring(start, end);
+    int codeIndex = response.indexOf("\"code\":\"");
+    if (codeIndex != -1) {
+      int start = codeIndex + 8;
+      int end = response.indexOf("\"", start);
+      String rawCode = response.substring(start, end);
 
-      updateScreenUI('SUCCESS', rawCode);
+      updateScreenUI("SUCCESS", rawCode);
       http.end();
       return true;
     }
   }
 
-  updateScreenUI('UniFi API Error: ' + httpCode);
+  updateScreenUI("UniFi API Error: " + String(httpCode));
   http.end();
   return false;
 }
 
 // --- SWITCH DISPATCHER ---
 
-async function processCodeGeneration() {
-  if (WiFi.status() !== WL_CONNECTED) {
-    updateScreenUI('Wi-Fi Disconnected!');
+void processCodeGeneration() {
+  if (WiFi.status() != WL_CONNECTED) {
+    updateScreenUI("Wi-Fi Disconnected!");
     return;
   }
 
   drawGetCodeButton(true);
-  lcd.setTextDatum(textdatum_t.middle_center);
+  lcd.setTextDatum(textdatum_t::middle_center);
   lcd.setTextColor(TFT_YELLOW, COLOR_BG_DARK);
   lcd.setTextSize(2);
-  lcd.drawString('          Contacting API...          ', 240, 120);
+  lcd.drawString("          Contacting API...          ", 240, 120);
 
   switch (currentSystem) {
-    case 'MERAKI':
-      await createMerakiPsk();
+    case MERAKI:
+      createMerakiPsk();
       break;
 
-    case 'UNIFI':
-      await createUnifiVoucher();
+    case UNIFI:
+      createUnifiVoucher();
       break;
 
     default:
-      updateScreenUI('Unknown System Target!');
+      updateScreenUI("Unknown System Target!");
       break;
   }
 }
@@ -637,78 +724,80 @@ async function processCodeGeneration() {
 // --- CLEAR / TIMEOUT ---
 
 // Clears the ticket and goes back to the start screen with the GET CODE button
-function clearCode() {
-  updateScreenUI('Tap button below to get code');
+void clearCode() {
+  updateScreenUI("Tap button below to get code");
 }
 
 // One press does one thing: clear the code while one is shown, otherwise get a new one
-async function handlePress() {
+void handlePress() {
   if (codeShown) {
-    drawGetCodeButton(true);      // brief pressed flash on CLEAR CODE
-    await delay(120);
+    drawGetCodeButton(true);  // Brief pressed flash on CLEAR CODE
+    delay(120);
     clearCode();
   } else {
-    await processCodeGeneration();
+    processCodeGeneration();
   }
 }
 
 // --- ARDUINO SETUP & LOOP ---
 
-async function setup() {
+void setup() {
   Serial.begin(115200);
   pinMode(BOOT_BUTTON, INPUT_PULLUP);
   randomSeed(analogRead(0));
 
   lcd.init();
-  lcd.setRotation(1);   // Landscape mode (480x320)
+  lcd.setRotation(1); // Landscape mode (480x320)
   lcd.setBrightness(255);
 
-  updateScreenUI('Connecting to Wi-Fi...');
+  updateScreenUI("Connecting to Wi-Fi...");
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() !== WL_CONNECTED) {
-    await delay(500);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
   }
 
-  updateScreenUI('Syncing NTP Time...');
+  updateScreenUI("Syncing NTP Time...");
 
   configTime(0, 0, NTP_SERVER);
-  while (!getLocalTime()) {
-    await delay(500);
+  struct tm timeinfo;
+  while (!getLocalTime(&timeinfo)) {
+    delay(500);
   }
 
-  updateScreenUI('Tap button below to get code');
+  updateScreenUI("Tap button below to get code");
 }
 
-async function loop() {
+void loop() {
+  uint16_t touchX, touchY;
+
   // Timeout: put the start screen back once a code has been shown long enough
-  if (codeShown && millis() - codeShownAt > DISPLAY_SECONDS * 1000) {
+  if (codeShown && millis() - codeShownAt > DISPLAY_SECONDS * 1000UL) {
     clearCode();
   }
 
-  // Trigger 1: touchscreen press detection
-  const t = lcd.getTouch();
-  if (t) {
-    if (t.x >= BTN_X && t.x <= BTN_X + BTN_W &&
-        t.y >= BTN_Y && t.y <= BTN_Y + BTN_H) {
+  // Trigger 1: Touchscreen Press Detection
+  if (lcd.getTouch(&touchX, &touchY)) {
+    if (touchX >= BTN_X && touchX <= (BTN_X + BTN_W) &&
+        touchY >= BTN_Y && touchY <= (BTN_Y + BTN_H)) {
 
       if (millis() - lastDebounce > 1500) {
         lastDebounce = millis();
-        await handlePress();
+        handlePress();
       }
     }
   }
 
-  // Trigger 2: physical BOOT button press
-  if (digitalRead(BOOT_BUTTON) === LOW && (millis() - lastDebounce > 1500)) {
+  // Trigger 2: Physical BOOT Button Press
+  if (digitalRead(BOOT_BUTTON) == LOW && (millis() - lastDebounce > 1500)) {
     lastDebounce = millis();
-    await handlePress();
+    handlePress();
   }
 
-  // Trigger 3: serial input
+  // Trigger 3: Serial Input
   if (Serial.available() > 0) {
     while (Serial.available() > 0) Serial.read();
-    await handlePress();
+    handlePress();
   }
 }
 </script>
@@ -3183,6 +3272,1754 @@ var qrcode = function() {
 </script>
 
 <script>
+const CydCpp = (() => {
+'use strict';
+/* ===== C++ (Arduino subset) to JavaScript converter, part 1: lexer and preprocessor ===== */
+
+class CompileError extends Error {
+  constructor(message, line) { super(message); this.name = 'CompileError'; this.line = line || 0; }
+}
+function fail(msg, line) { throw new CompileError(msg, line); }
+
+const PUNCT3 = ['<<=', '>>=', '...'];
+const PUNCT2 = ['->', '++', '--', '<<', '>>', '<=', '>=', '==', '!=', '&&', '||', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '::'];
+const PUNCT1 = '+-*/%=<>!&|^~?:;,.(){}[]#';
+const NUM_RE = /^(?:0[xX][0-9a-fA-F]+|0[bB][01]+|(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?)([uUlLfF]*)/;
+const ID_RE = /^[A-Za-z_][A-Za-z0-9_]*/;
+
+function tokText(t) {
+  if (!t || t.t === 'eof') return 'end of file';
+  if (t.t === 'str') return JSON.stringify(t.v);
+  if (t.t === 'chr') return "'" + String.fromCharCode(t.n) + "'";
+  return String(t.v);
+}
+
+/* Reads one escape sequence starting after the backslash. Returns [code, nextIndex]. */
+function readEscape(s, i, line) {
+  const c = s[i];
+  const simple = { n: 10, t: 9, r: 13, a: 7, b: 8, f: 12, v: 11, e: 27, '\\': 92, "'": 39, '"': 34, '?': 63 };
+  if (c in simple) return [simple[c], i + 1];
+  if (c === 'x') {
+    let j = i + 1, h = '';
+    while (j < s.length && /[0-9a-fA-F]/.test(s[j])) h += s[j++];
+    if (!h) fail('\\x used with no following hex digits', line);
+    return [parseInt(h, 16) & 255, j];
+  }
+  if (/[0-7]/.test(c)) {
+    let j = i, o = '';
+    while (j < s.length && o.length < 3 && /[0-7]/.test(s[j])) o += s[j++];
+    return [parseInt(o, 8) & 255, j];
+  }
+  return [c.charCodeAt(0), i + 1];
+}
+
+/* Reads a single token at s[i] (not whitespace, not a comment). Returns the token with .end set. */
+function readTok(s, i, line) {
+  const c = s[i];
+  if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(s[i + 1] || ''))) {
+    const m = NUM_RE.exec(s.slice(i));
+    const text = m[0], suf = m[1].toLowerCase();
+    const body = suf ? text.slice(0, text.length - m[1].length) : text;
+    const hex = /^0[xX]/.test(body), bin = /^0[bB]/.test(body);
+    const isFloat = !hex && !bin && (/[.eE]/.test(body) || suf.includes('f'));
+    let n;
+    if (hex) n = parseInt(body.slice(2), 16);
+    else if (bin) n = parseInt(body.slice(2), 2);
+    else if (!isFloat && /^0[0-7]+$/.test(body)) n = parseInt(body, 8);
+    else n = Number(body);
+    return { t: 'num', v: body, n, isFloat, suf, line, end: i + text.length, hex: hex || bin };
+  }
+  if (/[A-Za-z_]/.test(c)) {
+    const m = ID_RE.exec(s.slice(i));
+    return { t: 'id', v: m[0], line, end: i + m[0].length };
+  }
+  if (c === '"') {
+    let j = i + 1, v = '';
+    while (j < s.length && s[j] !== '"') {
+      if (s[j] === '\n') fail('missing terminating " character', line);
+      if (s[j] === '\\') { const [code, nj] = readEscape(s, j + 1, line); v += String.fromCharCode(code); j = nj; }
+      else v += s[j++];
+    }
+    if (j >= s.length) fail('missing terminating " character', line);
+    return { t: 'str', v, line, end: j + 1 };
+  }
+  if (c === "'") {
+    let j = i + 1, code;
+    if (s[j] === '\\') { [code, j] = readEscape(s, j + 1, line); }
+    else { code = s.charCodeAt(j); j++; }
+    if (s[j] !== "'") fail('missing terminating \' character (multi-character constants are not supported)', line);
+    return { t: 'chr', n: code, line, end: j + 1 };
+  }
+  for (const p of PUNCT3) if (s.startsWith(p, i)) return { t: 'op', v: p, line, end: i + 3 };
+  for (const p of PUNCT2) if (s.startsWith(p, i)) return { t: 'op', v: p, line, end: i + 2 };
+  if (PUNCT1.includes(c)) return { t: 'op', v: c, line, end: i + 1 };
+  fail("stray '" + c + "' in program", line);
+}
+
+/* Tokenises a directive body or #if expression: no comments left, no macro expansion. */
+function scanSimple(text, line) {
+  const out = [];
+  let i = 0;
+  while (i < text.length) {
+    if (/\s/.test(text[i])) { i++; continue; }
+    const t = readTok(text, i, line);
+    i = t.end; delete t.end; out.push(t);
+  }
+  return out;
+}
+
+function evalPP(text, macros, line) {
+  const toks = scanSimple(text, line);
+  let p = 0;
+  const peek = () => toks[p];
+  const isOp = v => peek() && peek().t === 'op' && peek().v === v;
+  const macroVal = name => {
+    const m = macros.get(name);
+    if (!m) return 0;
+    if (m.length === 1 && m[0].t === 'num') return m[0].n;
+    return m.length ? 1 : 0;
+  };
+  function primary() {
+    const t = toks[p++];
+    if (!t) fail('#if with no expression', line);
+    if (t.t === 'num') return t.n;
+    if (t.t === 'op' && t.v === '(') { const v = or(); if (!isOp(')')) fail("missing ')' in #if expression", line); p++; return v; }
+    if (t.t === 'op' && t.v === '!') return primary() ? 0 : 1;
+    if (t.t === 'op' && t.v === '-') return -primary();
+    if (t.t === 'id' && t.v === 'defined') {
+      let paren = false;
+      if (isOp('(')) { paren = true; p++; }
+      const n = toks[p++];
+      if (!n || n.t !== 'id') fail('operator "defined" requires an identifier', line);
+      if (paren) { if (!isOp(')')) fail("missing ')' after \"defined\"", line); p++; }
+      return macros.has(n.v) ? 1 : 0;
+    }
+    if (t.t === 'id') return macroVal(t.v);
+    fail('unsupported #if expression', line);
+  }
+  const cmp = () => {
+    let l = primary();
+    for (;;) {
+      const t = peek();
+      if (!t || t.t !== 'op' || !['==', '!=', '<', '>', '<=', '>='].includes(t.v)) return l;
+      p++; const r = primary();
+      l = ({ '==': l === r, '!=': l !== r, '<': l < r, '>': l > r, '<=': l <= r, '>=': l >= r })[t.v] ? 1 : 0;
+    }
+  };
+  const and = () => { let l = cmp(); while (isOp('&&')) { p++; const r = cmp(); l = (l && r) ? 1 : 0; } return l; };
+  const or = () => { let l = and(); while (isOp('||')) { p++; const r = and(); l = (l || r) ? 1 : 0; } return l; };
+  const v = or();
+  if (p < toks.length) fail('extra tokens at end of #if directive', line);
+  return v;
+}
+
+const PREDEFINED = { ARDUINO: 10607, ESP32: 1, ESP_PLATFORM: 1, ARDUINO_ARCH_ESP32: 1, IRAM_ATTR: '', PROGMEM: '', DRAM_ATTR: '', RTC_DATA_ATTR: '' };
+
+function lex(src) {
+  src = src.replace(/\r\n?/g, '\n');
+  const toks = [];
+  const macros = new Map();
+  for (const [k, v] of Object.entries(PREDEFINED)) macros.set(k, v === '' ? [] : scanSimple(String(v), 0));
+  const cond = [];
+  const active = () => cond.length === 0 || cond[cond.length - 1].active;
+  const expanding = new Set();
+  function emit(tok, line) {
+    if (tok.t === 'id' && macros.has(tok.v) && !expanding.has(tok.v)) {
+      expanding.add(tok.v);
+      for (const b of macros.get(tok.v)) emit(Object.assign({}, b, { line }), line);
+      expanding.delete(tok.v);
+      return;
+    }
+    toks.push(tok);
+  }
+  const n = src.length;
+  let i = 0, line = 1, bol = true;
+  while (i < n) {
+    const c = src[i];
+    if (c === '\n') { line++; i++; bol = true; continue; }
+    if (c === ' ' || c === '\t' || c === '\f' || c === '\v') { i++; continue; }
+    if (c === '\\' && src[i + 1] === '\n') { i += 2; line++; continue; }
+    if (c === '/' && src[i + 1] === '/') { while (i < n && src[i] !== '\n') i++; continue; }
+    if (c === '/' && src[i + 1] === '*') {
+      const start = line;
+      i += 2;
+      while (i < n && !(src[i] === '*' && src[i + 1] === '/')) { if (src[i] === '\n') line++; i++; }
+      if (i >= n) fail('unterminated comment', start);
+      i += 2; continue;
+    }
+    if (c === '#' && bol) {
+      // read the logical directive line
+      const dirLine = line;
+      let j = i + 1, text = '';
+      while (j < n) {
+        if (src[j] === '\n') break;
+        if (src[j] === '\\' && src[j + 1] === '\n') { j += 2; line++; text += ' '; continue; }
+        if (src[j] === '/' && src[j + 1] === '/') { while (j < n && src[j] !== '\n') j++; break; }
+        if (src[j] === '/' && src[j + 1] === '*') {
+          j += 2;
+          while (j < n && !(src[j] === '*' && src[j + 1] === '/')) { if (src[j] === '\n') line++; j++; }
+          j += 2; text += ' '; continue;
+        }
+        text += src[j++];
+      }
+      i = j;
+      text = text.trim();
+      const m = /^([A-Za-z_]+)\s*([\s\S]*)$/.exec(text);
+      const dir = m ? m[1] : '';
+      const rest = m ? m[2].trim() : '';
+      const on = active();
+      if (dir === 'if' || dir === 'ifdef' || dir === 'ifndef') {
+        let v = false;
+        if (on) {
+          if (dir === 'if') v = !!evalPP(rest, macros, dirLine);
+          else { const nm = /^[A-Za-z_]\w*/.exec(rest); if (!nm) fail('macro names must be identifiers', dirLine); v = macros.has(nm[0]) === (dir === 'ifdef'); }
+        }
+        cond.push({ pa: on, active: on && v, taken: v });
+      } else if (dir === 'elif') {
+        const top = cond[cond.length - 1];
+        if (!top) fail('#elif without #if', dirLine);
+        if (top.taken || !top.pa) top.active = false;
+        else { const v = !!evalPP(rest, macros, dirLine); top.active = v; top.taken = v; }
+      } else if (dir === 'else') {
+        const top = cond[cond.length - 1];
+        if (!top) fail('#else without #if', dirLine);
+        top.active = top.pa && !top.taken; top.taken = true;
+      } else if (dir === 'endif') {
+        if (!cond.length) fail('#endif without #if', dirLine);
+        cond.pop();
+      } else if (on) {
+        if (dir === 'define') {
+          const dm = /^([A-Za-z_]\w*)(\()?([\s\S]*)$/.exec(rest);
+          if (!dm) fail('macro names must be identifiers', dirLine);
+          if (dm[2]) fail('function-like macros (#define ' + dm[1] + '(...)) are not supported by this simulator, use a function or a const instead', dirLine);
+          const body = dm[3].trim();
+          if (!body && /0[xX][0-9a-fA-F]+$/.test(dm[1])) {
+            const idx = dm[1].search(/0[xX][0-9a-fA-F]+$/);
+            fail('#define ' + dm[1] + ' has no value. A space is missing before the number: #define ' + dm[1].slice(0, idx) + ' ' + dm[1].slice(idx), dirLine);
+          }
+          macros.set(dm[1], scanSimple(body, dirLine));
+        } else if (dir === 'undef') {
+          macros.delete(rest);
+        } else if (dir === 'error') {
+          fail('#error ' + rest, dirLine);
+        }
+        // include, pragma, warning, line and the rest are ignored
+      }
+      continue;
+    }
+    bol = false;
+    if (!active()) { while (i < n && src[i] !== '\n') i++; continue; }
+    const t = readTok(src, i, line);
+    i = t.end; delete t.end;
+    emit(t, line);
+  }
+  if (cond.length) fail('unterminated #if', line);
+  toks.push({ t: 'eof', line });
+  return toks;
+}
+
+/* ===== part 2: parser (C++ subset to AST) ===== */
+
+const TYPE_ALIASES = {
+  size_t: 'uint32', uint8_t: 'uint8', int8_t: 'int8', uint16_t: 'uint16', int16_t: 'int16', uint32_t: 'uint32', int32_t: 'int32',
+  uint64_t: 'uint64', int64_t: 'int64', time_t: 'int64', byte: 'uint8', word: 'uint16', boolean: 'bool', wl_status_t: 'int32',
+  esp_err_t: 'int32', uint_fast8_t: 'uint8', textdatum_t: 'int32', WiFiClient: 'WiFiClientSecure', ssize_t: 'int32', intptr_t: 'int32'
+};
+const OBJECT_TYPES = new Set(['WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress', 'LGFX']);
+const BASE_TYPE_NAMES = new Set(Object.keys(TYPE_ALIASES).concat(['String', 'WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress']));
+const TYPE_KEYWORDS = new Set(['void', 'bool', 'char', 'short', 'int', 'long', 'float', 'double', 'signed', 'unsigned', 'auto']);
+const QUALIFIERS = new Set(['const', 'volatile', 'constexpr', 'static', 'extern', 'inline', 'register', 'mutable']);
+const SCOPE_SKIP = new Set(['lgfx', 'std', 'fs']);
+const ASSIGN_OPS = new Set(['=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=']);
+const BINPREC = { '||': 1, '&&': 2, '|': 3, '^': 4, '&': 5, '==': 6, '!=': 6, '<': 7, '>': 7, '<=': 7, '>=': 7, '<<': 8, '>>': 8, '+': 9, '-': 9, '*': 10, '/': 10, '%': 10 };
+const UNSUPPORTED_WORDS = {
+  new: "'new' (dynamic allocation)", delete: "'delete'", this: "'this'", throw: "exceptions", try: "exceptions", catch: "exceptions",
+  template: 'templates', namespace: 'namespaces', typedef: 'typedef', using: "'using' declarations", goto: "'goto'", union: 'unions',
+  operator: 'operator overloading', virtual: 'virtual functions', friend: "'friend'", asm: 'inline assembly'
+};
+
+function makeType(base, ptr) {
+  if (ptr === 0) return base;
+  if (ptr === 1) {
+    if (base === 'char') return 'cstr';
+    if (base === 'void') return 'any';
+    if (OBJECT_TYPES.has(base)) return base;
+    return 'ptr:' + base;
+  }
+  return 'any';
+}
+
+class Parser {
+  constructor(toks) {
+    this.t = toks; this.p = 0;
+    this.typeNames = new Set(BASE_TYPE_NAMES);
+    this.enumNames = new Set();
+    this.displayClasses = new Set();
+    this.prescan();
+  }
+
+  prescan() {
+    const t = this.t;
+    for (let i = 0; i < t.length; i++) {
+      const k = t[i];
+      if (k.t !== 'id') continue;
+      if (k.v === 'enum') {
+        let j = i + 1;
+        if (t[j] && t[j].t === 'id' && (t[j].v === 'class' || t[j].v === 'struct')) j++;
+        if (t[j] && t[j].t === 'id') { this.enumNames.add(t[j].v); this.typeNames.add(t[j].v); }
+      } else if ((k.v === 'class' || k.v === 'struct') && t[i + 1] && t[i + 1].t === 'id' && t[i + 2] && t[i + 2].t === 'op' && (t[i + 2].v === '{' || t[i + 2].v === ':')) {
+        const name = t[i + 1].v;
+        this.typeNames.add(name);
+        let j = i + 2, display = false;
+        while (t[j] && !(t[j].t === 'op' && t[j].v === '{') && t[j].t !== 'eof') { if (t[j].t === 'id' && /LGFX_Device|LGFX_Sprite|LovyanGFX/.test(t[j].v)) display = true; j++; }
+        if (display) this.displayClasses.add(name);
+      }
+    }
+  }
+
+  peek(o = 0) { return this.t[Math.min(this.p + o, this.t.length - 1)]; }
+  next() { const k = this.t[this.p]; if (k.t !== 'eof') this.p++; return k; }
+  isOp(v, o = 0) { const k = this.peek(o); return k.t === 'op' && k.v === v; }
+  isId(v, o = 0) { const k = this.peek(o); return k.t === 'id' && k.v === v; }
+  accept(v) { if (this.isOp(v)) { this.next(); return true; } return false; }
+  prevLine() { return this.p > 0 ? this.t[this.p - 1].line : 1; }
+  expect(v) {
+    if (this.accept(v)) return;
+    const k = this.peek();
+    fail("expected '" + v + "' before '" + tokText(k) + "'" + (k.t === 'eof' ? '' : ''), v === ';' || v === ')' ? this.prevLine() : k.line);
+  }
+  expectId() {
+    const k = this.peek();
+    if (k.t !== 'id') fail('expected an identifier before \'' + tokText(k) + "'", k.line);
+    this.p++; return k.v;
+  }
+  unsupported(word, line) { fail('The converter does not support ' + (UNSUPPORTED_WORDS[word] || word) + ' yet', line); }
+
+  /* ---------- types ---------- */
+  isTypeStart(o = 0) {
+    const k = this.peek(o);
+    if (k.t !== 'id') return false;
+    return TYPE_KEYWORDS.has(k.v) || QUALIFIERS.has(k.v) || k.v === 'struct' || k.v === 'enum' || this.typeNames.has(k.v) ||
+      (SCOPE_SKIP.has(k.v) && this.isOp('::', o + 1));
+  }
+
+  /* Returns {base, ptr, isConst, isStatic, isExtern, isRef} or null (position restored). */
+  tryParseType() {
+    const save = this.p;
+    const f = { isConst: false, isStatic: false, isExtern: false };
+    let unsigned = false, signed = false, short = false, longs = 0, base = null, any = false;
+    for (;;) {
+      const k = this.peek();
+      if (k.t !== 'id') break;
+      const v = k.v;
+      if (QUALIFIERS.has(v)) {
+        if (v === 'const' || v === 'constexpr') f.isConst = true;
+        if (v === 'static') f.isStatic = true;
+        if (v === 'extern') f.isExtern = true;
+        this.next(); continue;
+      }
+      if (base !== null) break;
+      if (v === 'unsigned') { unsigned = true; any = true; this.next(); continue; }
+      if (v === 'signed') { signed = true; any = true; this.next(); continue; }
+      if (v === 'short') { short = true; any = true; this.next(); continue; }
+      if (v === 'long') { longs++; any = true; this.next(); continue; }
+      if (v === 'int') { base = 'int'; any = true; this.next(); continue; }
+      if (v === 'char' || v === 'float' || v === 'double' || v === 'bool' || v === 'void' || v === 'auto') { base = v; any = true; this.next(); continue; }
+      if (v === 'struct' || v === 'enum' || v === 'class') {
+        this.next();
+        if ((this.isId('class') || this.isId('struct')) && v === 'enum') this.next();
+        const nm = this.peek();
+        if (nm.t !== 'id') fail('expected a type name after \'' + v + "'", nm.line);
+        this.next(); base = nm.v; any = true; continue;
+      }
+      if (SCOPE_SKIP.has(v) && this.isOp('::', 1)) { this.next(); this.next(); continue; }
+      if (this.typeNames.has(v) && !unsigned && !signed && !short && !longs) {
+        // qualified names such as lgfx::LGFX_Device or A::B: keep the last part
+        this.next(); base = v; any = true;
+        while (this.isOp('::') && this.peek(1).t === 'id') { this.next(); base = this.next().v; }
+        continue;
+      }
+      break;
+    }
+    if (!any) { this.p = save; return null; }
+    let name;
+    if (base === null || base === 'int') {
+      if (short) name = unsigned ? 'uint16' : 'int16';
+      else if (longs >= 2) name = unsigned ? 'uint64' : 'int64';
+      else if (longs === 1) name = unsigned ? 'uint32' : 'int32';
+      else name = unsigned ? 'uint32' : 'int32';
+    } else if (base === 'char') name = unsigned ? 'uint8' : (signed ? 'int8' : 'char');
+    else if (base === 'double' && longs) name = 'double';
+    else if (base === 'float' || base === 'double' || base === 'bool' || base === 'void' || base === 'auto') name = base;
+    else if (TYPE_ALIASES[base]) name = TYPE_ALIASES[base];
+    else if (this.enumNames.has(base)) name = 'int32';
+    else if (this.displayClasses.has(base)) name = 'LGFX';
+    else if (base === 'String' || OBJECT_TYPES.has(base)) name = base;
+    else { this.p = save; return null; }
+    let ptr = 0;
+    while (this.isOp('*')) { this.next(); ptr++; while (this.isId('const') || this.isId('volatile')) this.next(); }
+    let isRef = false;
+    if (this.isOp('&')) { this.next(); isRef = true; }
+    return Object.assign(f, { base: name, ptr, isRef });
+  }
+
+  /* ---------- program ---------- */
+  parseProgram() {
+    const items = [];
+    while (this.peek().t !== 'eof') {
+      const it = this.parseTopLevel();
+      if (it) items.push(it);
+    }
+    return items;
+  }
+
+  parseTopLevel() {
+    const k = this.peek();
+    if (this.accept(';')) return null;
+    if (k.t === 'id') {
+      if (k.v === 'enum') return this.parseEnum();
+      if ((k.v === 'class' || k.v === 'struct') && this.peek(1).t === 'id' && (this.isOp('{', 2) || this.isOp(':', 2))) return this.parseClass();
+      if (UNSUPPORTED_WORDS[k.v]) this.unsupported(k.v, k.line);
+    }
+    return this.parseDeclOrFunction(true);
+  }
+
+  parseEnum() {
+    const start = this.p;
+    const line = this.next().line;
+    if (this.isId('class') || this.isId('struct')) this.next();
+    let name = null;
+    if (this.peek().t === 'id') name = this.next().v;
+    if (this.accept(':')) { if (!this.tryParseType()) fail('expected an integer type after ":" in enum', this.peek().line); }
+    if (!this.isOp('{')) {
+      // "enum Name var;" is a plain declaration that uses the type
+      this.p = start;
+      return this.parseDeclOrFunction(true);
+    }
+    this.expect('{');
+    const items = [];
+    while (!this.isOp('}')) {
+      const iline = this.peek().line;
+      const nm = this.expectId();
+      let value = null;
+      if (this.accept('=')) value = this.parseAssign();
+      items.push({ name: nm, value, line: iline });
+      if (!this.accept(',')) break;
+    }
+    this.expect('}');
+    this.accept(';');
+    return { k: 'enum', name, items, line };
+  }
+
+  parseClass() {
+    const kw = this.next();
+    const name = this.next().v;
+    if (!this.displayClasses.has(name)) {
+      fail('The converter does not support ' + kw.v + ' definitions yet (only the LovyanGFX display class, "class ' + name + ' : public lgfx::LGFX_Device")', kw.line);
+    }
+    while (!this.isOp('{')) { if (this.peek().t === 'eof') fail("expected '{'", kw.line); this.next(); }
+    let depth = 0;
+    do {
+      const k = this.next();
+      if (k.t === 'eof') fail('unterminated class ' + name, kw.line);
+      if (k.t === 'op' && k.v === '{') depth++;
+      else if (k.t === 'op' && k.v === '}') depth--;
+    } while (depth > 0);
+    this.accept(';');
+    return { k: 'class', name, display: true, line: kw.line };
+  }
+
+  parseDeclOrFunction(top) {
+    const line = this.peek().line;
+    const spec = this.tryParseType();
+    if (!spec) {
+      const k = this.peek();
+      fail("'" + tokText(k) + "' does not name a type", k.line);
+    }
+    // function?
+    if (top && this.peek().t === 'id' && this.isOp('(', 1)) {
+      const name = this.next().v;
+      return this.parseFunctionRest(spec, name, line);
+    }
+    return this.parseDeclRest(spec, false, line);
+  }
+
+  parseFunctionRest(spec, name, line) {
+    this.expect('(');
+    const params = [];
+    if (this.isId('void') && this.isOp(')', 1)) { this.next(); }
+    while (!this.isOp(')')) {
+      const pl = this.peek().line;
+      const ps = this.tryParseType();
+      if (!ps) fail("expected a parameter type before '" + tokText(this.peek()) + "'", pl);
+      let pname = null;
+      if (this.peek().t === 'id') pname = this.next().v;
+      let type = makeType(ps.base, ps.ptr);
+      if (this.accept('[')) { if (!this.isOp(']')) this.parseAssign(); this.expect(']'); type = type === 'cstr' ? 'cstr' : 'arr:' + type; }
+      let def = null;
+      if (this.accept('=')) def = this.parseAssign();
+      const byRef = ps.isRef && !ps.isConst && (type === 'String' || /^(u?int(8|16|32|64)|bool|char|float|double)$/.test(type));
+      params.push({ name: pname, type, byRef, def, line: pl });
+      if (!this.accept(',')) break;
+    }
+    this.expect(')');
+    const ret = makeType(spec.base, spec.ptr);
+    if (this.accept(';')) return { k: 'fn', name, ret, params, body: null, line };
+    if (!this.isOp('{')) fail("expected '{' before '" + tokText(this.peek()) + "'", this.peek().line);
+    const body = this.parseBlock();
+    return { k: 'fn', name, ret, params, body, line };
+  }
+
+  parseDeclRest(spec, noSemi, line) {
+    const items = [];
+    do {
+      const il = this.peek().line;
+      let ptr = spec.ptr;
+      if (items.length) while (this.accept('*')) ptr++;
+      let isRef = spec.isRef;
+      const name = this.expectId();
+      let arr = null;
+      if (this.accept('[')) {
+        arr = { len: this.isOp(']') ? null : this.parseAssign() };
+        this.expect(']');
+        if (this.isOp('[')) fail('multi-dimensional arrays are not supported by the converter', this.peek().line);
+      }
+      let init = null;
+      if (this.accept('=')) init = this.isOp('{') ? this.parseInitList() : this.parseAssign();
+      else if (this.isOp('(') && spec.base === 'String') {
+        const cl = this.next().line; const args = [];
+        while (!this.isOp(')')) { args.push(this.parseAssign()); if (!this.accept(',')) break; }
+        this.expect(')');
+        init = { k: 'ctor', type: { base: 'String', ptr: 0 }, args, line: cl };
+      } else if (this.isOp('(')) {
+        fail("constructor-style initialisation of '" + name + "' is not supported, declare it without arguments", this.peek().line);
+      }
+      items.push({ name, ptr, arr, init, isRef, line: il });
+    } while (this.accept(','));
+    if (!noSemi) this.expect(';');
+    return { k: 'decl', spec, items, line };
+  }
+
+  parseInitList() {
+    const line = this.next().line;
+    const list = [];
+    while (!this.isOp('}')) {
+      if (this.isOp('{')) fail('nested initializer lists are not supported by the converter', this.peek().line);
+      list.push(this.parseAssign());
+      if (!this.accept(',')) break;
+    }
+    this.expect('}');
+    return { k: 'initlist', list, line };
+  }
+
+  /* ---------- statements ---------- */
+  parseBlock() {
+    const line = this.peek().line;
+    this.expect('{');
+    const body = [];
+    while (!this.isOp('}')) {
+      if (this.peek().t === 'eof') fail("expected '}' at end of input", this.peek().line);
+      body.push(this.parseStatement());
+    }
+    this.next();
+    return { k: 'block', body, line };
+  }
+
+  isDeclStart() {
+    const k = this.peek();
+    if (k.t !== 'id') return false;
+    if (UNSUPPORTED_WORDS[k.v] && k.v !== 'this' && k.v !== 'new' && k.v !== 'delete') return false;
+    if (TYPE_KEYWORDS.has(k.v) || QUALIFIERS.has(k.v) || k.v === 'struct' || k.v === 'enum') return true;
+    if (SCOPE_SKIP.has(k.v) && this.isOp('::', 1)) return this.typeNames.has(this.peek(2).v);
+    if (this.typeNames.has(k.v)) {
+      const n = this.peek(1);
+      if (n.t === 'id') return true;
+      if (n.t === 'op' && n.v === '*') return true;
+      if (n.t === 'op' && n.v === '&' && this.peek(2).t === 'id') return true;
+    }
+    return false;
+  }
+
+  parseStatement() {
+    const k = this.peek();
+    const line = k.line;
+    if (k.t === 'op') {
+      if (k.v === '{') return this.parseBlock();
+      if (k.v === ';') { this.next(); return { k: 'empty', line }; }
+    }
+    if (k.t === 'id') {
+      switch (k.v) {
+        case 'if': {
+          this.next(); this.expect('(');
+          const cond = this.parseExpr(); this.expect(')');
+          const then = this.parseStatement();
+          let els = null;
+          if (this.isId('else')) { this.next(); els = this.parseStatement(); }
+          return { k: 'if', cond, then, els, line };
+        }
+        case 'while': {
+          this.next(); this.expect('(');
+          const cond = this.parseExpr(); this.expect(')');
+          return { k: 'while', cond, body: this.parseStatement(), line };
+        }
+        case 'do': {
+          this.next();
+          const body = this.parseStatement();
+          if (!this.isId('while')) fail("expected 'while' before '" + tokText(this.peek()) + "'", this.peek().line);
+          this.next(); this.expect('(');
+          const cond = this.parseExpr(); this.expect(')'); this.expect(';');
+          return { k: 'do', cond, body, line };
+        }
+        case 'for': {
+          this.next(); this.expect('(');
+          let init = null;
+          if (!this.isOp(';')) {
+            if (this.isDeclStart()) { const spec = this.tryParseType(); init = this.parseDeclRest(spec, true, line); }
+            else init = { k: 'expr', e: this.parseExpr(), line };
+          }
+          this.expect(';');
+          const cond = this.isOp(';') ? null : this.parseExpr();
+          this.expect(';');
+          const update = this.isOp(')') ? null : this.parseExpr();
+          this.expect(')');
+          return { k: 'for', init, cond, update, body: this.parseStatement(), line };
+        }
+        case 'switch': {
+          this.next(); this.expect('(');
+          const e = this.parseExpr(); this.expect(')');
+          this.expect('{');
+          const items = [];
+          while (!this.isOp('}')) {
+            const t = this.peek();
+            if (t.t === 'eof') fail("expected '}' at end of input", t.line);
+            if (this.isId('case')) { this.next(); const ce = this.parseCond(); this.expect(':'); items.push({ k: 'label', e: ce, line: t.line }); }
+            else if (this.isId('default')) { this.next(); this.expect(':'); items.push({ k: 'label', e: null, line: t.line }); }
+            else items.push(this.parseStatement());
+          }
+          this.next();
+          return { k: 'switch', e, items, line };
+        }
+        case 'return': {
+          this.next();
+          const e = this.isOp(';') ? null : this.parseExpr();
+          this.expect(';');
+          return { k: 'return', e, line };
+        }
+        case 'break': this.next(); this.expect(';'); return { k: 'break', line };
+        case 'continue': this.next(); this.expect(';'); return { k: 'continue', line };
+        case 'else': fail("'else' without a previous 'if'", line); break;
+        case 'case': case 'default': fail("'" + k.v + "' label not within a switch statement", line); break;
+        default:
+          if (UNSUPPORTED_WORDS[k.v] && !['this', 'new', 'delete'].includes(k.v)) this.unsupported(k.v, line);
+      }
+      if (this.isDeclStart()) {
+        const spec = this.tryParseType();
+        if (spec) return this.parseDeclRest(spec, false, line);
+      }
+    }
+    const e = this.parseExpr();
+    this.expect(';');
+    return { k: 'expr', e, line };
+  }
+
+  /* ---------- expressions ---------- */
+  parseExpr() {
+    let e = this.parseAssign();
+    while (this.isOp(',')) { const line = this.next().line; e = { k: 'comma', l: e, r: this.parseAssign(), line }; }
+    return e;
+  }
+
+  parseAssign() {
+    const l = this.parseCond();
+    const t = this.peek();
+    if (t.t === 'op' && ASSIGN_OPS.has(t.v)) {
+      this.next();
+      return { k: 'assign', op: t.v, l, r: this.parseAssign(), line: t.line };
+    }
+    return l;
+  }
+
+  parseCond() {
+    const c = this.parseBin(1);
+    if (this.isOp('?')) {
+      const line = this.next().line;
+      const a = this.parseExpr();
+      this.expect(':');
+      return { k: 'cond', c, a, b: this.parseAssign(), line };
+    }
+    return c;
+  }
+
+  parseBin(min) {
+    let l = this.parseUnary();
+    for (;;) {
+      const t = this.peek();
+      const pr = t.t === 'op' ? BINPREC[t.v] : undefined;
+      if (!pr || pr < min) return l;
+      this.next();
+      const r = this.parseBin(pr + 1);
+      l = { k: 'bin', op: t.v, l, r, line: t.line };
+    }
+  }
+
+  startsOperand(k) {
+    if (k.t === 'num' || k.t === 'str' || k.t === 'chr') return true;
+    if (k.t === 'id') return !QUALIFIERS.has(k.v);
+    return k.t === 'op' && ['(', '!', '~', '-', '+', '*', '&', '++', '--'].includes(k.v);
+  }
+
+  parseUnary() {
+    const t = this.peek();
+    if (t.t === 'op') {
+      if (t.v === '!' || t.v === '-' || t.v === '+' || t.v === '~' || t.v === '*' || t.v === '&') {
+        this.next();
+        return { k: 'unary', op: t.v, e: this.parseUnary(), line: t.line };
+      }
+      if (t.v === '++' || t.v === '--') { this.next(); return { k: 'preinc', op: t.v, e: this.parseUnary(), line: t.line }; }
+      if (t.v === '(' && this.isTypeStart(1)) {
+        const save = this.p;
+        this.next();
+        const ty = this.tryParseType();
+        if (ty && this.isOp(')') && this.startsOperand(this.peek(1))) {
+          this.next();
+          return { k: 'cast', type: ty, e: this.parseUnary(), line: t.line };
+        }
+        this.p = save;
+      }
+    }
+    if (t.t === 'id' && t.v === 'sizeof') {
+      this.next();
+      if (this.isOp('(')) {
+        const save = this.p;
+        this.next();
+        if (this.isTypeStart()) {
+          const ty = this.tryParseType();
+          if (ty && this.isOp(')')) { this.next(); return { k: 'sizeof', type: ty, line: t.line }; }
+        }
+        this.p = save;
+      }
+      return { k: 'sizeof', e: this.parseUnary(), line: t.line };
+    }
+    return this.parsePostfix();
+  }
+
+  parsePostfix() {
+    let e = this.parsePrimary();
+    for (;;) {
+      const t = this.peek();
+      if (t.t !== 'op') return e;
+      if (t.v === '(') {
+        this.next();
+        const args = [];
+        while (!this.isOp(')')) { args.push(this.parseAssign()); if (!this.accept(',')) break; }
+        this.expect(')');
+        e = { k: 'call', callee: e, args, line: t.line };
+      } else if (t.v === '[') {
+        this.next();
+        const idx = this.parseExpr();
+        this.expect(']');
+        e = { k: 'index', obj: e, idx, line: t.line };
+      } else if (t.v === '.' || t.v === '->') {
+        this.next();
+        const name = this.expectId();
+        e = { k: 'member', obj: e, name, arrow: t.v === '->', line: t.line };
+      } else if (t.v === '++' || t.v === '--') {
+        this.next();
+        e = { k: 'postinc', op: t.v, e, line: t.line };
+      } else return e;
+    }
+  }
+
+  parsePrimary() {
+    const t = this.peek();
+    if (t.t === 'num') { this.next(); return { k: 'num', v: t.v, n: t.n, isFloat: t.isFloat, suf: t.suf, hex: t.hex, line: t.line }; }
+    if (t.t === 'str') {
+      let v = '';
+      while (this.peek().t === 'str') v += this.next().v;
+      return { k: 'str', v, line: t.line };
+    }
+    if (t.t === 'chr') { this.next(); return { k: 'chr', n: t.n, line: t.line }; }
+    if (t.t === 'op') {
+      if (t.v === '(') {
+        this.next();
+        const e = this.parseExpr();
+        this.expect(')');
+        return { k: 'paren', e, line: t.line };
+      }
+      if (t.v === '{') fail('braced initializer lists are only supported in variable declarations', t.line);
+      fail("expected an expression before '" + t.v + "'", t.line);
+    }
+    if (t.t === 'eof') fail('expected an expression at end of input', t.line);
+    // identifiers
+    const v = t.v;
+    if (v === 'true' || v === 'false') { this.next(); return { k: 'bool', v: v === 'true', line: t.line }; }
+    if (v === 'nullptr') { this.next(); return { k: 'null', line: t.line }; }
+    if (/^(static|reinterpret|const|dynamic)_cast$/.test(v)) {
+      this.next();
+      this.expect('<');
+      const ty = this.tryParseType();
+      if (!ty) fail('expected a type in ' + v, t.line);
+      this.expect('>'); this.expect('(');
+      const e = this.parseExpr();
+      this.expect(')');
+      return { k: 'cast', type: ty, e, line: t.line };
+    }
+    if (UNSUPPORTED_WORDS[v]) this.unsupported(v, t.line);
+    if ((TYPE_KEYWORDS.has(v) || this.typeNames.has(v)) && this.isOp('(', 1)) {
+      const ty = this.tryParseType();
+      if (ty && this.isOp('(')) {
+        this.next();
+        const args = [];
+        while (!this.isOp(')')) { args.push(this.parseAssign()); if (!this.accept(',')) break; }
+        this.expect(')');
+        return { k: 'ctor', type: ty, args, line: t.line };
+      }
+    }
+    this.next();
+    if (this.isOp('::') && this.peek(1).t === 'id') {
+      const parts = [v];
+      while (this.isOp('::') && this.peek(1).t === 'id') { this.next(); parts.push(this.next().v); }
+      return { k: 'scoped', parts, line: t.line };
+    }
+    return { k: 'id', name: v, line: t.line };
+  }
+}
+
+/* ===== part 3: type helpers and the built-in Arduino / ESP32 / LovyanGFX tables ===== */
+
+const INT_TYPES = new Set(['int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64', 'char']);
+const FLOAT_TYPES = new Set(['float', 'double']);
+const isInt = t => INT_TYPES.has(t);
+const isFloat = t => FLOAT_TYPES.has(t);
+const isNum = t => isInt(t) || isFloat(t) || t === 'bool';
+const isText = t => t === 'String' || t === 'cstr' || t === 'cbuf';
+
+const TYPE_NAMES = {
+  int8: 'signed char', uint8: 'uint8_t', int16: 'short int', uint16: 'uint16_t', int32: 'int', uint32: 'unsigned int', int64: 'long long int',
+  uint64: 'long long unsigned int', char: 'char', bool: 'bool', float: 'float', double: 'double', String: 'String', cstr: 'const char*',
+  cbuf: 'char*', void: 'void', LGFX: 'LGFX'
+};
+function tn(t) { return TYPE_NAMES[t] || (t.startsWith('ptr:') ? tn(t.slice(4)) + '*' : t.startsWith('arr:') ? tn(t.slice(4)) + '[]' : t); }
+
+function arithType(a, b) {
+  if (isFloat(a) || isFloat(b)) return (a === 'float' && b === 'float') ? 'float' : 'double';
+  if (a === 'uint64' || b === 'uint64') return 'uint64';
+  if (a === 'int64' || b === 'int64') return 'int64';
+  if (a === 'uint32' || b === 'uint32') return 'uint32';
+  return 'int32';
+}
+function sizeOfType(t) {
+  switch (t) {
+    case 'char': case 'bool': case 'int8': case 'uint8': return 1;
+    case 'int16': case 'uint16': return 2;
+    case 'int64': case 'uint64': case 'double': return 8;
+    default: return 4;
+  }
+}
+function zeroOf(t) {
+  if (isInt(t) || isFloat(t)) return '0';
+  if (t === 'bool') return 'false';
+  if (t === 'String' || t === 'cstr') return '""';
+  return 'null';
+}
+function toStr(c, t) {
+  if (t === 'String' || t === 'cstr') return c;
+  if (t === 'cbuf' || t === 'IPAddress') return c + '.toString()';
+  if (t === 'char') return 'String.fromCharCode(' + c + ')';
+  if (t === 'bool') return '(' + c + ' ? "1" : "0")';
+  if (isFloat(t)) return '__rt.fstr(' + c + ', 2)';
+  return 'String(' + c + ')';
+}
+/* Serial.print(x, base) / String(x, base): the second argument is a base for integers, decimals for floats */
+function printArg(a, t) {
+  if (!a.length) return '""';
+  if (a.length >= 2) return '__rt.numToStr(' + a[0] + ', ' + a[1] + ', ' + (isFloat(t[0]) ? 'true' : 'false') + ')';
+  return toStr(a[0], t[0]);
+}
+
+const CONSTS = {
+  HIGH: 1, LOW: 0, INPUT: 1, OUTPUT: 3, INPUT_PULLUP: 5, INPUT_PULLDOWN: 9, LED_BUILTIN: 2,
+  NULL: 0, PI: 3.141592653589793, HALF_PI: 1.5707963267948966, TWO_PI: 6.283185307179586, DEG_TO_RAD: 0.017453292519943295, RAD_TO_DEG: 57.29577951308232,
+  DEC: 10, HEX: 16, OCT: 8, BIN: 2,
+  WL_NO_SHIELD: 255, WL_IDLE_STATUS: 0, WL_NO_SSID_AVAIL: 1, WL_SCAN_COMPLETED: 2, WL_CONNECTED: 3, WL_CONNECT_FAILED: 4, WL_CONNECTION_LOST: 5, WL_DISCONNECTED: 6,
+  WIFI_OFF: 0, WIFI_STA: 1, WIFI_AP: 2, WIFI_AP_STA: 3,
+  HTTPC_DISABLE_FOLLOW_REDIRECTS: 0, HTTPC_STRICT_FOLLOW_REDIRECTS: 1, HTTPC_FORCE_FOLLOW_REDIRECTS: 2,
+  HTTP_CODE_OK: 200, HTTP_CODE_CREATED: 201, HTTP_CODE_ACCEPTED: 202, HTTP_CODE_NO_CONTENT: 204, HTTP_CODE_MOVED_PERMANENTLY: 301, HTTP_CODE_FOUND: 302,
+  HTTP_CODE_BAD_REQUEST: 400, HTTP_CODE_UNAUTHORIZED: 401, HTTP_CODE_FORBIDDEN: 403, HTTP_CODE_NOT_FOUND: 404, HTTP_CODE_TOO_MANY_REQUESTS: 429,
+  HTTP_CODE_INTERNAL_SERVER_ERROR: 500,
+  HTTPC_ERROR_CONNECTION_REFUSED: -1, HTTPC_ERROR_CONNECTION_FAILED: -1, HTTPC_ERROR_SEND_HEADER_FAILED: -2, HTTPC_ERROR_SEND_PAYLOAD_FAILED: -3,
+  HTTPC_ERROR_NOT_CONNECTED: -4, HTTPC_ERROR_CONNECTION_LOST: -5, HTTPC_ERROR_READ_TIMEOUT: -11,
+  ECC_LOW: 0, ECC_MEDIUM: 1, ECC_QUARTILE: 2, ECC_HIGH: 3,
+  TFT_BLACK: 0x0000, TFT_NAVY: 0x000F, TFT_DARKGREEN: 0x03E0, TFT_DARKCYAN: 0x03EF, TFT_MAROON: 0x7800, TFT_PURPLE: 0x780F, TFT_OLIVE: 0x7BE0,
+  TFT_LIGHTGREY: 0xD69A, TFT_DARKGREY: 0x7BEF, TFT_BLUE: 0x001F, TFT_GREEN: 0x07E0, TFT_CYAN: 0x07FF, TFT_RED: 0xF800, TFT_MAGENTA: 0xF81F,
+  TFT_YELLOW: 0xFFE0, TFT_WHITE: 0xFFFF, TFT_ORANGE: 0xFD20, TFT_GREENYELLOW: 0xAFE5, TFT_PINK: 0xFC18
+};
+const TEXTDATUM = {
+  top_left: 0, top_center: 1, top_right: 2, middle_left: 4, middle_center: 5, middle_right: 6,
+  bottom_left: 8, bottom_center: 9, bottom_right: 10, baseline_left: 16, baseline_center: 17, baseline_right: 18
+};
+const OBJECTS = { Serial: { js: '__rt.Serial', type: 'HardwareSerial' }, WiFi: { js: '__rt.WiFi', type: 'WiFiClass' }, ESP: { js: '__rt.ESP', type: 'EspClass' } };
+const FIELDS = {
+  tm: { tm_sec: 'int32', tm_min: 'int32', tm_hour: 'int32', tm_mday: 'int32', tm_mon: 'int32', tm_year: 'int32', tm_wday: 'int32', tm_yday: 'int32', tm_isdst: 'int32' },
+  QRCode: { size: 'uint8', version: 'uint8', ecc: 'uint8', mode: 'uint8', mask: 'uint8' }
+};
+
+const same = (name, ret) => ({ ret, js: (o, a) => o + '.' + name + '(' + a.join(', ') + ')' });
+const LCD_VOID = ['setRotation', 'setBrightness', 'fillScreen', 'clear', 'clearDisplay', 'fillRect', 'drawRect', 'fillRoundRect', 'drawRoundRect', 'drawLine',
+  'drawFastHLine', 'drawFastVLine', 'drawPixel', 'fillCircle', 'drawCircle', 'fillTriangle', 'drawTriangle', 'setTextColor', 'setTextSize',
+  'setTextDatum', 'setTextWrap', 'setFont', 'setTextFont', 'setCursor', 'startWrite', 'endWrite', 'sleep', 'wakeup', 'waitDisplay', 'display',
+  'setSwapBytes', 'setTextPadding'];
+const CLASSES = {
+  HardwareSerial: {
+    begin: 'void', end: 'void', flush: 'void', setTimeout: 'void', available: 'int32', read: 'int32', peek: 'int32', write: 'int32',
+    print: { ret: 'int32', js: (o, a, t) => o + '.print(' + printArg(a, t) + ')' },
+    println: { ret: 'int32', js: (o, a, t) => o + '.println(' + printArg(a, t) + ')' },
+    printf: { ret: 'int32', js: (o, a) => o + '.print(__rt.sprintf(' + a.join(', ') + '))' }
+  },
+  WiFiClass: {
+    begin: 'int32', status: 'int32', localIP: 'IPAddress', disconnect: 'bool', mode: 'bool', RSSI: 'int32', isConnected: 'bool', setHostname: 'bool',
+    macAddress: 'String', SSID: 'String', reconnect: 'bool', setAutoReconnect: 'bool', setSleep: 'bool', getHostname: 'cstr'
+  },
+  EspClass: { restart: 'void', getFreeHeap: 'uint32', getChipModel: 'cstr', getCpuFreqMHz: 'uint32', getSketchSize: 'uint32' },
+  IPAddress: { toString: 'String' },
+  WiFiClientSecure: { setInsecure: 'void', setCACert: 'void', connected: 'bool', stop: 'void', setTimeout: 'void' },
+  HTTPClient: {
+    begin: 'bool', addHeader: 'void', setFollowRedirects: 'void', setTimeout: 'void', setConnectTimeout: 'void', setReuse: 'void', setUserAgent: 'void',
+    POST: { ret: 'int32', async: true }, GET: { ret: 'int32', async: true }, PUT: { ret: 'int32', async: true }, PATCH: { ret: 'int32', async: true },
+    getString: 'String', getSize: 'int32', connected: 'bool', end: 'void'
+  },
+  LGFX: Object.assign({
+    init: 'bool', setColorDepth: 'bool', drawString: 'int32', drawCenterString: 'int32', drawRightString: 'int32', textWidth: 'int32', fontHeight: 'int32',
+    width: 'int32', height: 'int32', color565: 'uint16', getTouch: 'bool',
+    print: { ret: 'int32', js: (o, a, t) => o + '.print(' + printArg(a, t) + ')' },
+    println: { ret: 'int32', js: (o, a, t) => o + '.println(' + printArg(a, t) + ')' },
+    printf: { ret: 'int32', js: (o, a) => o + '.print(__rt.sprintf(' + a.join(', ') + '))' }
+  }, Object.fromEntries(LCD_VOID.map(n => [n, 'void'])))
+};
+
+const mathFn = (name, js) => ({ ret: 'double', js: a => 'Math.' + (js || name) + '(' + a.join(', ') + ')' });
+const FREE = {
+  delay: { ret: 'void', async: true },
+  yield: { ret: 'void', async: true, js: () => '__rt.delay(0)' },
+  delayMicroseconds: { ret: 'void' },
+  millis: { ret: 'uint32' }, micros: { ret: 'uint32' },
+  pinMode: { ret: 'void' }, digitalRead: { ret: 'int32' }, digitalWrite: { ret: 'void' }, analogRead: { ret: 'int32' }, analogWrite: { ret: 'void' },
+  random: { ret: 'int32' }, randomSeed: { ret: 'void' }, map: { ret: 'int32' },
+  min: { ret: (t) => arithType(t[0], t[1]), js: a => 'Math.min(' + a.join(', ') + ')' },
+  max: { ret: (t) => arithType(t[0], t[1]), js: a => 'Math.max(' + a.join(', ') + ')' },
+  abs: { ret: (t) => isFloat(t[0]) ? t[0] : 'int32', js: a => 'Math.abs(' + a[0] + ')' },
+  constrain: { ret: (t) => arithType(t[0], t[1]), js: a => 'Math.min(Math.max(' + a[0] + ', ' + a[1] + '), ' + a[2] + ')' },
+  sq: { ret: (t) => isFloat(t[0]) ? 'double' : 'int32', js: a => '(' + a[0] + ' * ' + a[0] + ')' },
+  sqrt: mathFn('sqrt'), pow: mathFn('pow'), floor: mathFn('floor'), ceil: mathFn('ceil'), round: mathFn('round'), fabs: mathFn('fabs', 'abs'),
+  sin: mathFn('sin'), cos: mathFn('cos'), tan: mathFn('tan'), atan2: mathFn('atan2'), exp: mathFn('exp'), log: mathFn('log'), log10: mathFn('log10'),
+  fmod: { ret: 'double', js: a => '(' + a[0] + ' % ' + a[1] + ')' },
+  radians: { ret: 'double', js: a => '(' + a[0] + ' * 0.017453292519943295)' }, degrees: { ret: 'double', js: a => '(' + a[0] + ' * 57.29577951308232)' },
+  configTime: { ret: 'void' }, getLocalTime: { ret: 'bool' }, time: { ret: 'int64' }, mktime: { ret: 'int64' },
+  gmtime_r: { ret: 'tm' }, localtime_r: { ret: 'tm' }, gmtime: { ret: 'tm' }, localtime: { ret: 'tm' }, strftime: { ret: 'uint32' },
+  qrcode_getBufferSize: { ret: 'uint16' }, qrcode_initText: { ret: 'int8' }, qrcode_getModule: { ret: 'bool' },
+  strlen: { ret: 'uint32' }, strcmp: { ret: 'int32' }, strncmp: { ret: 'int32' }, strcpy: { ret: 'cbuf' }, strncpy: { ret: 'cbuf' }, strcat: { ret: 'cbuf' },
+  snprintf: { ret: 'int32' }, sprintf: { ret: 'int32' }, atoi: { ret: 'int32' }, atol: { ret: 'int32' }, atof: { ret: 'double' },
+  toupper: { ret: 'int32' }, tolower: { ret: 'int32' },
+  isDigit: { ret: 'bool' }, isAlpha: { ret: 'bool' }, isAlphaNumeric: { ret: 'bool' }, isUpperCase: { ret: 'bool' }, isLowerCase: { ret: 'bool' },
+  isSpace: { ret: 'bool' }, isPunct: { ret: 'bool' }, isHexadecimalDigit: { ret: 'bool' },
+  isdigit: { ret: 'bool', js: a => '__rt.isDigit(' + a.join(', ') + ')' }, isalpha: { ret: 'bool', js: a => '__rt.isAlpha(' + a.join(', ') + ')' },
+  isspace: { ret: 'bool', js: a => '__rt.isSpace(' + a.join(', ') + ')' },
+  F: { ret: 'cstr', js: a => a[0] }, PSTR: { ret: 'cstr', js: a => a[0] },
+  memset: { ret: 'any' }
+};
+const STATIC = { 'HTTPClient::errorToString': { ret: 'String', js: a => '__rt.HTTPClient.errorToString(' + a.join(', ') + ')' } };
+
+const RESERVED = new Set(['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends',
+  'false', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'null', 'return', 'super', 'switch', 'this', 'throw', 'true', 'try',
+  'typeof', 'var', 'void', 'while', 'with', 'yield', 'let', 'static', 'implements', 'interface', 'package', 'private', 'protected', 'public', 'await',
+  'arguments', 'eval', 'undefined', 'NaN', 'Infinity', 'Math', 'String', 'Number', 'Array', 'Object', 'Date', 'Symbol', 'Promise', 'JSON', 'window',
+  'document', 'globalThis', 'self', 'async', 'of']);
+const jsName = n => RESERVED.has(n) ? n + '$' : n;
+
+/* ===== part 4: code generator (AST to JavaScript) ===== */
+
+const STR = {
+  length: { ret: 'uint32', js: o => o + '.length' },
+  c_str: { ret: 'cstr', js: o => o },
+  substring: { ret: 'String', js: (o, a) => '__rt.substring(' + o + ', ' + a.join(', ') + ')' },
+  indexOf: { ret: 'int32', js: (o, a, t) => o + '.indexOf(' + toStr(a[0], t[0]) + (a[1] !== undefined ? ', ' + a[1] : '') + ')' },
+  lastIndexOf: { ret: 'int32', js: (o, a, t) => o + '.lastIndexOf(' + toStr(a[0], t[0]) + (a[1] !== undefined ? ', ' + a[1] : '') + ')' },
+  charAt: { ret: 'char', js: (o, a) => '__rt.charAt(' + o + ', ' + a[0] + ')' },
+  toInt: { ret: 'int32', js: o => '__rt.toInt(' + o + ')' },
+  toFloat: { ret: 'float', js: o => '__rt.toFloat(' + o + ')' },
+  startsWith: { ret: 'bool', js: (o, a, t) => o + '.startsWith(' + toStr(a[0], t[0]) + ')' },
+  endsWith: { ret: 'bool', js: (o, a, t) => o + '.endsWith(' + toStr(a[0], t[0]) + ')' },
+  equals: { ret: 'bool', js: (o, a, t) => '(' + o + ' === ' + toStr(a[0], t[0]) + ')' },
+  equalsIgnoreCase: { ret: 'bool', js: (o, a, t) => '(' + o + '.toLowerCase() === ' + toStr(a[0], t[0]) + '.toLowerCase())' },
+  compareTo: { ret: 'int32', js: (o, a, t) => '__rt.strcmp(' + o + ', ' + toStr(a[0], t[0]) + ')' },
+  reserve: { ret: 'bool', js: () => 'true' },
+  replace: { ret: 'void', mut: true, js: (lv, a, t) => '(' + lv + ' = ' + lv + '.split(' + toStr(a[0], t[0]) + ').join(' + toStr(a[1], t[1]) + '))' },
+  trim: { ret: 'void', mut: true, js: lv => '(' + lv + ' = ' + lv + '.trim())' },
+  toLowerCase: { ret: 'void', mut: true, js: lv => '(' + lv + ' = ' + lv + '.toLowerCase())' },
+  toUpperCase: { ret: 'void', mut: true, js: lv => '(' + lv + ' = ' + lv + '.toUpperCase())' },
+  concat: { ret: 'bool', mut: true, js: (lv, a, t) => '(' + lv + ' += ' + toStr(a[0], t[0]) + ', true)' },
+  remove: { ret: 'void', mut: true, js: (lv, a) => '(' + lv + ' = __rt.removeStr(' + lv + ', ' + a.join(', ') + '))' }
+};
+
+/* removes one pair of parentheses that wraps the whole expression */
+function stripOuter(c) {
+  if (c[0] !== '(' || c[c.length - 1] !== ')') return c;
+  let depth = 0, q = '';
+  for (let i = 0; i < c.length; i++) {
+    const ch = c[i];
+    if (q) { if (ch === '\\') i++; else if (ch === q) q = ''; continue; }
+    if (ch === '"' || ch === "'" || ch === '`') { q = ch; continue; }
+    if (ch === '(') depth++;
+    else if (ch === ')') { depth--; if (depth === 0) return i === c.length - 1 ? c.slice(1, -1) : c; }
+  }
+  return c;
+}
+function unparen(e) { while (e.k === 'paren') e = e.e; return e; }
+
+class Gen {
+  constructor(items, parser) {
+    this.items = items; this.parser = parser;
+    this.enumConsts = new Map();
+    this.funcs = new Map();
+    this.globals = new Map();
+    this.scopes = [];
+    this.fn = null;
+    this.ind = 1;
+    this.buf = [];
+    this.pre = [];
+    this.globalNames = [];
+    this.initLines = [];
+    this.fnCode = [];
+  }
+
+  /* ---------- scopes ---------- */
+  pushScope() { this.scopes.push(new Map()); }
+  popScope() { this.scopes.pop(); }
+  lookup(name) {
+    for (let i = this.scopes.length - 1; i >= 0; i--) if (this.scopes[i].has(name)) return this.scopes[i].get(name);
+    return this.globals.get(name) || null;
+  }
+  declare(info, line) {
+    if (this.scopes.length) {
+      const top = this.scopes[this.scopes.length - 1];
+      if (top.has(info.name)) fail("redeclaration of '" + info.name + "'", line);
+      top.set(info.name, info);
+    } else {
+      if (this.globals.has(info.name)) fail("redefinition of '" + info.name + "'", line);
+      this.globals.set(info.name, info);
+    }
+  }
+  emit(s) { this.buf.push('  '.repeat(this.ind) + s); }
+
+  /* ---------- driver ---------- */
+  generate() {
+    for (const it of this.items) if (it.k === 'enum') this.genEnum(it);
+    for (const it of this.items) if (it.k === 'fn') this.registerFn(it);
+    for (const it of this.items) if (it.k === 'decl') this.genGlobalDecl(it);
+    for (const it of this.items) if (it.k === 'fn' && it.body) this.genFn(it);
+    for (const need of ['setup', 'loop']) {
+      const f = this.funcs.get(need);
+      if (!f || !f.node.body) fail("undefined reference to '" + need + "()' (the sketch must define " + need + "())", 1);
+    }
+    const out = ['"use strict";'];
+    out.push(...this.pre);
+    if (this.globalNames.length) out.push('let ' + this.globalNames.join(', ') + ';');
+    out.push(...this.fnCode);
+    out.push('async function __init() {', ...this.initLines.map(l => '  ' + l), '}');
+    out.push('return { init: __init, setup: setup, loop: loop };');
+    return out.join('\n');
+  }
+
+  constEval(e) {
+    e = unparen(e);
+    switch (e.k) {
+      case 'num': return e.n;
+      case 'chr': return e.n;
+      case 'bool': return e.v ? 1 : 0;
+      case 'id': {
+        if (this.enumConsts.has(e.name)) return this.enumConsts.get(e.name).value;
+        if (e.name in CONSTS) return CONSTS[e.name];
+        break;
+      }
+      case 'unary': {
+        const v = this.constEval(e.e);
+        if (e.op === '-') return -v; if (e.op === '+') return v; if (e.op === '~') return ~v; if (e.op === '!') return v ? 0 : 1;
+        break;
+      }
+      case 'bin': {
+        const a = this.constEval(e.l), b = this.constEval(e.r);
+        switch (e.op) {
+          case '+': return a + b; case '-': return a - b; case '*': return a * b; case '/': return Math.trunc(a / b); case '%': return a % b;
+          case '<<': return a << b; case '>>': return a >> b; case '&': return a & b; case '|': return a | b; case '^': return a ^ b;
+        }
+        break;
+      }
+    }
+    fail('enumerator value is not an integer constant expression', e.line);
+  }
+
+  genEnum(en) {
+    let next = 0;
+    const parts = [];
+    for (const it of en.items) {
+      const v = it.value ? this.constEval(it.value) : next;
+      next = v + 1;
+      if (this.enumConsts.has(it.name)) fail("redeclaration of enumerator '" + it.name + "'", it.line);
+      const js = jsName(it.name);
+      this.enumConsts.set(it.name, { js, value: v });
+      parts.push(js + ' = ' + (v < 0 ? '(' + v + ')' : v));
+    }
+    if (parts.length) this.pre.push('const ' + parts.join(', ') + ';');
+  }
+
+  registerFn(fn) {
+    const prev = this.funcs.get(fn.name);
+    if (prev && prev.node.body && fn.body) fail("redefinition of '" + fn.name + "' (function overloading is not supported by the converter)", fn.line);
+    if (!prev || fn.body) {
+      const params = fn.params.map((p, i) => (!p.def && prev && prev.params[i] && prev.params[i].def) ? Object.assign({}, p, { def: prev.params[i].def }) : p);
+      this.funcs.set(fn.name, { name: fn.name, ret: fn.ret, params, node: fn, js: jsName(fn.name) });
+    }
+  }
+
+  /* ---------- declarations ---------- */
+  declItem(spec, item) {
+    const line = item.line;
+    const baseT = spec.base;
+    const info = { name: item.name, js: jsName(item.name), kind: 'var', isConst: spec.isConst };
+    if (item.isRef) fail("references to variables ('" + item.name + "') are not supported by the converter", line);
+    let code;
+    if (item.arr) {
+      const elemT = makeType(baseT, item.ptr);
+      const len = item.arr.len ? this.genExpr(item.arr.len) : null;
+      if (baseT === 'char' && item.ptr === 0) {
+        if (item.init && item.init.k === 'str') {
+          if (spec.isConst) { info.type = 'cstr'; info.strArray = true; code = JSON.stringify(item.init.v); }
+          else { info.type = 'cbuf'; code = 'new __rt.CharBuf(' + (len ? len.c : item.init.v.length + 1) + ', ' + JSON.stringify(item.init.v) + ')'; }
+        } else if (item.init && item.init.k === 'initlist') {
+          const codes = item.init.list.map(x => { const r = this.genExpr(x); return r.c; });
+          info.type = 'cbuf'; code = '__rt.CharBuf.fromCodes(' + (len ? len.c : codes.length) + ', [' + codes.join(', ') + '])';
+        } else {
+          if (!len) fail("storage size of '" + item.name + "' isn't known", line);
+          info.type = 'cbuf'; code = 'new __rt.CharBuf(' + len.c + ')';
+        }
+      } else {
+        let list = null;
+        if (item.init) {
+          if (item.init.k !== 'initlist') fail("array '" + item.name + "' must be initialised with a brace-enclosed initializer", line);
+          list = item.init.list.map(x => { const r = this.genExpr(x); return this.conv(r.c, r.t, elemT, line); });
+        }
+        if (!len && !list) fail("storage size of '" + item.name + "' isn't known", line);
+        info.type = 'arr:' + elemT; info.elem = elemT;
+        code = '__rt.mkArr(' + (len ? len.c : list.length) + ', ' + zeroOf(elemT) + (list ? ', [' + list.join(', ') + ']' : '') + ')';
+      }
+      return { info, code };
+    }
+    if (baseT === 'auto') {
+      if (!item.init) fail("declaration of 'auto " + item.name + "' has no initializer", line);
+      const r = this.genExpr(item.init);
+      info.type = r.t; code = r.c;
+      return { info, code };
+    }
+    const type = makeType(baseT, item.ptr);
+    if (type === 'void') fail("variable or field '" + item.name + "' declared void", line);
+    info.type = type;
+    if (item.init && item.init.k === 'initlist') fail("scalar object '" + item.name + "' requires one element in initializer", line);
+    if (OBJECT_TYPES.has(type) && item.ptr === 0) {
+      if (item.init) fail("initialising '" + item.name + "' from an expression is not supported by the converter", line);
+      code = type === 'LGFX' ? '__rt.display' : 'new __rt.' + type + '()';
+    } else if (item.init) {
+      const r = this.genExpr(item.init);
+      code = this.conv(r.c, r.t, type, line);
+    } else code = zeroOf(type);
+    return { info, code };
+  }
+
+  genGlobalDecl(d) {
+    for (const item of d.items) {
+      if (d.spec.isExtern && !item.init) continue;
+      const { info, code } = this.declItem(d.spec, item);
+      this.declare(info, item.line);
+      if (info.type === 'LGFX' && !item.arr) { this.pre.push('const ' + info.js + ' = ' + code + ';'); continue; }
+      this.globalNames.push(info.js);
+      this.initLines.push(info.js + ' = ' + code + ';');
+    }
+  }
+
+  /* ---------- functions ---------- */
+  genFn(fn) {
+    const sig = this.funcs.get(fn.name);
+    this.fn = sig;
+    this.pushScope();
+    const names = [];
+    for (const p of fn.params) {
+      if (!p.name) { names.push('_unused' + names.length); continue; }
+      const info = { name: p.name, js: jsName(p.name), kind: 'var', type: p.type, byRef: p.byRef };
+      this.declare(info, p.line);
+      names.push(info.js);
+    }
+    const saved = this.buf; this.buf = []; this.ind = 1;
+    for (const s of fn.body.body) this.genStmt(s);
+    const body = this.buf; this.buf = saved;
+    this.popScope();
+    this.fn = null;
+    this.fnCode.push('async function ' + sig.js + '(' + names.join(', ') + ') {', ...body, '}');
+  }
+
+  /* ---------- statements ---------- */
+  genBody(s, spin) {
+    this.pushScope();
+    if (spin) this.emit('if (__rt.spin()) await __rt.pause();');
+    if (s.k === 'block') for (const x of s.body) this.genStmt(x);
+    else this.genStmt(s);
+    this.popScope();
+  }
+  cond(e) { return stripOuter(this.genExpr(e).c); }
+  ln(s) { return '__rt.line = ' + s.line + '; '; }
+
+  declInline(d) {
+    const parts = [];
+    for (const item of d.items) {
+      const { info, code } = this.declItem(d.spec, item);
+      this.declare(info, item.line);
+      parts.push(info.js + ' = ' + code);
+    }
+    return 'let ' + parts.join(', ');
+  }
+
+  genStmt(s) {
+    switch (s.k) {
+      case 'empty': return;
+      case 'block':
+        this.emit('{'); this.ind++; this.pushScope();
+        for (const x of s.body) this.genStmt(x);
+        this.popScope(); this.ind--; this.emit('}');
+        return;
+      case 'decl':
+        for (const item of s.items) {
+          const { info, code } = this.declItem(s.spec, item);
+          if (s.spec.isStatic) {
+            info.js = this.fn.js + '$' + item.name;
+            this.globalNames.push(info.js);
+            this.initLines.push(info.js + ' = ' + code + ';');
+            this.declare(info, item.line);
+          } else {
+            this.declare(info, item.line);
+            this.emit(this.ln(s) + 'let ' + info.js + ' = ' + code + ';');
+          }
+        }
+        return;
+      case 'expr': {
+        const r = this.genExpr(s.e);
+        this.emit(this.ln(s) + stripOuter(r.c) + ';');
+        return;
+      }
+      case 'if': {
+        let cur = s, head = this.ln(s);
+        for (;;) {
+          this.emit(head + 'if (' + this.cond(cur.cond) + ') {');
+          this.ind++; this.genBody(cur.then); this.ind--;
+          if (!cur.els) { this.emit('}'); return; }
+          if (cur.els.k === 'if') { cur = cur.els; head = '} else '; continue; }
+          this.emit('} else {'); this.ind++; this.genBody(cur.els); this.ind--; this.emit('}');
+          return;
+        }
+      }
+      case 'while':
+        this.emit(this.ln(s) + 'while (' + this.cond(s.cond) + ') {');
+        this.ind++; this.genBody(s.body, true); this.ind--; this.emit('}');
+        return;
+      case 'do':
+        this.emit(this.ln(s) + 'do {');
+        this.ind++; this.genBody(s.body, true); this.ind--;
+        this.emit('} while (' + this.cond(s.cond) + ');');
+        return;
+      case 'for': {
+        this.pushScope();
+        let init = '';
+        if (s.init) init = s.init.k === 'decl' ? this.declInline(s.init) : stripOuter(this.genExpr(s.init.e).c);
+        const cond = s.cond ? this.cond(s.cond) : '';
+        const upd = s.update ? stripOuter(this.genExpr(s.update).c) : '';
+        this.emit(this.ln(s) + 'for (' + init + '; ' + cond + '; ' + upd + ') {');
+        this.ind++; this.genBody(s.body, true); this.ind--; this.emit('}');
+        this.popScope();
+        return;
+      }
+      case 'switch': {
+        const e = this.genExpr(s.e);
+        this.emit(this.ln(s) + 'switch (' + stripOuter(e.c) + ') {');
+        this.ind++;
+        let i = 0;
+        const items = s.items;
+        while (i < items.length) {
+          const labels = [];
+          while (i < items.length && items[i].k === 'label') labels.push(items[i++]);
+          if (!labels.length) fail('statement before the first case label is not supported by the converter', items[i].line);
+          const body = [];
+          while (i < items.length && items[i].k !== 'label') body.push(items[i++]);
+          this.emit(labels.map(l => l.e ? 'case ' + stripOuter(this.genExpr(l.e).c) + ':' : 'default:').join(' ') + ' {');
+          this.ind++; this.pushScope();
+          for (const b of body) this.genStmt(b);
+          this.popScope(); this.ind--;
+          this.emit('}');
+        }
+        this.ind--;
+        this.emit('}');
+        return;
+      }
+      case 'return': {
+        const ret = this.fn.ret;
+        if (!s.e) {
+          if (ret !== 'void') fail("return-statement with no value, in function returning '" + tn(ret) + "'", s.line);
+          this.emit(this.ln(s) + 'return;');
+        } else {
+          if (ret === 'void') fail("return-statement with a value, in function returning 'void'", s.line);
+          const r = this.genExpr(s.e);
+          this.emit(this.ln(s) + 'return ' + stripOuter(this.conv(r.c, r.t, ret, s.line)) + ';');
+        }
+        return;
+      }
+      case 'break': this.emit('break;'); return;
+      case 'continue': this.emit('continue;'); return;
+      case 'fn': fail('nested function definitions are not allowed', s.line); break;
+      default: fail('unsupported statement', s.line);
+    }
+  }
+
+  /* ---------- conversions ---------- */
+  wrap(x, to, from) {
+    if (/^\(?-?\d+(\.\d+)?\)?$/.test(x)) return x;
+    switch (to) {
+      case 'uint8': case 'char': return from === 'uint8' || from === 'char' ? x : '(' + x + ' & 255)';
+      case 'int8': return '(' + x + ' << 24 >> 24)';
+      case 'uint16': return from === 'uint8' || from === 'char' ? x : '(' + x + ' & 65535)';
+      case 'int16': return '(' + x + ' << 16 >> 16)';
+      case 'uint32': return (from === 'uint32' || from === 'uint8' || from === 'uint16' || from === 'char') ? x : '(' + x + ' >>> 0)';
+      default: return x;
+    }
+  }
+  conv(c, from, to, line, explicit) {
+    if (!to || to === 'any' || to === 'auto' || to === 'void' || from === to || from === 'any' || !from) return c;
+    if (to === 'bool') return (isInt(from) || isFloat(from)) ? '(' + c + ' != 0)' : c;
+    if (isInt(to)) {
+      if (isText(from)) fail("invalid conversion from '" + tn(from) + "' to '" + tn(to) + "'", line);
+      let x = c;
+      if (isFloat(from)) x = 'Math.trunc(' + c + ')';
+      else if (from === 'bool') x = '(' + c + ' ? 1 : 0)';
+      return this.wrap(x, to, from);
+    }
+    if (isFloat(to)) {
+      if (isText(from)) fail("invalid conversion from '" + tn(from) + "' to '" + tn(to) + "'", line);
+      return from === 'bool' ? '(' + c + ' ? 1 : 0)' : c;
+    }
+    if (to === 'String') {
+      if (from === 'cstr') return c;
+      if (from === 'cbuf') return c + '.toString()';
+      if (explicit) return toStr(c, from);
+      if (isNum(from)) fail("invalid conversion from '" + tn(from) + "' to 'String' (write String(...) to convert a number)", line);
+      return c;
+    }
+    if (to === 'cstr') {
+      if (from === 'cbuf') return c + '.toString()';
+      if (from === 'String' && !explicit) fail("cannot convert 'String' to 'const char*' (use .c_str())", line);
+      return c;
+    }
+    return c;
+  }
+
+  /* ---------- lvalues ---------- */
+  genLvalue(e) {
+    e = unparen(e);
+    if (e.k === 'id') {
+      const v = this.lookup(e.name);
+      if (!v) {
+        if (this.enumConsts.has(e.name) || e.name in CONSTS) fail('lvalue required as left operand of assignment', e.line);
+        fail("'" + e.name + "' was not declared in this scope", e.line);
+      }
+      return { c: v.byRef ? v.js + '.v' : v.js, t: v.type, kind: 'var', info: v };
+    }
+    if (e.k === 'member') {
+      const o = this.genExpr(e.obj);
+      const f = FIELDS[o.t] && FIELDS[o.t][e.name];
+      if (!f) fail("'" + tn(o.t) + "' has no member named '" + e.name + "'", e.line);
+      return { c: o.c + '.' + e.name, t: f, kind: 'member' };
+    }
+    if (e.k === 'index') {
+      const o = this.genExpr(e.obj), i = this.genExpr(e.idx);
+      const ic = this.conv(i.c, i.t, 'int32', e.line);
+      if (o.t === 'cbuf') return { c: o.c, idx: ic, t: 'char', kind: 'cbuf' };
+      if (o.t.startsWith('arr:') || o.t.startsWith('ptr:')) return { c: o.c + '[' + ic + ']', t: o.t.slice(4), kind: 'index' };
+      fail('assignment to an element of this type is not supported (' + tn(o.t) + ')', e.line);
+    }
+    if (e.k === 'unary' && e.op === '*') {
+      const o = this.genExpr(e.e);
+      if (o.t.startsWith('ptr:')) return { c: o.c + '.v', t: o.t.slice(4), kind: 'deref' };
+    }
+    fail('lvalue required as left operand of assignment', e.line);
+  }
+  makeRef(lv, line) {
+    if (lv.kind === 'cbuf') fail('taking the address of a char buffer element is not supported', line);
+    return '__rt.ref(() => ' + lv.c + ', (v) => { ' + lv.c + ' = v; })';
+  }
+
+  /* ---------- expressions ---------- */
+  genExpr(e) {
+    switch (e.k) {
+      case 'num': return this.genNum(e);
+      case 'str': return { c: JSON.stringify(e.v), t: 'cstr' };
+      case 'chr': return { c: String(e.n), t: 'char' };
+      case 'bool': return { c: e.v ? 'true' : 'false', t: 'bool' };
+      case 'null': return { c: 'null', t: 'any' };
+      case 'paren': { const r = this.genExpr(e.e); return r; }
+      case 'id': return this.genId(e);
+      case 'scoped': return this.genScoped(e);
+      case 'member': return this.genMember(e);
+      case 'index': return this.genIndex(e);
+      case 'call': return this.genCall(e);
+      case 'unary': return this.genUnary(e);
+      case 'preinc': case 'postinc': return this.genIncDec(e);
+      case 'bin': return this.genBin(e);
+      case 'assign': return this.genAssign(e);
+      case 'cond': return this.genCond(e);
+      case 'cast': {
+        const target = makeType(e.type.base, e.type.ptr);
+        const r = this.genExpr(e.e);
+        return { c: this.conv(r.c, r.t, target, e.line, true), t: target };
+      }
+      case 'ctor': return this.genCtor(e);
+      case 'sizeof': return this.genSizeof(e);
+      case 'comma': { const l = this.genExpr(e.l), r = this.genExpr(e.r); return { c: '(' + l.c + ', ' + r.c + ')', t: r.t }; }
+      case 'initlist': fail('unexpected initializer list', e.line); break;
+      default: fail('unsupported expression', e.line);
+    }
+  }
+
+  genNum(e) {
+    let t;
+    if (e.isFloat) t = e.suf.includes('f') ? 'float' : 'double';
+    else if (e.suf.includes('ll')) t = e.suf.includes('u') ? 'uint64' : 'int64';
+    else if (e.suf.includes('u')) t = 'uint32';
+    else if (e.n > 2147483647) t = e.n > 4294967295 ? 'int64' : (e.hex ? 'uint32' : 'int64');
+    else t = 'int32';
+    const c = e.hex && !e.isFloat ? e.v.toLowerCase() : String(e.n);
+    return { c, t };
+  }
+
+  genId(e) {
+    const name = e.name;
+    const v = this.lookup(name);
+    if (v) return { c: v.byRef ? v.js + '.v' : v.js, t: v.type, info: v };
+    if (this.enumConsts.has(name)) return { c: this.enumConsts.get(name).js, t: 'int32' };
+    if (name in CONSTS) {
+      const n = CONSTS[name];
+      return { c: n < 0 ? '(' + n + ')' : String(n), t: Number.isInteger(n) ? 'int32' : 'double' };
+    }
+    if (OBJECTS[name]) return { c: OBJECTS[name].js, t: OBJECTS[name].type };
+    if (this.funcs.has(name) || FREE[name]) fail("'" + name + "' is a function, call it with parentheses (function pointers are not supported)", e.line);
+    fail("'" + name + "' was not declared in this scope", e.line);
+  }
+
+  genScoped(e) {
+    const parts = e.parts.filter((p, i) => !(SCOPE_SKIP.has(p) && i < e.parts.length - 1));
+    const name = parts[parts.length - 1], scope = parts[parts.length - 2];
+    if ((scope === 'textdatum_t' || scope === 'textdatum') && name in TEXTDATUM) return { c: String(TEXTDATUM[name]), t: 'int32' };
+    if (scope && this.parser.enumNames.has(scope) && this.enumConsts.has(name)) return { c: this.enumConsts.get(name).js, t: 'int32' };
+    fail("'" + e.parts.join('::') + "' was not declared in this scope", e.line);
+  }
+
+  genMember(e) {
+    const o = this.genExpr(e.obj);
+    const f = FIELDS[o.t] && FIELDS[o.t][e.name];
+    if (f) return { c: o.c + '.' + e.name, t: f };
+    if (CLASSES[o.t] && CLASSES[o.t][e.name] !== undefined || (o.t === 'String' && STR[e.name])) fail("invalid use of non-static member function '" + e.name + "' (call it with parentheses)", e.line);
+    if (isText(o.t) || isNum(o.t)) fail("request for member '" + e.name + "' in something of non-class type '" + tn(o.t) + "'", e.line);
+    fail("'" + tn(o.t) + "' has no member named '" + e.name + "' (or the simulator does not support it)", e.line);
+  }
+
+  genIndex(e) {
+    const o = this.genExpr(e.obj), i = this.genExpr(e.idx);
+    const ic = this.conv(i.c, i.t, 'int32', e.line);
+    if (o.t === 'String' || o.t === 'cstr') return { c: '__rt.charAt(' + o.c + ', ' + ic + ')', t: 'char' };
+    if (o.t === 'cbuf') return { c: o.c + '.get(' + ic + ')', t: 'char' };
+    if (o.t.startsWith('arr:') || o.t.startsWith('ptr:')) return { c: o.c + '[' + ic + ']', t: o.t.slice(4) };
+    fail("invalid types '" + tn(o.t) + "[" + tn(i.t) + "]' for array subscript", e.line);
+  }
+
+  /* ----- calls ----- */
+  genCall(e) {
+    const f = e.callee;
+    if (f.k === 'id') {
+      const name = f.name;
+      if (this.lookup(name)) fail("'" + name + "' cannot be used as a function", f.line);
+      const sig = this.funcs.get(name);
+      if (sig) return this.userCall(sig, e);
+      if (FREE[name]) return this.freeCall(name, FREE[name], e);
+      fail("'" + name + "' was not declared in this scope (or it is not supported by this simulator)", f.line);
+    }
+    if (f.k === 'member') return this.methodCall(e);
+    if (f.k === 'scoped') {
+      const key = f.parts.slice(-2).join('::');
+      if (STATIC[key]) {
+        const args = e.args.map(a => this.genExpr(a));
+        return { c: STATIC[key].js(args.map(a => a.c)), t: STATIC[key].ret };
+      }
+      fail("'" + f.parts.join('::') + "' was not declared in this scope (or it is not supported by this simulator)", f.line);
+    }
+    fail('this kind of call is not supported by the converter', e.line);
+  }
+
+  userCall(sig, e) {
+    const params = sig.params;
+    if (e.args.length > params.length) fail("too many arguments to function '" + sig.name + "'", e.line);
+    const codes = [];
+    for (let i = 0; i < params.length; i++) {
+      const p = params[i];
+      if (i < e.args.length) {
+        if (p.byRef) {
+          let n = unparen(e.args[i]);
+          const v = n.k === 'id' ? this.lookup(n.name) : null;
+          codes.push(v && v.byRef ? v.js : this.makeRef(this.genLvalue(n), e.line));
+        } else {
+          const a = this.genExpr(e.args[i]);
+          codes.push(stripOuter(this.conv(a.c, a.t, p.type, e.line)));
+        }
+      } else if (p.def) {
+        const saved = this.scopes; this.scopes = [];
+        const a = this.genExpr(p.def);
+        this.scopes = saved;
+        codes.push(stripOuter(this.conv(a.c, a.t, p.type, e.line)));
+      } else fail("too few arguments to function '" + sig.name + "'", e.line);
+    }
+    return { c: '(await ' + sig.js + '(' + codes.join(', ') + '))', t: sig.ret };
+  }
+
+  freeCall(name, spec, e) {
+    const args = e.args.map(a => this.genExpr(a));
+    const codes = args.map(a => stripOuter(a.c)), types = args.map(a => a.t);
+    let c = spec.js ? spec.js(codes, types) : '__rt.' + name + '(' + codes.join(', ') + ')';
+    if (spec.async) c = '(await ' + c + ')';
+    return { c, t: typeof spec.ret === 'function' ? spec.ret(types) : spec.ret };
+  }
+
+  methodCall(e) {
+    const f = e.callee;
+    const objNode = unparen(f.obj);
+    const objT = this.genExpr(objNode).t;
+    const name = f.name;
+    if (objT === 'String') {
+      const m = STR[name];
+      if (!m) fail("'String' has no member named '" + name + "' (or the simulator does not support it)", e.line);
+      const args = e.args.map(a => this.genExpr(a));
+      const codes = args.map(a => stripOuter(a.c)), types = args.map(a => a.t);
+      let o;
+      if (m.mut) o = this.genLvalue(objNode).c;
+      else o = this.genExpr(objNode).c;
+      return { c: m.js(o, codes, types), t: m.ret };
+    }
+    if (isText(objT) || isNum(objT)) fail("request for member '" + name + "' in something of non-class type '" + tn(objT) + "'", e.line);
+    const cls = CLASSES[objT];
+    if (!cls) fail("'" + tn(objT) + "' is not a class type the simulator knows", e.line);
+    const m = cls[name];
+    if (m === undefined) fail("'" + (objT === 'LGFX' ? 'lcd' : objT) + "' has no member function '" + name + "' (or the simulator does not support it)", e.line);
+    const spec = typeof m === 'string' ? { ret: m } : m;
+    const o = this.genExpr(objNode).c;
+    const args = e.args.map(a => this.genExpr(a));
+    const codes = args.map(a => stripOuter(a.c)), types = args.map(a => a.t);
+    let c = spec.js ? spec.js(o, codes, types) : o + '.' + name + '(' + codes.join(', ') + ')';
+    if (spec.async) c = '(await ' + c + ')';
+    return { c, t: typeof spec.ret === 'function' ? spec.ret(types) : spec.ret };
+  }
+
+  genCtor(e) {
+    const T = makeType(e.type.base, e.type.ptr);
+    const args = e.args.map(a => this.genExpr(a));
+    if (T === 'String') {
+      if (args.length === 0) return { c: '""', t: 'String' };
+      if (args.length === 1) return { c: toStr(stripOuter(args[0].c), args[0].t), t: 'String' };
+      return { c: printArg(args.map(a => stripOuter(a.c)), args.map(a => a.t)), t: 'String' };
+    }
+    if (isNum(T)) {
+      if (args.length === 0) return { c: zeroOf(T), t: T };
+      if (args.length === 1) return { c: this.conv(args[0].c, args[0].t, T, e.line, true), t: T };
+    }
+    fail("the converter does not support constructing '" + tn(T) + "' this way", e.line);
+  }
+
+  genSizeof(e) {
+    if (e.type) {
+      const t = makeType(e.type.base, e.type.ptr);
+      return { c: String(e.type.ptr ? 4 : sizeOfType(t)), t: 'uint32' };
+    }
+    const inner = unparen(e.e);
+    if (inner.k === 'id') {
+      const v = this.lookup(inner.name);
+      if (v) {
+        const js = v.byRef ? v.js + '.v' : v.js;
+        if (v.strArray) return { c: '(' + js + '.length + 1)', t: 'uint32' };
+        if (v.type === 'cbuf') return { c: js + '.size', t: 'uint32' };
+        if (v.type.startsWith('arr:')) return { c: '(' + js + '.length * ' + (v.elem === 'cstr' ? 4 : sizeOfType(v.elem)) + ')', t: 'uint32' };
+        return { c: String(sizeOfType(v.type)), t: 'uint32' };
+      }
+    }
+    return { c: String(sizeOfType(this.genExpr(inner).t)), t: 'uint32' };
+  }
+
+  /* ----- operators ----- */
+  genUnary(e) {
+    if (e.op === '&') {
+      const n = unparen(e.e);
+      const o = n.k === 'id' ? this.genId(n) : null;
+      const ot = o ? o.t : this.genExpr(n).t;
+      if (OBJECT_TYPES.has(ot) || ot === 'cbuf' || ot.startsWith('arr:')) return { c: (o || this.genExpr(n)).c, t: ot };
+      if (o && o.info && o.info.byRef) return { c: o.info.js, t: 'ptr:' + ot };
+      return { c: this.makeRef(this.genLvalue(n), e.line), t: 'ptr:' + ot };
+    }
+    const r = this.genExpr(e.e);
+    switch (e.op) {
+      case '!': return { c: '(!' + r.c + ')', t: 'bool' };
+      case '*':
+        if (r.t.startsWith('ptr:')) return { c: r.c + '.v', t: r.t.slice(4) };
+        if (r.t === 'cstr' || r.t === 'String') return { c: '__rt.charAt(' + r.c + ', 0)', t: 'char' };
+        fail("invalid type argument of unary '*' (have '" + tn(r.t) + "')", e.line);
+        break;
+      case '-': case '+': case '~': {
+        if (isText(r.t)) fail("wrong type argument to unary '" + e.op + "'", e.line);
+        const t = isFloat(r.t) ? r.t : arithType(r.t, 'int32');
+        if (e.op === '+') return { c: r.c, t };
+        const c = '(' + e.op + r.c + ')';
+        return { c: t === 'uint32' ? '(' + c + ' >>> 0)' : c, t };
+      }
+    }
+    fail('unsupported unary operator ' + e.op, e.line);
+  }
+
+  genIncDec(e) {
+    const lv = this.genLvalue(e.e);
+    if (lv.kind === 'cbuf' || isText(lv.t)) fail("increment/decrement of '" + tn(lv.t) + "' is not supported by the converter", e.line);
+    return { c: e.k === 'preinc' ? '(' + e.op + lv.c + ')' : '(' + lv.c + e.op + ')', t: lv.t };
+  }
+
+  genBin(e) {
+    if (e.op === '&&' || e.op === '||') {
+      const l = this.genExpr(e.l), r = this.genExpr(e.r);
+      return { c: '(' + l.c + ' ' + e.op + ' ' + r.c + ')', t: 'bool' };
+    }
+    return this.binary(e.op, this.genExpr(e.l), this.genExpr(e.r), e.line);
+  }
+
+  binary(op, l, r, line) {
+    const lt = l.t, rt = r.t;
+    if (op === '==' || op === '!=') {
+      if (isText(lt) && isText(rt)) return { c: '(' + toStr(l.c, lt) + (op === '==' ? ' === ' : ' !== ') + toStr(r.c, rt) + ')', t: 'bool' };
+      if ((isText(lt) && (isNum(rt) && rt !== 'bool')) || (isText(rt) && (isNum(lt) && lt !== 'bool'))) {
+        fail("ISO C++ forbids comparison between a string and a number ('" + tn(lt) + "' " + op + " '" + tn(rt) + "')", line);
+      }
+      return { c: '(' + l.c + ' ' + op + ' ' + r.c + ')', t: 'bool' };
+    }
+    if (op === '<' || op === '>' || op === '<=' || op === '>=') {
+      if (isText(lt) !== isText(rt) && lt !== 'any' && rt !== 'any') fail("comparison between a string and a number ('" + tn(lt) + "' " + op + " '" + tn(rt) + "')", line);
+      if (isText(lt) && isText(rt)) return { c: '(' + toStr(l.c, lt) + ' ' + op + ' ' + toStr(r.c, rt) + ')', t: 'bool' };
+      return { c: '(' + l.c + ' ' + op + ' ' + r.c + ')', t: 'bool' };
+    }
+    if (op === '+') {
+      if (lt === 'String' || rt === 'String') return { c: '(' + toStr(l.c, lt) + ' + ' + toStr(r.c, rt) + ')', t: 'String' };
+      if (isText(lt) || isText(rt)) {
+        if (isText(lt) && isText(rt)) fail("invalid operands of types 'const char*' and 'const char*' to binary 'operator+' (wrap one side in String(...))", line);
+        fail("adding a number to a string literal is pointer arithmetic in C++ (wrap the text in String(...) to concatenate)", line);
+      }
+    } else if (isText(lt) || isText(rt)) {
+      fail("invalid operands of types '" + tn(lt) + "' and '" + tn(rt) + "' to binary 'operator" + op + "'", line);
+    }
+    const t = arithType(lt, rt);
+    const flt = isFloat(t);
+    switch (op) {
+      case '/':
+        return flt ? { c: '(' + l.c + ' / ' + r.c + ')', t } : { c: '__rt.idiv(' + l.c + ', ' + r.c + ')', t };
+      case '%':
+        if (flt) fail("invalid operands of types '" + tn(lt) + "' and '" + tn(rt) + "' to binary 'operator%'", line);
+        return { c: '__rt.imod(' + l.c + ', ' + r.c + ')', t };
+      case '+': case '-': {
+        const c = '(' + l.c + ' ' + op + ' ' + r.c + ')';
+        return { c: t === 'uint32' ? '(' + c + ' >>> 0)' : c, t };
+      }
+      case '*': {
+        if (t === 'uint32') return { c: '(Math.imul(' + l.c + ', ' + r.c + ') >>> 0)', t };
+        return { c: '(' + l.c + ' * ' + r.c + ')', t };
+      }
+      case '<<': case '>>': {
+        if (flt || isFloat(rt)) fail("invalid operands to binary 'operator" + op + "'", line);
+        const lp = arithType(lt, 'int32');
+        let c;
+        if (op === '<<') c = '(' + l.c + ' << ' + r.c + ')';
+        else c = '(' + l.c + (lp === 'uint32' ? ' >>> ' : ' >> ') + r.c + ')';
+        return { c: (lp === 'uint32' && op === '<<') ? '(' + c + ' >>> 0)' : c, t: lp };
+      }
+      case '&': case '|': case '^': {
+        if (flt) fail("invalid operands of types '" + tn(lt) + "' and '" + tn(rt) + "' to binary 'operator" + op + "'", line);
+        const c = '(' + l.c + ' ' + op + ' ' + r.c + ')';
+        return { c: t === 'uint32' ? '(' + c + ' >>> 0)' : c, t };
+      }
+    }
+    fail('unsupported operator ' + op, line);
+  }
+
+  genAssign(e) {
+    const lv = this.genLvalue(e.l);
+    if (e.r.k === 'initlist') fail('assignment from an initializer list is not supported by the converter', e.line);
+    const r = this.genExpr(e.r);
+    if (lv.kind === 'cbuf') {
+      if (e.op !== '=') fail('compound assignment to a char buffer element is not supported', e.line);
+      return { c: lv.c + '.set(' + lv.idx + ', ' + stripOuter(r.c) + ')', t: 'char' };
+    }
+    if (e.op === '=') {
+      if (lv.t === 'cbuf') fail('assignment to a char array is not allowed in C++ (use strcpy or snprintf)', e.line);
+      return { c: '(' + lv.c + ' = ' + stripOuter(this.conv(r.c, r.t, lv.t, e.line)) + ')', t: lv.t };
+    }
+    const op = e.op.slice(0, -1);
+    if (lv.t === 'String') {
+      if (op !== '+') fail("invalid operands to binary 'operator" + op + "' for String", e.line);
+      return { c: '(' + lv.c + ' += ' + toStr(stripOuter(r.c), r.t) + ')', t: 'String' };
+    }
+    if (isText(lv.t)) fail("compound assignment on '" + tn(lv.t) + "' is pointer arithmetic, which the converter does not support", e.line);
+    const bin = this.binary(op, { c: lv.c, t: lv.t }, r, e.line);
+    const final = this.conv(bin.c, bin.t, lv.t, e.line);
+    const plain = '(' + lv.c + ' ' + op + ' ' + r.c + ')';
+    if (final === bin.c && bin.c === plain && '+-*&|^'.includes(op)) return { c: '(' + lv.c + ' ' + e.op + ' ' + stripOuter(r.c) + ')', t: lv.t };
+    return { c: '(' + lv.c + ' = ' + stripOuter(final) + ')', t: lv.t };
+  }
+
+  genCond(e) {
+    const c = this.genExpr(e.c), a = this.genExpr(e.a), b = this.genExpr(e.b);
+    let t;
+    if (a.t === b.t) t = a.t;
+    else if (isNum(a.t) && isNum(b.t)) t = (a.t === 'bool' || b.t === 'bool') ? arithType(a.t === 'bool' ? 'int32' : a.t, b.t === 'bool' ? 'int32' : b.t) : arithType(a.t, b.t);
+    else if (isText(a.t) && isText(b.t)) t = (a.t === 'String' || b.t === 'String') ? 'String' : 'cstr';
+    else t = a.t === 'any' ? b.t : a.t;
+    const ac = isText(a.t) && isText(b.t) ? toStr(a.c, a.t) : a.c;
+    const bc = isText(a.t) && isText(b.t) ? toStr(b.c, b.t) : b.c;
+    return { c: '(' + stripOuter(c.c) + ' ? ' + ac + ' : ' + bc + ')', t };
+  }
+}
+
+/* ===== public API ===== */
+function convert(src) {
+  try {
+    const toks = lex(src);
+    const parser = new Parser(toks);
+    const items = parser.parseProgram();
+    const js = new Gen(items, parser).generate();
+    return { ok: true, js };
+  } catch (e) {
+    if (e instanceof CompileError) return { ok: false, error: { message: e.message, line: e.line } };
+    return { ok: false, error: { message: 'internal converter error: ' + (e && e.message), line: 0 } };
+  }
+}
+
+return { convert, CompileError };
+})();
+if (typeof module !== 'undefined') module.exports = CydCpp;
+</script>
+
+<script>
 (() => {
 'use strict';
 
@@ -3245,12 +5082,16 @@ function strftime(fmt, sec) {           // like gmtime_r + strftime: uses the UT
   return fmt.replace(/%([YmdHIMSpb%])/g, (_, c) => String(map[c]));
 }
 
+let serPend = '', serTimer = 0;
+const serFlush = () => { clearTimeout(serTimer); serTimer = 0; if (serPend) { serialOut(serPend, 'out'); serPend = ''; } };
 const Serial = {
-  begin() {},
+  begin() {}, end() {}, flush() {}, setTimeout() {},
   available() { return hw.serialBuf.length; },
-  read() { return hw.serialBuf.shift(); },
-  print(s) { serialOut(String(s), 'out'); },
-  println(s) { serialOut(String(s == null ? '' : s), 'out'); }
+  read() { return hw.serialBuf.length ? hw.serialBuf.shift() : -1; },
+  peek() { return hw.serialBuf.length ? hw.serialBuf[0] : -1; },
+  write(c) { serPend += typeof c === 'number' ? String.fromCharCode(c) : String(c); return 1; },
+  print(s) { s = String(s); const parts = s.split('\n'); for (let i = 0; i < parts.length; i++) { serPend += parts[i]; if (i < parts.length - 1) serFlush(); } if (serPend && !serTimer) serTimer = setTimeout(serFlush, 300); return s.length; },
+  println(s) { const t = s === undefined ? '' : String(s); this.print(t); serialOut(serPend, 'out'); serPend = ''; clearTimeout(serTimer); serTimer = 0; return t.length + 2; }
 };
 
 /* ---- serial monitor ---- */
@@ -3306,23 +5147,56 @@ function roundRectPath(x, y, w, h, r) {
 }
 
 const lcd = {
-  fg: TFT_WHITE, bg: TFT_BLACK, size: 1, datum: 'top_left',
-  init() {}, setRotation() {},
+  fg: TFT_WHITE, bg: null, size: 1, datum: 0, cx: 0, cy: 0,
+  init() { return true; }, setColorDepth() { return true; }, setRotation() {},
   setBrightness(b) { cv.style.opacity = String(0.12 + 0.88 * b / 255); },
-  off() { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 320); cv.style.opacity = '1'; this.fg = TFT_WHITE; this.bg = TFT_BLACK; this.size = 1; this.datum = 'top_left'; },
-  fillScreen(c) { ctx.fillStyle = css565(c); ctx.fillRect(0, 0, 480, 320); },
+  off() { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 320); cv.style.opacity = '1'; this.fg = TFT_WHITE; this.bg = null; this.size = 1; this.datum = 0; this.cx = 0; this.cy = 0; },
+  width() { return 480; }, height() { return 320; },
+  color565(r, g, b) { return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3); },
+  fillScreen(c) { if (window.__cydTrace) window.__cydTrace.push('<<clear>>'); ctx.fillStyle = css565(c); ctx.fillRect(0, 0, 480, 320); },
+  clear(c) { this.fillScreen(c === undefined ? 0 : c); }, clearDisplay(c) { this.fillScreen(c === undefined ? 0 : c); },
   fillRect(x, y, w, h, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, w, h); },
+  drawRect(x, y, w, h, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, w, 1); ctx.fillRect(x, y + h - 1, w, 1); ctx.fillRect(x, y, 1, h); ctx.fillRect(x + w - 1, y, 1, h); },
   fillRoundRect(x, y, w, h, r, c) { roundRectPath(x, y, w, h, r); ctx.fillStyle = css565(c); ctx.fill(); },
   drawRoundRect(x, y, w, h, r, c) { roundRectPath(x + 0.5, y + 0.5, w - 1, h - 1, r); ctx.strokeStyle = css565(c); ctx.lineWidth = 1; ctx.stroke(); },
+  drawFastHLine(x, y, w, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, w, 1); },
+  drawFastVLine(x, y, h, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, 1, h); },
+  drawPixel(x, y, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, 1, 1); },
+  drawLine(x0, y0, x1, y1, c) {
+    ctx.fillStyle = css565(c);
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    for (let n = 0; n < 4000; n++) {
+      ctx.fillRect(x0, y0, 1, 1);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  },
+  fillCircle(x, y, r, c) { ctx.fillStyle = css565(c); ctx.beginPath(); ctx.arc(x + 0.5, y + 0.5, r + 0.5, 0, 6.2832); ctx.fill(); },
+  drawCircle(x, y, r, c) { ctx.strokeStyle = css565(c); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x + 0.5, y + 0.5, r, 0, 6.2832); ctx.stroke(); },
+  fillTriangle(x0, y0, x1, y1, x2, y2, c) { ctx.fillStyle = css565(c); ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath(); ctx.fill(); },
+  drawTriangle(x0, y0, x1, y1, x2, y2, c) { this.drawLine(x0, y0, x1, y1, c); this.drawLine(x1, y1, x2, y2, c); this.drawLine(x2, y2, x0, y0, c); },
   setTextColor(fg, bg) { this.fg = fg; this.bg = bg !== undefined ? bg : null; },
   setTextSize(s) { this.size = s; },
   setTextDatum(d) { this.datum = d; },
-  drawString(str, x, y) {
-    str = String(str);
+  setCursor(x, y) { this.cx = x; this.cy = y; },
+  setTextWrap() {}, setFont() {}, setTextFont() {}, setTextPadding() {}, setSwapBytes() {}, startWrite() {}, endWrite() {}, sleep() {}, wakeup() {}, waitDisplay() {}, display() {},
+  textWidth(s) { return 6 * this.size * String(s).length; },
+  fontHeight() { return 8 * this.size; },
+  drawString(str, x, y) { return this._text(String(str), x, y, this.datum); },
+  drawCenterString(str, x, y) { return this._text(String(str), x, y, 1); },
+  drawRightString(str, x, y) { return this._text(String(str), x, y, 2); },
+  print(s) { const t = String(s); this._text(t, this.cx, this.cy, 0); this.cx += 6 * this.size * t.length; return t.length; },
+  println(s) { const t = s === undefined ? '' : String(s); this._text(t, this.cx, this.cy, 0); this.cx = 0; this.cy += 8 * this.size; return t.length + 2; },
+  _text(str, x, y, datum) {
+    if (window.__cydTrace) window.__cydTrace.push(str);
     const sz = this.size, w = 6 * sz * str.length, h = 8 * sz;
     let px = x, py = y;
-    if (this.datum === 'top_center') px = x - Math.trunc(w / 2);
-    else if (this.datum === 'middle_center') { px = x - Math.trunc(w / 2); py = y - Math.trunc(h / 2); }
+    const hz = datum & 3, vt = datum & 28;
+    if (hz === 1) px = x - Math.trunc(w / 2); else if (hz === 2) px = x - w;
+    if (vt === 4) py = y - Math.trunc(h / 2); else if (vt === 8) py = y - h; else if (vt === 16) py = y - 7 * sz;
     if (this.bg !== null) { ctx.fillStyle = css565(this.bg); ctx.fillRect(px, py, w, h); }
     ctx.fillStyle = css565(this.fg);
     for (let i = 0; i < str.length; i++) {
@@ -3334,12 +5208,13 @@ const lcd = {
     }
     return w;
   },
-  getTouch() {
-    if (!hw.touch) return null;
+  getTouch(rx, ry) {
     const t = hw.touch;
+    if (!t) return false;
     hw.touchPolled = true;
     if (hw.touchRelease) { hw.touch = null; hw.touchRelease = false; }
-    return t;
+    rx.v = t.x; ry.v = t.y;
+    return true;
   }
 };
 
@@ -3491,46 +5366,166 @@ async function netRequest(method, url, headers, body) {
 class WiFiClientSecure { setInsecure() {} }
 class HTTPClient {
   constructor() { this.headers = {}; this.url = ''; this.resp = ''; }
-  setFollowRedirects() {}
-  begin(a, b) { this.url = b === undefined ? a : b; this.headers = {}; }
+  setFollowRedirects() {} setTimeout() {} setConnectTimeout() {} setReuse() {} setUserAgent() {}
+  begin(a, b) { this.url = b === undefined ? a : b; this.headers = {}; return true; }
   addHeader(k, v) { this.headers[k] = v; }
-  async POST(body) { const r = await netRequest('POST', this.url, this.headers, body); this.resp = r.body; return r.status; }
+  async _send(method, body) { const r = await netRequest(method, this.url, this.headers, body); this.resp = r.body || ''; return r.status; }
+  POST(b) { return this._send('POST', b); } GET() { return this._send('GET'); } PUT(b) { return this._send('PUT', b); } PATCH(b) { return this._send('PATCH', b); }
   getString() { return this.resp; }
+  getSize() { return this.resp.length; }
+  connected() { return false; }
   end() {}
+  static errorToString(c) { return ({ '-1': 'connection refused', '-2': 'send header failed', '-3': 'send payload failed', '-4': 'not connected', '-5': 'connection lost', '-11': 'read Timeout' })[c] || 'unknown error'; }
 }
 
 /* =====================================================================
-   Sketch loader: compiles the editor text into a program
+   Runtime for converted sketches (__rt): the C++ / Arduino library surface
    ===================================================================== */
-const API = {
-  lcd, WiFi, WiFiClientSecure, HTTPClient, Serial, delay, millis, random,
-  randomSeed() {}, analogRead() { return Math.floor(Math.random() * 4096); }, pinMode() {}, digitalRead,
-  configTime, getLocalTime, nowSec, fmtExpiration, strftime, isoUtc, qrcode: window.qrcode, textdatum_t,
-  TFT_WHITE, TFT_BLACK, TFT_GREEN, TFT_YELLOW, TFT_ORANGE, TFT_LIGHTGREY,
-  WL_IDLE_STATUS, WL_CONNECTED, WL_DISCONNECTED, INPUT_PULLUP: 2, LOW: 0, HIGH: 1, HTTPC_STRICT_FOLLOW_REDIRECTS: 1
+class CharBuf {
+  constructor(n, init) { this.size = n; this.a = new Uint8Array(n); if (typeof init === 'string') this.setStr(init); }
+  static fromCodes(n, codes) { const b = new CharBuf(n); for (let i = 0; i < codes.length && i < n; i++) b.a[i] = codes[i] & 255; return b; }
+  get(i) { if (i < 0 || i >= this.size) throw new Error('index ' + i + ' is out of bounds for char[' + this.size + ']'); return this.a[i]; }
+  set(i, v) { if (i < 0 || i >= this.size) throw new Error('index ' + i + ' is out of bounds for char[' + this.size + ']'); this.a[i] = v & 255; return v; }
+  setStr(s, max) {
+    s = String(s);
+    const n = Math.min(s.length, this.size - 1, max === undefined ? Infinity : max);
+    for (let i = 0; i < n; i++) this.a[i] = s.charCodeAt(i) & 255;
+    if (n >= 0 && n < this.size) this.a[n] = 0;
+  }
+  toString() { let s = ''; for (let i = 0; i < this.size && this.a[i]; i++) s += String.fromCharCode(this.a[i]); return s; }
+  get length() { return this.toString().length; }
+}
+class Tm { constructor() { this.tm_sec = 0; this.tm_min = 0; this.tm_hour = 0; this.tm_mday = 0; this.tm_mon = 0; this.tm_year = 0; this.tm_wday = 0; this.tm_yday = 0; this.tm_isdst = 0; } }
+class QRCodeObj { constructor() { this.size = 0; this.version = 0; this.ecc = 0; this.mode = 0; this.mask = 0; this.q = null; } }
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+let tzOffset = 0;
+function fillTm(tm, sec) {
+  const d = new Date(sec * 1000);
+  tm.tm_sec = d.getUTCSeconds(); tm.tm_min = d.getUTCMinutes(); tm.tm_hour = d.getUTCHours();
+  tm.tm_mday = d.getUTCDate(); tm.tm_mon = d.getUTCMonth(); tm.tm_year = d.getUTCFullYear() - 1900; tm.tm_wday = d.getUTCDay();
+  tm.tm_yday = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 1)) / 86400000);
+  tm.tm_isdst = 0;
+  return tm;
+}
+const tmSec = tm => Date.UTC(tm.tm_year + 1900, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec) / 1000;
+function fmtTm(fmt, tm) {
+  const hr = tm.tm_hour, yr = tm.tm_year + 1900;
+  const map = { Y: yr, y: p2(yr % 100), m: p2(tm.tm_mon + 1), d: p2(tm.tm_mday), e: String(tm.tm_mday).padStart(2, ' '), H: p2(hr), I: p2(hr % 12 || 12), M: p2(tm.tm_min), S: p2(tm.tm_sec),
+    p: hr >= 12 ? 'PM' : 'AM', b: MONTHS[tm.tm_mon].slice(0, 3), B: MONTHS[tm.tm_mon], a: DAYS[tm.tm_wday].slice(0, 3), A: DAYS[tm.tm_wday], j: String(tm.tm_yday + 1).padStart(3, '0'),
+    F: yr + '-' + p2(tm.tm_mon + 1) + '-' + p2(tm.tm_mday), T: p2(hr) + ':' + p2(tm.tm_min) + ':' + p2(tm.tm_sec), Z: 'UTC', z: '+0000', '%': '%' };
+  return fmt.replace(/%([YymdeHIMSpbBaAjFTZz%])/g, (_, c) => String(map[c]));
+}
+function cfmt(fmt, args) {
+  let ai = 0;
+  return String(fmt).replace(/%([-+ 0#]*)(\d+)?(?:\.(\d+))?(hh|h|ll|l|z)?([diuxXcsfFeEgGp%])/g, (m, flags, width, prec, len, conv) => {
+    if (conv === '%') return '%';
+    if (ai >= args.length) return '';
+    let v = args[ai++], s;
+    switch (conv) {
+      case 'd': case 'i': s = String(Math.trunc(Number(v))); if (flags.includes('+') && Number(v) >= 0) s = '+' + s; break;
+      case 'u': s = String(Math.trunc(Number(v)) >>> 0); break;
+      case 'x': s = (Math.trunc(Number(v)) >>> 0).toString(16); break;
+      case 'X': s = (Math.trunc(Number(v)) >>> 0).toString(16).toUpperCase(); break;
+      case 'c': s = typeof v === 'number' ? String.fromCharCode(v) : String(v); break;
+      case 's': s = String(v); if (prec !== undefined) s = s.slice(0, +prec); break;
+      case 'p': s = '0x3ffb0000'; break;
+      case 'e': case 'E': s = Number(v).toExponential(prec === undefined ? 6 : +prec); break;
+      case 'g': case 'G': s = String(Number(v)); break;
+      default: s = Number(v).toFixed(prec === undefined ? 6 : +prec); if (flags.includes('+') && Number(v) >= 0) s = '+' + s;
+    }
+    if (width && s.length < +width) {
+      if (flags.includes('-')) s = s.padEnd(+width, ' ');
+      else if (flags.includes('0') && 'diuxXfFeE'.includes(conv)) { const neg = /^[-+]/.test(s) ? s[0] : ''; s = neg + s.slice(neg.length).padStart(+width - neg.length, '0'); }
+      else s = s.padStart(+width, ' ');
+    }
+    return s;
+  });
+}
+const sOf = x => (x === null || x === undefined) ? '' : String(x);
+const wlHost = { name: 'esp32s3-cyd' };
+Object.assign(WiFi, {
+  localIP() { return { toString: () => '192.168.1.57' }; }, disconnect() { this.began = false; this.wasUp = false; return true; }, mode() { return true; },
+  RSSI() { return this.status() === WL_CONNECTED ? -58 : 0; }, isConnected() { return this.status() === WL_CONNECTED; },
+  setHostname(n) { wlHost.name = n; return true; }, getHostname() { return wlHost.name; }, macAddress() { return 'A4:CF:12:34:56:78'; },
+  SSID() { return this.ssid || ''; }, reconnect() { return true; }, setAutoReconnect() { return true; }, setSleep() { return true; }
+});
+const rt = {
+  line: 0, display: lcd, Serial, WiFi, CharBuf, tm: Tm, QRCode: QRCodeObj, WiFiClientSecure, HTTPClient,
+  ESP: { restart() { serialOut('[sim] ESP.restart()', 'sim'); setTimeout(() => { if (running) start(); }, 0); }, getFreeHeap: () => 214336, getChipModel: () => 'ESP32-S3', getCpuFreqMHz: () => 240, getSketchSize: () => 1048576 },
+  ref(get, set) { return { get v() { return get(); }, set v(x) { set(x); } }; },
+  mkArr(n, zero, list) { const a = new Array(n).fill(zero); if (list) for (let i = 0; i < list.length && i < n; i++) a[i] = list[i]; return a; },
+  idiv(a, b) { if (b === 0) throw new Error('integer division by zero (the real board would crash here)'); return Math.trunc(a / b); },
+  imod(a, b) { if (b === 0) throw new Error('integer modulo by zero (the real board would crash here)'); return a % b; },
+  _last: 0,
+  spin() { const n = performance.now(); if (n - this._last > 40) { this._last = n; return true; } return false; },
+  pause() { return sleep(0); },
+  delay, millis, micros: () => millis() * 1000, delayMicroseconds() {}, random, randomSeed() {}, analogRead: () => Math.floor(Math.random() * 4096),
+  pinMode() {}, digitalRead, digitalWrite() {}, analogWrite() {},
+  map: (x, a, b, c, d) => b === a ? c : Math.trunc((x - a) * (d - c) / (b - a) + c),
+  configTime(off, dst, server) { tzOffset = (off | 0) + (dst | 0); configTime(0, 0, server); },
+  getLocalTime(tm) { const ok = getLocalTime(); if (ok && tm) fillTm(tm, nowSec() + tzOffset); return ok; },
+  time(ref) { const t = nowSec(); if (ref) ref.v = t; return t; },
+  mktime(tm) { return tmSec(tm) - tzOffset; },
+  gmtime_r(ref, tm) { return fillTm(tm, ref.v); }, localtime_r(ref, tm) { return fillTm(tm, ref.v + tzOffset); },
+  gmtime(ref) { return fillTm(new Tm(), ref.v); }, localtime(ref) { return fillTm(new Tm(), ref.v + tzOffset); },
+  strftime(buf, size, fmt, tm) { const s = fmtTm(String(fmt), tm); if (s.length + 1 > size) return 0; buf.setStr(s); return s.length; },
+  qrcode_getBufferSize(v) { const n = 4 * v + 17; return Math.ceil(n * n / 8) + 1; },
+  qrcode_initText(qr, data, version, ecc, text) {
+    try {
+      const q = window.qrcode(version, ['L', 'M', 'Q', 'H'][ecc] || 'L'); q.addData(String(text)); q.make();
+      qr.q = q; qr.size = q.getModuleCount(); qr.version = version; qr.ecc = ecc; return 0;
+    } catch (e) { return -1; }
+  },
+  qrcode_getModule(qr, x, y) { return qr.q && x >= 0 && y >= 0 && x < qr.size && y < qr.size ? qr.q.isDark(y, x) : false; },
+  charAt(s, i) { s = sOf(s); return i >= 0 && i < s.length ? s.charCodeAt(i) : 0; },
+  substring(s, a, b) { s = sOf(s); if (b === undefined) b = s.length; if (a > b) { const t = a; a = b; b = t; } return s.slice(Math.max(0, a), Math.max(0, b)); },
+  toInt(s) { const n = parseInt(sOf(s), 10); return Number.isNaN(n) ? 0 : n; },
+  toFloat(s) { const n = parseFloat(sOf(s)); return Number.isNaN(n) ? 0 : n; },
+  removeStr(s, i, n) { s = sOf(s); return n === undefined ? s.slice(0, i) : s.slice(0, i) + s.slice(i + n); },
+  strcmp(a, b) { a = sOf(a); b = sOf(b); return a < b ? -1 : a > b ? 1 : 0; },
+  strncmp(a, b, n) { return rt.strcmp(sOf(a).slice(0, n), sOf(b).slice(0, n)); },
+  strlen: s => sOf(s).length,
+  strcpy(d, s) { d.setStr(sOf(s)); return d; }, strncpy(d, s, n) { d.setStr(sOf(s), n); return d; }, strcat(d, s) { d.setStr(d.toString() + sOf(s)); return d; },
+  memset(b, v, n) { if (b && b.a) b.a.fill(v & 255, 0, n); else if (Array.isArray(b)) b.fill(v, 0, n); return b; },
+  sprintf(fmt, ...args) { return cfmt(fmt, args); },
+  snprintf(buf, size, fmt, ...args) { const s = cfmt(fmt, args); buf.setStr(s.slice(0, Math.max(0, size - 1))); return s.length; },
+  fstr: (x, d) => Number(x).toFixed(d),
+  numToStr(v, base, isFloat) { return isFloat ? Number(v).toFixed(base) : (base === 10 ? String(Math.trunc(v)) : (Math.trunc(v) >>> 0).toString(base).toUpperCase()); },
+  atoi(s) { return rt.toInt(s); }, atol(s) { return rt.toInt(s); }, atof(s) { return rt.toFloat(s); },
+  toupper: c => (c >= 97 && c <= 122 ? c - 32 : c), tolower: c => (c >= 65 && c <= 90 ? c + 32 : c),
+  isDigit: c => c >= 48 && c <= 57, isAlpha: c => (c >= 65 && c <= 90) || (c >= 97 && c <= 122), isSpace: c => c === 32 || (c >= 9 && c <= 13),
+  isAlphaNumeric: c => rt.isDigit(c) || rt.isAlpha(c), isUpperCase: c => c >= 65 && c <= 90, isLowerCase: c => c >= 97 && c <= 122,
+  isPunct: c => c > 32 && c < 127 && !rt.isAlphaNumeric(c), isHexadecimalDigit: c => rt.isDigit(c) || (c >= 65 && c <= 70) || (c >= 97 && c <= 102)
 };
-const API_NAMES = Object.keys(API);
-const RET = 'return { setup: typeof setup === "function" ? setup : null, loop: typeof loop === "function" ? loop : null };';
-let progSeq = 0;
 
-/* Returns a factory(...apiValues) => {setup, loop}. Throws {message, line} on a syntax error. */
+/* =====================================================================
+   Sketch loader: .ino text -> JavaScript (CydCpp.convert) -> program
+   ===================================================================== */
+let progSeq = 0, lastJs = '';
+
+/* Converts the .ino and returns a factory(__rt) => {init, setup, loop}. Throws {message, line} (an .ino line) on an error. */
 function compile(src) {
+  const r = CydCpp.convert(src);
+  if (!r.ok) throw r.error;
+  const js = r.js;
   const key = '__cydProg' + (++progSeq);
   let err = null;
-  const onErr = ev => { err = { message: String(ev.message || 'Syntax error').replace(/^Uncaught\s+/, ''), line: ev.lineno ? ev.lineno - 1 : 0 }; ev.preventDefault(); };
+  const onErr = ev => { err = { message: 'Internal converter error: ' + String(ev.message || 'invalid JavaScript').replace(/^Uncaught\s+/, ''), line: 0 }; ev.preventDefault(); };
   window.addEventListener('error', onErr);
   try {
     const s = document.createElement('script');
-    s.textContent = 'window.' + key + ' = function(' + API_NAMES.join(',') + ') {\n' + src + '\n' + RET + '\n};';
+    s.textContent = 'window.' + key + ' = async function(__rt) {\n' + 'return (function(){\n' + js + '\n})();\n};';
     (document.head || document.documentElement).appendChild(s);
     s.remove();
   } catch (e) { /* fall through to the Function constructor */ }
   finally { window.removeEventListener('error', onErr); }
   const f = window[key]; try { delete window[key]; } catch (_) {}
   if (err) throw err;
-  if (typeof f === 'function') return f;
-  try { return new Function(...API_NAMES, src + '\n' + RET); }
-  catch (e) { throw { message: e.message, line: 0 }; }
+  lastJs = js;
+  if (typeof f === 'function') return rt2 => f(rt2);
+  try { const g = new Function('__rt', js); return rt2 => g(rt2); }
+  catch (e) { throw { message: 'Internal converter error: ' + e.message, line: 0 }; }
 }
 
 /* =====================================================================
@@ -3550,20 +5545,22 @@ setInterval(() => { if (running) clockEl.textContent = fmtClock(performance.now(
 async function runSketch() {
   try {
     await sleep(350);
-    const prog = factory(...API_NAMES.map(n => API[n]));
-    if (!prog.setup && !prog.loop) throw new Error('define setup() and loop() in the sketch');
-    if (prog.setup) await prog.setup();
-    for (;;) { if (prog.loop) await prog.loop(); await sleep(2); }
+    rt.line = 0;
+    const prog = await factory(rt);
+    if (!prog.setup || !prog.loop) throw new Error('define both setup() and loop() in the sketch');
+    await prog.init();
+    await prog.setup();
+    for (;;) { await prog.loop(); await sleep(2); }
   } catch (e) {
     if (e instanceof Abort) return;
     running = false; setStatus('crashed');
     const msg = (e && e.message) ? e.message : String(e);
     serialOut('[sim] runtime error: ' + msg, 'err');
-    setProblem({ message: 'Runtime error: ' + msg, line: 0 });
+    setProblem({ message: 'Runtime error: ' + msg, line: rt.line || 0 });
   }
 }
 function start() {
-  if (!factory) { serialOut('[sim] nothing to run, fix the errors in sketch.js first', 'err'); return; }
+  if (!factory) { serialOut('[sim] nothing to run, fix the errors in sketch.ino first', 'err'); return; }
   if (liveCtrl) liveCtrl.abort();
   runId++;
   running = true; t0 = performance.now();
@@ -3602,7 +5599,7 @@ $('#wifiLink').addEventListener('change', e => { hw.wifiLink = e.target.checked;
 /* =====================================================================
    Code editor
    ===================================================================== */
-const CODE_KEY = 'cyd-sim-code-v1';
+const CODE_KEY = 'cyd-sim-ino-v1';
 const ta = $('#code'), gutter = $('#gutter'), prob = $('#problems');
 const defaultSrc = $('#src-default').textContent.replace(/^\n/, '');
 let lastLines = 0, autoTimer = 0, trapTab = true;
@@ -3638,7 +5635,9 @@ function applyCode(restart) {
   try {
     const f = compile(ta.value);
     factory = f;
-    setProblem(null, 'Compiled, ' + lastLines + ' lines' + (restart ? ', restarted' : ''));
+    $('#genjs').textContent = lastJs;
+    $('#genjsInfo').textContent = '(' + lastJs.split('\n').length + ' lines)';
+    setProblem(null, 'Converted and compiled, ' + lastLines + ' lines' + (restart ? ', restarted' : ''));
     if (restart) start();
     return true;
   } catch (e) {
