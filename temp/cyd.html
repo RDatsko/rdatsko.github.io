@@ -369,7 +369,7 @@ const UNIFI_MINUTES    = WIFI_TIMEOUT * 60; // Expiration in minutes (1440 mins 
 
 const NTP_SERVER       = 'pool.ntp.org';
 const BOOT_BUTTON      = 0;        // Physical BOOT button on CYD board
-const DISPLAY_SECONDS  = 60;   // a displayed code clears itself after this many seconds
+const DISPLAY_SECONDS  = 60;       // a displayed code clears itself after this many seconds
 let lastDebounce       = 0;
 let codeShown          = false;    // true while a code is on screen (the button then reads CLEAR CODE)
 let codeShownAt        = 0;        // millis() when that code appeared
