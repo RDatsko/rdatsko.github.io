@@ -514,6 +514,7 @@ function updateScreenUI(statusText, passcode = '') {
     lcd.setTextSize(1);
 
     // 3. Right card (QR code)
+    lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
     lcd.setTextDatum(textdatum_t.top_center);
     lcd.drawString('QR CODE', 390, 48);
 
