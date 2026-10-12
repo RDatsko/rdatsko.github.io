@@ -136,6 +136,22 @@ input[type="range"] { flex: 1; min-width: 0; accent-color: var(--go); }
 .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
 .switch input { width: 36px; height: 20px; accent-color: var(--go); }
 
+/* live API switch */
+.live { display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); cursor: pointer; font-weight: 500; }
+.live input { accent-color: var(--stop); width: 16px; height: 16px; margin: 0; }
+.live.on { border-color: var(--stop); background: rgba(229, 96, 79, .12); color: var(--stop); }
+.live-badge { font-size: 10px; font-weight: 600; letter-spacing: .08em; padding: 1px 7px; border-radius: 8px; background: var(--stop); color: #1a0705; }
+#mockGroups[inert] { opacity: .4; }
+.lbl { display: block; margin-bottom: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.status { margin: 8px 0 12px; font-size: 12px; color: var(--muted); }
+.status[data-s="ok"] { color: var(--go); }
+.status[data-s="err"] { color: var(--stop); }
+.status[data-s="warn"] { color: var(--warn); }
+.cmd { margin: 0 0 10px; padding: 8px 10px; background: var(--term); border-radius: 4px; font: 12px/1.5 var(--mono); overflow-x: auto; }
+details.script > summary { cursor: pointer; color: var(--info); font-size: 12px; }
+.script-bar { display: flex; gap: 8px; margin: 8px 0; }
+.script-view { margin: 0; max-height: 260px; overflow: auto; padding: 8px 10px; background: var(--term); border-radius: 4px; font: 11px/1.5 var(--mono); white-space: pre; }
+
 /* network log */
 .netlist { display: flex; flex-direction: column; }
 .net-empty { padding: 18px 12px; color: var(--muted); }
@@ -155,13 +171,7 @@ details.req[open] summary { background: var(--panel-2); }
 
 @media (prefers-reduced-motion: reduce) { canvas { transition: none; } }
 </style>
-<style>
-/* standalone reset (the hosted version gets this from its wrapper) */
-[hidden]{display:none!important}
-img{max-width:100%}
-</style>
-</head>
-<body>
+
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -171,6 +181,11 @@ img{max-width:100%}
     <span class="chip">ESP32-4832S040</span>
     <span class="chip">ST7796 · GT911 · 480×320</span>
     <span class="spacer"></span>
+    <label class="live" id="liveLabel" for="liveApi" title="Send the sketch's requests to the real API instead of the mock server">
+      <input type="checkbox" id="liveApi">
+      <span>Live API</span>
+      <span class="live-badge" id="liveBadge" hidden>REAL REQUESTS</span>
+    </label>
   </header>
 
   <main class="shell" id="shell" data-wide="true">
@@ -178,7 +193,7 @@ img{max-width:100%}
     <section class="pane" aria-label="Code and network">
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" id="t-code" aria-selected="true" aria-controls="p-code" type="button">sketch.js</button>
-        <button class="tab" role="tab" id="t-mock" aria-selected="false" aria-controls="p-mock" type="button">Mock API</button>
+        <button class="tab" role="tab" id="t-mock" aria-selected="false" aria-controls="p-mock" type="button">API</button>
         <button class="tab" role="tab" id="t-net" aria-selected="false" aria-controls="p-net" type="button">Network<span class="count" id="netCount">0</span></button>
       </div>
 
@@ -198,6 +213,24 @@ img{max-width:100%}
       </div>
 
       <div id="p-mock" role="tabpanel" aria-labelledby="t-mock" hidden>
+        <div class="group" id="liveGroup">
+          <h3>Live API</h3>
+          <p class="note">Tick <b>Live API</b> at the top right to send the sketch's requests to the real Meraki or UniFi API. Each tap then creates a real Wi-Fi passphrase or voucher on your network. The mock settings below are ignored while it is on.</p>
+          <label class="lbl" for="proxyUrl">Local proxy</label>
+          <div class="row">
+            <input class="in" id="proxyUrl" type="text" value="http://localhost:8787" spellcheck="false" autocomplete="off">
+            <button class="btn" id="proxyTest" type="button">Test</button>
+          </div>
+          <p class="status" id="proxyStatus" data-s="idle">Not checked yet.</p>
+          <p class="note">Browsers block direct calls to these APIs, so run the small proxy on your computer and leave it running:</p>
+          <pre class="cmd">python3 cyd_proxy.py --unifi-host 192.168.1.1</pre>
+          <details class="script">
+            <summary>Show the proxy script (cyd_proxy.py)</summary>
+            <div class="script-bar"><button class="btn" id="copyProxy" type="button">Copy script</button></div>
+            <pre class="script-view" id="proxyShow"></pre>
+          </details>
+        </div>
+        <div id="mockGroups">
         <div class="group">
           <h3>Server response</h3>
           <p class="note">Auto checks the request the way the real API would: key header present, valid JSON, passphrase length and a future expiry. Pick a code to force a response and see how your sketch reacts.</p>
@@ -221,6 +254,7 @@ img{max-width:100%}
             <input type="range" id="latency" min="0" max="4000" step="100" value="700" aria-label="API latency">
             <output id="latencyOut" for="latency">700 ms</output>
           </div>
+        </div>
         </div>
         <div class="group">
           <h3>Wi-Fi</h3>
@@ -334,7 +368,10 @@ const UNIFI_MINUTES = 1440;     // Expiration in minutes (1440 mins = 24 hrs)
 
 const NTP_SERVER = 'pool.ntp.org';
 const BOOT_BUTTON = 0;          // Physical BOOT button on CYD board
+const CODE_DISPLAY_SECONDS = 60;   // a displayed code clears itself after this many seconds
 let lastDebounce = 0;
+let codeShown = false;          // true while a code is on screen (the button then reads CLEAR CODE)
+let codeShownAt = 0;            // millis() when that code appeared
 
 // Color palette (RGB565)
 const COLOR_BG_DARK = 0x2124;
@@ -417,7 +454,7 @@ function drawGetCodeButton(isPressed = false) {
   lcd.setTextColor(textCol, bgCol);
   lcd.setTextSize(3);
   lcd.setTextDatum(textdatum_t.middle_center);
-  lcd.drawString('GET CODE', BTN_X + BTN_W / 2, BTN_Y + BTN_H / 2);
+  lcd.drawString(codeShown ? 'CLEAR CODE' : 'GET CODE', BTN_X + BTN_W / 2, BTN_Y + BTN_H / 2);
 }
 
 // Small label above a larger value, left aligned inside the ticket card
@@ -432,6 +469,8 @@ function drawTicketField(label, value, y) {
 }
 
 function updateScreenUI(statusText, passcode = '') {
+  codeShown = (passcode !== '');
+  if (codeShown) codeShownAt = millis();      // the display timeout counts from here
   lcd.fillScreen(COLOR_BG_DARK);
 
   // 1. Top header banner
@@ -607,6 +646,24 @@ async function processCodeGeneration() {
   }
 }
 
+// --- CLEAR / TIMEOUT ---
+
+// Clears the ticket and goes back to the start screen with the GET CODE button
+function clearCode() {
+  updateScreenUI('Tap button below to get code');
+}
+
+// One press does one thing: clear the code while one is shown, otherwise get a new one
+async function handlePress() {
+  if (codeShown) {
+    drawGetCodeButton(true);      // brief pressed flash on CLEAR CODE
+    await delay(120);
+    clearCode();
+  } else {
+    await processCodeGeneration();
+  }
+}
+
 // --- ARDUINO SETUP & LOOP ---
 
 async function setup() {
@@ -636,6 +693,11 @@ async function setup() {
 }
 
 async function loop() {
+  // Timeout: put the start screen back once a code has been shown long enough
+  if (codeShown && millis() - codeShownAt > CODE_DISPLAY_SECONDS * 1000) {
+    clearCode();
+  }
+
   // Trigger 1: touchscreen press detection
   const t = lcd.getTouch();
   if (t) {
@@ -644,7 +706,7 @@ async function loop() {
 
       if (millis() - lastDebounce > 1500) {
         lastDebounce = millis();
-        await processCodeGeneration();
+        await handlePress();
       }
     }
   }
@@ -652,15 +714,183 @@ async function loop() {
   // Trigger 2: physical BOOT button press
   if (digitalRead(BOOT_BUTTON) === LOW && (millis() - lastDebounce > 1500)) {
     lastDebounce = millis();
-    await processCodeGeneration();
+    await handlePress();
   }
 
   // Trigger 3: serial input
   if (Serial.available() > 0) {
     while (Serial.available() > 0) Serial.read();
-    await processCodeGeneration();
+    await handlePress();
   }
 }
+
+</script>
+
+<!-- Proxy script for Live API mode, shown in the API tab. Same text as cyd_proxy.py. -->
+<script type="text/plain" id="proxy-src">
+#!/usr/bin/env python3
+"""
+CYD Simulator local proxy (for the "Live API" checkbox)
+
+Why it exists: a web page cannot call api.meraki.com or a UniFi console directly,
+because browsers enforce CORS and reject the console's self-signed certificate.
+This small relay runs on your own computer, accepts the simulator's request on
+localhost and forwards it to the real API.
+
+Usage:
+    python3 cyd_proxy.py --unifi-host 192.168.1.1     # Meraki and UniFi
+    python3 cyd_proxy.py                              # Meraki only
+Options:
+    --port 8787                  port to listen on (default 8787)
+    --unifi-host HOST[:PORT]     UniFi console to allow (repeat for more than one)
+
+Only these two calls are forwarded, anything else is refused:
+    POST https://api.meraki.com/api/v1/networks/<id>/wireless/ssids/<n>/identityPsks
+    POST https://<unifi-host>/v1/sites/<site>/hotspot/vouchers
+
+It listens on 127.0.0.1 only, keeps no state, and never prints API keys.
+The certificate of a UniFi host is not verified (consoles use a self-signed
+one). The certificate of api.meraki.com is verified as usual.
+Requires Python 3.8 or newer and nothing else.
+"""
+import argparse
+import json
+import re
+import socket
+import ssl
+import time
+import urllib.error
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlparse
+
+MERAKI_HOST = "api.meraki.com"
+MERAKI_PATH = re.compile(r"^/api/v1/networks/[^/]+/wireless/ssids/\d+/identityPsks$")
+UNIFI_PATH = re.compile(r"^/v1/sites/[^/]+/hotspot/vouchers$")
+PASS_HEADERS = {
+    "content-type": "Content-Type",
+    "x-cisco-meraki-api-key": "X-Cisco-Meraki-API-Key",
+    "x-api-key": "X-API-KEY",
+}
+MAX_BODY = 64 * 1024
+TIMEOUT = 10
+unifi_hosts = set()
+
+
+def check_target(url):
+    p = urlparse(url)
+    if p.scheme != "https":
+        return None, "only https URLs are forwarded"
+    if p.netloc == MERAKI_HOST and MERAKI_PATH.match(p.path):
+        return "meraki", None
+    if p.netloc in unifi_hosts and UNIFI_PATH.match(p.path):
+        return "unifi", None
+    return None, "target not allowed: " + p.netloc + p.path
+
+
+class Handler(BaseHTTPRequestHandler):
+    server_version = "CydProxy/1.0"
+
+    def _cors(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Private-Network", "true")
+
+    def _json(self, code, obj):
+        data = json.dumps(obj).encode()
+        self.send_response(code)
+        self._cors()
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self._cors()
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def do_GET(self):
+        if self.path == "/health":
+            self._json(200, {"ok": True, "meraki": MERAKI_HOST, "unifi": sorted(unifi_hosts)})
+        else:
+            self._json(404, {"error": "not found"})
+
+    def do_POST(self):
+        if self.path != "/forward":
+            return self._json(404, {"error": "not found"})
+        try:
+            n = int(self.headers.get("Content-Length", "0"))
+            if n <= 0 or n > MAX_BODY:
+                raise ValueError("bad length")
+            req = json.loads(self.rfile.read(n))
+            url = req["url"]
+            method = str(req.get("method", "POST")).upper()
+            body = req.get("body") or ""
+            headers = req.get("headers") or {}
+        except Exception:
+            return self._json(400, {"error": "bad request"})
+        if method != "POST":
+            return self._json(400, {"error": "only POST is forwarded"})
+        kind, err = check_target(url)
+        if err:
+            return self._json(403, {"error": err})
+
+        out = {PASS_HEADERS[k.lower()]: str(v) for k, v in headers.items() if k.lower() in PASS_HEADERS}
+        ctx = ssl._create_unverified_context() if kind == "unifi" else ssl.create_default_context()
+        upstream = urllib.request.Request(url, data=str(body).encode(), headers=out, method="POST")
+        started = time.time()
+        status, text, error = -1, "", None
+        try:
+            with urllib.request.urlopen(upstream, timeout=TIMEOUT, context=ctx) as resp:
+                status = resp.status
+                text = resp.read(MAX_BODY).decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            status = e.code
+            text = e.read(MAX_BODY).decode("utf-8", "replace")
+        except urllib.error.URLError as e:
+            if isinstance(e.reason, (TimeoutError, socket.timeout)):
+                status, error = -11, "upstream timed out"
+            else:
+                status, error = -1, str(e.reason)
+        except (TimeoutError, socket.timeout):
+            status, error = -11, "upstream timed out"
+        except Exception as e:  # keep the proxy alive whatever happens
+            status, error = -1, str(e)
+
+        p = urlparse(url)
+        print("%s POST %s%s -> %s (%d ms)" % (time.strftime("%H:%M:%S"), p.netloc, p.path, status,
+                                              (time.time() - started) * 1000))
+        result = {"status": status, "body": text}
+        if error:
+            result["error"] = error
+        self._json(200, result)
+
+    def log_message(self, *args):
+        pass
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Local proxy for the CYD Simulator's Live API mode")
+    ap.add_argument("--port", type=int, default=8787)
+    ap.add_argument("--unifi-host", action="append", default=[], metavar="HOST[:PORT]")
+    args = ap.parse_args()
+    unifi_hosts.update(args.unifi_host)
+    srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    print("CYD proxy listening on http://localhost:%d" % args.port)
+    print("  Meraki : %s" % MERAKI_HOST)
+    print("  UniFi  : %s" % (", ".join(sorted(unifi_hosts)) or "none (add --unifi-host HOST)"))
+    print("Press Ctrl+C to stop.")
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopped")
+
+
+if __name__ == "__main__":
+    main()
 </script>
 
 <script>
@@ -2964,6 +3194,7 @@ var qrcode = function() {
 }));
 
 </script>
+
 <script>
 (() => {
 'use strict';
@@ -3178,12 +3409,12 @@ function addNetEntry(e) {
   const s = el('summary');
   let u = e.url; try { const x = new URL(e.url); u = x.host + x.pathname; } catch (_) {}
   const ok = e.status >= 200 && e.status < 300;
-  s.append(el('span', 't', fmtClock(e.t)), el('span', 'm', e.method), el('span', 'u', u), el('span', 'st ' + (ok ? 'ok' : 'bad'), e.status + ' · ' + e.ms + ' ms'));
+  s.append(el('span', 't', fmtClock(e.t)), el('span', 'm', (e.live ? 'LIVE ' : '') + e.method), el('span', 'u', u), el('span', 'st ' + (ok ? 'ok' : 'bad'), e.status + ' · ' + e.ms + ' ms'));
   const body = el('div', 'req-body');
   body.append(el('h4', null, 'Request URL'), el('pre', null, e.url));
   body.append(el('h4', null, 'Headers'), el('pre', null, Object.keys(e.headers).map(k => k + ': ' + maskHeader(k, String(e.headers[k]))).join('\n') || '(none)'));
   body.append(el('h4', null, 'Body'), el('pre', null, e.body || '(empty)'));
-  body.append(el('h4', null, 'Response'), el('pre', null, e.resp || '(empty)'));
+  body.append(el('h4', null, 'Response'), el('pre', null, e.resp || (e.note ? '(no response) ' + e.note : '(empty)')));
   d.append(s, body);
   netList.prepend(d);
 }
@@ -3226,18 +3457,48 @@ function mockServer(method, url, headers, bodyStr, force) {
   }
   return isMeraki ? merakiAuto(u, headers, b) : unifiAuto(u, headers, b);
 }
+/* Live mode: the request really goes out, through the local proxy when one is set. */
+let live = false, liveCtrl = null, hostedBlocked = false;
+async function liveRequest(method, url, headers, body) {
+  const id = runId;
+  const base = $('#proxyUrl').value.trim().replace(/\/+$/, '');
+  const ctrl = new AbortController(); liveCtrl = ctrl;
+  let timedOut = false;
+  const timer = setTimeout(() => { timedOut = true; ctrl.abort(); }, 10000);
+  try {
+    let status, text, note;
+    if (base) {
+      const r = await fetch(base + '/forward', { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ method, url, headers, body }), signal: ctrl.signal });
+      const j = await r.json();
+      status = r.ok ? j.status : -1; text = r.ok ? (j.body || '') : ''; note = j.error;
+    } else {
+      const r = await fetch(url, { method, headers, body, signal: ctrl.signal });
+      status = r.status; text = await r.text();
+    }
+    if (id !== runId) throw new Abort();
+    return { status, body: text, note };
+  } catch (e) {
+    if (e instanceof Abort || id !== runId) throw new Abort();
+    if (timedOut) return { status: -11, body: '', note: 'no answer within 10 s' };
+    await new Promise(r => setTimeout(r, 60));
+    if (hostedBlocked) return { status: -1, body: '', note: 'this hosted page blocks outgoing requests, use the downloaded file' };
+    return { status: -1, body: '', note: base ? 'proxy not reachable at ' + base + ', is cyd_proxy.py running?' : 'blocked by the browser (CORS or certificate), use the local proxy' };
+  } finally { clearTimeout(timer); if (liveCtrl === ctrl) liveCtrl = null; }
+}
 async function netRequest(method, url, headers, body) {
   const started = millis();
   const entry = { t: started, method, url, headers: Object.assign({}, headers), body, status: 0, resp: '', ms: 0 };
   const force = $('#mockStatus').value;
   let res;
-  if (!hw.wifiLink) { await sleep(300); res = { status: -1, body: '' }; }
+  entry.live = live;
+  if (!hw.wifiLink) { await sleep(300); res = { status: -1, body: '', note: 'access point unreachable' }; }
+  else if (live) { res = await liveRequest(method, url, headers, body); }
   else if (force === '-1') { await sleep(400); res = { status: -1, body: '' }; }
   else if (force === '-11') { await sleep(3000); res = { status: -11, body: '' }; }
   else { await sleep(+$('#latency').value); res = mockServer(method, url, headers, body, force); }
-  entry.status = res.status; entry.resp = res.body; entry.ms = millis() - started;
+  entry.status = res.status; entry.resp = res.body; entry.note = res.note; entry.ms = millis() - started;
   addNetEntry(entry);
-  serialOut('[sim] ' + method + ' ' + url.replace(/^https:\/\//, '') + ' -> ' + res.status + ' (' + entry.ms + ' ms)', 'sim');
+  serialOut('[sim] ' + (live ? 'LIVE ' : '') + method + ' ' + url.replace(/^https:\/\//, '') + ' -> ' + res.status + ' (' + entry.ms + ' ms)' + (res.note ? ' [' + res.note + ']' : ''), live && res.status >= 200 && res.status < 300 ? 'rx' : 'sim');
   return res;
 }
 class WiFiClientSecure { setInsecure() {} }
@@ -3316,6 +3577,7 @@ async function runSketch() {
 }
 function start() {
   if (!factory) { serialOut('[sim] nothing to run, fix the errors in sketch.js first', 'err'); return; }
+  if (liveCtrl) liveCtrl.abort();
   runId++;
   running = true; t0 = performance.now();
   hw.touch = null; hw.bootDown = false; hw.bootLatch = false; hw.serialBuf = [];
@@ -3328,6 +3590,7 @@ function start() {
   runSketch();
 }
 function stop() {
+  if (liveCtrl) liveCtrl.abort();
   runId++; running = false; hw.touch = null; dot.hidden = true;
   lcd.off(); setStatus('stopped');
   serialOut('[sim] stopped', 'sim');
@@ -3433,6 +3696,56 @@ resetBtn.addEventListener('click', () => {
   }
   clearTimeout(resetArmed); resetArmed = 0; resetBtn.textContent = 'Reset'; resetBtn.classList.remove('btn-warn');
   ta.value = defaultSrc; renderGutter(); saveCode(); applyCode(true);
+});
+
+/* =====================================================================
+   Live API switch and proxy
+   ===================================================================== */
+const liveBox = $('#liveApi'), proxyIn = $('#proxyUrl'), proxyStatus = $('#proxyStatus');
+const PROXY_KEY = 'cyd-sim-proxy-v1';
+try { const p = localStorage.getItem(PROXY_KEY); if (p !== null) proxyIn.value = p; } catch (_) {}
+proxyIn.addEventListener('input', () => { try { localStorage.setItem(PROXY_KEY, proxyIn.value); } catch (_) {} });
+document.addEventListener('securitypolicyviolation', e => { if (/connect-src/.test(e.violatedDirective || '')) hostedBlocked = true; });
+$('#proxyShow').textContent = $('#proxy-src').textContent.replace(/^\n/, '');
+
+function setProxyStatus(state, text) { proxyStatus.dataset.s = state; proxyStatus.textContent = text; }
+async function testProxy() {
+  const base = proxyIn.value.trim().replace(/\/+$/, '');
+  if (!base) { setProxyStatus('warn', 'No proxy set. Requests go straight from the browser, which Meraki and UniFi usually block.'); return 'direct'; }
+  setProxyStatus('idle', 'Checking ' + base + ' ...');
+  try {
+    const r = await fetch(base + '/health', { cache: 'no-store' });
+    const j = await r.json();
+    setProxyStatus('ok', 'Proxy is running. Allowed: Meraki' + (j.unifi && j.unifi.length ? ' and UniFi at ' + j.unifi.join(', ') : ', no UniFi host yet (start it with --unifi-host)'));
+    return 'ok';
+  } catch (e) {
+    await new Promise(r => setTimeout(r, 60));
+    if (hostedBlocked) { setProxyStatus('err', 'This hosted page blocks requests to other sites, so Live API cannot work here. Use the downloaded file.'); return 'blocked'; }
+    setProxyStatus('err', 'Nothing answered at ' + base + '. Start cyd_proxy.py, then press Test.');
+    return 'down';
+  }
+}
+function setLive(on) {
+  live = on;
+  $('#liveLabel').classList.toggle('on', on);
+  $('#liveBadge').hidden = !on;
+  $('#mockGroups').toggleAttribute('inert', on);
+  serialOut(on ? '[sim] LIVE API on: GET CODE now sends real requests and creates real credentials' : '[sim] Live API off, using the mock server', on ? 'err' : 'sim');
+}
+liveBox.addEventListener('change', async () => {
+  setLive(liveBox.checked);
+  if (!liveBox.checked) return;
+  const r = await testProxy();
+  if (r === 'blocked') { liveBox.checked = false; setLive(false); }
+  if (r !== 'ok') $('#t-mock').click();
+});
+$('#proxyTest').addEventListener('click', testProxy);
+const copyProxy = $('#copyProxy');
+copyProxy.addEventListener('click', () => {
+  const text = $('#proxyShow').textContent;
+  const done = t => { copyProxy.textContent = t; setTimeout(() => { copyProxy.textContent = 'Copy script'; }, 1500); };
+  const fallback = () => { const rg = document.createRange(); rg.selectNodeContents($('#proxyShow')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rg); done('Selected, press Ctrl+C'); };
+  try { navigator.clipboard.writeText(text).then(() => done('Copied'), fallback); } catch (_) { fallback(); }
 });
 
 /* tabs */
