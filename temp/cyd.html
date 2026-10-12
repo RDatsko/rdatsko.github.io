@@ -1,0 +1,1136 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CYD Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: IDE-style two panes. Editable sketch, mock API and network log on the left (the code tab widens the pane); the board with its serial monitor on the right (board first on phones). Dark by design, like a bench tool. */
+:root {
+  --bg: #12161b;
+  --panel: #1a2027;
+  --panel-2: #212932;
+  --line: #2b3540;
+  --fg: #d9e1e8;
+  --muted: #8393a3;
+  --go: #35c07a;
+  --go-ink: #052013;
+  --stop: #e5604f;
+  --warn: #e6b34a;
+  --info: #5aa9f0;
+  --pcb: #0f5240;
+  --pcb-2: #0b4031;
+  --silk: #cfe8dc;
+  --term: #0d1115;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  margin: 0;
+  padding-inline: 16px;
+  padding-block: 10px 28px;
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fg);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+
+.app { max-width: 1320px; margin-inline: auto; display: flex; flex-direction: column; gap: 12px; }
+
+/* top bar */
+.topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-block: 6px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: .01em; }
+.brand svg { width: 22px; height: 22px; color: var(--go); }
+.chip { font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 3px 8px; border-radius: 4px; background: var(--panel); }
+.spacer { flex: 1; }
+
+/* panes */
+.shell { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 12px; align-items: start; }
+.shell[data-wide="true"] { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+@media (max-width: 900px) { .shell, .shell[data-wide="true"] { grid-template-columns: minmax(0, 1fr); } .sim { order: -1; } }
+.pane { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; min-width: 0; overflow: hidden; }
+.sim { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.tabs { display: flex; border-bottom: 1px solid var(--line); background: var(--panel-2); overflow-x: auto; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 10px 14px; cursor: pointer; white-space: nowrap; font-family: var(--mono); font-size: 12px; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--go); background: var(--panel); }
+.count { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px; background: var(--line); color: var(--fg); font-size: 11px; text-align: center; }
+
+/* toolbar */
+.toolbar, .ed-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+.btn { display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 5px 11px; cursor: pointer; font-weight: 500; }
+.btn:hover:not(:disabled) { border-color: var(--muted); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn svg { width: 12px; height: 12px; }
+.btn-go { background: var(--go); border-color: var(--go); color: var(--go-ink); }
+.btn-go:hover:not(:disabled) { border-color: #7ae0aa; filter: brightness(1.08); }
+.btn-warn { border-color: var(--warn); color: var(--warn); }
+.clock { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--fg); padding-inline: 6px; }
+.pill { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 10px; background: var(--line); color: var(--muted); }
+.pill[data-s="running"] { background: rgba(53, 192, 122, .16); color: var(--go); }
+.pill[data-s="crashed"] { background: rgba(229, 96, 79, .16); color: var(--stop); }
+
+/* code editor */
+.auto { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; margin-left: auto; }
+.auto input { accent-color: var(--go); }
+.ed { display: flex; height: min(72vh, 680px); min-height: 360px; background: var(--term); }
+.gutter { margin: 0; padding: 10px 8px 24px; min-width: 3.4em; text-align: right; color: #5d6b7a; font: 12px/1.55 var(--mono); user-select: none; overflow: hidden; border-right: 1px solid var(--line); flex: none; }
+#code { flex: 1; min-width: 0; resize: none; border: 0; background: transparent; color: var(--fg); padding: 10px 12px; font: 12px/1.55 var(--mono); white-space: pre; overflow: auto; tab-size: 2; outline: none; }
+#code:focus-visible { box-shadow: inset 0 0 0 1px var(--info); }
+.problems { display: block; width: 100%; text-align: left; border: 0; border-top: 1px solid var(--line); padding: 8px 12px; background: var(--panel-2); font: 12px/1.45 var(--mono); color: var(--muted); cursor: default; overflow-wrap: anywhere; }
+.problems[data-s="ok"] { color: var(--go); }
+.problems[data-s="err"] { color: var(--stop); cursor: pointer; }
+.hint { margin: 0; padding: 7px 12px 10px; font-size: 11px; color: var(--muted); background: var(--panel-2); }
+
+/* stage + board */
+.stage { padding: 22px 12px 26px; display: flex; justify-content: center; background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 18px 18px; }
+.board { width: min(100%, 600px); }
+.pcb { position: relative; background: linear-gradient(180deg, var(--pcb), var(--pcb-2)); border-radius: 14px; padding: 16px 16px 74px; box-shadow: 0 14px 34px rgba(0, 0, 0, .5), inset 0 0 0 2px rgba(255, 255, 255, .06); }
+.bezel { background: #05070a; border-radius: 6px; padding: 10px; box-shadow: inset 0 0 0 2px #1d262e; }
+.screen { position: relative; aspect-ratio: 480 / 320; max-width: 100%; }
+canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; background: #000; touch-action: none; cursor: crosshair; transition: opacity .15s; }
+.dot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .2); pointer-events: none; }
+.pcb-foot { position: absolute; left: 16px; right: 16px; bottom: 12px; display: flex; align-items: center; gap: 14px; }
+.usb { width: 46px; height: 20px; border-radius: 4px; background: linear-gradient(#cfd5da, #8e969d); box-shadow: inset 0 0 0 3px #5b636a, inset 0 0 0 7px #1c2126; flex: none; }
+.silk { flex: 1; min-width: 0; font-family: var(--mono); font-size: 10px; letter-spacing: .04em; color: var(--silk); opacity: .85; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; }
+.tact-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: none; }
+.tact-wrap span { font-family: var(--mono); font-size: 9px; color: var(--silk); opacity: .85; letter-spacing: .05em; }
+.tact { width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 3px solid #1f262c; background: #c9ced3; cursor: pointer; box-shadow: 0 2px 0 #0a0e12; touch-action: none; }
+.tact.down { transform: translateY(2px); box-shadow: none; background: #9aa1a8; }
+.led { width: 9px; height: 9px; border-radius: 50%; background: #2b3a33; flex: none; }
+.led.on { background: #ff5959; box-shadow: 0 0 9px #ff5959; }
+.caption { padding: 0 12px 12px; text-align: center; color: var(--muted); font-size: 12px; }
+
+/* serial monitor */
+.pane-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+.pane-head h2 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.out { height: 210px; overflow: auto; margin: 0; padding: 10px 12px; background: var(--term); font: 12px/1.55 var(--mono); }
+.out div { white-space: pre-wrap; overflow-wrap: anywhere; }
+.out .sim { color: var(--muted); }
+.out .rx { color: var(--info); }
+.out .err { color: var(--stop); }
+.send { display: flex; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--line); }
+.send input { flex: 1; min-width: 0; }
+
+/* form controls */
+.in { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--fg); padding: 6px 8px; border-radius: 4px; font: 12px var(--mono); }
+.in:focus { border-color: var(--info); outline: none; }
+select.in { font-family: var(--sans); font-size: 13px; }
+.group { padding: 12px; border-bottom: 1px solid var(--line); }
+.group:last-child { border-bottom: 0; }
+.group h3 { margin: 0 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.note { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.row output { font-family: var(--mono); font-size: 12px; min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] { flex: 1; min-width: 0; accent-color: var(--go); }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+.switch input { width: 36px; height: 20px; accent-color: var(--go); }
+
+/* network log */
+.netlist { display: flex; flex-direction: column; }
+.net-empty { padding: 18px 12px; color: var(--muted); }
+details.req { border-bottom: 1px solid var(--line); }
+details.req summary { list-style: none; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 12px; cursor: pointer; font-family: var(--mono); font-size: 11px; }
+details.req summary::-webkit-details-marker { display: none; }
+details.req[open] summary { background: var(--panel-2); }
+.m { color: var(--info); font-weight: 500; }
+.u { color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st { padding: 1px 7px; border-radius: 9px; font-weight: 500; background: var(--line); }
+.st.ok { background: rgba(53, 192, 122, .18); color: var(--go); }
+.st.bad { background: rgba(229, 96, 79, .18); color: var(--stop); }
+.req-body { padding: 8px 12px 12px; }
+.req-body h4 { margin: 10px 0 4px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.req-body pre { margin: 0; padding: 8px; background: var(--term); border-radius: 4px; font: 11px/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.t { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { canvas { transition: none; } }
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+      CYD Simulator
+    </div>
+    <span class="chip">ESP32-4832S040</span>
+    <span class="chip">ST7796 · GT911 · 480×320</span>
+    <span class="spacer"></span>
+  </header>
+
+  <main class="shell" id="shell" data-wide="true">
+    <!-- LEFT: code, mock API, network -->
+    <section class="pane" aria-label="Code and network">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="t-code" aria-selected="true" aria-controls="p-code" type="button">sketch.js</button>
+        <button class="tab" role="tab" id="t-mock" aria-selected="false" aria-controls="p-mock" type="button">Mock API</button>
+        <button class="tab" role="tab" id="t-net" aria-selected="false" aria-controls="p-net" type="button">Network<span class="count" id="netCount">0</span></button>
+      </div>
+
+      <div id="p-code" role="tabpanel" aria-labelledby="t-code">
+        <div class="ed-bar">
+          <button class="btn btn-go" id="runCode" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z" fill="currentColor"/></svg>Run</button>
+          <button class="btn" id="copyCode" type="button">Copy</button>
+          <button class="btn" id="resetCode" type="button">Reset</button>
+          <label class="auto" for="autoRun"><input type="checkbox" id="autoRun" checked>Auto-run on edit</label>
+        </div>
+        <div class="ed">
+          <pre class="gutter" id="gutter" aria-hidden="true">1</pre>
+          <textarea id="code" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Sketch code"></textarea>
+        </div>
+        <button class="problems" id="problems" type="button" data-s="ok">Ready</button>
+        <p class="hint">Tab inserts two spaces; press Esc then Tab to leave the editor. Run with Ctrl or Cmd + Enter. Your edits stay in this browser.</p>
+      </div>
+
+      <div id="p-mock" role="tabpanel" aria-labelledby="t-mock" hidden>
+        <div class="group">
+          <h3>Server response</h3>
+          <p class="note">Auto checks the request the way the real API would: key header present, valid JSON, passphrase length and a future expiry. Pick a code to force a response and see how your sketch reacts.</p>
+          <select class="in" id="mockStatus" aria-label="Server response">
+            <option value="auto">Auto, validate the request</option>
+            <option value="201">201 Created</option>
+            <option value="200">200 OK</option>
+            <option value="400">400 Bad Request</option>
+            <option value="401">401 Unauthorized</option>
+            <option value="403">403 Forbidden</option>
+            <option value="404">404 Not Found</option>
+            <option value="429">429 Too Many Requests</option>
+            <option value="500">500 Server Error</option>
+            <option value="-1">-1 Connection refused</option>
+            <option value="-11">-11 Read timeout</option>
+          </select>
+        </div>
+        <div class="group">
+          <h3>Latency</h3>
+          <div class="row">
+            <input type="range" id="latency" min="0" max="4000" step="100" value="700" aria-label="API latency">
+            <output id="latencyOut" for="latency">700 ms</output>
+          </div>
+        </div>
+        <div class="group">
+          <h3>Wi-Fi</h3>
+          <label class="switch" for="wifiLink">
+            <span>Access point reachable</span>
+            <input type="checkbox" id="wifiLink" checked>
+          </label>
+          <p class="note" style="margin-top:10px">Turn this off after the board connects to see the Wi-Fi Disconnected screen on the next tap.</p>
+        </div>
+      </div>
+
+      <div id="p-net" role="tabpanel" aria-labelledby="t-net" hidden>
+        <div class="netlist" id="netlist">
+          <div class="net-empty" id="netEmpty">No requests yet. Tap GET CODE on the display.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: simulation -->
+    <section class="sim" aria-label="Simulation">
+      <div class="pane">
+        <div class="toolbar">
+          <button class="btn btn-go" id="btnStart" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z" fill="currentColor"/></svg>Start</button>
+          <button class="btn" id="btnStop" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" fill="currentColor"/></svg>Stop</button>
+          <button class="btn" id="btnRestart" type="button"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 6a4 4 0 1 1-1.2-2.8M10 1.5V4H7.5"/></svg>Restart</button>
+          <span class="clock" id="clock">00:00.000</span>
+          <span class="spacer"></span>
+          <span class="pill" id="pill" data-s="stopped">Stopped</span>
+        </div>
+        <div class="stage">
+          <div class="board">
+            <div class="pcb">
+              <div class="bezel">
+                <div class="screen" id="screen">
+                  <canvas id="lcd" width="480" height="320" aria-label="Board display. Click or tap to touch the screen."></canvas>
+                  <div class="dot" id="dot" hidden></div>
+                </div>
+              </div>
+              <div class="pcb-foot">
+                <div class="usb" title="USB-C"></div>
+                <div class="silk">ESP32-4832S040<br>4.0&Prime; CYD · GPIO0 = BOOT</div>
+                <div class="tact-wrap"><button class="tact" id="btnBoot" type="button" aria-label="BOOT button, GPIO0"></button><span>BOOT</span></div>
+                <div class="tact-wrap"><button class="tact" id="btnRst" type="button" aria-label="RST button"></button><span>RST</span></div>
+                <div class="led" id="led" title="Power LED"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="caption">Click the display to touch it. Hold the BOOT button to pull GPIO0 low.</div>
+      </div>
+
+      <div class="pane">
+        <div class="pane-head">
+          <h2>Serial monitor</h2>
+          <span class="spacer"></span>
+          <button class="btn" id="clearSerial" type="button">Clear</button>
+        </div>
+        <div class="out" id="serial" role="log" aria-live="off"></div>
+        <form class="send" id="sendForm" autocomplete="off">
+          <input class="in" id="sendInput" type="text" placeholder="Send text to Serial (any byte triggers a code)" aria-label="Serial input">
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- The sketch. Plain text, loaded into the editor; the editor copy is what actually runs. -->
+<script type="text/plain" id="src-default">
+// sketch.js: JavaScript port of sketch.ino for the CYD simulator.
+// Edit anything here. Press Run (Ctrl/Cmd + Enter), or pause typing with Auto-run on,
+// and the simulator restarts with your changes.
+//
+// Rules of the port:
+//  - Anything that waits is async: use `await delay(ms)` and `await http.POST(body)`.
+//  - Never write a loop without an await inside it, or the browser tab will freeze.
+//  - Available: lcd, WiFi, WiFiClientSecure, HTTPClient, Serial, delay, millis, random,
+//    randomSeed, analogRead, pinMode, digitalRead, configTime, getLocalTime, qrcode,
+//    TFT_* colours, textdatum_t. Define setup() and loop() like an Arduino sketch.
+//  - The original sketch has "#define COLOR_HEADER_BLUE0x1C53" (no space), which does
+//    not compile on a real toolchain. It is fixed below.
+
+// ============================================================================
+// SYSTEM SELECTOR & NETWORK CONFIGURATION
+// ============================================================================
+
+const MERAKI = 'MERAKI';
+const UNIFI = 'UNIFI';
+
+// *** SET YOUR ACTIVE SYSTEM HERE ***
+const currentSystem = MERAKI;   // Options: MERAKI or UNIFI
+
+// --- Wi-Fi Settings ---
+const WIFI_SSID = 'Guest_WiFi_Network';
+const WIFI_PASSWORD = 'YOUR_WIFI_PASSWORD';
+
+// --- Meraki System Settings ---
+const MERAKI_API_KEY = 'YOUR_MERAKI_API_KEY';
+const MERAKI_NET_ID = 'N_123456789012345';
+const MERAKI_SSID_NUM = 0;      // Target SSID index (0 to 14)
+const MERAKI_HOURS = 24;        // Passcode expiration (hours)
+
+// --- UniFi System Settings ---
+const UNIFI_HOST = '192.168.1.1';
+const UNIFI_API_KEY = 'YOUR_UNIFI_API_KEY';
+const UNIFI_SITE_ID = 'default';
+const UNIFI_MINUTES = 1440;     // Expiration in minutes (1440 mins = 24 hrs)
+
+// ============================================================================
+
+const NTP_SERVER = 'pool.ntp.org';
+const BOOT_BUTTON = 0;          // Physical BOOT button on CYD board
+let lastDebounce = 0;
+
+// Color palette (RGB565)
+const COLOR_BG_DARK = 0x2124;
+const COLOR_HEADER_BLUE = 0x1C53;
+const COLOR_CARD_BG = 0xE73C;
+const COLOR_ORANGE_BTN = 0xFC00;
+const COLOR_TEXT_DARK = 0x10A2;
+
+// Button bounds
+const BTN_X = 25;
+const BTN_Y = 222;
+const BTN_W = 430;
+const BTN_H = 52;
+
+// --- UTILITY FUNCTIONS ---
+
+// Generates a 12-character passcode formatted as "XXXX - XXXX - XXXX"
+function generateGroupedPasscode() {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let raw = '';
+  for (let i = 0; i < 12; i++) {
+    raw += chars[random(0, chars.length)];
+  }
+  return raw.substring(0, 4) + ' - ' + raw.substring(4, 8) + ' - ' + raw.substring(8, 12);
+}
+
+// Formats UTC expiration timestamp (e.g. "Oct 13, 2026, 11:30 AM (UTC)")
+function getFormattedExpiration(hoursValid) {
+  return fmtExpiration(nowSec() + hoursValid * 3600);
+}
+
+function getIsoUtcTimestamp(hoursValid) {
+  return isoUtc(nowSec() + hoursValid * 3600);
+}
+
+// --- QR CODE RENDERER ---
+
+function drawQRCode(payload, startX, startY, scale = 3) {
+  let qr;
+  try {
+    qr = qrcode(4, 'L');              // version 4, ECC_LOW
+    qr.addData(payload);
+    qr.make();
+  } catch (e) {
+    Serial.println('QR failed: ' + payload.length + ' bytes, version 4 / ECC_LOW holds 78');
+    return;
+  }
+
+  const size = qr.getModuleCount();
+  const qrSize = size * scale;
+  const margin = scale * 2;
+
+  // Draw white background
+  lcd.fillRect(startX - margin, startY - margin, qrSize + margin * 2, qrSize + margin * 2, TFT_WHITE);
+
+  // Draw modules
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (qr.isDark(y, x)) {
+        lcd.fillRect(startX + x * scale, startY + y * scale, scale, scale, TFT_BLACK);
+      }
+    }
+  }
+}
+
+// --- DISPLAY UI RENDERERS ---
+
+function drawGetCodeButton(isPressed = false) {
+  const bgCol = isPressed ? TFT_GREEN : COLOR_ORANGE_BTN;
+  const border = TFT_WHITE;
+  const textCol = isPressed ? TFT_BLACK : TFT_WHITE;
+
+  lcd.fillRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, bgCol);
+  lcd.drawRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, border);
+
+  lcd.setTextColor(textCol, bgCol);
+  lcd.setTextSize(3);
+  lcd.setTextDatum(textdatum_t.middle_center);
+  lcd.drawString('GET CODE', BTN_X + BTN_W / 2, BTN_Y + BTN_H / 2);
+
+  // Footer subtext
+  lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
+  lcd.setTextSize(1);
+  lcd.drawString('*Tap here to generate a single-use code*', 240, 290);
+}
+
+function updateScreenUI(statusText, passcode = '') {
+  lcd.fillScreen(COLOR_BG_DARK);
+
+  // 1. Top header banner
+  lcd.fillRect(0, 0, 480, 40, COLOR_HEADER_BLUE);
+  lcd.setTextColor(TFT_WHITE, COLOR_HEADER_BLUE);
+  lcd.setTextSize(2);
+  lcd.setTextDatum(textdatum_t.middle_center);
+
+  const sysName = (currentSystem === MERAKI) ? 'Meraki' : 'UniFi';
+  lcd.drawString('GUEST WI-FI ACCESS (' + sysName + ')', 240, 20);
+
+  if (passcode !== '') {
+    const validHours = (currentSystem === MERAKI) ? MERAKI_HOURS : Math.trunc(UNIFI_MINUTES / 60);
+    const expirationStr = getFormattedExpiration(validHours);
+
+    // 2. Left card
+    lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
+    lcd.setTextSize(1);
+    lcd.setTextDatum(textdatum_t.top_left);
+    lcd.drawString('Currently active ticket', 25, 48);
+
+    lcd.fillRoundRect(25, 62, 280, 145, 8, COLOR_CARD_BG);
+    lcd.drawRoundRect(25, 62, 280, 145, 8, TFT_WHITE);
+
+    // Yellow badge
+    lcd.fillRoundRect(33, 70, 70, 18, 4, TFT_YELLOW);
+    lcd.setTextColor(COLOR_TEXT_DARK, TFT_YELLOW);
+    lcd.setTextSize(1);
+    lcd.drawString('Passcode', 38, 74);
+
+    // Passcode text
+    lcd.setTextColor(COLOR_TEXT_DARK, COLOR_CARD_BG);
+    lcd.setTextSize(2);
+    lcd.drawString(passcode, 33, 94);
+
+    // Ticket details
+    lcd.setTextSize(1);
+    lcd.drawString('SSID: ' + WIFI_SSID, 33, 125);
+    lcd.drawString('Valid: ' + validHours + ' Hours', 33, 145);
+    lcd.drawString('Expires: ' + expirationStr, 33, 165);
+
+    // 3. Right card (QR code)
+    lcd.setTextDatum(textdatum_t.top_center);
+    lcd.drawString('QR CODE', 390, 48);
+
+    lcd.fillRoundRect(320, 62, 135, 145, 8, COLOR_CARD_BG);
+    lcd.drawRoundRect(320, 62, 135, 145, 8, COLOR_HEADER_BLUE);
+
+    // Strip spaces for the payload string
+    const rawPass = passcode.split(' - ').join('');
+    const qrPayload = 'WIFI:S:' + WIFI_SSID + ';T:WPA;P:' + rawPass + ';;';
+
+    drawQRCode(qrPayload, 338, 72, 3);
+
+    lcd.setTextColor(COLOR_HEADER_BLUE, COLOR_CARD_BG);
+    lcd.setTextSize(1);
+    lcd.drawString('SCAN TO JOIN', 387, 186);
+
+  } else {
+    // Status message
+    lcd.setTextDatum(textdatum_t.middle_center);
+    lcd.setTextColor(TFT_ORANGE, COLOR_BG_DARK);
+    lcd.setTextSize(2);
+    lcd.drawString(statusText, 240, 120);
+  }
+
+  drawGetCodeButton(false);
+}
+
+// --- SYSTEM API WORKFLOWS ---
+
+async function createMerakiPsk() {
+  const client = new WiFiClientSecure();
+  client.setInsecure();
+
+  const http = new HTTPClient();
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  const url = 'https://api.meraki.com/api/v1/networks/' + MERAKI_NET_ID +
+              '/wireless/ssids/' + MERAKI_SSID_NUM + '/identityPsks';
+
+  const formattedPasscode = generateGroupedPasscode();
+  const rawPasscode = formattedPasscode.split(' - ').join('');   // Strip spaces for API call
+
+  const expiresAt = getIsoUtcTimestamp(MERAKI_HOURS);
+  const pskName = 'CYD-Guest-' + random(1000, 9999);
+
+  const jsonPayload = '{"name":"' + pskName +
+                      '","passphrase":"' + rawPasscode +
+                      '","expiresAt":"' + expiresAt + '"}';
+
+  http.begin(client, url);
+  http.addHeader('Content-Type', 'application/json');
+  http.addHeader('X-Cisco-Meraki-API-Key', MERAKI_API_KEY);
+
+  const httpCode = await http.POST(jsonPayload);
+
+  if (httpCode === 201) {
+    updateScreenUI('SUCCESS', formattedPasscode);
+    http.end();
+    return true;
+  } else {
+    updateScreenUI('Meraki API Error: ' + httpCode);
+    http.end();
+    return false;
+  }
+}
+
+async function createUnifiVoucher() {
+  const client = new WiFiClientSecure();
+  client.setInsecure();
+
+  const http = new HTTPClient();
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  const url = 'https://' + UNIFI_HOST + '/v1/sites/' + UNIFI_SITE_ID + '/hotspot/vouchers';
+
+  const jsonPayload = '{"name":"CYD-Guest","count":1,"timeLimitMinutes":' +
+                      UNIFI_MINUTES + ',"authorizedGuestLimit":1}';
+
+  http.begin(client, url);
+  http.addHeader('Content-Type', 'application/json');
+  http.addHeader('X-API-KEY', UNIFI_API_KEY);
+
+  const httpCode = await http.POST(jsonPayload);
+
+  if (httpCode === 200 || httpCode === 201) {
+    const response = http.getString();
+
+    const codeIndex = response.indexOf('"code":"');
+    if (codeIndex !== -1) {
+      const start = codeIndex + 8;
+      const end = response.indexOf('"', start);
+      const rawCode = response.substring(start, end);
+
+      updateScreenUI('SUCCESS', rawCode);
+      http.end();
+      return true;
+    }
+  }
+
+  updateScreenUI('UniFi API Error: ' + httpCode);
+  http.end();
+  return false;
+}
+
+// --- SWITCH DISPATCHER ---
+
+async function processCodeGeneration() {
+  if (WiFi.status() !== WL_CONNECTED) {
+    updateScreenUI('Wi-Fi Disconnected!');
+    return;
+  }
+
+  drawGetCodeButton(true);
+  lcd.setTextDatum(textdatum_t.middle_center);
+  lcd.setTextColor(TFT_YELLOW, COLOR_BG_DARK);
+  lcd.setTextSize(2);
+  lcd.drawString('Contacting API...', 240, 120);
+
+  switch (currentSystem) {
+    case MERAKI:
+      await createMerakiPsk();
+      break;
+
+    case UNIFI:
+      await createUnifiVoucher();
+      break;
+
+    default:
+      updateScreenUI('Unknown System Target!');
+      break;
+  }
+}
+
+// --- ARDUINO SETUP & LOOP ---
+
+async function setup() {
+  Serial.begin(115200);
+  pinMode(BOOT_BUTTON, INPUT_PULLUP);
+  randomSeed(analogRead(0));
+
+  lcd.init();
+  lcd.setRotation(1);   // Landscape mode (480x320)
+  lcd.setBrightness(255);
+
+  updateScreenUI('Connecting to Wi-Fi...');
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() !== WL_CONNECTED) {
+    await delay(500);
+  }
+
+  updateScreenUI('Syncing NTP Time...');
+
+  configTime(0, 0, NTP_SERVER);
+  while (!getLocalTime()) {
+    await delay(500);
+  }
+
+  updateScreenUI('Tap button below to get code');
+}
+
+async function loop() {
+  // Trigger 1: touchscreen press detection
+  const t = lcd.getTouch();
+  if (t) {
+    if (t.x >= BTN_X && t.x <= BTN_X + BTN_W &&
+        t.y >= BTN_Y && t.y <= BTN_Y + BTN_H) {
+
+      if (millis() - lastDebounce > 1500) {
+        lastDebounce = millis();
+        await processCodeGeneration();
+      }
+    }
+  }
+
+  // Trigger 2: physical BOOT button press
+  if (digitalRead(BOOT_BUTTON) === LOW && (millis() - lastDebounce > 1500)) {
+    lastDebounce = millis();
+    await processCodeGeneration();
+  }
+
+  // Trigger 3: serial input
+  if (Serial.available() > 0) {
+    while (Serial.available() > 0) Serial.read();
+    await processCodeGeneration();
+  }
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const p2 = n => String(n).padStart(2, '0');
+
+/* =====================================================================
+   Virtual board: clock, GPIO, Wi-Fi, time
+   ===================================================================== */
+class Abort extends Error {}
+let runId = 0, running = false, t0 = 0;
+const hw = { bootDown: false, bootLatch: false, touch: null, touchPolled: false, touchRelease: false, serialBuf: [], wifiLink: true };
+
+const millis = () => running ? Math.floor(performance.now() - t0) : 0;
+function sleep(ms) {
+  const id = runId;
+  return new Promise((res, rej) => setTimeout(() => (id !== runId ? rej(new Abort()) : res()), ms));
+}
+const delay = sleep;
+const random = (a, b) => b === undefined ? Math.floor(Math.random() * a) : a + Math.floor(Math.random() * (b - a));
+
+const WL_IDLE_STATUS = 0, WL_CONNECTED = 3, WL_DISCONNECTED = 6;
+const WiFi = {
+  began: false, at: 0, wasUp: false,
+  reset() { this.began = false; this.at = 0; this.wasUp = false; },
+  begin(ssid) {
+    this.began = true; this.at = millis();
+    serialOut('[sim] Wi-Fi: connecting to "' + ssid + '"', 'sim');
+  },
+  status() {
+    if (!this.began) return WL_IDLE_STATUS;
+    if (!hw.wifiLink) {
+      if (this.wasUp) { serialOut('[sim] Wi-Fi: link lost', 'sim'); this.wasUp = false; }
+      return WL_DISCONNECTED;
+    }
+    if (millis() - this.at < 1800) return WL_IDLE_STATUS;
+    if (!this.wasUp) { this.wasUp = true; serialOut('[sim] Wi-Fi: connected, IP 192.168.1.57', 'sim'); }
+    return WL_CONNECTED;
+  }
+};
+const ntp = { at: -1, synced: false, reset() { this.at = -1; this.synced = false; } };
+function configTime(a, b, server) { ntp.at = millis(); serialOut('[sim] NTP: querying ' + server, 'sim'); }
+function getLocalTime() {
+  if (ntp.at < 0 || !hw.wifiLink) return false;
+  if (millis() - ntp.at < 1200) return false;
+  if (!ntp.synced) { ntp.synced = true; serialOut('[sim] NTP: synced ' + new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC', 'sim'); }
+  return true;
+}
+const nowSec = () => Math.floor(Date.now() / 1000);
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtExpiration(sec) {           // strftime("%b %d, %Y, %I:%M %p (UTC)")
+  const d = new Date(sec * 1000); let h = d.getUTCHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return MON[d.getUTCMonth()] + ' ' + p2(d.getUTCDate()) + ', ' + d.getUTCFullYear() + ', ' + p2(h) + ':' + p2(d.getUTCMinutes()) + ' ' + ap + ' (UTC)';
+}
+const isoUtc = sec => new Date(sec * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+const Serial = {
+  begin() {},
+  available() { return hw.serialBuf.length; },
+  read() { return hw.serialBuf.shift(); },
+  print(s) { serialOut(String(s), 'out'); },
+  println(s) { serialOut(String(s == null ? '' : s), 'out'); }
+};
+
+/* ---- serial monitor ---- */
+const serialEl = $('#serial');
+function serialOut(text, kind) {
+  const near = serialEl.scrollHeight - serialEl.scrollTop - serialEl.clientHeight < 40;
+  serialEl.append(el('div', kind || 'out', text));
+  while (serialEl.childElementCount > 400) serialEl.firstElementChild.remove();
+  if (near) serialEl.scrollTop = serialEl.scrollHeight;
+}
+
+/* =====================================================================
+   Display: ST7796 480x320 with LovyanGFX-style drawing calls
+   ===================================================================== */
+const cv = $('#lcd');
+const ctx = cv.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const TFT_WHITE = 0xFFFF, TFT_BLACK = 0x0000, TFT_GREEN = 0x07E0, TFT_YELLOW = 0xFFE0, TFT_ORANGE = 0xFD20, TFT_LIGHTGREY = 0xD69A;
+const textdatum_t = { top_left: 'top_left', top_center: 'top_center', middle_center: 'middle_center' };
+const colorCache = new Map();
+function css565(c) {
+  let v = colorCache.get(c);
+  if (!v) {
+    let r = (c >> 11) & 31, g = (c >> 5) & 63, b = c & 31;
+    r = (r << 3) | (r >> 2); g = (g << 2) | (g >> 4); b = (b << 3) | (b >> 2);
+    v = 'rgb(' + r + ',' + g + ',' + b + ')'; colorCache.set(c, v);
+  }
+  return v;
+}
+/* classic 5x7 GLCD font (Font0), ASCII 32..126, one column per byte, bit0 = top row */
+const FONT = ('0000000000 00005F0000 0007000700 147F147F14 242A7F2A12 2313086462 3649552250 0005030000 001C224100 0041221C00 ' +
+  '14083E0814 08083E0808 0050300000 0808080808 0060600000 2010080402 3E5149453E 00427F4000 4261514946 2141454B31 ' +
+  '1814127F10 2745454539 3C4A494930 0171090503 3649494936 064949291E 0036360000 0056360000 0814224100 1414141414 ' +
+  '0041221408 0201510906 324979413E 7E1111117E 7F49494936 3E41414122 7F4141221C 7F49494941 7F09090901 3E4149497A ' +
+  '7F0808087F 00417F4100 2040413F01 7F08142241 7F40404040 7F020C027F 7F0408107F 3E4141413E 7F09090906 3E4151215E ' +
+  '7F09192946 4649494931 01017F0101 3F4040403F 1F2040201F 3F4038403F 6314081463 0708700807 6151494543 007F414100 ' +
+  '0204081020 0041417F00 0402010204 4040404040 0001020400 2054545478 7F48444438 3844444420 384444487F 3854545418 ' +
+  '087E090102 0C5252523E 7F08040478 00447D4000 2040443D00 7F10284400 00417F4000 7C04180478 7C08040478 3844444438 ' +
+  '7C14141408 081414187C 7C08040408 4854545420 043F444020 3C4040207C 1C2040201C 3C4030403C 4428102844 0C5050503C ' +
+  '4464544C44 0008364100 00007F0000 0041360800 1008081008').split(' ').map(h => [0, 2, 4, 6, 8].map(i => parseInt(h.substr(i, 2), 16)));
+const glyph = code => FONT[(code >= 32 && code <= 126 ? code : 63) - 32];
+
+function roundRectPath(x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+const lcd = {
+  fg: TFT_WHITE, bg: TFT_BLACK, size: 1, datum: 'top_left',
+  init() {}, setRotation() {},
+  setBrightness(b) { cv.style.opacity = String(0.12 + 0.88 * b / 255); },
+  off() { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 320); cv.style.opacity = '1'; this.fg = TFT_WHITE; this.bg = TFT_BLACK; this.size = 1; this.datum = 'top_left'; },
+  fillScreen(c) { ctx.fillStyle = css565(c); ctx.fillRect(0, 0, 480, 320); },
+  fillRect(x, y, w, h, c) { ctx.fillStyle = css565(c); ctx.fillRect(x, y, w, h); },
+  fillRoundRect(x, y, w, h, r, c) { roundRectPath(x, y, w, h, r); ctx.fillStyle = css565(c); ctx.fill(); },
+  drawRoundRect(x, y, w, h, r, c) { roundRectPath(x + 0.5, y + 0.5, w - 1, h - 1, r); ctx.strokeStyle = css565(c); ctx.lineWidth = 1; ctx.stroke(); },
+  setTextColor(fg, bg) { this.fg = fg; this.bg = bg !== undefined ? bg : null; },
+  setTextSize(s) { this.size = s; },
+  setTextDatum(d) { this.datum = d; },
+  drawString(str, x, y) {
+    str = String(str);
+    const sz = this.size, w = 6 * sz * str.length, h = 8 * sz;
+    let px = x, py = y;
+    if (this.datum === 'top_center') px = x - Math.trunc(w / 2);
+    else if (this.datum === 'middle_center') { px = x - Math.trunc(w / 2); py = y - Math.trunc(h / 2); }
+    if (this.bg !== null) { ctx.fillStyle = css565(this.bg); ctx.fillRect(px, py, w, h); }
+    ctx.fillStyle = css565(this.fg);
+    for (let i = 0; i < str.length; i++) {
+      const g = glyph(str.charCodeAt(i));
+      for (let col = 0; col < 5; col++) {
+        const bits = g[col];
+        for (let row = 0; row < 7; row++) if ((bits >> row) & 1) ctx.fillRect(px + (i * 6 + col) * sz, py + row * sz, sz, sz);
+      }
+    }
+    return w;
+  },
+  getTouch() {
+    if (!hw.touch) return null;
+    const t = hw.touch;
+    hw.touchPolled = true;
+    if (hw.touchRelease) { hw.touch = null; hw.touchRelease = false; }
+    return t;
+  }
+};
+
+/* touch + buttons */
+const screenEl = $('#screen'), dot = $('#dot');
+function touchPoint(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: Math.max(0, Math.min(479, Math.floor((e.clientX - r.left) / r.width * 480))), y: Math.max(0, Math.min(319, Math.floor((e.clientY - r.top) / r.height * 320))) };
+}
+function placeDot(e) {
+  const r = screenEl.getBoundingClientRect();
+  dot.style.left = ((e.clientX - r.left) / r.width * 100) + '%';
+  dot.style.top = ((e.clientY - r.top) / r.height * 100) + '%';
+}
+cv.addEventListener('pointerdown', e => {
+  if (!running) return;
+  try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+  hw.touch = touchPoint(e); hw.touchPolled = false; hw.touchRelease = false;
+  placeDot(e); dot.hidden = false;
+});
+cv.addEventListener('pointermove', e => { if (hw.touch && !dot.hidden) { hw.touch = touchPoint(e); placeDot(e); } });
+function endTouch() { dot.hidden = true; if (!hw.touch) return; if (hw.touchPolled) hw.touch = null; else hw.touchRelease = true; }
+cv.addEventListener('pointerup', endTouch);
+cv.addEventListener('pointercancel', endTouch);
+
+const bootBtn = $('#btnBoot');
+function bootPress(down) {
+  bootBtn.classList.toggle('down', down);
+  if (down) { hw.bootDown = true; hw.bootLatch = true; } else hw.bootDown = false;
+}
+bootBtn.addEventListener('pointerdown', e => { try { bootBtn.setPointerCapture(e.pointerId); } catch (_) {} bootPress(true); });
+bootBtn.addEventListener('pointerup', () => bootPress(false));
+bootBtn.addEventListener('pointercancel', () => bootPress(false));
+bootBtn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); bootPress(true); } });
+bootBtn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') bootPress(false); });
+/* digitalRead(0) is LOW while BOOT is pressed; a press shorter than one loop pass is still seen once */
+function digitalRead(pin) {
+  if (pin !== 0) return 1;
+  const low = hw.bootDown || hw.bootLatch;
+  hw.bootLatch = false;
+  return low ? 0 : 1;
+}
+
+/* =====================================================================
+   Mock network: HTTPClient + simulated Meraki and UniFi servers
+   ===================================================================== */
+const netList = $('#netlist'), netCountEl = $('#netCount');
+let netCount = 0;
+function maskHeader(k, v) { return /key/i.test(k) ? (v.length > 4 ? v.slice(0, 4) + '••••••' : '••••') : v; }
+function addNetEntry(e) {
+  const empty = $('#netEmpty'); if (empty) empty.remove();
+  netCount++; netCountEl.textContent = String(netCount);
+  const d = el('details', 'req');
+  const s = el('summary');
+  let u = e.url; try { const x = new URL(e.url); u = x.host + x.pathname; } catch (_) {}
+  const ok = e.status >= 200 && e.status < 300;
+  s.append(el('span', 't', fmtClock(e.t)), el('span', 'm', e.method), el('span', 'u', u), el('span', 'st ' + (ok ? 'ok' : 'bad'), e.status + ' · ' + e.ms + ' ms'));
+  const body = el('div', 'req-body');
+  body.append(el('h4', null, 'Request URL'), el('pre', null, e.url));
+  body.append(el('h4', null, 'Headers'), el('pre', null, Object.keys(e.headers).map(k => k + ': ' + maskHeader(k, String(e.headers[k]))).join('\n') || '(none)'));
+  body.append(el('h4', null, 'Body'), el('pre', null, e.body || '(empty)'));
+  body.append(el('h4', null, 'Response'), el('pre', null, e.resp || '(empty)'));
+  d.append(s, body);
+  netList.prepend(d);
+}
+const rid = n => Array.from({ length: n }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
+const jerr = (status, msg) => ({ status, body: JSON.stringify({ errors: [msg] }) });
+
+function merakiOk(b) {
+  return JSON.stringify({ id: String(Math.floor(Math.random() * 9e8 + 1e8)), name: b.name || '', passphrase: b.passphrase || '', expiresAt: b.expiresAt || null, wifiPersonalNetworkId: null, groupPolicyId: null });
+}
+function unifiOk(b) {
+  const code = String(Math.floor(Math.random() * 90000 + 10000)) + '-' + String(Math.floor(Math.random() * 90000 + 10000));
+  return JSON.stringify({ vouchers: [{ id: rid(8) + '-' + rid(4) + '-' + rid(4) + '-' + rid(4) + '-' + rid(12), createdAt: new Date().toISOString(), name: b.name || 'CYD-Guest', code, authorizedGuestLimit: b.authorizedGuestLimit || 1, authorizedGuestCount: 0, timeLimitMinutes: b.timeLimitMinutes || 0, expired: false }] });
+}
+function merakiAuto(u, h, b) {
+  if (!h['X-Cisco-Meraki-API-Key']) return jerr(401, 'Invalid API key');
+  const m = u.pathname.match(/^\/api\/v1\/networks\/([^/]+)\/wireless\/ssids\/(\d+)\/identityPsks$/);
+  if (!m || !/^[NL]_\d+$/.test(m[1])) return jerr(404, 'Network not found');
+  if (+m[2] > 14) return jerr(400, 'SSID number must be between 0 and 14');
+  if (!b) return jerr(400, 'Request body is not valid JSON');
+  if (!b.name) return jerr(400, 'name is required');
+  if (!b.passphrase || String(b.passphrase).length < 8) return jerr(400, 'passphrase must be at least 8 characters');
+  if (b.expiresAt && !(Date.parse(b.expiresAt) > Date.now())) return jerr(400, 'expiresAt must be in the future');
+  return { status: 201, body: merakiOk(b) };
+}
+function unifiAuto(u, h, b) {
+  if (!h['X-API-KEY']) return { status: 401, body: JSON.stringify({ statusCode: 401, statusName: 'UNAUTHORIZED', message: 'Missing credentials' }) };
+  if (!b || !(b.count >= 1)) return { status: 400, body: JSON.stringify({ statusCode: 400, statusName: 'BAD_REQUEST', message: 'count must be at least 1' }) };
+  return { status: 200, body: unifiOk(b) };
+}
+function mockServer(method, url, headers, bodyStr, force) {
+  let u; try { u = new URL(url); } catch (_) { return { status: -1, body: '' }; }
+  const isMeraki = u.hostname === 'api.meraki.com';
+  const isUnifi = /^\/v1\/sites\/[^/]+\/hotspot\/vouchers$/.test(u.pathname);
+  if (!isMeraki && !isUnifi) return { status: -1, body: '' };
+  let b = null; try { b = JSON.parse(bodyStr); } catch (_) {}
+  if (force !== 'auto') {
+    const code = +force;
+    if (code === 200 || code === 201) return { status: code, body: isMeraki ? merakiOk(b || {}) : unifiOk(b || {}) };
+    return jerr(code, 'Simulated ' + code + ' response');
+  }
+  return isMeraki ? merakiAuto(u, headers, b) : unifiAuto(u, headers, b);
+}
+async function netRequest(method, url, headers, body) {
+  const started = millis();
+  const entry = { t: started, method, url, headers: Object.assign({}, headers), body, status: 0, resp: '', ms: 0 };
+  const force = $('#mockStatus').value;
+  let res;
+  if (!hw.wifiLink) { await sleep(300); res = { status: -1, body: '' }; }
+  else if (force === '-1') { await sleep(400); res = { status: -1, body: '' }; }
+  else if (force === '-11') { await sleep(3000); res = { status: -11, body: '' }; }
+  else { await sleep(+$('#latency').value); res = mockServer(method, url, headers, body, force); }
+  entry.status = res.status; entry.resp = res.body; entry.ms = millis() - started;
+  addNetEntry(entry);
+  serialOut('[sim] ' + method + ' ' + url.replace(/^https:\/\//, '') + ' -> ' + res.status + ' (' + entry.ms + ' ms)', 'sim');
+  return res;
+}
+class WiFiClientSecure { setInsecure() {} }
+class HTTPClient {
+  constructor() { this.headers = {}; this.url = ''; this.resp = ''; }
+  setFollowRedirects() {}
+  begin(a, b) { this.url = b === undefined ? a : b; this.headers = {}; }
+  addHeader(k, v) { this.headers[k] = v; }
+  async POST(body) { const r = await netRequest('POST', this.url, this.headers, body); this.resp = r.body; return r.status; }
+  getString() { return this.resp; }
+  end() {}
+}
+
+/* =====================================================================
+   Sketch loader: compiles the editor text into a program
+   ===================================================================== */
+const API = {
+  lcd, WiFi, WiFiClientSecure, HTTPClient, Serial, delay, millis, random,
+  randomSeed() {}, analogRead() { return Math.floor(Math.random() * 4096); }, pinMode() {}, digitalRead,
+  configTime, getLocalTime, nowSec, fmtExpiration, isoUtc, qrcode: window.qrcode, textdatum_t,
+  TFT_WHITE, TFT_BLACK, TFT_GREEN, TFT_YELLOW, TFT_ORANGE, TFT_LIGHTGREY,
+  WL_IDLE_STATUS, WL_CONNECTED, WL_DISCONNECTED, INPUT_PULLUP: 2, LOW: 0, HIGH: 1, HTTPC_STRICT_FOLLOW_REDIRECTS: 1
+};
+const API_NAMES = Object.keys(API);
+const RET = 'return { setup: typeof setup === "function" ? setup : null, loop: typeof loop === "function" ? loop : null };';
+let progSeq = 0;
+
+/* Returns a factory(...apiValues) => {setup, loop}. Throws {message, line} on a syntax error. */
+function compile(src) {
+  const key = '__cydProg' + (++progSeq);
+  let err = null;
+  const onErr = ev => { err = { message: String(ev.message || 'Syntax error').replace(/^Uncaught\s+/, ''), line: ev.lineno ? ev.lineno - 1 : 0 }; ev.preventDefault(); };
+  window.addEventListener('error', onErr);
+  try {
+    const s = document.createElement('script');
+    s.textContent = 'window.' + key + ' = function(' + API_NAMES.join(',') + ') {\n' + src + '\n' + RET + '\n};';
+    (document.head || document.documentElement).appendChild(s);
+    s.remove();
+  } catch (e) { /* fall through to the Function constructor */ }
+  finally { window.removeEventListener('error', onErr); }
+  const f = window[key]; try { delete window[key]; } catch (_) {}
+  if (err) throw err;
+  if (typeof f === 'function') return f;
+  try { return new Function(...API_NAMES, src + '\n' + RET); }
+  catch (e) { throw { message: e.message, line: 0 }; }
+}
+
+/* =====================================================================
+   Runner and toolbar
+   ===================================================================== */
+const pill = $('#pill'), led = $('#led'), clockEl = $('#clock');
+const btnStart = $('#btnStart'), btnStop = $('#btnStop');
+let factory = null;
+function fmtClock(ms) { const s = Math.floor(ms / 1000); return p2(Math.floor(s / 60)) + ':' + p2(s % 60) + '.' + String(Math.floor(ms % 1000)).padStart(3, '0'); }
+function setStatus(s) {
+  pill.dataset.s = s; pill.textContent = s === 'running' ? 'Running' : s === 'crashed' ? 'Crashed' : 'Stopped';
+  led.classList.toggle('on', s === 'running');
+  btnStart.disabled = s === 'running'; btnStop.disabled = s !== 'running';
+}
+setInterval(() => { if (running) clockEl.textContent = fmtClock(performance.now() - t0); }, 100);
+
+async function runSketch() {
+  try {
+    await sleep(350);
+    const prog = factory(...API_NAMES.map(n => API[n]));
+    if (!prog.setup && !prog.loop) throw new Error('define setup() and loop() in the sketch');
+    if (prog.setup) await prog.setup();
+    for (;;) { if (prog.loop) await prog.loop(); await sleep(2); }
+  } catch (e) {
+    if (e instanceof Abort) return;
+    running = false; setStatus('crashed');
+    const msg = (e && e.message) ? e.message : String(e);
+    serialOut('[sim] runtime error: ' + msg, 'err');
+    setProblem({ message: 'Runtime error: ' + msg, line: 0 });
+  }
+}
+function start() {
+  if (!factory) { serialOut('[sim] nothing to run, fix the errors in sketch.js first', 'err'); return; }
+  runId++;
+  running = true; t0 = performance.now();
+  hw.touch = null; hw.bootDown = false; hw.bootLatch = false; hw.serialBuf = [];
+  WiFi.reset(); ntp.reset(); dot.hidden = true;
+  lcd.off(); clockEl.textContent = '00:00.000';
+  serialOut('ets Jul 29 2019 12:21:46', 'out');
+  serialOut('rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)', 'out');
+  serialOut('[sim] sketch started', 'sim');
+  setStatus('running');
+  runSketch();
+}
+function stop() {
+  runId++; running = false; hw.touch = null; dot.hidden = true;
+  lcd.off(); setStatus('stopped');
+  serialOut('[sim] stopped', 'sim');
+}
+btnStart.addEventListener('click', start);
+btnStop.addEventListener('click', stop);
+$('#btnRestart').addEventListener('click', start);
+$('#btnRst').addEventListener('click', start);
+$('#clearSerial').addEventListener('click', () => { serialEl.textContent = ''; });
+$('#sendForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const inp = $('#sendInput'); const text = inp.value + '\n';
+  if (!running) { serialOut('[sim] board is stopped, nothing received', 'err'); return; }
+  for (let i = 0; i < text.length; i++) hw.serialBuf.push(text.charCodeAt(i));
+  serialOut('> ' + inp.value, 'rx'); inp.value = '';
+});
+
+/* mock controls */
+$('#latency').addEventListener('input', e => { $('#latencyOut').textContent = e.target.value + ' ms'; });
+$('#wifiLink').addEventListener('change', e => { hw.wifiLink = e.target.checked; serialOut('[sim] access point ' + (hw.wifiLink ? 'reachable' : 'unreachable'), 'sim'); });
+
+/* =====================================================================
+   Code editor
+   ===================================================================== */
+const CODE_KEY = 'cyd-sim-code-v1';
+const ta = $('#code'), gutter = $('#gutter'), prob = $('#problems');
+const defaultSrc = $('#src-default').textContent.replace(/^\n/, '');
+let lastLines = 0, autoTimer = 0, trapTab = true;
+
+function renderGutter() {
+  const n = ta.value.split('\n').length;
+  if (n === lastLines) return;
+  lastLines = n;
+  gutter.textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n');
+}
+function setProblem(err, okText) {
+  if (err) {
+    prob.dataset.s = 'err';
+    prob.dataset.line = String(err.line || 0);
+    prob.textContent = (err.line ? 'Line ' + err.line + ': ' : '') + err.message;
+  } else {
+    prob.dataset.s = 'ok'; prob.dataset.line = '0';
+    prob.textContent = okText || 'No problems';
+  }
+}
+function goToLine(n) {
+  if (!n) return;
+  const lines = ta.value.split('\n');
+  let pos = 0; for (let i = 0; i < n - 1 && i < lines.length; i++) pos += lines[i].length + 1;
+  ta.focus();
+  ta.setSelectionRange(pos, pos + (lines[n - 1] || '').length);
+  ta.scrollTop = Math.max(0, (n - 5) * 18.6);
+}
+prob.addEventListener('click', () => { if (prob.dataset.s === 'err') goToLine(+prob.dataset.line); });
+
+function applyCode(restart) {
+  clearTimeout(autoTimer);
+  try {
+    const f = compile(ta.value);
+    factory = f;
+    setProblem(null, 'Compiled, ' + lastLines + ' lines' + (restart ? ', restarted' : ''));
+    if (restart) start();
+    return true;
+  } catch (e) {
+    setProblem(e);
+    return false;
+  }
+}
+function saveCode() { try { localStorage.setItem(CODE_KEY, ta.value); } catch (_) {} }
+
+ta.addEventListener('input', () => {
+  renderGutter(); saveCode();
+  clearTimeout(autoTimer);
+  if ($('#autoRun').checked) autoTimer = setTimeout(() => applyCode(true), 900);
+  else { prob.dataset.s = 'ok'; prob.textContent = 'Edited. Press Run to apply.'; }
+});
+ta.addEventListener('scroll', () => { gutter.scrollTop = ta.scrollTop; });
+ta.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); applyCode(true); return; }
+  if (e.key === 'Escape') { trapTab = false; return; }
+  if (e.key === 'Tab' && trapTab && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    e.preventDefault();
+    ta.setRangeText('  ', ta.selectionStart, ta.selectionEnd, 'end');
+    ta.dispatchEvent(new Event('input'));
+  }
+});
+ta.addEventListener('blur', () => { trapTab = true; });
+
+$('#runCode').addEventListener('click', () => applyCode(true));
+const copyBtn = $('#copyCode');
+copyBtn.addEventListener('click', () => {
+  const done = t => { copyBtn.textContent = t; setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500); };
+  const fallback = () => { ta.focus(); ta.select(); done('Selected, press Ctrl+C'); };
+  try { navigator.clipboard.writeText(ta.value).then(() => done('Copied'), fallback); } catch (_) { fallback(); }
+});
+const resetBtn = $('#resetCode');
+let resetArmed = 0;
+resetBtn.addEventListener('click', () => {
+  if (!resetArmed) {
+    resetBtn.textContent = 'Click again to reset'; resetBtn.classList.add('btn-warn');
+    resetArmed = setTimeout(() => { resetArmed = 0; resetBtn.textContent = 'Reset'; resetBtn.classList.remove('btn-warn'); }, 3000);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = 0; resetBtn.textContent = 'Reset'; resetBtn.classList.remove('btn-warn');
+  ta.value = defaultSrc; renderGutter(); saveCode(); applyCode(true);
+});
+
+/* tabs */
+const tabs = [['t-code', 'p-code'], ['t-mock', 'p-mock'], ['t-net', 'p-net']];
+for (const [t, p] of tabs) {
+  $('#' + t).addEventListener('click', () => {
+    for (const [t2, pn] of tabs) { $('#' + t2).setAttribute('aria-selected', String(t2 === t)); $('#' + pn).hidden = pn !== p; }
+    $('#shell').dataset.wide = String(t === 't-code');
+  });
+}
+
+/* boot */
+let saved = null; try { saved = localStorage.getItem(CODE_KEY); } catch (_) {}
+ta.value = saved || defaultSrc;
+renderGutter();
+setStatus('stopped');
+if (typeof window.qrcode === 'undefined') serialOut('[sim] QR library did not load, the QR code area will show an error', 'err');
+if (!applyCode(false) && saved) {
+  /* saved code no longer compiles: fall back to the original so the board still runs */
+  const bad = prob.textContent;
+  ta.value = defaultSrc; renderGutter(); applyCode(false);
+  setProblem(null, 'Saved code had an error (' + bad + '), loaded the original');
+}
+start();
+})();
+</script>
+
+</body></html>
