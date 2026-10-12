@@ -349,20 +349,21 @@ const UNIFI  = 'UNIFI';
 const currentSystem    = MERAKI;   // Options: MERAKI or UNIFI
 
 // --- Wi-Fi Settings ---
-const WIFI_SSID        = 'Guest_WiFi_Network';
+const WIFI_SSID        = 'A-JIS Guest';
 const WIFI_PASSWORD    = 'YOUR_WIFI_PASSWORD';
+const WIFI_TIMEOUT     = 72;
 
 // --- Meraki System Settings ---
 const MERAKI_API_KEY   = 'YOUR_MERAKI_API_KEY';
 const MERAKI_NET_ID    = 'N_123456789012345';
-const MERAKI_SSID_NUM  = 0;        // Target SSID index (0 to 14)
-const MERAKI_HOURS     = 24;       // Passcode expiration (hours)
+const MERAKI_SSID_NUM  = 0;                 // Target SSID index (0 to 14)
+const MERAKI_HOURS     = WIFI_TIMEOUT;      // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
 const UNIFI_HOST       = '192.168.1.1';
 const UNIFI_API_KEY    = 'YOUR_UNIFI_API_KEY';
 const UNIFI_SITE_ID    = 'default';
-const UNIFI_MINUTES    = 1440;     // Expiration in minutes (1440 mins = 24 hrs)
+const UNIFI_MINUTES    = WIFI_TIMEOUT * 60; // Expiration in minutes (1440 mins = 24 hrs)
 
 // ============================================================================
 
