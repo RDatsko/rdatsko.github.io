@@ -351,20 +351,21 @@ const NetworkSystem currentSystem = MERAKI;  // Options: MERAKI or UNIFI
 // --- Wi-Fi Settings ---
 const char* WIFI_SSID       = "Guest_Wifi_Network";
 const char* WIFI_PASSWORD   = "YOUR_WIFI_PASSWORD";
-const int   WIFI_TIMEOUT    = 72;   // Hours
-const int   DISPLAY_SECONDS = 60;   // A displayed code clears itself after this many seconds
+const int   WIFI_TIMEOUT    =   1;   // Days Valid
+const int   DISPLAY_SECONDS =  60;   // A displayed code clears itself after this many seconds
 
 // --- Meraki System Settings ---
 const char* MERAKI_API_KEY  = "YOUR_MERAKI_API_KEY";
 const char* MERAKI_NET_ID   = "N_123456789012345";
-const int   MERAKI_SSID_NUM = 0;                  // Target SSID index (0 to 14)
-const int   MERAKI_HOURS    = WIFI_TIMEOUT;       // Passcode expiration (hours)
+const int   MERAKI_SSID_NUM = 0; // Target SSID index (0 to 14)
+const char* MERAKI_GROUP_POLICY_ID = "YOUR_GROUP_POLICY_ID"; // Network-wide > Group policies (required by the API)
+const int   MERAKI_HOURS    = WIFI_TIMEOUT * 24; // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
-const char* UNIFI_HOST      = "192.168.1.1";         // UniFi Console LAN IP or Domain
-const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";  // Site Manager API Key
-const char* UNIFI_SITE_ID   = "default";             // Default site ID (usually 'default')
-const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 60;     // Expiration in minutes
+const char* UNIFI_HOST      = "192.168.1.1";           // UniFi Console LAN IP or Domain
+const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";    // Site Manager API Key
+const char* UNIFI_SITE_ID   = "default";               // Default site ID (usually 'default')
+const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 60 * 24;  // Expiration in minutes
 
 // ============================================================================
 
@@ -635,7 +636,8 @@ bool createMerakiPsk() {
 
   String jsonPayload = "{\"name\":\"" + pskName +
                        "\",\"passphrase\":\"" + rawPasscode +
-                       "\",\"expiresAt\":\"" + expiresAt + "\"}";
+                       "\",\"expiresAt\":\"" + expiresAt +
+                       "\",\"groupPolicyId\":\"" + MERAKI_GROUP_POLICY_ID + "\"}";
 
   http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
@@ -644,7 +646,7 @@ bool createMerakiPsk() {
   int httpCode = http.POST(jsonPayload);
 
   if (httpCode == 201) {
-    updateScreenUI("SUCCESS", formattedPasscode);
+    updateScreenUI("SUCCESS", rawPasscode);  // shown without dashes, exactly what the guest types
     http.end();
     return true;
   } else {
@@ -5284,7 +5286,7 @@ const rid = n => Array.from({ length: n }, () => '0123456789abcdef'[Math.floor(M
 const jerr = (status, msg) => ({ status, body: JSON.stringify({ errors: [msg] }) });
 
 function merakiOk(b) {
-  return JSON.stringify({ id: String(Math.floor(Math.random() * 9e8 + 1e8)), name: b.name || '', passphrase: b.passphrase || '', expiresAt: b.expiresAt || null, wifiPersonalNetworkId: null, groupPolicyId: null });
+  return JSON.stringify({ id: String(Math.floor(Math.random() * 9e8 + 1e8)), name: b.name || '', passphrase: b.passphrase || '', expiresAt: b.expiresAt || null, wifiPersonalNetworkId: null, groupPolicyId: b.groupPolicyId || null });
 }
 function unifiOk(b) {
   const code = String(Math.floor(Math.random() * 90000 + 10000)) + '-' + String(Math.floor(Math.random() * 90000 + 10000));
@@ -5297,6 +5299,7 @@ function merakiAuto(u, h, b) {
   if (+m[2] > 14) return jerr(400, 'SSID number must be between 0 and 14');
   if (!b) return jerr(400, 'Request body is not valid JSON');
   if (!b.name) return jerr(400, 'name is required');
+  if (!b.groupPolicyId) return jerr(400, 'groupPolicyId is required');
   if (!b.passphrase || String(b.passphrase).length < 8) return jerr(400, 'passphrase must be at least 8 characters');
   if (b.expiresAt && !(Date.parse(b.expiresAt) > Date.now())) return jerr(400, 'expiresAt must be in the future');
   return { status: 201, body: merakiOk(b) };
