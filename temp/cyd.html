@@ -214,7 +214,7 @@ details.req[open] summary { background: var(--panel-2); }
         </div>
         <button class="problems" id="problems" type="button" data-s="ok">Ready</button>
         <details class="genjs"><summary>Generated JavaScript <span id="genjsInfo"></span></summary><pre id="genjs"></pre></details>
-        <p class="hint">This is the Arduino sketch (.ino). On every Run the page converts it to JavaScript in the background and runs that. Tab inserts two spaces; press Esc then Tab to leave the editor. Run with Ctrl or Cmd + Enter. Your edits stay in this browser.</p>
+        <p class="hint">This is the Arduino sketch (.ino). On every Run the page converts it to JavaScript in the background and runs that. Tab inserts two spaces; press Esc then Tab to leave the editor. Run with Ctrl or Cmd + Enter. Nothing is saved: edits last only while this page is open, so use Copy to keep them.</p>
       </div>
 
       <div id="p-mock" role="tabpanel" aria-labelledby="t-mock" hidden>
@@ -334,6 +334,7 @@ details.req[open] summary { background: var(--panel-2); }
 #include <WiFiClientSecure.h>
 #include <time.h>
 #include <qrcode.h>
+#include <Preferences.h>
 #include <LovyanGFX.hpp>
 
 // ============================================================================
@@ -358,21 +359,19 @@ const PasscodeStyle PASSCODE_STYLE = WORDS;  // Options: CODE or WORDS
 // --- Wi-Fi Settings ---
 const char* WIFI_SSID       = "Guest_Wifi_Network";
 const char* WIFI_PASSWORD   = "YOUR_WIFI_PASSWORD";
-const int   WIFI_TIMEOUT    = 3;    // Days
-const int   DISPLAY_SECONDS = 60;   // A displayed code clears itself after this many seconds
+const int   WIFI_TIMEOUT    = 3;    // Default "Valid for", in days (1, 3, 5, 7, 14, 21 or 28). Changeable in Settings
+const int   DISPLAY_SECONDS = 60;   // Default "Wi-Fi Code Timeout", in seconds (30, 60 or 120). Changeable in Settings
 
 // --- Meraki System Settings ---
 const char* MERAKI_API_KEY  = "YOUR_MERAKI_API_KEY";
 const char* MERAKI_NET_ID   = "N_123456789012345";
 const int   MERAKI_SSID_NUM = 0;                  // Target SSID index (0 to 14)
 const char* MERAKI_GROUP_POLICY_ID = "YOUR_GROUP_POLICY_ID";  // Network-wide > Group policies (required by the API)
-const int   MERAKI_HOURS    = WIFI_TIMEOUT * 24;  // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
 const char* UNIFI_HOST      = "192.168.1.1";         // UniFi Console LAN IP or Domain
 const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";  // Site Manager API Key
 const char* UNIFI_SITE_ID   = "default";             // Default site ID (usually 'default')
-const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 24 * 60; // Expiration in minutes
 
 // ============================================================================
 
@@ -382,6 +381,57 @@ const long  JST_OFFSET     = 9 * 3600;  // Japan Standard Time, UTC+9 (no daylig
 unsigned long lastDebounce = 0;
 bool          codeShown    = false;  // True while a code is on screen (the button then reads CLEAR CODE)
 unsigned long codeShownAt  = 0;      // millis() when that code appeared
+
+// ============================================================================
+// SETTINGS (on the device: hold the BOOT button for 5 seconds to open or close)
+// ============================================================================
+
+const int   VALID_DAYS[]      = {1, 3, 5, 7, 14, 21, 28};
+const char* VALID_CHIP[]      = {"1D", "3D", "5D", "7D", "2Wk", "3Wk", "4Wk"};
+const char* VALID_LONG[]      = {"1 Day", "3 Days", "5 Days", "7 Days", "2 Weeks", "3 Weeks", "4 Weeks"};
+const int   VALID_COUNT       = 7;
+const int   TIMEOUT_SECONDS[] = {30, 60, 120};
+const char* TIMEOUT_CHIP[]    = {"30s", "60s", "2min"};
+const int   TIMEOUT_COUNT     = 3;
+
+const unsigned long SETTINGS_HOLD_MS = 5000;   // Hold BOOT this long to open or close Settings
+const unsigned long SETTINGS_IDLE_MS = 60000;  // Settings closes itself after this long without a touch
+
+Preferences   prefs;                 // Settings survive a power cycle
+int           validIdx      = 1;     // Selected entry in VALID_DAYS
+int           timeoutIdx    = 1;     // Selected entry in TIMEOUT_SECONDS
+bool          settingsMode  = false;
+unsigned long settingsLastTouch = 0;
+bool          bootWasDown   = false;
+bool          bootHoldDone  = false; // True once this hold has already toggled Settings
+unsigned long bootHeldSince = 0;
+
+int validDays()      { return VALID_DAYS[validIdx]; }
+int validHours()     { return VALID_DAYS[validIdx] * 24; }
+int displaySeconds() { return TIMEOUT_SECONDS[timeoutIdx]; }
+
+// Starts from WIFI_TIMEOUT / DISPLAY_SECONDS, then applies whatever was saved on the device
+void loadSettings() {
+  for (int i = 0; i < VALID_COUNT; i++) {
+    if (VALID_DAYS[i] == WIFI_TIMEOUT) validIdx = i;
+  }
+  for (int i = 0; i < TIMEOUT_COUNT; i++) {
+    if (TIMEOUT_SECONDS[i] == DISPLAY_SECONDS) timeoutIdx = i;
+  }
+  prefs.begin("cyd", false);
+  int savedValid   = prefs.getUChar("validIdx", validIdx);
+  int savedTimeout = prefs.getUChar("timeoutIdx", timeoutIdx);
+  prefs.end();
+  if (savedValid >= 0 && savedValid < VALID_COUNT) validIdx = savedValid;
+  if (savedTimeout >= 0 && savedTimeout < TIMEOUT_COUNT) timeoutIdx = savedTimeout;
+}
+
+void saveSettings() {
+  prefs.begin("cyd", false);
+  prefs.putUChar("validIdx", validIdx);
+  prefs.putUChar("timeoutIdx", timeoutIdx);
+  prefs.end();
+}
 
 // Color Palette Definitions (RGB565)
 #define COLOR_BG_DARK     0x2124  // Dark Charcoal background
@@ -575,7 +625,7 @@ void drawQRCode(String payload, int startX, int startY, int scale = 3) {
 // --- DISPLAY UI RENDERERS ---
 
 // The button reads GET CODE, or CLEAR CODE while a code is on screen
-void drawGetCodeButton(bool isPressed = false) {
+void drawButton(const char* label, bool isPressed) {
   uint32_t bgCol   = isPressed ? TFT_GREEN : COLOR_BTN;
   uint32_t border  = TFT_WHITE;
   uint32_t textCol = isPressed ? TFT_BLACK : TFT_WHITE;
@@ -586,7 +636,23 @@ void drawGetCodeButton(bool isPressed = false) {
   lcd.setTextColor(textCol, bgCol);
   lcd.setTextSize(3);
   lcd.setTextDatum(textdatum_t::middle_center);
-  lcd.drawString(codeShown ? "CLEAR CODE" : "GET CODE", BTN_X + (BTN_W / 2), BTN_Y + (BTN_H / 2));
+  lcd.drawString(label, BTN_X + (BTN_W / 2), BTN_Y + (BTN_H / 2));
+}
+
+void drawGetCodeButton(bool isPressed = false) {
+  drawButton(codeShown ? "CLEAR CODE" : "GET CODE", isPressed);
+}
+
+// Green banner with a centered title, plus the system marker in the upper left corner (M = Meraki, U = UniFi)
+void drawHeader(const char* title) {
+  lcd.fillRect(0, 0, 480, 40, COLOR_HEADER);
+  lcd.setTextColor(TFT_WHITE, COLOR_HEADER);
+  lcd.setTextSize(2);
+  lcd.setTextDatum(textdatum_t::middle_center);
+  lcd.drawString(title, 240, 20);
+
+  lcd.setTextDatum(textdatum_t::top_left);
+  lcd.drawString((currentSystem == MERAKI) ? "M" : "U", 6, 4);
 }
 
 // Small label above a larger value, left aligned inside the ticket card
@@ -606,20 +672,10 @@ void updateScreenUI(String statusText, String passcode = "") {
   lcd.fillScreen(COLOR_BG_DARK);
 
   // 1. Top Header Banner
-  lcd.fillRect(0, 0, 480, 40, COLOR_HEADER);
-  lcd.setTextColor(TFT_WHITE, COLOR_HEADER);
-  lcd.setTextSize(2);
-  lcd.setTextDatum(textdatum_t::middle_center);
-
-  lcd.drawString("GUEST WI-FI ACCESS", 240, 20);
-
-  // System marker in the upper left corner: M = Meraki, U = UniFi
-  lcd.setTextDatum(textdatum_t::top_left);
-  lcd.drawString((currentSystem == MERAKI) ? "M" : "U", 6, 4);
+  drawHeader("GUEST WI-FI ACCESS");
 
   if (passcode != "") {
-    int validHours = (currentSystem == MERAKI) ? MERAKI_HOURS : (UNIFI_MINUTES / 60);
-    String expirationStr = getFormattedExpiration(validHours);
+    String expirationStr = getFormattedExpiration(validHours());
 
     // 2. Left Card - Section Header
     lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
@@ -644,7 +700,7 @@ void updateScreenUI(String statusText, String passcode = "") {
 
     // Ticket Details: size-2 values with small labels so they read on the 4" panel
     drawTicketField("SSID", String(WIFI_SSID), 134);
-    drawTicketField("VALID", String(WIFI_TIMEOUT) + (WIFI_TIMEOUT == 1 ? " Day" : " Days"), 168);
+    drawTicketField("VALID", String(VALID_LONG[validIdx]), 168);
     drawTicketField("EXPIRES (JST)", expirationStr, 202);
     lcd.setTextSize(1);
 
@@ -693,7 +749,7 @@ bool createMerakiPsk() {
 
   String passcode = generatePasscode();
 
-  String expiresAt = getIsoUtcTimestamp(MERAKI_HOURS);
+  String expiresAt = getIsoUtcTimestamp(validHours());
   String pskName   = "CYD-Guest-" + String(random(1000, 9999));
 
   String jsonPayload = "{\"name\":\"" + pskName +
@@ -728,7 +784,7 @@ bool createUnifiVoucher() {
   String url = "https://" + String(UNIFI_HOST) + "/v1/sites/" + String(UNIFI_SITE_ID) + "/hotspot/vouchers";
 
   String jsonPayload = "{\"name\":\"CYD-Guest\",\"count\":1,\"timeLimitMinutes\":" +
-                       String(UNIFI_MINUTES) + ",\"authorizedGuestLimit\":1}";
+                       String(validHours() * 60) + ",\"authorizedGuestLimit\":1}";
 
   http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
@@ -785,6 +841,91 @@ void processCodeGeneration() {
   }
 }
 
+// --- SETTINGS SCREEN ---
+
+const int CHIP_VALID_Y   = 82;   // Row of "Valid for" options (7 chips)
+const int CHIP_TIMEOUT_Y = 172;  // Row of "Wi-Fi Code Timeout" options (3 chips)
+const int CHIP_H         = 48;
+
+int validChipX(int i)   { return 25 + i * 62; }    // 56 px wide, 6 px apart
+int timeoutChipX(int i) { return 25 + i * 147; }   // 136 px wide, 11 px apart
+
+void drawChip(int x, int y, int w, const char* label, bool selected) {
+  uint32_t bgCol = selected ? COLOR_BTN : COLOR_CARD_BG;
+  lcd.fillRoundRect(x, y, w, CHIP_H, 8, bgCol);
+  lcd.drawRoundRect(x, y, w, CHIP_H, 8, selected ? TFT_WHITE : COLOR_TEXT_MUTED);
+  lcd.setTextColor(selected ? TFT_WHITE : COLOR_TEXT_DARK, bgCol);
+  lcd.setTextSize(2);
+  lcd.setTextDatum(textdatum_t::middle_center);
+  lcd.drawString(label, x + (w / 2), y + (CHIP_H / 2));
+}
+
+void drawSettingsScreen() {
+  lcd.fillScreen(COLOR_BG_DARK);
+  drawHeader("SETTINGS");
+
+  lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
+  lcd.setTextSize(2);
+  lcd.setTextDatum(textdatum_t::top_left);
+  lcd.drawString("Valid for", 25, 56);
+  lcd.drawString("Wi-Fi Code Timeout", 25, 146);
+
+  for (int i = 0; i < VALID_COUNT; i++) {
+    drawChip(validChipX(i), CHIP_VALID_Y, 56, VALID_CHIP[i], i == validIdx);
+  }
+  for (int i = 0; i < TIMEOUT_COUNT; i++) {
+    drawChip(timeoutChipX(i), CHIP_TIMEOUT_Y, 136, TIMEOUT_CHIP[i], i == timeoutIdx);
+  }
+
+  lcd.setTextColor(TFT_LIGHTGREY, COLOR_BG_DARK);
+  lcd.setTextSize(1);
+  lcd.setTextDatum(textdatum_t::top_left);
+  lcd.drawString("Tap an option to select it. Hold BOOT for 5 s or tap DONE to exit.", 25, 234);
+
+  drawButton("DONE", false);
+}
+
+void openSettings() {
+  settingsMode = true;
+  codeShown = false;
+  settingsLastTouch = millis();
+  drawSettingsScreen();
+}
+
+void closeSettings() {
+  settingsMode = false;
+  updateScreenUI("Tap button below to get code");
+}
+
+void handleSettingsTouch(uint16_t x, uint16_t y) {
+  settingsLastTouch = millis();
+
+  if (x >= BTN_X && x <= (BTN_X + BTN_W) && y >= BTN_Y && y <= (BTN_Y + BTN_H)) {
+    closeSettings();
+    return;
+  }
+  for (int i = 0; i < VALID_COUNT; i++) {
+    if (x >= validChipX(i) && x < validChipX(i) + 56 && y >= CHIP_VALID_Y && y <= CHIP_VALID_Y + CHIP_H) {
+      if (validIdx != i) {
+        validIdx = i;
+        saveSettings();
+        drawSettingsScreen();
+      }
+      return;
+    }
+  }
+  for (int i = 0; i < TIMEOUT_COUNT; i++) {
+    if (x >= timeoutChipX(i) && x < timeoutChipX(i) + 136 && y >= CHIP_TIMEOUT_Y && y <= CHIP_TIMEOUT_Y + CHIP_H) {
+      if (timeoutIdx != i) {
+        timeoutIdx = i;
+        saveSettings();
+        drawSettingsScreen();
+      }
+      return;
+    }
+  }
+}
+
 // --- CLEAR / TIMEOUT ---
 
 // Clears the ticket and goes back to the start screen with the GET CODE button
@@ -809,6 +950,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(BOOT_BUTTON, INPUT_PULLUP);
   randomSeed(analogRead(0));
+  loadSettings();
 
   lcd.init();
   lcd.setRotation(1); // Landscape mode (480x320)
@@ -835,15 +977,25 @@ void setup() {
 void loop() {
   uint16_t touchX, touchY;
 
+  // Settings closes itself if nobody touches it for a while, so the kiosk never gets stuck there
+  if (settingsMode && millis() - settingsLastTouch > SETTINGS_IDLE_MS) {
+    closeSettings();
+  }
+
   // Timeout: put the start screen back once a code has been shown long enough
-  if (codeShown && millis() - codeShownAt > DISPLAY_SECONDS * 1000UL) {
+  if (codeShown && millis() - codeShownAt > displaySeconds() * 1000UL) {
     clearCode();
   }
 
   // Trigger 1: Touchscreen Press Detection
   if (lcd.getTouch(&touchX, &touchY)) {
-    if (touchX >= BTN_X && touchX <= (BTN_X + BTN_W) &&
-        touchY >= BTN_Y && touchY <= (BTN_Y + BTN_H)) {
+    if (settingsMode) {
+      if (millis() - lastDebounce > 300) {
+        lastDebounce = millis();
+        handleSettingsTouch(touchX, touchY);
+      }
+    } else if (touchX >= BTN_X && touchX <= (BTN_X + BTN_W) &&
+               touchY >= BTN_Y && touchY <= (BTN_Y + BTN_H)) {
 
       if (millis() - lastDebounce > 1500) {
         lastDebounce = millis();
@@ -852,16 +1004,35 @@ void loop() {
     }
   }
 
-  // Trigger 2: Physical BOOT Button Press
-  if (digitalRead(BOOT_BUTTON) == LOW && (millis() - lastDebounce > 1500)) {
-    lastDebounce = millis();
-    handlePress();
+  // Trigger 2: Physical BOOT Button. A short press acts when it is released;
+  // holding it for 5 seconds opens or closes Settings instead.
+  bool bootDown = (digitalRead(BOOT_BUTTON) == LOW);
+  if (bootDown) {
+    if (!bootWasDown) {
+      bootWasDown = true;
+      bootHoldDone = false;
+      bootHeldSince = millis();
+    }
+    if (!bootHoldDone && millis() - bootHeldSince >= SETTINGS_HOLD_MS) {
+      bootHoldDone = true;
+      if (settingsMode) {
+        closeSettings();
+      } else {
+        openSettings();
+      }
+    }
+  } else if (bootWasDown) {
+    bootWasDown = false;
+    if (!bootHoldDone && !settingsMode && millis() - lastDebounce > 1500) {
+      lastDebounce = millis();
+      handlePress();
+    }
   }
 
   // Trigger 3: Serial Input
   if (Serial.available() > 0) {
     while (Serial.available() > 0) Serial.read();
-    handlePress();
+    if (!settingsMode) handlePress();
   }
 }
 </script>
@@ -3589,8 +3760,8 @@ const TYPE_ALIASES = {
   uint64_t: 'uint64', int64_t: 'int64', time_t: 'int64', byte: 'uint8', word: 'uint16', boolean: 'bool', wl_status_t: 'int32',
   esp_err_t: 'int32', uint_fast8_t: 'uint8', textdatum_t: 'int32', WiFiClient: 'WiFiClientSecure', ssize_t: 'int32', intptr_t: 'int32'
 };
-const OBJECT_TYPES = new Set(['WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress', 'LGFX']);
-const BASE_TYPE_NAMES = new Set(Object.keys(TYPE_ALIASES).concat(['String', 'WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress']));
+const OBJECT_TYPES = new Set(['WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress', 'LGFX', 'Preferences']);
+const BASE_TYPE_NAMES = new Set(Object.keys(TYPE_ALIASES).concat(['String', 'WiFiClientSecure', 'HTTPClient', 'QRCode', 'tm', 'IPAddress', 'Preferences']));
 const TYPE_KEYWORDS = new Set(['void', 'bool', 'char', 'short', 'int', 'long', 'float', 'double', 'signed', 'unsigned', 'auto']);
 const QUALIFIERS = new Set(['const', 'volatile', 'constexpr', 'static', 'extern', 'inline', 'register', 'mutable']);
 const SCOPE_SKIP = new Set(['lgfx', 'std', 'fs']);
@@ -4246,6 +4417,7 @@ const CLASSES = {
   },
   EspClass: { restart: 'void', getFreeHeap: 'uint32', getChipModel: 'cstr', getCpuFreqMHz: 'uint32', getSketchSize: 'uint32' },
   IPAddress: { toString: 'String' },
+  Preferences: { begin: 'bool', end: 'void', clear: 'bool', isKey: 'bool', getUChar: 'uint8', putUChar: 'uint32', getUInt: 'uint32', putUInt: 'uint32', getInt: 'int32', putInt: 'uint32', getBool: 'bool', putBool: 'uint32' },
   WiFiClientSecure: { setInsecure: 'void', setCACert: 'void', connected: 'bool', stop: 'void', setTimeout: 'void' },
   HTTPClient: {
     begin: 'bool', addHeader: 'void', setFollowRedirects: 'void', setTimeout: 'void', setConnectTimeout: 'void', setReuse: 'void', setUserAgent: 'void',
@@ -5460,6 +5632,21 @@ class CharBuf {
   toString() { let s = ''; for (let i = 0; i < this.size && this.a[i]; i++) s += String.fromCharCode(this.a[i]); return s; }
   get length() { return this.toString().length; }
 }
+const nvsStore = new Map();   // simulated flash: survives Restart, gone when the page closes (no browser storage is used)
+class PreferencesObj {
+  constructor() { this.ns = null; }
+  begin(ns) { this.ns = String(ns); return true; }
+  end() { this.ns = null; }
+  _k(k) { return this.ns + '/' + k; }
+  _get(k, d) { return this.ns && nvsStore.has(this._k(k)) ? nvsStore.get(this._k(k)) : d; }
+  _put(k, v) { if (!this.ns) return 0; nvsStore.set(this._k(k), Number(v)); return 1; }
+  getUChar(k, d) { return this._get(k, d); } putUChar(k, v) { return this._put(k, v); }
+  getUInt(k, d) { return this._get(k, d); } putUInt(k, v) { return this._put(k, v); }
+  getInt(k, d) { return this._get(k, d); } putInt(k, v) { return this._put(k, v); }
+  getBool(k, d) { return !!this._get(k, d ? 1 : 0); } putBool(k, v) { return this._put(k, v ? 1 : 0); }
+  isKey(k) { return !!this.ns && nvsStore.has(this._k(k)); }
+  clear() { if (this.ns) for (const k of [...nvsStore.keys()]) if (k.startsWith(this.ns + '/')) nvsStore.delete(k); return true; }
+}
 class Tm { constructor() { this.tm_sec = 0; this.tm_min = 0; this.tm_hour = 0; this.tm_mday = 0; this.tm_mon = 0; this.tm_year = 0; this.tm_wday = 0; this.tm_yday = 0; this.tm_isdst = 0; } }
 class QRCodeObj { constructor() { this.size = 0; this.version = 0; this.ecc = 0; this.mode = 0; this.mask = 0; this.q = null; } }
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -5516,7 +5703,7 @@ Object.assign(WiFi, {
   SSID() { return this.ssid || ''; }, reconnect() { return true; }, setAutoReconnect() { return true; }, setSleep() { return true; }
 });
 const rt = {
-  line: 0, display: lcd, Serial, WiFi, CharBuf, tm: Tm, QRCode: QRCodeObj, WiFiClientSecure, HTTPClient,
+  line: 0, display: lcd, Serial, WiFi, CharBuf, tm: Tm, QRCode: QRCodeObj, Preferences: PreferencesObj, WiFiClientSecure, HTTPClient,
   ESP: { restart() { serialOut('[sim] ESP.restart()', 'sim'); setTimeout(() => { if (running) start(); }, 0); }, getFreeHeap: () => 214336, getChipModel: () => 'ESP32-S3', getCpuFreqMHz: () => 240, getSketchSize: () => 1048576 },
   ref(get, set) { return { get v() { return get(); }, set v(x) { set(x); } }; },
   mkArr(n, zero, list) { const a = new Array(n).fill(zero); if (list) for (let i = 0; i < list.length && i < n; i++) a[i] = list[i]; return a; },
@@ -5664,7 +5851,6 @@ $('#wifiLink').addEventListener('change', e => { hw.wifiLink = e.target.checked;
 /* =====================================================================
    Code editor
    ===================================================================== */
-const CODE_KEY = 'cyd-sim-ino-v1';
 const ta = $('#code'), gutter = $('#gutter'), prob = $('#problems');
 const defaultSrc = $('#src-default').textContent.replace(/^\n/, '');
 let lastLines = 0, autoTimer = 0, trapTab = true;
@@ -5710,10 +5896,9 @@ function applyCode(restart) {
     return false;
   }
 }
-function saveCode() { try { localStorage.setItem(CODE_KEY, ta.value); } catch (_) {} }
 
 ta.addEventListener('input', () => {
-  renderGutter(); saveCode();
+  renderGutter();
   clearTimeout(autoTimer);
   if ($('#autoRun').checked) autoTimer = setTimeout(() => applyCode(true), 900);
   else { prob.dataset.s = 'ok'; prob.textContent = 'Edited. Press Run to apply.'; }
@@ -5746,16 +5931,13 @@ resetBtn.addEventListener('click', () => {
     return;
   }
   clearTimeout(resetArmed); resetArmed = 0; resetBtn.textContent = 'Reset'; resetBtn.classList.remove('btn-warn');
-  ta.value = defaultSrc; renderGutter(); saveCode(); applyCode(true);
+  ta.value = defaultSrc; renderGutter(); applyCode(true);
 });
 
 /* =====================================================================
    Live API switch and proxy
    ===================================================================== */
 const liveBox = $('#liveApi'), proxyIn = $('#proxyUrl'), proxyStatus = $('#proxyStatus');
-const PROXY_KEY = 'cyd-sim-proxy-v1';
-try { const p = localStorage.getItem(PROXY_KEY); if (p !== null) proxyIn.value = p; } catch (_) {}
-proxyIn.addEventListener('input', () => { try { localStorage.setItem(PROXY_KEY, proxyIn.value); } catch (_) {} });
 document.addEventListener('securitypolicyviolation', e => { if (/connect-src/.test(e.violatedDirective || '')) hostedBlocked = true; });
 $('#proxyShow').textContent = $('#proxy-src').textContent.replace(/^\n/, '');
 
@@ -5809,17 +5991,11 @@ for (const [t, p] of tabs) {
 }
 
 /* boot */
-let saved = null; try { saved = localStorage.getItem(CODE_KEY); } catch (_) {}
-ta.value = saved || defaultSrc;
+ta.value = defaultSrc;
 renderGutter();
 setStatus('stopped');
 if (typeof window.qrcode === 'undefined') serialOut('[sim] QR library did not load, the QR code area will show an error', 'err');
-if (!applyCode(false) && saved) {
-  /* saved code no longer compiles: fall back to the original so the board still runs */
-  const bad = prob.textContent;
-  ta.value = defaultSrc; renderGutter(); applyCode(false);
-  setProblem(null, 'Saved code had an error (' + bad + '), loaded the original');
-}
+applyCode(false);
 start();
 })();
 </script>
