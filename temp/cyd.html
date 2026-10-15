@@ -439,6 +439,7 @@ void saveSettings() {
 #define COLOR_CARD_BG     0xE73C  // Light grey/silver card background
 #define COLOR_BTN         0x2509  // #25A34B Button green
 #define COLOR_PASSCODE    0xF582  // #F7B114 Background of the "Passcode" badge
+#define COLOR_FW_RED      0xD984  // #D93025 "UPDATE FW" button
 #define COLOR_TEXT_DARK   0x10A2  // Dark Navy/Black text
 #define COLOR_TEXT_MUTED  0x6B4D  // Grey for the small field labels
 
@@ -625,18 +626,20 @@ void drawQRCode(String payload, int startX, int startY, int scale = 3) {
 // --- DISPLAY UI RENDERERS ---
 
 // The button reads GET CODE, or CLEAR CODE while a code is on screen
-void drawButton(const char* label, bool isPressed) {
-  uint32_t bgCol   = isPressed ? TFT_GREEN : COLOR_BTN;
-  uint32_t border  = TFT_WHITE;
-  uint32_t textCol = isPressed ? TFT_BLACK : TFT_WHITE;
-
-  lcd.fillRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, bgCol);
-  lcd.drawRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, border);
+// A button in the bottom row (BTN_Y, BTN_H): any x and width, any fill color
+void drawButtonAt(int x, int w, const char* label, uint32_t bgCol, uint32_t textCol) {
+  lcd.fillRoundRect(x, BTN_Y, w, BTN_H, 10, bgCol);
+  lcd.drawRoundRect(x, BTN_Y, w, BTN_H, 10, TFT_WHITE);
 
   lcd.setTextColor(textCol, bgCol);
   lcd.setTextSize(3);
   lcd.setTextDatum(textdatum_t::middle_center);
-  lcd.drawString(label, BTN_X + (BTN_W / 2), BTN_Y + (BTN_H / 2));
+  lcd.drawString(label, x + (w / 2), BTN_Y + (BTN_H / 2));
+}
+
+// The full-width green button
+void drawButton(const char* label, bool isPressed) {
+  drawButtonAt(BTN_X, BTN_W, label, isPressed ? TFT_GREEN : COLOR_BTN, isPressed ? TFT_BLACK : TFT_WHITE);
 }
 
 void drawGetCodeButton(bool isPressed = false) {
@@ -846,6 +849,9 @@ void processCodeGeneration() {
 const int CHIP_VALID_Y   = 82;   // Row of "Valid for" options (7 chips)
 const int CHIP_TIMEOUT_Y = 172;  // Row of "Wi-Fi Code Timeout" options (3 chips)
 const int CHIP_H         = 48;
+const int SET_BTN_W      = 210;  // The two buttons under the options: UPDATE FW (left) and DONE (right)
+const int FW_BTN_X       = 25;
+const int DONE_BTN_X     = 245;
 
 int validChipX(int i)   { return 25 + i * 62; }    // 56 px wide, 6 px apart
 int timeoutChipX(int i) { return 25 + i * 147; }   // 136 px wide, 11 px apart
@@ -882,7 +888,8 @@ void drawSettingsScreen() {
   lcd.setTextDatum(textdatum_t::top_left);
   lcd.drawString("Tap an option to select it. Hold BOOT for 5 s or tap DONE to exit.", 25, 234);
 
-  drawButton("DONE", false);
+  drawButtonAt(FW_BTN_X, SET_BTN_W, "UPDATE FW", COLOR_FW_RED, TFT_WHITE);
+  drawButtonAt(DONE_BTN_X, SET_BTN_W, "DONE", COLOR_BTN, TFT_WHITE);
 }
 
 void openSettings() {
@@ -900,8 +907,9 @@ void closeSettings() {
 void handleSettingsTouch(uint16_t x, uint16_t y) {
   settingsLastTouch = millis();
 
-  if (x >= BTN_X && x <= (BTN_X + BTN_W) && y >= BTN_Y && y <= (BTN_Y + BTN_H)) {
-    closeSettings();
+  if (y >= BTN_Y && y <= (BTN_Y + BTN_H)) {
+    if (x >= DONE_BTN_X && x <= (DONE_BTN_X + SET_BTN_W)) closeSettings();
+    // UPDATE FW (x from FW_BTN_X to FW_BTN_X + SET_BTN_W) is a placeholder and does nothing yet
     return;
   }
   for (int i = 0; i < VALID_COUNT; i++) {
