@@ -348,24 +348,31 @@ enum NetworkSystem {
 // *** SET YOUR ACTIVE SYSTEM HERE ***
 const NetworkSystem currentSystem = MERAKI;  // Options: MERAKI or UNIFI
 
+// *** PASSCODE STYLE (Meraki only; UniFi vouchers are made by the controller) ***
+enum PasscodeStyle {
+  CODE,    // 12 random characters, e.g. K7MQ4XT9RW2B
+  WORDS    // three short words, e.g. maple-tide-gold
+};
+const PasscodeStyle PASSCODE_STYLE = WORDS;  // Options: CODE or WORDS
+
 // --- Wi-Fi Settings ---
 const char* WIFI_SSID       = "Guest_Wifi_Network";
 const char* WIFI_PASSWORD   = "YOUR_WIFI_PASSWORD";
-const int   WIFI_TIMEOUT    =   1;   // Days Valid
-const int   DISPLAY_SECONDS =  60;   // A displayed code clears itself after this many seconds
+const int   WIFI_TIMEOUT    = 3;    // Days
+const int   DISPLAY_SECONDS = 60;   // A displayed code clears itself after this many seconds
 
 // --- Meraki System Settings ---
 const char* MERAKI_API_KEY  = "YOUR_MERAKI_API_KEY";
 const char* MERAKI_NET_ID   = "N_123456789012345";
-const int   MERAKI_SSID_NUM = 0; // Target SSID index (0 to 14)
-const char* MERAKI_GROUP_POLICY_ID = "YOUR_GROUP_POLICY_ID"; // Network-wide > Group policies (required by the API)
-const int   MERAKI_HOURS    = WIFI_TIMEOUT * 24; // Passcode expiration (hours)
+const int   MERAKI_SSID_NUM = 0;                  // Target SSID index (0 to 14)
+const char* MERAKI_GROUP_POLICY_ID = "YOUR_GROUP_POLICY_ID";  // Network-wide > Group policies (required by the API)
+const int   MERAKI_HOURS    = WIFI_TIMEOUT * 24;  // Passcode expiration (hours)
 
 // --- UniFi System Settings ---
-const char* UNIFI_HOST      = "192.168.1.1";           // UniFi Console LAN IP or Domain
-const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";    // Site Manager API Key
-const char* UNIFI_SITE_ID   = "default";               // Default site ID (usually 'default')
-const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 60 * 24;  // Expiration in minutes
+const char* UNIFI_HOST      = "192.168.1.1";         // UniFi Console LAN IP or Domain
+const char* UNIFI_API_KEY   = "YOUR_UNIFI_API_KEY";  // Site Manager API Key
+const char* UNIFI_SITE_ID   = "default";             // Default site ID (usually 'default')
+const int   UNIFI_MINUTES   = WIFI_TIMEOUT * 24 * 60; // Expiration in minutes
 
 // ============================================================================
 
@@ -450,14 +457,70 @@ const int BTN_H = 52;
 
 // --- UTILITY FUNCTIONS ---
 
-// Generates a 12-character passcode formatted as "XXXX-XXXX-XXXX"
-String generateGroupedPasscode() {
-  const char chars[] = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-  String raw = "";
-  for (int i = 0; i < 12; i++) {
-    raw += chars[random(0, sizeof(chars) - 1)];
+// Word list for the WORDS style: 512 short (3-4 letter) words, so a phrase is at most 14 characters
+const char* const WORD_LIST[] = {
+  "able", "acid", "aged", "also", "aqua", "arch", "area", "army", "atom", "aunt", "away", "baby",
+  "back", "bake", "ball", "band", "bank", "barn", "base", "bath", "bead", "beam", "bean", "bear",
+  "beef", "beet", "bell", "belt", "bend", "best", "bike", "bill", "bird", "bite", "blue", "boat",
+  "body", "bold", "bolt", "book", "boot", "bowl", "boxy", "brad", "brim", "buck", "bulb", "bush",
+  "buzz", "cake", "calf", "calm", "came", "camp", "cape", "card", "care", "cart", "case", "chin",
+  "city", "clam", "clay", "clue", "coal", "coat", "coil", "coin", "cold", "come", "cone", "cool",
+  "cope", "copy", "core", "corn", "cost", "cozy", "crew", "crop", "crow", "curl", "cute", "dale",
+  "dash", "data", "dawn", "deck", "deep", "deer", "desk", "dew", "dice", "diet", "dime", "dish",
+  "dive", "dock", "dome", "door", "dose", "dove", "down", "drag", "draw", "duck", "dune", "dusk",
+  "dust", "duty", "earn", "ease", "east", "easy", "edge", "elm", "epic", "even", "ever", "face",
+  "fact", "fade", "fair", "fall", "farm", "fast", "fawn", "fear", "feed", "fern", "fig", "file",
+  "fill", "film", "find", "fine", "fir", "fish", "five", "flag", "flat", "flax", "flip", "flow",
+  "foam", "fold", "folk", "food", "foot", "form", "fort", "four", "frog", "from", "fuel", "full",
+  "fund", "gain", "game", "gate", "gear", "gem", "gift", "girl", "glue", "goat", "gold", "golf",
+  "good", "grab", "grid", "grin", "grow", "gull", "half", "hall", "hand", "hare", "harp", "hawk",
+  "hazy", "heat", "help", "herb", "hero", "hide", "high", "hill", "hip", "hive", "hold", "holy",
+  "home", "hood", "hook", "hope", "horn", "hour", "huge", "hush", "hut", "idea", "inch", "ink",
+  "iron", "item", "ivy", "jade", "jam", "jar", "jazz", "jest", "jet", "join", "joke", "jump",
+  "june", "just", "keen", "keep", "kelp", "kept", "kind", "king", "kiwi", "knit", "lake", "lamb",
+  "lamp", "lap", "lark", "last", "lava", "lawn", "lazy", "leaf", "lean", "leap", "lend", "lens",
+  "lily", "limb", "lime", "line", "link", "lion", "list", "live", "load", "loaf", "lock", "log",
+  "logo", "long", "look", "loop", "lost", "loud", "love", "luck", "lush", "lynx", "made", "mail",
+  "main", "make", "malt", "map", "mark", "mask", "mat", "math", "meat", "melt", "memo", "mild",
+  "mile", "milk", "mind", "mint", "mist", "moon", "moss", "most", "moth", "move", "much", "mud",
+  "nail", "navy", "nest", "news", "nice", "node", "noon", "norm", "nose", "note", "nut", "oak",
+  "oat", "oath", "oboe", "odd", "okay", "once", "only", "opal", "open", "orb", "oven", "over",
+  "owl", "pace", "pack", "page", "pail", "palm", "park", "part", "past", "peak", "peg", "pen",
+  "pie", "pier", "pig", "pink", "pipe", "play", "plot", "plum", "plus", "poem", "poet", "pond",
+  "pony", "pool", "port", "pot", "pour", "pure", "quay", "race", "rack", "rain", "ram", "ramp",
+  "rare", "rate", "ray", "real", "reed", "rest", "rice", "rich", "ride", "ring", "rise", "road",
+  "roam", "rock", "roof", "room", "rope", "rose", "ruby", "rug", "rush", "rust", "rye", "safe",
+  "sage", "sail", "sand", "sap", "saw", "sea", "seat", "seed", "self", "sell", "send", "shed",
+  "ship", "shoe", "shop", "show", "shy", "side", "sign", "silk", "sing", "sink", "site", "size",
+  "skip", "sky", "slab", "snow", "soft", "soil", "sole", "some", "soon", "sort", "soul", "soup",
+  "sour", "sow", "spa", "span", "spot", "star", "stay", "stem", "step", "stir", "stop", "sub",
+  "such", "suit", "sun", "surf", "tail", "take", "talk", "tall", "tan", "tank", "tape", "tea",
+  "team", "tent", "term", "test", "text", "thin", "tide", "tidy", "time", "tin", "tiny", "tip",
+  "toad", "toe", "tone", "tool", "tops", "toy", "tram", "tree", "trim", "trip", "true", "tube",
+  "tuna", "tune", "turn", "twin", "type", "unit", "upon", "used", "vale", "van", "vane", "vast",
+  "vat", "vine", "wade", "wage", "wait", "wake", "walk", "wall", "want", "warm", "wave", "wavy",
+  "web", "week", "well", "west", "what", "wide", "wild", "will", "wind", "wine", "wing", "wink",
+  "wise", "wish", "wolf", "wood", "wool", "work", "worm", "wrap", "yak", "yam", "yard", "yarn",
+  "year", "yew", "yoga", "zero", "zest", "zip", "zone", "zoom"
+};
+const int WORD_COUNT = sizeof(WORD_LIST) / sizeof(WORD_LIST[0]);
+
+// Returns the exact Wi-Fi passphrase to create: 12 characters (CODE) or "word-word-word" (WORDS)
+String generatePasscode() {
+  if (PASSCODE_STYLE == WORDS) {
+    String phrase = "";
+    for (int i = 0; i < 3; i++) {
+      if (i > 0) phrase += "-";
+      phrase += WORD_LIST[random(0, WORD_COUNT)];
+    }
+    return phrase;
   }
-  return raw.substring(0, 4) + "-" + raw.substring(4, 8) + "-" + raw.substring(8, 12);
+  const char chars[] = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  String code = "";
+  for (int i = 0; i < 12; i++) {
+    code += chars[random(0, sizeof(chars) - 1)];
+  }
+  return code;
 }
 
 // Formats the expiration in Japan time (e.g. "2026/10/13 20:30")
@@ -548,8 +611,11 @@ void updateScreenUI(String statusText, String passcode = "") {
   lcd.setTextSize(2);
   lcd.setTextDatum(textdatum_t::middle_center);
 
-  String sysName = (currentSystem == MERAKI) ? "Meraki" : "UniFi";
-  lcd.drawString("GUEST WI-FI ACCESS (" + sysName + ")", 240, 20);
+  lcd.drawString("GUEST WI-FI ACCESS", 240, 20);
+
+  // System marker in the upper left corner: M = Meraki, U = UniFi
+  lcd.setTextDatum(textdatum_t::top_left);
+  lcd.drawString((currentSystem == MERAKI) ? "M" : "U", 6, 4);
 
   if (passcode != "") {
     int validHours = (currentSystem == MERAKI) ? MERAKI_HOURS : (UNIFI_MINUTES / 60);
@@ -578,7 +644,7 @@ void updateScreenUI(String statusText, String passcode = "") {
 
     // Ticket Details: size-2 values with small labels so they read on the 4" panel
     drawTicketField("SSID", String(WIFI_SSID), 134);
-    drawTicketField("VALID", String(validHours) + " Hours", 168);
+    drawTicketField("VALID", String(WIFI_TIMEOUT) + (WIFI_TIMEOUT == 1 ? " Day" : " Days"), 168);
     drawTicketField("EXPIRES (JST)", expirationStr, 202);
     lcd.setTextSize(1);
 
@@ -592,10 +658,8 @@ void updateScreenUI(String statusText, String passcode = "") {
     lcd.drawRoundRect(320, 62, 135, 176, 8, COLOR_HEADER);
 
     // Render Wi-Fi QR Code (Centered in Right Card)
-    // Strip the dashes from a Meraki passcode for the payload string
-    String rawPass = passcode;
-    if (currentSystem == MERAKI) rawPass.replace("-", "");
-    String qrPayload = "WIFI:S:" + String(WIFI_SSID) + ";T:WPA;P:" + rawPass + ";;";
+    // The passcode is the exact Wi-Fi password, hyphens included for WORDS
+    String qrPayload = "WIFI:S:" + String(WIFI_SSID) + ";T:WPA;P:" + passcode + ";;";
 
     drawQRCode(qrPayload, 338, 93, 3);
 
@@ -627,15 +691,13 @@ bool createMerakiPsk() {
   String url = "https://api.meraki.com/api/v1/networks/" + String(MERAKI_NET_ID) +
                "/wireless/ssids/" + String(MERAKI_SSID_NUM) + "/identityPsks";
 
-  String formattedPasscode = generateGroupedPasscode();
-  String rawPasscode = formattedPasscode;
-  rawPasscode.replace("-", "");  // Strip dashes for API call
+  String passcode = generatePasscode();
 
   String expiresAt = getIsoUtcTimestamp(MERAKI_HOURS);
   String pskName   = "CYD-Guest-" + String(random(1000, 9999));
 
   String jsonPayload = "{\"name\":\"" + pskName +
-                       "\",\"passphrase\":\"" + rawPasscode +
+                       "\",\"passphrase\":\"" + passcode +
                        "\",\"expiresAt\":\"" + expiresAt +
                        "\",\"groupPolicyId\":\"" + MERAKI_GROUP_POLICY_ID + "\"}";
 
@@ -646,7 +708,7 @@ bool createMerakiPsk() {
   int httpCode = http.POST(jsonPayload);
 
   if (httpCode == 201) {
-    updateScreenUI("SUCCESS", rawPasscode);  // shown without dashes, exactly what the guest types
+    updateScreenUI("SUCCESS", passcode);  // shown exactly as the guest types it
     http.end();
     return true;
   } else {
